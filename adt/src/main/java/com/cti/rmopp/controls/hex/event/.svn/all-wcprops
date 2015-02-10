@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/HexEditor/!svn/ver/18/HexEditor/trunk/src/org/fife/ui/hex/event
+END
+HexEditorListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/HexEditor/!svn/ver/18/HexEditor/trunk/src/org/fife/ui/hex/event/HexEditorListener.java
+END
+SelectionChangedEvent.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/HexEditor/!svn/ver/23/HexEditor/trunk/src/org/fife/ui/hex/event/SelectionChangedEvent.java
+END
+SelectionChangedListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/HexEditor/!svn/ver/23/HexEditor/trunk/src/org/fife/ui/hex/event/SelectionChangedListener.java
+END
+HexEditorEvent.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/HexEditor/!svn/ver/23/HexEditor/trunk/src/org/fife/ui/hex/event/HexEditorEvent.java
+END
