@@ -57,6 +57,13 @@ public class CTable extends JTable {
 
 		init();
 	}
+	
+	public CTable(int rowHeight) {
+
+		init();
+		
+		setRowHeight(rowHeight);
+	}
 
 	/**
 	 * @param arg0
@@ -65,52 +72,14 @@ public class CTable extends JTable {
 		super(arg0);
 
 		init();
-	}
+	}	
+	
+	public CTable(TableModel arg0 ,int rowHeight) {
+		super(arg0);
 
-	/**
-	 * @param arg0
-	 * @param arg1
-	 */
-	public CTable(TableModel arg0, TableColumnModel arg1) {
-		super(arg0, arg1);
 		init();
-	}
-
-	/**
-	 * @param arg0
-	 * @param arg1
-	 */
-	public CTable(int arg0, int arg1) {
-		super(arg0, arg1);
-		init();
-	}
-
-	/**
-	 * @param arg0
-	 * @param arg1
-	 */
-	public CTable(Vector arg0, Vector arg1) {
-		super(arg0, arg1);
-		init();
-	}
-
-	/**
-	 * @param arg0
-	 * @param arg1
-	 */
-	public CTable(Object[][] arg0, Object[] arg1) {
-		super(arg0, arg1);
-		init();
-	}
-
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 */
-	public CTable(TableModel arg0, TableColumnModel arg1, ListSelectionModel arg2) {
-		super(arg0, arg1, arg2);
-		init();
+		
+		setRowHeight(rowHeight);
 	}	
 
 	private void init() {
@@ -146,7 +115,7 @@ public class CTable extends JTable {
 
 		UIManager.put("TableHeader.foreground", TABLEHEADER_FG_DEFAULT);
 
-		setRowHeight(30);
+	//	setRowHeight(30);
 
 		setTableHeader(new JTableHeader(getColumnModel()) {
 			/**

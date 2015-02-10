@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JSeparator;
 
-import com.cti.rmopp.controls.CButton;
 import com.cti.rmopp.controls.CFrame;
 import com.cti.rmopp.controls.CLoggerPane;
 import com.cti.rmopp.controls.CMenu;

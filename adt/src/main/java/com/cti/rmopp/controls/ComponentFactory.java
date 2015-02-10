@@ -65,6 +65,10 @@ public class ComponentFactory {
 	public static CTable createTable(TableModel model) {
 		return new CTable(model);
 	}
+	
+	public static CTable createTable(TableModel model,int rowHeight) {
+		return new CTable(model,rowHeight);
+	}
 
 	public static CLoggerPane createLoggerPane() {
 		return new CLoggerPane();

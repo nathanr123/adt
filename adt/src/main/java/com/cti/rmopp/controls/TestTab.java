@@ -36,7 +36,7 @@ public class TestTab extends JFrame  {
 
 		FileTableModel model = new FileTableModel(dir);
 
-		CTable table = new CTable(model);
+		CTable table = new CTable(model,30);
 
 		tab.add("CTIJTable", new CScrollPane(table));
 		

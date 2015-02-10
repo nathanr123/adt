@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -86,26 +87,38 @@ class HexTable extends CTable {
 	 *            The table model to use.
 	 */
 	public HexTable(HexEditor hexEditor, HexTableModel model) {
-
 		super(model);
+
 		this.hexEditor = hexEditor;
+
 		this.model = model;
+		
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
+		
 		setAutoResizeMode(CTable.AUTO_RESIZE_OFF);
-		setFont(new Font("Monospaced", Font.PLAIN, 14));
-		// setRowHeight(28);
+		
 		setCellSelectionEnabled(true);
+		
 		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		
 		setDefaultEditor(Object.class, new CellEditor());
+		
 		setDefaultRenderer(Object.class, new CellRenderer());
+		
 		getTableHeader().setReorderingAllowed(false);
+		
 		setShowGrid(false);
 
 		FontMetrics fm = getFontMetrics(getFont());
+		
 		Font headerFont = UIManager.getFont("TableHeader.font");
+		
 		FontMetrics headerFM = hexEditor.getFontMetrics(headerFont);
+		
 		int w = fm.stringWidth("wwww"); // cell contents, 0-255
+		
 		w = Math.max(w, headerFM.stringWidth("+999"));
+		
 		for (int i = 0; i < getColumnCount(); i++) {
 			TableColumn column = getColumnModel().getColumn(i);
 			if (i < 16) {
@@ -245,10 +258,15 @@ class HexTable extends CTable {
 	 * @see #setSelectionByOffsets(int, int)
 	 */
 	public void changeSelectionByOffset(int offset, boolean extend) {
+	
 		offset = Math.max(0, offset);
+		
 		offset = Math.min(offset, model.getByteCount() - 1);
+		
 		int row = offset / 16;
+		
 		int col = offset % 16;
+		
 		changeSelection(row, col, false, extend);
 	}
 
@@ -275,6 +293,7 @@ class HexTable extends CTable {
 	 */
 	private void ensureCellIsVisible(int row, int col) {
 		Rectangle cellRect = getCellRect(row, col, false);
+		
 		if (cellRect != null) {
 			scrollRectToVisible(cellRect);
 		}
@@ -417,8 +436,6 @@ class HexTable extends CTable {
 	}
 
 	protected void processKeyEvent(java.awt.event.KeyEvent e) {
-
-		// TODO: Convert into Actions and put into InputMap/ActionMap?
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
@@ -503,7 +520,6 @@ class HexTable extends CTable {
 	}
 
 	private void repaintSelection() {
-		// TODO: Repaint only selected lines.
 		repaint();
 	}
 
@@ -538,10 +554,13 @@ class HexTable extends CTable {
 		if (min < 0 || min >= getRowCount() || max < 0 || max >= getRowCount()) {
 			throw new IllegalArgumentException();
 		}
+
 		int startOffs = min * 16;
+		
 		int endOffs = max * 16 + 15;
-		// TODO: Have a single call to change selection by a range.
+		
 		changeSelectionByOffset(startOffs, false);
+		
 		changeSelectionByOffset(endOffs, true);
 	}
 
@@ -558,12 +577,14 @@ class HexTable extends CTable {
 	public void setSelectionByOffsets(int startOffs, int endOffs) {
 
 		startOffs = Math.max(0, startOffs);
+		
 		startOffs = Math.min(startOffs, model.getByteCount() - 1);
 
 		// Clear the old selection (may not be necessary).
 		repaintSelection();
 
 		anchorSelectionIndex = startOffs;
+		
 		leadSelectionIndex = endOffs;
 
 		// Scroll after changing the selection as blit scrolling is
@@ -655,10 +676,11 @@ class HexTable extends CTable {
 			highlight = new Point();
 		}
 
-		public Component getTableCellRendererComponent(CTable table, Object value, boolean selected, boolean focus,
-				int row, int column) {
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+				boolean hasFocus, int row, int column) {
 
-			super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 			highlight.setLocation(-1, -1);
 			if (column == table.getColumnCount() - 1 && // "Ascii dump"
@@ -675,7 +697,7 @@ class HexTable extends CTable {
 				boolean colorBG = hexEditor.getAlternateRowBG() && (row & 1) > 0;
 				setBackground(colorBG ? ANTERNATING_CELL_COLOR : table.getBackground());
 			} else {
-				if (!selected) {
+				if (!isSelected) {
 					if ((hexEditor.getAlternateRowBG() && (row & 1) > 0)
 							^ (hexEditor.getAlternateColumnBG() && (column & 1) > 0)) {
 						setBackground(ANTERNATING_CELL_COLOR);

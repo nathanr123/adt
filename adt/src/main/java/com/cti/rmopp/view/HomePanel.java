@@ -42,7 +42,7 @@ public class HomePanel extends CPanel {
 
 		FileTableModel model = new FileTableModel(dir);
 
-		CTable table = ComponentFactory.createTable(model);
+		CTable table = ComponentFactory.createTable(model,30);
 
 		CScrollPane scr = ComponentFactory.createScrollPane(table);
 
@@ -54,7 +54,7 @@ public class HomePanel extends CPanel {
 
 		add(usersListPanel);
 
-		CTable table1 = ComponentFactory.createTable(model);
+		CTable table1 = ComponentFactory.createTable(model,30);
 
 		CScrollPane scr1 = ComponentFactory.createScrollPane(table1);
 
