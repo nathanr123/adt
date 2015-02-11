@@ -4,18 +4,35 @@
 package com.cti.rmopp.controls;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
+import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
+import javax.swing.plaf.metal.MetalIconFactory;
 
 /**
  * @author nathanr_kamal
@@ -43,6 +60,10 @@ public class CTabbedPane extends JTabbedPane {
 	private static final Color TABBEDPANE_FG_DEFAULT = Color.BLACK;
 
 	private static final Color TABBEDPANE_FG_SELECTED = Color.WHITE;
+	
+	private CLabel tabLabel;
+	
+	private TitleBarButton button;
 
 	/**
 	 * 
@@ -78,6 +99,17 @@ public class CTabbedPane extends JTabbedPane {
 
 	}
 
+	@Override
+	public void addTab(String title, Component component) {
+		super.addTab(title, component);
+/*
+		if (getTabCount() > 1) { 
+			int count = this.getTabCount() - 1;
+
+			setTabComponentAt(count, new CloseButtonTab(component, title, null));
+		}*/
+	}
+
 	private static class CTIJTabbedPaneUI extends BasicTabbedPaneUI {
 
 		public static ComponentUI createUI(JComponent c) {
@@ -110,8 +142,9 @@ public class CTabbedPane extends JTabbedPane {
 		}
 
 		protected int calculateTabWidth(int tabPlacement, int tabIndex, FontMetrics metrics) {
-			return TABBEDPANE_TAB_WIDTH;// super.calculateTabWidth(tabPlacement, tabIndex,
-						// metrics) + metrics.getHeight();
+			return TABBEDPANE_TAB_WIDTH;// super.calculateTabWidth(tabPlacement,
+										// tabIndex,
+			// metrics) + metrics.getHeight();
 		}
 
 		protected void paintTabBackground(Graphics g, int tabPlacement, int tabIndex, int x, int y, int w, int h,
@@ -169,6 +202,7 @@ public class CTabbedPane extends JTabbedPane {
 				g.setFont(Constants.FONTTITLE);
 
 				g.setColor(TABBEDPANE_FG_SELECTED);
+				
 			} else {
 
 				g.setFont(Constants.FONTDEFAULT);
@@ -182,6 +216,147 @@ public class CTabbedPane extends JTabbedPane {
 		protected int getTabLabelShiftY(int tabPlacement, int tabIndex, boolean isSelected) {
 			return 0;
 		}
+	}
+
+	public class CloseButtonTab extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -925039726902932471L;
+		
+
+
+		public CloseButtonTab(final Component tab, String title, Icon icon) {
+
+			setOpaque(false);
+
+			FlowLayout flowLayout = new FlowLayout(FlowLayout.CENTER, 3, 6);
+
+			setLayout(flowLayout);
+
+			setVisible(true);
+
+			setPreferredSize(new Dimension(TABBEDPANE_TAB_WIDTH, TABBEDPANE_TAB_HEIGHT));
+
+			tabLabel = new CLabel(title);
+			
+			tabLabel.setFont(Constants.FONTTITLE);
+
+			tabLabel.setIcon(icon);
+
+			add(new JLabel(" "));
+
+			add(tabLabel);
+
+			add(new JLabel("                "));
+
+			button = new TitleBarButton("close");
+
+			button.setMargin(new Insets(0, 0, 0, 0));
+
+			button.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+
+			button.addMouseListener(new MouseListener() {
+				public void mouseClicked(MouseEvent e) {
+					JTabbedPane tabbedPane = (JTabbedPane) getParent().getParent();
+					tabbedPane.remove(tab);
+				}
+
+				public void mousePressed(MouseEvent e) {
+				}
+
+				public void mouseReleased(MouseEvent e) {
+				}
+
+				public void mouseEntered(MouseEvent e) {
+					
+				}
+
+				public void mouseExited(MouseEvent e) {
+					
+				}
+			});
+
+			add(button);
+		}
+
+		
+
+	}
+	
+	private class TitleBarButton extends JButton implements ChangeListener {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2419313605594289553L;	
+
+		private static final String IMAGE_PATH = "images\\";
+		
+		private String imagepath;
+
+		public TitleBarButton(String path) {
+
+			this.imagepath = path;
+
+			setOpaque(true);
+
+			setFocusable(false);
+
+			setContentAreaFilled(false);
+
+			//setBackground(titlePanel.getBackground());
+			
+			setFocusPainted(false);
+
+			setIcon(getIconImage(imagepath, false,16,16));
+
+			setBorder(Constants.NOBORDER);
+
+			addChangeListener(this);
+		}
+
+		public void stateChanged(ChangeEvent e) {
+
+			ButtonModel model = this.getModel();
+			
+			this.setOpaque(true);	
+			
+			if (model.isRollover()) {
+				
+				this.setBackground(this.getBackground().brighter().brighter());
+				
+				setIcon(getIconImage(imagepath, false,16,16));
+				
+				setBorder(new LineBorder(Color.GRAY));
+
+			} else if (model.isPressed()) {
+
+				setIcon(getIconImage(imagepath, true,16,16));
+				
+				
+			} else {				
+				
+				//setBackground(titlePanel.getBackground());
+				
+				setIcon(getIconImage(imagepath, false,16,16));
+				
+				setBorder(null);
+			}
+
+		}		
+		
+		private ImageIcon getIconImage(String path, boolean isHover,int w,int h) {
+
+			if (isHover)
+				return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + "_active.png")).getImage()).getScaledInstance(
+						w, h, java.awt.Image.SCALE_SMOOTH));
+
+			else
+				return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + ".png")).getImage()).getScaledInstance(w, h,
+						java.awt.Image.SCALE_SMOOTH));
+		}
+
 	}
 
 }
