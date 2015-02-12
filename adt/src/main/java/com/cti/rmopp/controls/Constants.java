@@ -5,6 +5,7 @@ package com.cti.rmopp.controls;
 
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.LayoutManager2;
 
 import javax.swing.border.Border;
 
@@ -29,9 +30,11 @@ public class Constants {
 	public static final Font FONTSMALL = new Font(FONTNAMEDEFAULT, Font.PLAIN, FONTSIZESMALL);
 
 	public static final Font FONTTITLE = new Font(FONTNAMEDEFAULT, Font.PLAIN, FONTSIZETITLE);
-	
+
 	public static final Border NOBORDER = null;
 
 	public static final Cursor HANDCURSOR = new Cursor(Cursor.HAND_CURSOR);
+
+	public static final LayoutManager2 NOLAYOUT = null;
 
 }
