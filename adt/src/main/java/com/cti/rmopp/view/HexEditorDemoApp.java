@@ -27,7 +27,6 @@
 package com.cti.rmopp.view;
 
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import com.cti.rmopp.controls.CFrame;
 

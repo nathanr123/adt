@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
+import javax.swing.JToolTip;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
@@ -49,7 +50,7 @@ public class CLed extends JLabel {
 
 	private static final Color LED_BG_DISABLED = Color.GRAY;
 
-	private static final Color LED_BG_ON = new Color(35,228,22);//Color.GREEN;
+	private static final Color LED_BG_ON = new Color(35, 228, 22);// Color.GREEN;
 
 	private static final Color LED_BG_IDLE = Color.YELLOW;
 
@@ -58,7 +59,7 @@ public class CLed extends JLabel {
 	private static final Color LED_BORDER_BG_DEFAULT = Color.LIGHT_GRAY;
 
 	private static final Border LED_BORDER_DEFAULT = new LineBorder(LED_BORDER_BG_DEFAULT);
-	
+
 	private int defaultStatus;
 
 	public CLed() {
@@ -87,11 +88,11 @@ public class CLed extends JLabel {
 		setBorder(LED_BORDER_DEFAULT);
 	}
 
-	public Dimension getSize() {		
+	public Dimension getSize() {
 		return getPreferredSize();
 	}
-	
-	public int getStatus(){
+
+	public int getStatus() {
 		return defaultStatus;
 	}
 
@@ -111,22 +112,36 @@ public class CLed extends JLabel {
 
 	}
 
+	@Override
+	public JToolTip createToolTip() {
+
+		return ComponentFactory.createToolTip();
+	}
+
 	public void setStatus(int status) {
-		
+
 		defaultStatus = status;
-		
+
 		switch (status) {
 		case DISABLED:
 			setBackground(LED_BG_DISABLED);
+			
+			setToolTipText("STATUS : DISABLED");
 			break;
 		case ON:
 			setBackground(LED_BG_ON);
+			
+			setToolTipText("STATUS : ON");
 			break;
 		case IDLE:
 			setBackground(LED_BG_IDLE);
+			
+			setToolTipText("STATUS : IDLE");
 			break;
 		case OFF:
 			setBackground(LED_BG_OFF);
+			
+			setToolTipText("STATUS : OFF");
 			break;
 		}
 	}
