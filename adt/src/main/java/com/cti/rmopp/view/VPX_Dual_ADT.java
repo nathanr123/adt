@@ -55,7 +55,7 @@ public class VPX_Dual_ADT extends CFrame {
 
 	public VPX_Dual_ADT(String title) throws HeadlessException {
 
-		super(title, true, true, true);
+		super(title, false, false, true);
 
 		this.appTitle = title;
 

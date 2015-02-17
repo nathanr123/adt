@@ -1,6 +1,7 @@
 package com.cti.rmopp.controls;
 
 import java.awt.Color;
+import java.awt.Font;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -66,6 +67,25 @@ public class CLabel extends JLabel {
 		} else
 			setFont(Constants.FONTDEFAULT);
 
+	}
+	
+	public CLabel(String arg0, Icon image, boolean isTitle,Font font) {
+		super(arg0);
+
+		setBorder(NOBORDER);
+
+		setIcon(image);
+
+		setIconTextGap(8);
+
+		setForeground(LABEL_FG_DEFAULT);
+
+		if (isTitle) {			
+			setHorizontalAlignment(CENTER);
+		} else
+			setFont(Constants.FONTDEFAULT);
+
+		setFont(font);
 	}
 
 	public CLabel(Icon image) {

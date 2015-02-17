@@ -85,13 +85,13 @@ public class CLoggerPane extends CPanel implements ActionListener, ClipboardOwne
 
 		btnCpyClipBrd = ComponentFactory.createButton("Copy to ClipBoard");
 
-		btnClear.setPreferredSize(new Dimension(85, 35));
+		btnClear.setPreferredSize(new Dimension(65, 25));
 
-		btnSave.setPreferredSize(new Dimension(85, 35));
+		btnSave.setPreferredSize(new Dimension(65, 25));
 
 		// btnExport.setPreferredSize(new Dimension(85, 35));
 
-		btnCpyClipBrd.setPreferredSize(new Dimension(175, 35));
+		btnCpyClipBrd.setPreferredSize(new Dimension(150, 25));
 
 		controlPanel.add(btnClear);
 
@@ -100,7 +100,9 @@ public class CLoggerPane extends CPanel implements ActionListener, ClipboardOwne
 		// controlPanel.add(btnExport);
 
 		btnClear.addActionListener(this);
+		
 		btnSave.addActionListener(this);
+		
 		btnCpyClipBrd.addActionListener(this);
 
 		controlPanel.add(btnCpyClipBrd);

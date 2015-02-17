@@ -4,6 +4,7 @@
 package com.cti.rmopp.controls;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.LayoutManager2;
 
 import javax.swing.Icon;
@@ -33,7 +34,12 @@ public class ComponentFactory {
 	}
 
 	public static CLabel createLabel(String label, Icon icon, boolean isTitle) {
-		CLabel lbl = new CLabel(label, icon, true);
+		CLabel lbl = new CLabel(label, icon, isTitle);
+		return lbl;
+	}
+
+	public static CLabel createLabel(String label, Icon icon, boolean isTitle, Font font) {
+		CLabel lbl = new CLabel(label, icon, isTitle, font);
 		return lbl;
 	}
 
@@ -65,9 +71,9 @@ public class ComponentFactory {
 	public static CTable createTable(TableModel model) {
 		return new CTable(model);
 	}
-	
-	public static CTable createTable(TableModel model,int rowHeight) {
-		return new CTable(model,rowHeight);
+
+	public static CTable createTable(TableModel model, int rowHeight) {
+		return new CTable(model, rowHeight);
 	}
 
 	public static CLoggerPane createLoggerPane() {
@@ -78,11 +84,10 @@ public class ComponentFactory {
 		return new CTextArea();
 	}
 
-
 	public static CTextField createTextField() {
 		return new CTextField();
 	}
-	
+
 	public static CTextField createTextField(int row) {
 		return new CTextField(row);
 	}
@@ -110,16 +115,16 @@ public class ComponentFactory {
 	public static CToolTip createToolTip() {
 		return new CToolTip();
 	}
-	
-	public static CButton createButton(String label){
+
+	public static CButton createButton(String label) {
 		return new CButton(label);
 	}
 
-	public static CCheckBox createCheckBox(String label,boolean selected){
-		return new CCheckBox(label,selected);
+	public static CCheckBox createCheckBox(String label, boolean selected) {
+		return new CCheckBox(label, selected);
 	}
-	
-	public static CComboBox createComboBox(){
+
+	public static CComboBox createComboBox() {
 		return new CComboBox();
 	}
 

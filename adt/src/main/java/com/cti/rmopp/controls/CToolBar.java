@@ -41,9 +41,9 @@ public class CToolBar extends JToolBar {
 
 	private static final Border TOOLBAR_BORDER_LINE = new LineBorder(TOOLBAR_BG_DEFAULT);
 
-	private static final int WINDOW_BUTTON_WIDTH_DEFAULT = 42;
+	private static final int WINDOW_BUTTON_WIDTH_DEFAULT = 32;
 
-	private static final int WINDOW_BUTTON_HEIGHT_DEFAULT = 42;
+	private static final int WINDOW_BUTTON_HEIGHT_DEFAULT = 32;
 
 	private static final String IMAGE_PATH = "images\\";
 
@@ -140,7 +140,7 @@ public class CToolBar extends JToolBar {
 
 			setFocusable(false);
 
-			// setContentAreaFilled(false);
+			setFont(Constants.FONTSMALL);
 
 			setBackground(Color.GRAY);
 
@@ -191,13 +191,13 @@ public class CToolBar extends JToolBar {
 
 				this.setForeground(TOOLBAR_BORDER_DARKSHADOW_COLOR_DEFAULT);
 
-				setIcon(getIconImage(imagepath, false, 26, 26));
+				setIcon(getIconImage(imagepath, false, 22, 22));
 
 			} else if (model.isPressed()) {
 
 				this.setForeground(TOOLBAR_BORDER_DARKSHADOW_COLOR_DEFAULT);
 
-				setIcon(getIconImage(imagepath, true, 26, 26));
+				setIcon(getIconImage(imagepath, true, 20, 20));
 
 			} else {
 
@@ -205,7 +205,7 @@ public class CToolBar extends JToolBar {
 
 				setForeground(TOOLBAR_FG_DEFAULT);
 
-				setIcon(getIconImage(imagepath, false, 24, 24));
+				setIcon(getIconImage(imagepath, false, 20, 20));
 			}
 
 		}

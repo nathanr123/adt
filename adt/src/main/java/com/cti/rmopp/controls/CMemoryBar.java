@@ -43,7 +43,7 @@ public class CMemoryBar extends CPanel {
 
 	//	setDark(true);
 
-		setLayout(new FlowLayout(FlowLayout.RIGHT, 40, 10));
+		setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 		dateNtimeLbl = ComponentFactory.createLabel("Date and time");
 

@@ -28,9 +28,9 @@ public class CFrame extends JFrame {
 	 */
 	private static final long serialVersionUID = 5553840031771930764L;	
 	
-	private static final int WINDOW_BUTTON_WIDTH_DEFAULT = 34;
+	private static final int WINDOW_BUTTON_WIDTH_DEFAULT = 24;
 	
-	private static final int WINDOW_BUTTON_HEIGHT_DEFAULT = 34;
+	private static final int WINDOW_BUTTON_HEIGHT_DEFAULT = 24;
 
 	private static final String IMAGE_PATH = "images\\";
 
@@ -74,7 +74,7 @@ public class CFrame extends JFrame {
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-		ic = new ImageIcon(((new ImageIcon(IMAGE_PATH + "cornet.png")).getImage()).getScaledInstance(24, 24,
+		ic = new ImageIcon(((new ImageIcon(IMAGE_PATH + "cornet.png")).getImage()).getScaledInstance(16, 16,
 				java.awt.Image.SCALE_SMOOTH));
 
 		setIconImage(ic.getImage());
@@ -95,7 +95,7 @@ public class CFrame extends JFrame {
 
 		titlePanel = ComponentFactory.createPanel(new BorderLayout());
 
-		titleLbl = ComponentFactory.createLabel("", ic, true);
+		titleLbl = ComponentFactory.createLabel("", ic, true,Constants.FONTDEFAULT);
 
 		buttonPanel = ComponentFactory.createPanel();
 		
@@ -118,7 +118,7 @@ public class CFrame extends JFrame {
 
 	private void loadButtons() {
 
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
 		if (isMinimizeButton) {
 			if (btnMinimize == null)
@@ -229,7 +229,7 @@ public class CFrame extends JFrame {
 			
 			setFocusPainted(false);
 
-			setIcon(getIconImage(imagepath, false,16,16));
+			setIcon(getIconImage(imagepath, false,12,12));
 
 			setBorder(Constants.NOBORDER);
 
@@ -246,17 +246,17 @@ public class CFrame extends JFrame {
 				
 				this.setBackground(this.getBackground().brighter().brighter());
 				
-				setIcon(getIconImage(imagepath, false,18,18));
+				setIcon(getIconImage(imagepath, false,14,14));
 
 			} else if (model.isPressed()) {
 
-				setIcon(getIconImage(imagepath, true,18,18));
+				setIcon(getIconImage(imagepath, true,14,14));
 				
 			} else {				
 				
 				setBackground(titlePanel.getBackground());
 				
-				setIcon(getIconImage(imagepath, false,16,16));
+				setIcon(getIconImage(imagepath, false,12,12));
 			}
 
 		}		

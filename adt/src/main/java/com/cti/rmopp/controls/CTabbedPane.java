@@ -45,9 +45,9 @@ public class CTabbedPane extends JTabbedPane {
 	 */
 	private static final long serialVersionUID = 5223414289680525274L;
 
-	private static final int TABBEDPANE_TAB_WIDTH = 120;
+	private static final int TABBEDPANE_TAB_WIDTH = 100;
 
-	private static final int TABBEDPANE_TAB_HEIGHT = 30;
+	private static final int TABBEDPANE_TAB_HEIGHT = 25;
 
 	private static final Color TABBEDPANE_TAB_BG_DEFAULT = Color.DARK_GRAY;
 
@@ -199,13 +199,13 @@ public class CTabbedPane extends JTabbedPane {
 
 			if (isSelected) {
 
-				g.setFont(Constants.FONTTITLE);
+				g.setFont(Constants.FONTDEFAULT);
 
 				g.setColor(TABBEDPANE_FG_SELECTED);
 				
 			} else {
 
-				g.setFont(Constants.FONTDEFAULT);
+				g.setFont(Constants.FONTSMALL);
 
 				g.setColor(TABBEDPANE_FG_DEFAULT);
 			}
