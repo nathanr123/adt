@@ -24,6 +24,7 @@ public class CTitledBorder extends TitledBorder {
 	private static final Color TITLE_BORDER_DEFAULT = Color.GRAY;
 
 	public CTitledBorder(String title) {
+		
 		super(title);
 
 		setTitleFont(Constants.FONTTITLE);

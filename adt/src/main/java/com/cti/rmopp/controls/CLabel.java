@@ -15,13 +15,14 @@ public class CLabel extends JLabel {
 	 */
 	private static final long serialVersionUID = -5917930397899326190L;
 
-	/*********************** COLORS ************************/
+	private static final Color LABEL_FG_DEFAULT = new Color(254, 254, 254);
 
-	Color LABEL_FG_DEFAULT = new Color(254, 254, 254);
+	private static final Color LABEL_FG_ERROR = Color.RED;
 
 	Border NOBORDER = null;
 
 	public CLabel(String arg0) {
+
 		super(arg0);
 
 		setBorder(NOBORDER);
@@ -33,6 +34,7 @@ public class CLabel extends JLabel {
 	}
 
 	public CLabel(String arg0, boolean isTitle) {
+
 		super(arg0);
 
 		setBorder(NOBORDER);
@@ -40,6 +42,7 @@ public class CLabel extends JLabel {
 		setForeground(LABEL_FG_DEFAULT);
 
 		if (isTitle) {
+
 			setFont(Constants.FONTTITLE);
 
 			setHorizontalAlignment(CENTER);
@@ -51,6 +54,7 @@ public class CLabel extends JLabel {
 	}
 
 	public CLabel(String arg0, Icon image, boolean isTitle) {
+
 		super(arg0);
 
 		setBorder(NOBORDER);
@@ -62,14 +66,19 @@ public class CLabel extends JLabel {
 		setForeground(LABEL_FG_DEFAULT);
 
 		if (isTitle) {
+
 			setFont(Constants.FONTTITLE);
+
 			setHorizontalAlignment(CENTER);
+
 		} else
+
 			setFont(Constants.FONTDEFAULT);
 
 	}
-	
-	public CLabel(String arg0, Icon image, boolean isTitle,Font font) {
+
+	public CLabel(String arg0, Icon image, boolean isTitle, Font font) {
+
 		super(arg0);
 
 		setBorder(NOBORDER);
@@ -80,15 +89,19 @@ public class CLabel extends JLabel {
 
 		setForeground(LABEL_FG_DEFAULT);
 
-		if (isTitle) {			
+		if (isTitle) {
+
 			setHorizontalAlignment(CENTER);
+
 		} else
+
 			setFont(Constants.FONTDEFAULT);
 
 		setFont(font);
 	}
 
 	public CLabel(Icon image) {
+
 		setIcon(image);
 	}
 
@@ -96,6 +109,17 @@ public class CLabel extends JLabel {
 	public JToolTip createToolTip() {
 
 		return ComponentFactory.createToolTip();
+	}
+
+	public void setErrorStatus(boolean isError) {
+
+		if (isError)
+
+			setForeground(LABEL_FG_ERROR);
+
+		else
+
+			setForeground(LABEL_FG_DEFAULT);
 	}
 
 }

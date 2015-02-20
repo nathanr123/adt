@@ -39,6 +39,7 @@ public class CMenu extends JMenu {
 	 * 
 	 */
 	public CMenu() {
+		
 		init();
 	}
 
@@ -46,7 +47,9 @@ public class CMenu extends JMenu {
 	 * @param s
 	 */
 	public CMenu(String s) {
+		
 		super(s);
+		
 		init();
 	}
 
@@ -54,7 +57,9 @@ public class CMenu extends JMenu {
 	 * @param a
 	 */
 	public CMenu(Action a) {
+		
 		super(a);
+		
 		init();
 	}
 
@@ -63,7 +68,9 @@ public class CMenu extends JMenu {
 	 * @param b
 	 */
 	public CMenu(String s, boolean b) {
+		
 		super(s, b);
+		
 		init();
 	}
 

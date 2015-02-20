@@ -3,6 +3,8 @@
  */
 package com.cti.rmopp.controls;
 
+import static com.cti.rmopp.controls.ComponentFactory.getImageIcon;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -74,8 +76,8 @@ public class CFrame extends JFrame {
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-		ic = new ImageIcon(((new ImageIcon(IMAGE_PATH + "cornet.png")).getImage()).getScaledInstance(16, 16,
-				java.awt.Image.SCALE_SMOOTH));
+		ic = getImageIcon(IMAGE_PATH + "cornet.png", 18, 18);
+
 
 		setIconImage(ic.getImage());
 
@@ -261,15 +263,13 @@ public class CFrame extends JFrame {
 
 		}		
 		
-		private ImageIcon getIconImage(String path, boolean isHover,int w,int h) {
+		private ImageIcon getIconImage(String path, boolean isHover, int w, int h) {
 
 			if (isHover)
-				return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + "_active.png")).getImage()).getScaledInstance(
-						w, h, java.awt.Image.SCALE_SMOOTH));
+				return getImageIcon(IMAGE_PATH + path + "_active.png", w, h);
 
 			else
-				return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + ".png")).getImage()).getScaledInstance(w, h,
-						java.awt.Image.SCALE_SMOOTH));
+				return getImageIcon(IMAGE_PATH + path + ".png", w, h);
 		}
 
 	}

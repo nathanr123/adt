@@ -20,10 +20,6 @@ import javax.swing.plaf.metal.MetalSliderUI;
 
 public class CSlider extends JSlider {
 
-	/**
-	 * 
-	 */
-
 	private static final int SLIDER_THUMB_ICON_WIDTH = 17;
 
 	private static final int SLIDER_THUMB_ICON_HEIGHT = 17;
@@ -58,6 +54,7 @@ public class CSlider extends JSlider {
 		private static final Stroke endStroke = new BasicStroke(8, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
 
 		public static ComponentUI createUI(JComponent c) {
+
 			return new CTI_NVRSliderUI();
 		}
 
@@ -67,9 +64,13 @@ public class CSlider extends JSlider {
 			Dimension d = super.getPreferredSize(c);
 
 			if (slider.getOrientation() == JSlider.HORIZONTAL) {
+
 				d.height += 10;
+
 			} else {
+
 				d.width += 10;
+
 			}
 			return d;
 		}
@@ -98,6 +99,7 @@ public class CSlider extends JSlider {
 				g2.drawLine(0, 2, thumbRect.x, 2);
 
 				g.translate(-trackRect.x, -(trackRect.y + cy));
+
 			} else {
 
 				int cx = (trackRect.width / 2) - 2;
@@ -121,7 +123,6 @@ public class CSlider extends JSlider {
 
 	static class SpecialThumbIcon implements Icon {
 
-	
 		public void paintIcon(Component c, Graphics g, int x, int y) {
 
 			Graphics2D g2 = (Graphics2D) g;
@@ -131,15 +132,15 @@ public class CSlider extends JSlider {
 			g.fillRect(x + 3, y + 3, 14, 11);
 		}
 
-	
 		public int getIconWidth() {
+
 			return SLIDER_THUMB_ICON_WIDTH;
 		}
 
-
 		public int getIconHeight() {
+
 			return SLIDER_THUMB_ICON_HEIGHT;
 		}
 	}
-	
+
 }

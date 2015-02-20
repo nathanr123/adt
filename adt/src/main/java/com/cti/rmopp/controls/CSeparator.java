@@ -28,6 +28,9 @@ public class CSeparator extends JSeparator {
 	 * 
 	 */
 	public CSeparator() {
+		
+		super();
+		
 		init();
 	}
 
@@ -35,11 +38,14 @@ public class CSeparator extends JSeparator {
 	 * @param orientation
 	 */
 	public CSeparator(int orientation) {
+		
 		super(orientation);
+		
 		init();
 	}
 
 	private void init() {
+		
 		UIManager.put("Separator.foreground", SEPARATOR_BG_DEFAULT);
 
 		UIManager.put("Separator.background", SEPARATOR_FG_DEFAULT);

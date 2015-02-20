@@ -89,7 +89,6 @@ public class CButton extends JButton implements ChangeListener {
 
 		setFont(Constants.FONTSMALL);
 
-		//setPreferredSize(new Dimension(getWidth() + 10, getHeight() + 5));
 	}
 
 }

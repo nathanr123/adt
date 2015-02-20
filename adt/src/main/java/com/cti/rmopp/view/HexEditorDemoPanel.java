@@ -72,42 +72,41 @@ import com.cti.rmopp.controls.hex.swing.HexEditor;
 
 
 
-/**
- * Content pane for the demo applet/standalone app, that demonstrates
- * the functionality of the Swing {@link HexEditor} component.
- *
- * @author Robert Futrell
- * @version 1.0
- */
+
 class HexEditorDemoPanel extends CPanel implements ActionListener,
 							HexEditorListener, SelectionChangedListener {
 
 	private static final long serialVersionUID = 1L;
 
 	private HexEditor editor;
+	
 	private JFileChooser chooser;
+	
 	private CCheckBox colHeaderCB;
+	
 	private CCheckBox rowHeaderCB;
+	
 	private CCheckBox showGridCB;
-	private CComboBox lafCombo;
+	
+	//private CComboBox lafCombo;
+	
 	private CCheckBox altRowBGCB;
+	
 	private CCheckBox altColBGCB;
+	
 	private CCheckBox highlightAsciiSelCB;
+	
 	private CComboBox highlightAsciiSelCombo;
+	
 	private CCheckBox lowBytePaddingCB;
+	
 	private CTextField infoField;
+	
 	private CTextField selField;
+	
 	private CTextField sizeField;
 
-	private Action openAction;
-	private Action cutAction;
-	private Action copyAction;
-	private Action pasteAction;
-	private Action deleteAction;
-	private Action undoAction;
-	private Action redoAction;
-
-	private static final String MSG = "HexEditorDemoPanel";
+	private static final String MSG = "VPX_Dual_adt";
 	
 	private static final ResourceBundle msg = ResourceBundle.getBundle(MSG);
 
@@ -117,11 +116,7 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 	public HexEditorDemoPanel() {
 
 		setLayout(new BorderLayout());
-
-		createActions(msg);
-		
-		add(createToolBar(), BorderLayout.NORTH);
-
+	
 		CPanel temp =  ComponentFactory.createPanel(new BorderLayout());
 		
 		ConfigPanel configPanel = new ConfigPanel();
@@ -129,38 +124,53 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 		temp.add(configPanel, BorderLayout.LINE_START);
 
 		infoField = ComponentFactory.createTextField();
+
 		infoField.setEditable(false);
+		
 		infoField.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(5, 5, 5, 5),
 				infoField.getBorder()));
 
 		selField =  ComponentFactory.createTextField(30);
+		
 		selField.setEditable(false);
+		
 		selField.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(5, 0, 5, 5),
 				selField.getBorder()));
 
 		sizeField =  ComponentFactory.createTextField(15);
+		
 		sizeField.setEditable(false);
+		
 		sizeField.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(5, 0, 5, 5),
 				sizeField.getBorder()));
 
 		CPanel temp2 = ComponentFactory.createPanel(new BorderLayout());
+		
 		CPanel temp3 = ComponentFactory.createPanel(new BorderLayout());
+		
 		temp2.add(infoField);
+		
 		temp3.add(selField, BorderLayout.LINE_START);
+		
 		temp3.add(sizeField, BorderLayout.LINE_END);
+		
 		temp2.add(temp3, BorderLayout.LINE_END);
+		
 		temp.add(temp2, BorderLayout.SOUTH);
 		add(temp, BorderLayout.SOUTH);
 
-		// Add the editor after infoField as it listens to byte changes.
+	
 		editor = new HexEditor();
+	
 		editor.addHexEditorListener(this);
+		
 		editor.addSelectionChangedListener(this);
-		//handleOpenFile("org/fife/ui/hex/swing/demo/HexEditorDemoPanel.class");
-		handleOpenFile("icons\\copy.gif");
+		
+		handleOpenFile("images\\copy.gif");
+		
 		add(editor);
 
 	}
@@ -183,41 +193,7 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 		}
 		else if (source==showGridCB) {
 			editor.setShowGrid(showGridCB.isSelected());
-		}
-		else if (source==lafCombo) {
-			String value = (String)lafCombo.getSelectedItem();
-			String laf = null;
-			if ("System".equals(value)) {
-				laf = UIManager.getSystemLookAndFeelClassName();
-			}
-			else if ("Metal".equals(value)) {
-				laf = UIManager.getCrossPlatformLookAndFeelClassName();
-			}
-			else if ("Motif".equals(value)) {
-				laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-			}
-			else if ("Nimbus".equals(value)) {
-				LookAndFeelInfo[] infos = UIManager.getInstalledLookAndFeels();
-				for (int i=0; i<infos.length; i++) {
-					if ("Nimbus".equals(infos[i].getName())) {
-						laf = infos[i].getClassName();
-						break;
-					}
-				}
-			}
-			try {
-				UIManager.setLookAndFeel(laf);
-				Window w = SwingUtilities.getWindowAncestor(this);
-				if (w!=null) {
-					SwingUtilities.updateComponentTreeUI(w);
-				}
-				else {
-					SwingUtilities.updateComponentTreeUI(this);
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
+		}		
 		else if (source==altColBGCB) {
 			editor.setAlternateColumnBG(altColBGCB.isSelected());
 		}
@@ -237,49 +213,6 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 		}
 
 	}
-
-
-	/**
-	 * Creates the actions used by this panel.
-	 *
-	 * @param msg The resource bundle used to localize the actions.
-	 */
-	private void createActions(ResourceBundle msg) {
-		openAction = new OpenAction();
-		cutAction = new CutAction();
-		copyAction = new CopyAction();
-		pasteAction = new PasteAction();
-		deleteAction = new DeleteAction();
-		undoAction = new UndoAction();
-		redoAction = new RedoAction();
-	}
-
-
-	/**
-	 * Creates the toolbar used in this demo panel.
-	 *
-	 * @return The toolbar.
-	 */
-	private CToolBar createToolBar() {
-
-		CToolBar toolbar = new CToolBar();
-
-		toolbar.addButton(openAction);
-		toolbar.addSeparator();
-
-		toolbar.addButton(cutAction);
-		toolbar.addButton(copyAction);
-		toolbar.addButton(pasteAction);
-		toolbar.addButton(deleteAction);
-		toolbar.addSeparator();
-
-		toolbar.addButton(undoAction);
-		toolbar.addButton(redoAction);
-
-		return toolbar;
-
-	}
-
 
 	/**
 	 * Prompts the user for a file to open, and opens it.
@@ -308,36 +241,6 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 	}
 
 
-	/**
-	 * Creates and returns the specified image.
-	 *
-	 * @param name The name of the image file, such as <code>copy.gif</code>.
-	 * @return The image, or <code>null</code> if it cannot be found.
-	 */
-	private Image getImage(String name) {
-		// Check jar first to prevent Applet AccessControlException
-		ClassLoader cl = this.getClass().getClassLoader();
-		InputStream in = cl.getResourceAsStream("icons\\"+name);
-		try {
-			if (in!=null) { // In a jar
-				return ImageIO.read(in);
-			}
-			else { // e.g. in Eclipse debugger
-				File file = new File(name);
-				if (file.isFile()) {
-					return ImageIO.read(file);
-				}
-				else {
-					throw new IOException("Image not found: " + name);
-				}
-			}
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-		return null;
-	}
-
-
 	private String getInfoString(String key, int offs, int param) {
 		String text = msg.getString(key);
 		text = MessageFormat.format(text,
@@ -354,13 +257,6 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 		return text;
 	}
 
-
-	/**
-	 * Opens a file.  Displays an error dialog if the file cannot be
-	 * opened.
-	 *
-	 * @param fileName The file to open.
-	 */
 	private void handleOpenFile(String fileName) {
 		// Check jar first to prevent Applet AccessControlException
 		ClassLoader cl = this.getClass().getClassLoader();
@@ -428,31 +324,6 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 
 	}
 
-
-	/**
-	 * Returns whether Nimbus is supported by the current JVM.  Nimbus was
-	 * added in 6u10, and the package containing it changed in Java 7, so this
-	 * is the only reliable way to check for it.
-	 *
-	 * @return Whether Nimbus is installed.
-	 */
-	private boolean isNimbusSupported() {
-		// Overridden to always return false, since Nimbus doesn't uninstall
-		// cleanly (leaves table selection color behind) and we don't want it
-		// to look like a HexEditor bug.
-		return false;
-		/*
-		LookAndFeelInfo[] infos = UIManager.getInstalledLookAndFeels();
-		for (int i=0; i<infos.length; i++) {
-			if ("Nimbus".equals(infos[i].getName())) {
-				return true;
-			}
-		}
-		return false;
-		*/
-	}
-
-
 	/**
 	 * Called when the selection changes in the hex editor.
 	 *
@@ -464,32 +335,6 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 		String subject = count==1 ? " byte" : " bytes";
 		selField.setText(count + subject + " selected at offset " + offs);
 	}
-
-
-	/**
-	 * Base class for all actions in the demo.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private abstract class ActionBase extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ActionBase() {
-			String name = msg.getString(getNameKey());
-			putValue(Action.NAME, name);
-			putValue(Action.SHORT_DESCRIPTION, name);
-			ImageIcon icon = new ImageIcon(getImage(getIconKey()));
-			putValue(Action.SMALL_ICON, icon);
-		}
-
-		protected abstract String getNameKey();
-
-		protected abstract String getIconKey();
-
-	}
-
 
 	/**
 	 * Renderer for JComboBox content lists containing colors.
@@ -591,9 +436,12 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 
 			add(temp);
 
+			/*
 			temp = ComponentFactory.createPanel(new BorderLayout());
 			temp.add(new CLabel(msg.getString("LafLabel")),
 									BorderLayout.LINE_START);
+			
+			
 			lafCombo = ComponentFactory.createComboBox();
 			lafCombo.addItem("System");
 			lafCombo.addItem("Metal");
@@ -603,6 +451,7 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 			}
 			lafCombo.addActionListener(HexEditorDemoPanel.this);
 			temp.add(lafCombo);
+			*/
 			temp2 = ComponentFactory.createPanel(new BorderLayout());
 			temp2.add(temp, BorderLayout.LINE_START);
 			add(temp2, BorderLayout.SOUTH);
@@ -610,183 +459,4 @@ class HexEditorDemoPanel extends CPanel implements ActionListener,
 		}
 
 	}
-
-
-	/**
-	 * Copies the currently selected bytes to the clipboard.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class CopyAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			editor.copy();
-		}
-
-		protected String getNameKey() {
-			return "Action.Copy.Name";
-		}
-
-		protected String getIconKey() {
-			return "copy.gif";
-		}
-
-	}
-
-
-	/**
-	 * Moves the currently selected bytes to the clipboard, similar to
-	 * a "cut" action in a text editor.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class CutAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			editor.cut();
-		}
-
-		protected String getNameKey() {
-			return "Action.Cut.Name";
-		}
-
-		protected String getIconKey() {
-			return "cut.gif";
-		}
-
-	}
-
-
-	/**
-	 * Deletes the currently selected bytes.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class DeleteAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			editor.delete();
-		}
-
-		protected String getNameKey() {
-			return "Action.Delete.Name";
-		}
-
-		protected String getIconKey() {
-			return "delete.gif";
-		}
-
-	}
-
-
-	/**
-	 * Action that prompts a user to open a file.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class OpenAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			doOpen();
-		}
-
-		protected String getNameKey() {
-			return "Action.Open.Name";
-		}
-
-		protected String getIconKey() {
-			return "open.gif";
-		}
-
-	}
-
-
-	/**
-	 * Pastes the current clipboard contents into the hex editor at
-	 * the currently selected byte location.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class PasteAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			editor.paste();
-		}
-
-		protected String getNameKey() {
-			return "Action.Paste.Name";
-		}
-
-		protected String getIconKey() {
-			return "paste.gif";
-		}
-
-	}
-
-
-	/**
-	 * Undoes the last "undo" operation.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class RedoAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			editor.redo();
-		}
-
-		protected String getNameKey() {
-			return "Action.Redo.Name";
-		}
-
-		protected String getIconKey() {
-			return "redo.gif";
-		}
-
-	}
-
-
-	/**
-	 * Takes back the last operation done.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
-	 */
-	private class UndoAction extends ActionBase {
-
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			editor.undo();
-		}
-
-		protected String getNameKey() {
-			return "Action.Undo.Name";
-		}
-
-		protected String getIconKey() {
-			return "undo.gif";
-		}
-
-	}
-
-
 }

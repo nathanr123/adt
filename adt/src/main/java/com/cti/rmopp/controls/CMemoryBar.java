@@ -41,7 +41,7 @@ public class CMemoryBar extends CPanel {
 
 	public CMemoryBar() {
 
-	//	setDark(true);
+		// setDark(true);
 
 		setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -62,29 +62,42 @@ public class CMemoryBar extends CPanel {
 		Thread th = new Thread(new Runnable() {
 
 			int i = -1;
-		
+
 			public void run() {
 				while (isAppRunning) {
 
 					if (i == -1) {
+
 						updateMemory();
+
 						updateDateAndTime();
+
 						updateThreads();
+
 					} else if (i == 60) {
+
 						updateMemory();
+
 						updateDateAndTime();
+
 					} else if (i >= 180) {
+
 						updateThreads();
+
 						i = 0;
-					}				
-					
+					}
+
 					try {
+
 						Thread.sleep(1000);
+
 					} catch (InterruptedException e) {
+
 						e.printStackTrace();
 					}
 				}
 			}
+
 		}, "Memory Monitor");
 
 		th.start();
@@ -122,41 +135,62 @@ public class CMemoryBar extends CPanel {
 	private void updateThreads() {
 
 		/*
-		Thread[] threadList = getAllThreads();
-
-		for (Thread thread : threadList)
-			System.out.println(new StringBuilder().append(thread.getThreadGroup().getName()).append("::")
-					.append(thread.getName()).append("::PRIORITY:-").append(thread.getPriority()));
-*/
+		 * Thread[] threadList = getAllThreads();
+		 * 
+		 * for (Thread thread : threadList) System.out.println(new
+		 * StringBuilder(
+		 * ).append(thread.getThreadGroup().getName()).append("::")
+		 * .append(thread
+		 * .getName()).append("::PRIORITY:-").append(thread.getPriority()));
+		 */
 	}
 
 	ThreadGroup rootThreadGroup = null;
 
 	ThreadGroup getRootThreadGroup() {
+
 		if (rootThreadGroup != null)
+
 			return rootThreadGroup;
+
 		ThreadGroup tg = Thread.currentThread().getThreadGroup();
+
 		ThreadGroup ptg;
+
 		while ((ptg = tg.getParent()) != null)
+
 			tg = ptg;
+
 		return tg;
 	}
 
 	Thread[] getAllThreads() {
+
 		final ThreadGroup root = getRootThreadGroup();
+
 		final ThreadMXBean thbean = ManagementFactory.getThreadMXBean();
+
 		int nAlloc = thbean.getThreadCount();
+
 		int n = 0;
+
 		Thread[] threads;
+
 		do {
+
 			nAlloc *= 2;
+
 			threads = new Thread[nAlloc];
+
 			n = root.enumerate(threads, true);
+
 		} while (n == nAlloc);
+
 		return java.util.Arrays.copyOf(threads, n);
 	}
 
 	public void stopMemoryMonitor() {
+
 		isAppRunning = false;
 	}
 

@@ -38,6 +38,7 @@ public class CProgressBar extends JProgressBar {
 	private static final Border PROGRESSBAR_BORDER_DEFAULT = BorderFactory.createLineBorder(PROGRESSBAR_BG_SELECTION);
 
 	public CProgressBar() {
+
 		init();
 	}
 
@@ -45,7 +46,9 @@ public class CProgressBar extends JProgressBar {
 	 * @param orient
 	 */
 	public CProgressBar(int orient) {
+
 		super(orient);
+
 		init();
 	}
 
@@ -53,7 +56,9 @@ public class CProgressBar extends JProgressBar {
 	 * @param newModel
 	 */
 	public CProgressBar(BoundedRangeModel newModel) {
+
 		super(newModel);
+
 		init();
 	}
 
@@ -62,7 +67,9 @@ public class CProgressBar extends JProgressBar {
 	 * @param max
 	 */
 	public CProgressBar(int min, int max) {
+
 		super(min, max);
+
 		init();
 	}
 
@@ -72,7 +79,9 @@ public class CProgressBar extends JProgressBar {
 	 * @param max
 	 */
 	public CProgressBar(int orient, int min, int max) {
+
 		super(orient, min, max);
+
 		init();
 	}
 
@@ -96,13 +105,15 @@ public class CProgressBar extends JProgressBar {
 
 		SwingUtilities.updateComponentTreeUI(this);
 
-		setUI(new BasicProgressBarUI() {			
+		setUI(new BasicProgressBarUI() {
 
 			protected Color getSelectionBackground() {
+
 				return PROGRESSBAR_TEXT_DEFAULT;
 			}
 
 			protected Color getSelectionForeground() {
+
 				return PROGRESSBAR_TEXT_DEFAULT;
 			}
 		});

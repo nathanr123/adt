@@ -56,6 +56,7 @@ public class CPanel extends JPanel {
 		setFont(Constants.FONTDEFAULT);
 
 		if (isLight) {
+			
 			setBackground(PANEL_BG_LIGHT);
 
 			setForeground(PANEL_FG_LIGHT);
@@ -66,18 +67,25 @@ public class CPanel extends JPanel {
 			setForeground(PANEL_FG_DARK);
 
 		}
+		
 		applyBorder();
 	}
 
 	public void applyBorder() {
+		
 		if (isLight)
+			
 			this.setBorder(BorderFactory.createLineBorder(PANEL_FG_DARK));
+		
 		else
+			
 			this.setBorder(BorderFactory.createLineBorder(PANEL_BG_DARK));
 	}
 
 	public void applyLight() {
+		
 		this.isLight = true;
+		
 		init();
 	}
 

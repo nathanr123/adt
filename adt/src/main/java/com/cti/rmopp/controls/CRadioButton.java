@@ -3,7 +3,10 @@ package com.cti.rmopp.controls;
 import java.awt.Color;
 
 import javax.swing.ImageIcon;
+
 import javax.swing.JRadioButton;
+
+import static com.cti.rmopp.controls.ComponentFactory.getImageIcon;
 
 public class CRadioButton extends JRadioButton {
 
@@ -27,24 +30,19 @@ public class CRadioButton extends JRadioButton {
 	private static final Color RADIO_BG_DEFAULT = Color.DARK_GRAY;// Color.BLACK;
 
 	private static final Color RADIO_FG_DEFAULT = Color.WHITE;
+	
+	private static final Color RADIO_FG_ERROR = Color.RED;
 
-	private ImageIcon defaultIcon = new ImageIcon(
-			((new ImageIcon(IMAGE_PATH + RADIO_DEFAULT_IMAGE)).getImage()).getScaledInstance(14, 14,
-					java.awt.Image.SCALE_SMOOTH));
+	private ImageIcon defaultIcon = getImageIcon(IMAGE_PATH + RADIO_DEFAULT_IMAGE, 14, 14);
 
-	private ImageIcon selectedIcon = new ImageIcon(
-			((new ImageIcon(IMAGE_PATH + RADIO_DEFAULT_SELECTED_IMAGE)).getImage()).getScaledInstance(14, 14,
-					java.awt.Image.SCALE_SMOOTH));
+	private ImageIcon selectedIcon = getImageIcon(IMAGE_PATH + RADIO_DEFAULT_SELECTED_IMAGE, 14, 14);
 
-	private ImageIcon defaultDisableIcon = new ImageIcon(
-			((new ImageIcon(IMAGE_PATH + RADIO_DEFAULT_DISABLED_IMAGE)).getImage()).getScaledInstance(14, 14,
-					java.awt.Image.SCALE_SMOOTH));
+	private ImageIcon defaultDisableIcon = getImageIcon(IMAGE_PATH + RADIO_DEFAULT_DISABLED_IMAGE, 14, 14);
 
-	private ImageIcon selectedDisableIcon = new ImageIcon(
-			((new ImageIcon(IMAGE_PATH + RADIO_DEFAULT_SELECTED_DISABLED_IMAGE)).getImage()).getScaledInstance(14, 14,
-					java.awt.Image.SCALE_SMOOTH));
+	private ImageIcon selectedDisableIcon = getImageIcon(IMAGE_PATH + RADIO_DEFAULT_SELECTED_DISABLED_IMAGE, 14, 14);
 
 	public CRadioButton(String text) {
+
 		super(text);
 
 		setIcon(defaultIcon);
@@ -66,6 +64,17 @@ public class CRadioButton extends JRadioButton {
 		setCursor(Constants.HANDCURSOR);
 
 		setFont(Constants.FONTDEFAULT);
+	}
+	
+	public void setErrorStatus(boolean isError) {
+
+		if (isError)
+
+			setForeground(RADIO_FG_ERROR);
+
+		else
+
+			setForeground(RADIO_FG_DEFAULT);
 	}
 
 }

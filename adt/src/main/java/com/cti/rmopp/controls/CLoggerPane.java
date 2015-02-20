@@ -15,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -121,22 +120,34 @@ public class CLoggerPane extends CPanel implements ActionListener, ClipboardOwne
 	public void updateLog(int LEVEL, String log) {
 
 		if (txtArea.getCaretPosition() > 0)
+			
 			txtArea.append("\n");
 
 		txtArea.append(getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log);
 	}
 
 	private String getLevel(int level) {
+		
 		String lvl = "INFO";
+		
 		if (level == INFO) {
+			
 			lvl = "INFO";
+			
 		} else if (level == ERROR) {
+			
 			lvl = "ERROR";
+			
 		} else if (level == WARN) {
+			
 			lvl = "WARN";
+			
 		} else if (level == FATAL) {
+			
 			lvl = "FATAL";
+			
 		}
+		
 		return lvl;
 	}
 
@@ -146,6 +157,7 @@ public class CLoggerPane extends CPanel implements ActionListener, ClipboardOwne
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		
 		String cmd = e.getActionCommand();
 
 		if (cmd.equals("Clear")) {
@@ -163,12 +175,16 @@ public class CLoggerPane extends CPanel implements ActionListener, ClipboardOwne
 	}
 
 	private void clearContents() {
+		
 		txtArea.setText("");
 	}
 
 	private void setClipboardContents(String aString) {
+		
 		StringSelection stringSelection = new StringSelection(aString);
+		
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		
 		clipboard.setContents(stringSelection, this);
 	}
 
@@ -185,7 +201,7 @@ public class CLoggerPane extends CPanel implements ActionListener, ClipboardOwne
 			fw.close();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 

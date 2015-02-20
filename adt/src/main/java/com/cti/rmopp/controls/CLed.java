@@ -89,23 +89,35 @@ public class CLed extends JLabel {
 	}
 
 	public Dimension getSize() {
+
 		return getPreferredSize();
 	}
 
 	public int getStatus() {
+
 		return defaultStatus;
 	}
 
 	public void setSize(int size) {
+
 		switch (size) {
+
 		case SMALL:
+
 			setPreferredSize(new Dimension(LED_SMALL_WIDTH, LED_SMALL_HEIGHT));
+
 			break;
+
 		case MEDIUM:
+
 			setPreferredSize(new Dimension(LED_MEDIUM_WIDTH, LED_MEDIUM_HEIGHT));
+
 			break;
+
 		case LARGE:
+
 			setPreferredSize(new Dimension(LED_LARGE_WIDTH, LED_LARGE_HEIGHT));
+
 			break;
 
 		}
@@ -123,25 +135,37 @@ public class CLed extends JLabel {
 		defaultStatus = status;
 
 		switch (status) {
+
 		case DISABLED:
+
 			setBackground(LED_BG_DISABLED);
-			
+
 			setToolTipText("STATUS : DISABLED");
+
 			break;
+
 		case ON:
+
 			setBackground(LED_BG_ON);
-			
+
 			setToolTipText("STATUS : ON");
+
 			break;
+
 		case IDLE:
+
 			setBackground(LED_BG_IDLE);
-			
+
 			setToolTipText("STATUS : IDLE");
+
 			break;
+
 		case OFF:
+
 			setBackground(LED_BG_OFF);
-			
+
 			setToolTipText("STATUS : OFF");
+
 			break;
 		}
 	}

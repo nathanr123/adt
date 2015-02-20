@@ -1,11 +1,13 @@
 package com.cti.rmopp.controls;
 
+import static com.cti.rmopp.controls.ComponentFactory.getImageIcon;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,17 +21,11 @@ import javax.swing.plaf.basic.BasicSpinnerUI;
 
 public class CSpinner extends JSpinner {
 
-	/**
-	 * 
-	 */
-
 	private static final int COMPONENT_IMAGEICON_WIDTH = 24;
 
 	private static final int COMPONENT_IMAGEICON_HEIGHT = 24;
 
 	private static final long serialVersionUID = -2168511991641276202L;
-
-	/*********************** SPINNER BAR - IMAGES ************************/
 
 	private static final String SPINNER_UP_IMAGE = "chevronup.png";
 
@@ -41,9 +37,22 @@ public class CSpinner extends JSpinner {
 
 	private static final Color SPINNER_BORDER_COLOR_DEFAULT = Color.DARK_GRAY;
 
+	private static final Color SPINNER_BORDER_COLOR_ERROR = Color.RED;
+
 	private static final Border SPINNER_BORDER_DEFAULT = new LineBorder(SPINNER_BORDER_COLOR_DEFAULT);
 
+	private static final Border SPINNER_BORDER_ERROR = new LineBorder(SPINNER_BORDER_COLOR_ERROR);
+
+	private static final Color SPINNER_TEXT_FG_DEFAULT = Color.BLACK;
+
+	private static final Color SPINNER_TEXT_BG_DEFAULT = Color.WHITE;
+
+	private Editor spinnerEditor;
+
 	public CSpinner() {
+
+		super();
+
 		init();
 	}
 
@@ -51,7 +60,9 @@ public class CSpinner extends JSpinner {
 
 		setBorder(SPINNER_BORDER_DEFAULT);
 
-		setEditor(new Editor(this));
+		spinnerEditor = new Editor(this);
+
+		setEditor(spinnerEditor);
 
 		setUI(new CSpinnerUI());
 	}
@@ -96,12 +107,12 @@ public class CSpinner extends JSpinner {
 
 			btn.setBorder(Constants.NOBORDER);
 
-			btn.setIcon(getImageIcon(url));
+			btn.setIcon(getImageIcon(url, COMPONENT_IMAGEICON_WIDTH, COMPONENT_IMAGEICON_HEIGHT));
 
 			btn.setRolloverEnabled(false);
 
 			btn.setCursor(Constants.HANDCURSOR);
-			
+
 			btn.addChangeListener(new CTIStateChangeListener(btn));
 
 			return btn;
@@ -109,19 +120,15 @@ public class CSpinner extends JSpinner {
 
 	}
 
-	public ImageIcon getImageIcon(String url) {
-
-		return new ImageIcon(((new ImageIcon(url)).getImage()).getScaledInstance(COMPONENT_IMAGEICON_WIDTH,
-				COMPONENT_IMAGEICON_HEIGHT, java.awt.Image.SCALE_SMOOTH));
-	}
-	
 	private class CTIStateChangeListener implements ChangeListener {
+
 		JButton btn;
 
 		public CTIStateChangeListener(JButton button) {
+			
 			btn = button;
 		}
-		
+
 		public void stateChanged(ChangeEvent e) {
 
 			ButtonModel model = btn.getModel();
@@ -136,37 +143,53 @@ public class CSpinner extends JSpinner {
 		 * 
 		 */
 		private static final long serialVersionUID = -5251777939969966483L;
-		
-		private final Color TEXT_FG_DEFAULT = Color.BLACK;
 
-		private final Color TEXT_BG_DEFAULT = Color.WHITE;
-
-		
 		private JLabel label = new JLabel();
 
 		private Editor(JSpinner spinner) {
-			
+
 			setLayout(new FlowLayout(FlowLayout.LEADING));
-			
-			label.setForeground(TEXT_FG_DEFAULT);
-			
+
+			label.setForeground(SPINNER_TEXT_FG_DEFAULT);
+
 			label.setFont(Constants.FONTDEFAULT);
-			
-			setBackground(TEXT_BG_DEFAULT);
-			
+
+			setBackground(SPINNER_TEXT_BG_DEFAULT);
+
 			setBorder(new EmptyBorder(5, 6, 5, 0));
-			
+
 			add(label);
-			
+
 			spinner.addChangeListener(this);
-			
+
+		}
+
+		public void setFG(Color colors) {
+
+			label.setForeground(colors);
 		}
 
 		public void stateChanged(ChangeEvent e) {
-			
+
 			JSpinner spinner = (JSpinner) e.getSource();
-			
+
 			label.setText(spinner.getValue().toString());
+		}
+	}
+
+	public void setErrorStatus(boolean isError) {
+
+		if (isError) {
+
+			spinnerEditor.setFG(SPINNER_BORDER_COLOR_ERROR);
+
+			setBorder(SPINNER_BORDER_ERROR);
+
+		} else {
+
+			spinnerEditor.setFG(SPINNER_TEXT_FG_DEFAULT);
+
+			setBorder(SPINNER_BORDER_DEFAULT);
 		}
 	}
 }

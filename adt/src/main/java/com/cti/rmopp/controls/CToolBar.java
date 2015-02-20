@@ -48,6 +48,9 @@ public class CToolBar extends JToolBar {
 	private static final String IMAGE_PATH = "images\\";
 
 	public CToolBar() {
+
+		super();
+
 		init();
 	}
 
@@ -76,15 +79,15 @@ public class CToolBar extends JToolBar {
 
 		add(new ToolBarButton(name));
 	}
-	
+
 	public void addButton(Action action) {
 
 		add(new ToolBarButton(action));
 	}
-	
-	public void addButton(String name,String path) {
 
-		add(new ToolBarButton(name,path));
+	public void addButton(String name, String path) {
+
+		add(new ToolBarButton(name, path));
 	}
 
 	public void addButton(ImageIcon ico) {
@@ -97,16 +100,15 @@ public class CToolBar extends JToolBar {
 
 	private class ToolBarButton extends JButton implements ChangeListener {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 2419313605594289553L;
 
 		private String imagepath;
 
-		public ToolBarButton(String name) {
+		public ToolBarButton(String text) {
 
-			setText(name);
+			super(text);
+
+			setText(text);
 
 			init();
 
@@ -115,12 +117,14 @@ public class CToolBar extends JToolBar {
 		public ToolBarButton(Action act) {
 
 			super(act);
-			
+
 			init();
-			
+
 		}
-		
+
 		public ToolBarButton(String name, String path) {
+
+			super();
 
 			this.imagepath = path;
 
@@ -129,6 +133,9 @@ public class CToolBar extends JToolBar {
 		}
 
 		public ToolBarButton(ImageIcon ico) {
+
+			super();
+
 			init();
 
 			setIcon(ico);
@@ -149,6 +156,7 @@ public class CToolBar extends JToolBar {
 			setFocusPainted(false);
 
 			if (imagepath != null) {
+
 				setIcon(getIconImage(imagepath, false, 24, 24));
 			}
 
@@ -169,11 +177,13 @@ public class CToolBar extends JToolBar {
 
 		@Override
 		public Dimension getMaximumSize() {
+
 			return new Dimension(WINDOW_BUTTON_WIDTH_DEFAULT, WINDOW_BUTTON_HEIGHT_DEFAULT);
 		}
 
 		@Override
 		public Dimension getMinimumSize() {
+
 			return new Dimension(WINDOW_BUTTON_WIDTH_DEFAULT, WINDOW_BUTTON_HEIGHT_DEFAULT);
 		}
 
@@ -215,11 +225,11 @@ public class CToolBar extends JToolBar {
 	public ImageIcon getIconImage(String path, boolean isHover, int w, int h) {
 
 		if (isHover)
-			return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + "_active.png")).getImage()).getScaledInstance(w,
-					h, java.awt.Image.SCALE_SMOOTH));
+
+			return ComponentFactory.getImageIcon(IMAGE_PATH + path + "_active.png", w, h);
 
 		else
-			return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + ".png")).getImage()).getScaledInstance(w, h,
-					java.awt.Image.SCALE_SMOOTH));
+
+			return ComponentFactory.getImageIcon(IMAGE_PATH + path + ".png", w, h);
 	}
 }

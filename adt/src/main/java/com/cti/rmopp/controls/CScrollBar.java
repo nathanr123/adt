@@ -57,12 +57,15 @@ public class CScrollBar extends JScrollBar {
 
 	public CScrollBar() {
 
+		super();
+
 		setIcons();
 
 		setUI(new CTIScrollbarUI());
 	}
 
 	public CScrollBar(int orientation) {
+
 		super(orientation);
 
 		setIcons();
@@ -81,6 +84,7 @@ public class CScrollBar extends JScrollBar {
 	}
 
 	public CScrollBar(int orientation, int value, int extent, int min, int max) {
+
 		super(orientation, value, extent, min, max);
 
 		setIcons();
@@ -121,7 +125,9 @@ public class CScrollBar extends JScrollBar {
 		private Image imageThumb, imageTrack;
 
 		CTIScrollbarUI() {
+
 			imageThumb = FauxImage.create(32, 32, SCROLLBAR_THUMB_DEFAULT);
+
 			imageTrack = FauxImage.create(32, 32, SCROLLBAR_TRACK_DEFAULT);
 		}
 
@@ -135,6 +141,7 @@ public class CScrollBar extends JScrollBar {
 
 		@Override
 		protected void paintTrack(Graphics g, JComponent c, Rectangle r) {
+
 			((Graphics2D) g).drawImage(imageTrack, r.x, r.y, r.width, r.height, null);
 		}
 
@@ -146,17 +153,20 @@ public class CScrollBar extends JScrollBar {
 
 		@Override
 		protected JButton createIncreaseButton(int orientation) {
+
 			return getScrollBarButtons(increaseIcon);
 		}
 	}
 
 	private class CTIStateChangeListener implements ChangeListener {
+
 		JButton btn;
 
 		public CTIStateChangeListener(JButton button) {
+
 			btn = button;
 		}
-		
+
 		public void stateChanged(ChangeEvent e) {
 
 			ButtonModel model = btn.getModel();
@@ -166,24 +176,33 @@ public class CScrollBar extends JScrollBar {
 	}
 
 	public ImageIcon getImageIcon(componentStatus status) {
+
 		String path = IMAGE_PATH;
 
 		if (getOrientation() == JScrollBar.HORIZONTAL) {
+
 			if (status == componentStatus.DECREEMENT) {
+
 				path += SCROLL_LEFT_IMAGE;
+
 			} else if (status == componentStatus.INCREEMENT) {
+
 				path += SCROLL_RIGHT_IMAGE;
 			}
+
 		} else if (getOrientation() == JScrollBar.VERTICAL) {
+
 			if (status == componentStatus.DECREEMENT) {
+
 				path += SCROLL_UP_IMAGE;
+
 			} else if (status == componentStatus.INCREEMENT) {
+
 				path += SCROLL_DOWN_IMAGE;
 			}
 		}
 
-		return new ImageIcon(((new ImageIcon(path)).getImage()).getScaledInstance(COMPONENT_IMAGEICON_WIDTH,
-				COMPONENT_IMAGEICON_HEIGHT, java.awt.Image.SCALE_SMOOTH));
+		return ComponentFactory.getImageIcon(path, COMPONENT_IMAGEICON_WIDTH, COMPONENT_IMAGEICON_HEIGHT);
 	}
 
 	private static class FauxImage {

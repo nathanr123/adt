@@ -1,5 +1,7 @@
 package com.cti.rmopp.controls;
 
+import static com.cti.rmopp.controls.ComponentFactory.getImageIcon;
+
 import java.awt.Color;
 
 import javax.swing.ImageIcon;
@@ -30,38 +32,36 @@ public class CCheckBox extends JCheckBox {
 
 	private static final Color CHECKBOX_FG_DEFAULT = Color.WHITE;
 
-	private static final ImageIcon DEFAULTICON = new ImageIcon(
-			((new ImageIcon(IMAGE_PATH + CHECK_DEFAULT_IMAGE)).getImage()).getScaledInstance(14, 14,
-					java.awt.Image.SCALE_SMOOTH));
+	private static final Color CHECKBOX_FG_ERROR = Color.RED;
 
-	private static final ImageIcon SELECTEDICON = new ImageIcon(((new ImageIcon(IMAGE_PATH
-			+ CHECK_DEFAULT_SELECTED_IMAGE)).getImage()).getScaledInstance(14, 14, java.awt.Image.SCALE_SMOOTH));
+	private static final ImageIcon DEFAULTICON = getImageIcon(IMAGE_PATH + CHECK_DEFAULT_IMAGE, 14, 14);
 
-	private static final ImageIcon DEFAULTDISABLEDICON = new ImageIcon(((new ImageIcon(IMAGE_PATH
-			+ CHECK_DEFAULT_DISABLED_IMAGE)).getImage()).getScaledInstance(14, 14, java.awt.Image.SCALE_SMOOTH));
+	private static final ImageIcon SELECTEDICON = getImageIcon(IMAGE_PATH + CHECK_DEFAULT_SELECTED_IMAGE, 14, 14);
 
-	private static final ImageIcon SELECTEDDISABLEDICON = new ImageIcon(
-			((new ImageIcon(IMAGE_PATH + CHECK_DEFAULT_SELECTED_DISABLED_IMAGE)).getImage()).getScaledInstance(14, 14,
-					java.awt.Image.SCALE_SMOOTH));
+	private static final ImageIcon DEFAULTDISABLEDICON = getImageIcon(IMAGE_PATH + CHECK_DEFAULT_DISABLED_IMAGE, 14, 14);
+
+	private static final ImageIcon SELECTEDDISABLEDICON = getImageIcon(IMAGE_PATH
+			+ CHECK_DEFAULT_SELECTED_DISABLED_IMAGE, 14, 14);
 
 	public CCheckBox(String text) {
+
 		super(text);
 
 		init();
 
 	}
-	
-	public CCheckBox(String text,boolean selected ) {
+
+	public CCheckBox(String text, boolean selected) {
+
 		super(text);
-		
+
 		init();
-		
+
 		setSelected(selected);
-		
+
 	}
-	
-	private void init(){
-		
+
+	private void init() {
 
 		setIcon(DEFAULTICON);
 
@@ -84,4 +84,14 @@ public class CCheckBox extends JCheckBox {
 		setFont(Constants.FONTDEFAULT);
 	}
 
+	public void setErrorStatus(boolean isError) {
+
+		if (isError)
+
+			setForeground(CHECKBOX_FG_ERROR);
+
+		else
+
+			setForeground(CHECKBOX_FG_DEFAULT);
+	}
 }

@@ -42,6 +42,7 @@ public class CTaskBar extends CPanel {
 	}
 
 	public void updateStatus(String status) {
+		
 		statusLbl.setText(status);
 	}
 
@@ -74,6 +75,7 @@ public class CTaskBar extends CPanel {
 	}
 
 	public void stopUpdates() {
+		
 		memBar.stopMemoryMonitor();
 	}
 	

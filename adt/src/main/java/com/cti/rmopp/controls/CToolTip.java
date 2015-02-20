@@ -26,10 +26,14 @@ public class CToolTip extends JToolTip {
 	private static final Color TOOLTIP_BORDER_DEFAULT = Color.GRAY;
 
 	public CToolTip() {
+
+		super();
+
 		init();
 	}
 
 	private void init() {
+
 		setFont(Constants.FONTSMALL);
 
 		setForeground(TOOLTIP_FG_DEFAULT);

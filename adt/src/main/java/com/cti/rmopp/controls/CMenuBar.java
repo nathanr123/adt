@@ -38,7 +38,6 @@ public class CMenuBar extends JMenuBar{
 	public CMenuBar() {
 
 		init();
-
 	}
 
 	public void init() {

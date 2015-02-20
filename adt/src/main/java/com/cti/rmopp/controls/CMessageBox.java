@@ -45,10 +45,14 @@ public class CMessageBox implements ActionListener {
 	private void initDialog(Window parent, String title, String msg, int msgType) {
 
 		if (parent instanceof Dialog) {
+
 			dialog = new JDialog((Dialog) parent, true);
+
 		} else {
+
 			dialog = new JDialog((Frame) parent, true);
 		}
+
 		dialog.setUndecorated(true);
 
 		dialog.getContentPane().setLayout(new BorderLayout());
@@ -98,20 +102,31 @@ public class CMessageBox implements ActionListener {
 		dialog.setLocation((d.width >> 1) - (dialog.getWidth() >> 1), (d.height >> 1) - (dialog.getHeight() >> 1));
 
 		switch (msgType) {
+
 		case MSG_COMFIRMATION:
+
 			panel[2].add(submit);
+
 			panel[2].add(cancel);
+
 			break;
 
 		case MSG_INFORMATION:
+
 			submit.setText("Ok");
+
 			panel[2].add(submit);
+
 			break;
 
 		case MSG_POPUP:
+
 			Timer timer = new Timer(1100, new ActionListener() {
+
 				public void actionPerformed(ActionEvent e) {
+
 					dialog.setVisible(false);
+
 					dialog.dispose();
 				}
 			});
@@ -146,9 +161,12 @@ public class CMessageBox implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
+
 		if (!dialog.isVisible()) {
+
 			return;
 		}
+
 		if (e.getSource() == submit) {
 
 			value = 1;
@@ -164,6 +182,7 @@ public class CMessageBox implements ActionListener {
 	}
 
 	public static void main(String[] args) {
+
 		CMessageBox cm = new CMessageBox();
 
 		cm.showConfirmDialog(null, "Testing", "Actoin");

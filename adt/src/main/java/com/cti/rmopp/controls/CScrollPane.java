@@ -13,33 +13,55 @@ public class CScrollPane extends JScrollPane {
 	private static final long serialVersionUID = -1229641246499679961L;
 
 	public CScrollPane() {
-		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
-		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
+		super();
+
 		init();
+
+		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
+
+		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 	}
 
 	public CScrollPane(Component view) {
+
 		super(view);
-		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
-		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 		init();
+
+		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
+
+		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 	}
 
 	public CScrollPane(int vsbPolicy, int hsbPolicy) {
+
 		super(vsbPolicy, hsbPolicy);
-		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
-		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 		init();
+
+		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
+
+		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 	}
 
 	public CScrollPane(Component view, int vsbPolicy, int hsbPolicy) {
+
 		super(view, vsbPolicy, hsbPolicy);
-		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
-		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 		init();
+
+		setVerticalScrollBar(new CScrollBar(JScrollBar.VERTICAL));
+
+		setHorizontalScrollBar(new CScrollBar(JScrollBar.HORIZONTAL));
+
 	}
 
 	private void init() {
+
 		setBorder(Constants.NOBORDER);
 	}
 

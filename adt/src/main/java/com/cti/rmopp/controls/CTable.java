@@ -5,15 +5,12 @@ package com.cti.rmopp.controls;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Vector;
 
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 /**
@@ -34,7 +31,7 @@ public class CTable extends JTable {
 	private static final Color TABLE_BG_SELECTION = new Color(45, 137, 239);
 
 	private static final Color TABLE_FG_SELECTION = Color.WHITE;
-	
+
 	private static final Color TABLE_SHADOW_DARK = Color.DARK_GRAY;
 
 	private static final Color TABLE_CELL_BG_FOCUS = new Color(45, 137, 239);
@@ -55,13 +52,17 @@ public class CTable extends JTable {
 	 */
 	public CTable() {
 
-		init();
-	}
-	
-	public CTable(int rowHeight) {
+		super();
 
 		init();
-		
+	}
+
+	public CTable(int rowHeight) {
+
+		super();
+
+		init();
+
 		setRowHeight(rowHeight);
 	}
 
@@ -69,18 +70,20 @@ public class CTable extends JTable {
 	 * @param arg0
 	 */
 	public CTable(TableModel arg0) {
+
 		super(arg0);
 
 		init();
-	}	
-	
-	public CTable(TableModel arg0 ,int rowHeight) {
+	}
+
+	public CTable(TableModel arg0, int rowHeight) {
+
 		super(arg0);
 
 		init();
-		
+
 		setRowHeight(rowHeight);
-	}	
+	}
 
 	private void init() {
 
@@ -115,7 +118,7 @@ public class CTable extends JTable {
 
 		UIManager.put("TableHeader.foreground", TABLEHEADER_FG_DEFAULT);
 
-	//	setRowHeight(30);
+		// setRowHeight(30);
 
 		setTableHeader(new JTableHeader(getColumnModel()) {
 			/**
@@ -125,8 +128,11 @@ public class CTable extends JTable {
 
 			@Override
 			public Dimension getPreferredSize() {
+
 				Dimension d = super.getPreferredSize();
+
 				d.height = 40;
+
 				return d;
 			}
 		});

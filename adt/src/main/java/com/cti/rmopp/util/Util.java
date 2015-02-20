@@ -20,7 +20,8 @@ public class Util {
 
 	private static int scrHeight;
 
-	public Util() {}
+	public Util() {
+	}
 
 	public static Dimension getScreenResoultion() {
 
@@ -29,20 +30,24 @@ public class Util {
 		scrWidth = (int) d.getWidth();
 
 		scrHeight = (int) d.getHeight();
-		
+
 		return d;
 
 	}
 
 	public static int getScreenWidth() {
+
 		if (scrWidth == 0)
+
 			getScreenResoultion();
 
 		return scrWidth;
 	}
 
 	public static int getScreenHeight() {
+
 		if (scrHeight == 0)
+
 			getScreenResoultion();
 
 		return scrHeight;

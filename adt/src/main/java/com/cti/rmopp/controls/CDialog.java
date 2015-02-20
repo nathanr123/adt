@@ -19,6 +19,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import static com.cti.rmopp.controls.ComponentFactory.getImageIcon;
+
 /**
  * @author nathanr_kamal
  *
@@ -30,9 +32,9 @@ public class CDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 5553840031771930764L;
 
-	private static final int WINDOW_BUTTON_WIDTH_DEFAULT = 34;
+	private static final int WINDOW_BUTTON_WIDTH_DEFAULT = 24;
 
-	private static final int WINDOW_BUTTON_HEIGHT_DEFAULT = 34;
+	private static final int WINDOW_BUTTON_HEIGHT_DEFAULT = 24;
 
 	private static final String IMAGE_PATH = "images\\";
 
@@ -49,10 +51,15 @@ public class CDialog extends JDialog {
 	private ImageIcon ic;
 
 	public CDialog() {
+		
+		super();
+		
 		init();
 	}
 
 	public CDialog(String title) {
+		
+		super();
 
 		init();
 
@@ -65,18 +72,17 @@ public class CDialog extends JDialog {
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-		ic = new ImageIcon(((new ImageIcon(IMAGE_PATH + "cornet.png")).getImage()).getScaledInstance(24, 24,
-				java.awt.Image.SCALE_SMOOTH));
+		ic = getImageIcon(IMAGE_PATH + "cornet.png", 18, 18);
 
 		setIconImage(ic.getImage());
-		
-		JPanel jp = (JPanel)getContentPane();
-		
+
+		JPanel jp = (JPanel) getContentPane();
+
 		jp.setBorder(new LineBorder(Color.GRAY));
-		
+
 		loadTitleBar();
 	}
-		
+
 	private void loadTitleBar() {
 
 		titlePanel = ComponentFactory.createPanel(new BorderLayout());
@@ -105,7 +111,9 @@ public class CDialog extends JDialog {
 		if (isCloseButton) {
 
 			if (btnClose == null)
+				
 				btnClose = new TitleBarButton("close");
+			
 			btnClose.setPreferredSize(new Dimension(WINDOW_BUTTON_WIDTH_DEFAULT, WINDOW_BUTTON_HEIGHT_DEFAULT));
 
 			btnClose.addActionListener(new ActionListener() {
@@ -194,12 +202,11 @@ public class CDialog extends JDialog {
 		private ImageIcon getIconImage(String path, boolean isHover, int w, int h) {
 
 			if (isHover)
-				return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + "_active.png")).getImage()).getScaledInstance(
-						w, h, java.awt.Image.SCALE_SMOOTH));
+				
+				return getImageIcon(IMAGE_PATH + path + "_active.png", w, h);
 
 			else
-				return new ImageIcon(((new ImageIcon(IMAGE_PATH + path + ".png")).getImage()).getScaledInstance(w, h,
-						java.awt.Image.SCALE_SMOOTH));
+				return getImageIcon(IMAGE_PATH + path + ".png", w, h);
 		}
 
 	}

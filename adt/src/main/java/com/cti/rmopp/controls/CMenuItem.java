@@ -46,7 +46,9 @@ public class CMenuItem extends JMenuItem {
 	 * @param icon
 	 */
 	public CMenuItem(Icon icon) {
+
 		super(icon);
+
 		init();
 	}
 
@@ -54,7 +56,9 @@ public class CMenuItem extends JMenuItem {
 	 * @param text
 	 */
 	public CMenuItem(String text) {
+
 		super(text);
+
 		init();
 	}
 
@@ -62,7 +66,9 @@ public class CMenuItem extends JMenuItem {
 	 * @param a
 	 */
 	public CMenuItem(Action a) {
+
 		super(a);
+
 		init();
 	}
 
@@ -71,7 +77,9 @@ public class CMenuItem extends JMenuItem {
 	 * @param icon
 	 */
 	public CMenuItem(String text, Icon icon) {
+
 		super(text, icon);
+
 		init();
 	}
 
@@ -80,7 +88,9 @@ public class CMenuItem extends JMenuItem {
 	 * @param mnemonic
 	 */
 	public CMenuItem(String text, int mnemonic) {
+
 		super(text, mnemonic);
+
 		init();
 	}
 

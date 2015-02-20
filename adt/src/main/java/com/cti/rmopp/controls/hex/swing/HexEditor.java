@@ -100,17 +100,23 @@ public class HexEditor extends CScrollPane {
 	public static final String PROPERTY_SHOW_GRID = "showGrid";
 
 	private HexTable table;
+	
 	private boolean alternateRowBG;
+	
 	private boolean alternateColumnBG;
+	
 	private boolean highlightSelectionInAsciiDump;
+	
 	private Color highlightSelectionInAsciiDumpColor;
+	
 	private boolean padLowBytes;
 
 	private static final TransferHandler DEFAULT_TRANSFER_HANDLER =
 							new HexEditorTransferHandler();
 
 	static final int DUMP_COLUMN_WIDTH		= 200;
-	private static final String MSG = "HexEditor";
+	
+	private static final String MSG = "VPX_Dual_adt";
 
 
 	/**
@@ -121,14 +127,21 @@ public class HexEditor extends CScrollPane {
 		ResourceBundle msg = ResourceBundle.getBundle(MSG);
 
 		HexTableModel model = new HexTableModel(this, msg);
+		
 		table = new HexTable(this, model);
+		
 		setViewportView(table);
+		
 		setShowRowHeader(true);
 
 		setAlternateRowBG(false);
+		
 		setAlternateColumnBG(false);
+		
 		setHighlightSelectionInAsciiDump(true);
+		
 		setHighlightSelectionInAsciiDumpColor(new Color(255,255,192));
+		
 		setPadLowBytes(true);
 
 		setTransferHandler(DEFAULT_TRANSFER_HANDLER);
@@ -210,13 +223,18 @@ public class HexEditor extends CScrollPane {
 
 		// Sanity check (should never happen)
 		if (table.leadSelectionIndex==-1 || table.anchorSelectionIndex==-1) {
+			
 			UIManager.getLookAndFeel().provideErrorFeedback(table);
+			
 			return;
 		}
 
 		int start = table.getSmallestSelectionIndex();
+		
 		int end = table.getLargestSelectionIndex();
+		
 		int len = end-start+1;
+		
 		removeBytes(start, len);
 
 	}
