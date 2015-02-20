@@ -30,7 +30,9 @@ public class Test extends JFrame {
 				try {
 
 					Test frame = new Test();
+					
 					frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
