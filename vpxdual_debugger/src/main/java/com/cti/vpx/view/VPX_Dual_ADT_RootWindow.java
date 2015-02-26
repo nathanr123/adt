@@ -1,4 +1,4 @@
-package com.cti.vpxdual_debugger;
+package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,8 +16,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 
-import com.cti.vpxdual_debugger.util.ComponentFactory;
-import com.cti.vpxdual_debugger.util.VPXUtilities;
+import com.cti.vpx.controls.VPX_LoggerPanel;
+import com.cti.vpx.controls.VPX_MessagePanel;
+import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_Dual_ADT_RootWindow extends JFrame {
 
@@ -204,8 +206,10 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		vpx_Right_SplitPane.setLeftComponent(tb);
 
 		JTabbedPane tb1 = new JTabbedPane();
-
-		tb1.addTab("Logger", new JPanel());
+		
+		tb1.addTab("Message", new VPX_MessagePanel());
+		
+		tb1.addTab("Logger", new VPX_LoggerPanel());
 
 		vpx_Right_SplitPane.setRightComponent(tb1);
 

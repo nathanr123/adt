@@ -1,8 +1,10 @@
-package com.cti.vpxdual_debugger;
+package com.cti.vpx;
 
 import java.awt.EventQueue;
 
 import javax.swing.UIManager;
+
+import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
 
 public class VPX_Dual_ADT {
 

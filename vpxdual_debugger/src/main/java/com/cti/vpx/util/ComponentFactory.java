@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.cti.vpxdual_debugger.util;
+package com.cti.vpx.util;
 
 import java.awt.Image;
 import java.awt.event.ActionListener;
