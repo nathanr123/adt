@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -43,9 +44,10 @@ public class ScanWindow extends JPanel {
 
     private JTable table;
     private JTree tree;
-    DefaultTreeModel dm;
+    static DefaultTreeModel dm;
     JPanel buttonPanel, treeContainer;
-    static JButton scanButton, addButton, treeButton;
+    static JToggleButton treeButton;
+    static JButton scanButton, addButton;
     static DynamicAccessModel accessModel;
     JLabel fromLbl, toLbl;
     JTextField frmField, toField;
@@ -53,24 +55,22 @@ public class ScanWindow extends JPanel {
     JScrollPane treeScroll, tableScroll;
     CheckRenderer treeRenderer;
     MyTableRenderer tableRenderer;
-    DefaultMutableTreeNode root;
-    //JSplitPane splitPane;
+    static DefaultMutableTreeNode root;
 
     /**
      * Create the panel.
      */
     public ScanWindow() {
         setLayout(new BorderLayout(0, 0));
-        addingTable();
-       // addingTreePanel();
+        addingTree();
         addingButtonPanel();
 
     }
 
     private void addingButtonPanel() {
-        
+
         buttonPanel = new JPanel();
-        
+
         scanButton = new JButton("Scan");
         scanButton.addActionListener(new ScanAction());
         buttonPanel.add(scanButton);
@@ -80,25 +80,26 @@ public class ScanWindow extends JPanel {
         addButton.addActionListener(new ScanAction());
 
         buttonPanel.add(addButton);
-        treeButton = new JButton("TreeView");
+        treeButton = new JToggleButton("TableView");
         treeButton.setEnabled(false);
         treeButton.addActionListener(new ScanAction());
         buttonPanel.add(treeButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
 
     }
 
-    public void addingNodes() {
-       
-        for (int i = 1; i < pinger.list.size(); i++) {
-            CheckNode treeNode = new CheckNode((String) pinger.list.get(i), true, false);
-            dm.insertNodeInto(treeNode, root, root.getChildCount());
-        }
+    public static void addingNodes(String ips) {
+        CheckNode treeNode = new CheckNode(ips, true, false);
+        dm.insertNodeInto(treeNode, root, root.getChildCount());
     }
 
     private void addingTable() {
-        table = new JTable();
+        if (table == null) {
+            table = new JTable();
+            accessModel = new DynamicAccessModel();
+            accessModel.addRows();
+        }
         table.setSize(new Dimension(450, 400));
         table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new MouseAdapter() {
@@ -117,21 +118,22 @@ public class ScanWindow extends JPanel {
             }
         });
 
-        accessModel = new DynamicAccessModel();
+        
         table.setDefaultRenderer(Object.class, new MyTableRenderer());
         table.setModel(accessModel);
+        
         tableScroll = new JScrollPane(table);
+        if (treeScroll != null) {
+            tableScroll.setVisible(true);
+            treeScroll.setVisible(false);
+        }
+
+        revalidate();
+
+        repaint();
+
         add(tableScroll, BorderLayout.CENTER);
 
-    }
-
-    private void addingTreePanel() {
-        treeContainer = new JPanel();
-        treeContainer.setLayout(new BorderLayout());
-//        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, treeContainer, tableScroll);
-//        splitPane.setOneTouchExpandable(true);
-//        splitPane.setDividerLocation(150);
-        add(treeContainer, BorderLayout.CENTER);
     }
 
     class NodeSelectionListener extends MouseAdapter {
@@ -149,7 +151,7 @@ public class ScanWindow extends JPanel {
             TreePath path = tree.getPathForRow(row);
             if (path != null) {
                 Object o = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                if (!((String) o).equalsIgnoreCase("IP Address")) {
+                if (!((String) o).equalsIgnoreCase("System")) {
                     CheckNode node = (CheckNode) path.getLastPathComponent();
                     boolean isSelected = !(node.isSelected());
                     node.setSelected(isSelected);
@@ -182,7 +184,6 @@ public class ScanWindow extends JPanel {
         public CheckRenderer() {
             setLayout(null);
             check = new JCheckBox();
-            //add(check = new JCheckBox());
             add(label = new TreeLabel());
 
         }
@@ -193,7 +194,7 @@ public class ScanWindow extends JPanel {
             String stringValue = tree.convertValueToText(value, isSelected,
                     expanded, leaf, row, hasFocus);
             setEnabled(tree.isEnabled());
-            if (!stringValue.equalsIgnoreCase("IP Address")) {
+            if (!stringValue.equals("System")) {
                 check.setSelected(((CheckNode) value).isSelected());
                 label.setFont(tree.getFont());
                 label.setText(stringValue);
@@ -205,13 +206,15 @@ public class ScanWindow extends JPanel {
             }
 
             if (leaf) {
+                
                 label.setIcon(greenIcon);
+                label.setText(stringValue);
             } else if (expanded) {
                 label.setIcon(UIManager.getIcon("Tree.openIcon"));
                 label.setForeground(UIManager.getColor("Tree.textForeground"));
                 label.setText(stringValue);
             } else {
-                label.setIcon(UIManager.getIcon("Tree.closedIcon"));
+                label.setIcon(greenIcon);
                 label.setForeground(UIManager.getColor("Tree.textForeground"));
                 label.setText(stringValue);
             }
@@ -271,7 +274,7 @@ public class ScanWindow extends JPanel {
                     if (0 < str.length()) {
                         if (isSelected) {
                             g.setColor(UIManager
-                                    .getColor("Tree.selectionBackground"));
+                                    .getColor("Tree.selectionBorderColor"));
                         } else {
                             g.setColor(UIManager.getColor("Tree.textBackground"));
                         }
@@ -315,28 +318,29 @@ public class ScanWindow extends JPanel {
     }
 
     private void addingTree() {
-        dm = new DefaultTreeModel(new DefaultMutableTreeNode("IP Address"));
+        dm = new DefaultTreeModel(new DefaultMutableTreeNode("System"));
         root = (DefaultMutableTreeNode) dm.getRoot();
-        addingNodes();
-        tree = new JTree(dm);
+        if (tree == null) {
+            tree = new JTree(dm);
+        }
         treeRenderer = new CheckRenderer();
         tree.setCellRenderer(treeRenderer);
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION
         );
+
         tree.addMouseListener(new NodeSelectionListener(tree));
         treeScroll = new JScrollPane(tree);
-        
-        remove(tableScroll);
-        
-        add(treeScroll);
-        
+        if (tableScroll != null) {
+            tableScroll.setVisible(false);
+            treeScroll.setVisible(true);
+        }
         revalidate();
-        
         repaint();
-   //     splitPane.revalidate();
-    //    splitPane.repaint();
+        add(treeScroll, BorderLayout.CENTER);
 
+        //     splitPane.revalidate();
+        //    splitPane.repaint();
     }
 
     class MyTableRenderer implements TableCellRenderer {
@@ -366,10 +370,14 @@ public class ScanWindow extends JPanel {
 
             } else if ((event.getActionCommand().equals("Add"))) {
                 displayGUI("Add");
-                CheckNode treeNode = new CheckNode(frmField.getText(), true, false);
-                dm.insertNodeInto(treeNode, root, root.getChildCount());
-            } else {
+            } else if (event.getActionCommand().equals("TreeView")) {
+                treeButton.setText("TableView");
                 addingTree();
+
+            } else {
+                treeButton.setText("TreeView");
+                addingTable();
+
             }
         }
     }
@@ -386,8 +394,13 @@ public class ScanWindow extends JPanel {
             if ((scanOrAdd.equalsIgnoreCase("scan"))) {
                 scanIPsOnLan(frmField.getText(), toField.getText());
             } else {
-                accessModel.addRow(frmField.getText());
-
+                if (accessModel != null) {
+                    accessModel.addRow(frmField.getText());
+                }
+                CheckNode treeNode = new CheckNode(frmField.getText(), true, false);
+                dm.insertNodeInto(treeNode, root, root.getChildCount());
+                revalidate();
+                repaint();
             }
         } else {
             // write the code for cancel button I dont know what is doing here
@@ -424,7 +437,6 @@ public class ScanWindow extends JPanel {
         try {
             StatusWindow statusWindow = new StatusWindow(this, "Scanning IP Address Please wait");
             pinger = new Pinger(fromIp, toIp, this, statusWindow);
-
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -441,8 +453,8 @@ public class ScanWindow extends JPanel {
             toLbl = new JLabel("To  ");
             frmField = new JTextField(12);
             toField = new JTextField(12);
-            frmField.setText("192.168.0.1");
-            toField.setText("192.168.0.2");
+            frmField.setText("172.17.1.29");
+            toField.setText("172.17.1.60");
             panel.add(fromLbl);
             panel.add(frmField);
             panel.add(toLbl);
@@ -450,7 +462,7 @@ public class ScanWindow extends JPanel {
         } else {
             panel.setLayout(new GridLayout(1, 2));
             panel.setBorder(BorderFactory.createBevelBorder(0));
-            fromLbl = new JLabel("IP Address");
+            fromLbl = new JLabel("System");
             frmField = new JTextField(12);
             frmField.setText("172.17.1.19");
             panel.add(fromLbl);
@@ -464,7 +476,7 @@ public class ScanWindow extends JPanel {
 
         int colIndex = 0;
         private List<RowData> rows = new ArrayList<ScanWindow.RowData>();
-        String[] columnNames = new String[]{"", "IP Address", "Type", "Status"};
+        String[] columnNames = new String[]{"", "System", "Type", "Status"};
 
         public DynamicAccessModel() {
 
@@ -475,7 +487,7 @@ public class ScanWindow extends JPanel {
         public boolean isCellEditable(int rowIndex, int columnIndex) {
             return true;
         }
-        
+
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
@@ -487,8 +499,16 @@ public class ScanWindow extends JPanel {
             return rows.size();
         }
 
-        public void addRow(String availableIPs) {
-            rows.add(new RowData(availableIPs, 1));
+        public void addRows() {
+
+            for (int i = 1; i < pinger.list.size(); i++) {
+                rows.add(new RowData((String) pinger.list.get(i), 1));
+            }
+            fireTableRowsInserted(rows.size(), rows.size());
+        }
+
+        public void addRow(String ip) {
+            rows.add(new RowData(ip, 1));
             fireTableRowsInserted(rows.size(), rows.size());
         }
 
@@ -549,10 +569,10 @@ public class ScanWindow extends JPanel {
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        } catch (Exception evt) {
-        }
+//        try {
+//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//        } catch (Exception evt) {
+//        }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

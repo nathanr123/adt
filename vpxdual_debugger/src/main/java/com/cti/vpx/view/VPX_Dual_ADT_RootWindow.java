@@ -1,11 +1,11 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -13,11 +13,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
+import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -60,6 +60,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private JSplitPane vpx_Right_SplitPane;
 
+	private JTabbedPane vpx_Content_Tabbed_Pane_Right;
+
 	/**
 	 * Create the frame.
 	 */
@@ -79,7 +81,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
-		setAlwaysOnTop(true);
+		//setAlwaysOnTop(true);
 
 		loadComponents();
 	}
@@ -135,6 +137,16 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Menu_Window_MemoryBrowser = ComponentFactory
 				.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser"));
+		
+		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount()-1);
+				
+			}
+		});
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
 
@@ -171,7 +183,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		JTabbedPane tb = new JTabbedPane();
 
-		tb.addTab("Processor Explorer", new JPanel());
+		tb.addTab("Processor Explorer", new ScanWindow());
 
 		vpx_SplitPane.setLeftComponent(tb);
 
@@ -199,11 +211,11 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-		JTabbedPane tb = new JTabbedPane();
+		vpx_Content_Tabbed_Pane_Right = new JTabbedPane();
 
-		tb.addTab("Processor", new JPanel());
+		vpx_Content_Tabbed_Pane_Right.addTab("Processor", new JPanel());
 
-		vpx_Right_SplitPane.setLeftComponent(tb);
+		vpx_Right_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
 
 		JTabbedPane tb1 = new JTabbedPane();
 		

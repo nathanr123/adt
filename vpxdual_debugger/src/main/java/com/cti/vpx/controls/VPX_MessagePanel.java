@@ -60,6 +60,9 @@ public class VPX_MessagePanel extends JPanel {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
+		
+		JTextArea textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
 
 	}
 

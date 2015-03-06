@@ -55,10 +55,9 @@ class Pinger {
                     int res = pr.waitFor();
                     //System.out.println("res: " + res);
                     if (res == 0) {
-
+                        getNodes(fromIP + i);
                         getNeighbours(fromIP + i, inc);
                         System.out.println("Pinging..." + fromIP + i);
-                        ScanWindow.accessModel.addRow(fromIP + i);
                         inc++;
                     }
 
@@ -73,6 +72,10 @@ class Pinger {
             message.close();
             ScanWindow.treeButton.setEnabled(true);
             ScanWindow.addButton.setEnabled(true);
+        }
+
+        public void getNodes(String ips) {
+            ScanWindow.addingNodes(ips);
         }
     }
 }

@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/HexEditor/!svn/ver/19/HexEditor/trunk/src/org/fife/ui/hex/swing
+END
+HexEditor.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/HexEditor/!svn/ver/24/HexEditor/trunk/src/org/fife/ui/hex/swing/HexEditor.java
+END
+ByteArrayTransferable.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/HexEditor/!svn/ver/19/HexEditor/trunk/src/org/fife/ui/hex/swing/ByteArrayTransferable.java
+END
+HexEditorRowHeader.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/HexEditor/!svn/ver/22/HexEditor/trunk/src/org/fife/ui/hex/swing/HexEditorRowHeader.java
+END
+HexTable.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/HexEditor/!svn/ver/24/HexEditor/trunk/src/org/fife/ui/hex/swing/HexTable.java
+END
+HexTableModel.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/HexEditor/!svn/ver/24/HexEditor/trunk/src/org/fife/ui/hex/swing/HexTableModel.java
+END
+HexEditorTransferHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/HexEditor/!svn/ver/19/HexEditor/trunk/src/org/fife/ui/hex/swing/HexEditorTransferHandler.java
+END
