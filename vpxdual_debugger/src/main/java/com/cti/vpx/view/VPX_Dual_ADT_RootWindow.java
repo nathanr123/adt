@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
@@ -11,15 +13,25 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
+import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
+import com.cti.vpx.model.Cage;
+import com.cti.vpx.model.Core;
+import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.Slot;
+import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.model.VPXSystem.PROCESSOR_TYPE;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.XMLParser;
 
 public class VPX_Dual_ADT_RootWindow extends JFrame {
 
@@ -62,6 +74,10 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private JTabbedPane vpx_Content_Tabbed_Pane_Right;
 
+	private Cage system;
+
+	private DefaultMutableTreeNode cageRootNode;
+
 	/**
 	 * Create the frame.
 	 */
@@ -70,7 +86,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		rBundle = VPXUtilities.getResourceBundle();
 
 		initializeRootWindow();
-
 	}
 
 	private void initializeRootWindow() {
@@ -137,14 +152,16 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Menu_Window_MemoryBrowser = ComponentFactory
 				.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser"));
-		
+
 		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
-				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount()-1);
 				
+				vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
+				
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
 			}
 		});
 
@@ -183,7 +200,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		JTabbedPane tb = new JTabbedPane();
 
-		tb.addTab("Processor Explorer", new ScanWindow());
+		tb.addTab("Processor Explorer", getSystemTree());
 
 		vpx_SplitPane.setLeftComponent(tb);
 
@@ -218,9 +235,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		vpx_Right_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
 
 		JTabbedPane tb1 = new JTabbedPane();
-		
+
 		tb1.addTab("Message", new VPX_MessagePanel());
-		
+
 		tb1.addTab("Logger", new VPX_LoggerPanel());
 
 		vpx_Right_SplitPane.setRightComponent(tb1);
@@ -232,4 +249,96 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		return vpx_Right_SplitPane;
 	}
+
+	private JScrollPane getSystemTree() {
+
+		cageRootNode = new DefaultMutableTreeNode();
+
+		createCageObject();
+
+		VPX_ProcessorTree tree = new VPX_ProcessorTree(cageRootNode);
+
+		JScrollPane jp = new JScrollPane(tree);
+
+		for (int i = 0; i < tree.getRowCount(); i++) {
+			tree.expandRow(i);
+		}
+		return jp;
+	}
+
+	private void createCageObject() {
+		system = new Cage();
+
+		system.setID(0);
+
+		Slot slot = new Slot(0);
+
+		slot.setModel("C66778");
+
+		int idx = 0;
+
+		system = XMLParser.readFromFile();
+
+		if (system == null) {
+
+			system = new Cage();
+
+			for (PROCESSOR_TYPE pType : PROCESSOR_TYPE.values()) {
+
+				Processor p = new Processor(pType);
+
+				p.setID(idx);
+
+				p.addIPAddress("192.168.2.1");
+
+				p.addIPAddress("192.168.2.2");
+
+				for (int i = 0; i < VPXSystem.MAX_CORE; i++) {
+					p.addCore(new Core(i, 5555));
+				}
+
+				slot.addProcessor(p);
+
+				idx++;
+			}
+
+			system.addSlot(slot);
+
+			XMLParser.writeToFile(system);
+		}
+
+		cageRootNode.setUserObject(system.getName());
+
+		List<Slot> sl = system.getSlots();
+
+		for (Iterator<Slot> iterator = sl.iterator(); iterator.hasNext();) {
+
+			Slot slt = iterator.next();
+
+			DefaultMutableTreeNode slotNode = new DefaultMutableTreeNode(slt.getName());
+
+			List<Processor> prc = slt.getProcessors();
+
+			for (Iterator<Processor> iterator2 = prc.iterator(); iterator2.hasNext();) {
+
+				Processor processor = iterator2.next();
+
+				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(processor.getName());
+
+				List<Core> crs = processor.getCores();
+
+				for (Iterator<Core> iterator3 = crs.iterator(); iterator3.hasNext();) {
+
+					Core core = iterator3.next();
+
+					processorNode.add(new DefaultMutableTreeNode(core.getName()));
+				}
+				slotNode.add(processorNode);
+			}
+
+			cageRootNode.add(slotNode);
+		}
+
+	}
+
 }
