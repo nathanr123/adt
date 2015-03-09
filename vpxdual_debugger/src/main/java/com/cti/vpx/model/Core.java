@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement
-public class Core implements VPXSystem {
+public class Core implements VPX {
 
 	/**
 	 * 
@@ -30,7 +30,7 @@ public class Core implements VPXSystem {
 
 	public Core(int iD, int port) {
 		super();
-		this.name = "Core : " + iD;
+		this.name = this.getClass().getSimpleName() + " : " + iD;
 		ID = iD;
 		this.port = port;
 	}

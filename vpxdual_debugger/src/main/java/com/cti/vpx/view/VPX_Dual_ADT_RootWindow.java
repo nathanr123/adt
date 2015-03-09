@@ -23,12 +23,12 @@ import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
-import com.cti.vpx.model.Cage;
+import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
-import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.model.VPXSystem.PROCESSOR_TYPE;
+import com.cti.vpx.model.VPX;
+import com.cti.vpx.model.VPX.PROCESSOR_TYPE;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.util.XMLParser;
@@ -74,7 +74,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private JTabbedPane vpx_Content_Tabbed_Pane_Right;
 
-	private Cage system;
+	private VPXSystem system;
 
 	private DefaultMutableTreeNode cageRootNode;
 
@@ -96,7 +96,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
-		//setAlwaysOnTop(true);
+		// setAlwaysOnTop(true);
 
 		loadComponents();
 	}
@@ -157,9 +157,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
-				
+
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
 			}
@@ -267,7 +267,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	}
 
 	private void createCageObject() {
-		system = new Cage();
+		system = new VPXSystem();
 
 		system.setID(0);
 
@@ -281,7 +281,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		if (system == null) {
 
-			system = new Cage();
+			system = new VPXSystem();
 
 			for (PROCESSOR_TYPE pType : PROCESSOR_TYPE.values()) {
 
@@ -293,7 +293,12 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 				p.addIPAddress("192.168.2.2");
 
-				for (int i = 0; i < VPXSystem.MAX_CORE; i++) {
+				int loop = VPX.MAX_CORE_DSP;
+
+				if (pType == PROCESSOR_TYPE.P2020) {
+					loop = VPX.MAX_CORE_P2020;
+				}
+				for (int i = 0; i < loop; i++) {
 					p.addCore(new Core(i, 5555));
 				}
 

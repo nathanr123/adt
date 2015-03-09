@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class Slot implements VPXSystem {
+public class Slot implements VPX {
 
 	/**
 	 * 
@@ -21,21 +21,21 @@ public class Slot implements VPXSystem {
 	private String model;
 
 	private List<Processor> processors;
-	
+
 	public Slot() {
-		
+
 	}
 
 	public Slot(int iD) {
 		super();
 		ID = iD;
-		this.name = "Slot : " + iD;
+		this.name = this.getClass().getSimpleName() + " : " + iD;
 	}
 
 	public Slot(int iD, String model, List<Processor> processors) {
 		super();
 		ID = iD;
-		this.name = "Slot : " + iD;
+		this.name = this.getClass().getSimpleName() + " : " + iD;
 		this.model = model;
 		this.processors = processors;
 	}

@@ -11,7 +11,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import com.cti.vpx.model.Cage;
+import com.cti.vpx.model.VPXSystem;
 
 /**
  * @author Abi_Achu
@@ -25,7 +25,7 @@ public class XMLParser {
 
 	}
 
-	public static void writeToFile(Cage system) {
+	public static void writeToFile(VPXSystem system) {
 		try {
 
 			File folder = new File(rBundle.getString("Scan.processor.data.path"));
@@ -38,7 +38,7 @@ public class XMLParser {
 			File file = new File(rBundle.getString("Scan.processor.data.path") + "\\"
 					+ rBundle.getString("Scan.processor.data.xml"));
 
-			JAXBContext jaxbContext = JAXBContext.newInstance(Cage.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
 
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
@@ -53,9 +53,9 @@ public class XMLParser {
 
 	}
 
-	public static Cage readFromFile() {
+	public static VPXSystem readFromFile() {
 
-		Cage cag = null;
+		VPXSystem cag = null;
 
 		try {
 
@@ -63,11 +63,11 @@ public class XMLParser {
 					+ rBundle.getString("Scan.processor.data.xml"));
 
 			if (file.exists()) {
-				JAXBContext jaxbContext = JAXBContext.newInstance(Cage.class);
+				JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
 
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-				cag = (Cage) jaxbUnmarshaller.unmarshal(file);
+				cag = (VPXSystem) jaxbUnmarshaller.unmarshal(file);
 			}
 
 		} catch (JAXBException e) {

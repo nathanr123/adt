@@ -4,8 +4,15 @@
 package com.cti.vpx.util;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ResourceBundle;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 /**
  * @author nathanr_kamal
@@ -56,4 +63,40 @@ public class VPXUtilities {
 		return scrHeight;
 	}
 
+	public static ImageIcon getImageIcon(String path, int w, int h) {
+
+		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
+	}
+
+	private static Image getImage(String name) {
+
+		ClassLoader cl = ComponentFactory.class.getClassLoader();
+
+		InputStream in = cl.getResourceAsStream(name);
+
+		try {
+			if (in != null) {
+
+				return ImageIO.read(in);
+
+			} else {
+
+				File file = new File(name);
+
+				if (file.isFile()) {
+
+					return ImageIO.read(file);
+				} else {
+
+					throw new IOException("Image not found: " + name);
+				}
+			}
+
+		} catch (IOException ioe) {
+
+			ioe.printStackTrace();
+		}
+
+		return null;
+	}
 }

@@ -14,6 +14,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
+import com.cti.vpx.model.Core;
+import com.cti.vpx.model.Slot;
+import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 
 /**
@@ -114,13 +117,13 @@ public class VPX_ProcessorTree extends JTree {
 
 			String nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
 
-			if (nodo.startsWith("System")) {
+			if (nodo.startsWith(VPXSystem.class.getSimpleName())) {
 				setIcon(systemIcon);
-			} else if (nodo.startsWith("Slot")) {
+			} else if (nodo.startsWith(Slot.class.getSimpleName())) {
 				setIcon(slotIcon);
 			} else if (nodo.startsWith("DSP") || nodo.startsWith("P2020")) {
 				setIcon(processorIcon);
-			} else if (nodo.startsWith("Core")) {
+			} else if (nodo.startsWith(Core.class.getSimpleName())) {
 				setIcon(coreIcon);
 			}
 			return this;
