@@ -19,16 +19,17 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.cti.vpx.controls.IPRangeSelector;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
-import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPX;
 import com.cti.vpx.model.VPX.PROCESSOR_TYPE;
+import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.util.XMLParser;
@@ -127,6 +128,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		vpx_MenuBar.add(vpx_Menu_File);
 
 		vpx_Menu_File_Scan = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Scan"));
+		vpx_Menu_File_Scan.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				IPRangeSelector ir =  new IPRangeSelector(VPX_Dual_ADT_RootWindow.this);
+				ir.setVisible(true);
+			}
+		});
 
 		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Exit"));
 
