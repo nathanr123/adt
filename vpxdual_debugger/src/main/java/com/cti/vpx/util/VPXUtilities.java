@@ -63,6 +63,21 @@ public class VPXUtilities {
 		return scrHeight;
 	}
 
+	public static long getLongFromIP(String ip) {
+
+		String[] split = ip.split("\\.");
+
+		return (Long.parseLong(split[0]) << 24 | Long.parseLong(split[1]) << 16 | Long.parseLong(split[2]) << 8 | Long
+				.parseLong(split[3]));
+
+	}
+
+	public static String getIPFromLong(final long ipaslong) {
+
+		return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff,
+				(ipaslong >>> 8) & 0xff, (ipaslong) & 0xff);
+	}
+
 	public static ImageIcon getImageIcon(String path, int w, int h) {
 
 		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));

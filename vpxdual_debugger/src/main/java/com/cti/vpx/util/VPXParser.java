@@ -17,15 +17,15 @@ import com.cti.vpx.model.VPXSystem;
  * @author Abi_Achu
  *
  */
-public class XMLParser {
+public class VPXParser {
 
 	private static final ResourceBundle rBundle = VPXUtilities.getResourceBundle();
 
-	public XMLParser() {
+	public VPXParser() {
 
 	}
 
-	public static void writeToFile(VPXSystem system) {
+	public static void writeToXMLFile(VPXSystem system) {
 		try {
 
 			File folder = new File(rBundle.getString("Scan.processor.data.path"));
@@ -53,7 +53,7 @@ public class XMLParser {
 
 	}
 
-	public static VPXSystem readFromFile() {
+	public static VPXSystem readFromXMLFile() {
 
 		VPXSystem cag = null;
 
@@ -77,4 +77,9 @@ public class XMLParser {
 		return cag;
 	}
 
+	public static String[] parseBuffertoString(byte[] buffer) {
+		String[] strArr = new String(buffer).trim().split(";;");
+
+		return strArr;
+	}
 }

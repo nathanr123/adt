@@ -19,7 +19,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.cti.vpx.controls.IPRangeSelector;
+import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
@@ -32,7 +32,7 @@ import com.cti.vpx.model.VPX.PROCESSOR_TYPE;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.util.XMLParser;
+import com.cti.vpx.util.VPXParser;
 
 public class VPX_Dual_ADT_RootWindow extends JFrame {
 
@@ -94,8 +94,10 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		setTitle(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version"));
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		setBounds(0, 0,500, 500);
 
-		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
+	//	setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
 		// setAlwaysOnTop(true);
 
@@ -132,7 +134,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				IPRangeSelector ir =  new IPRangeSelector(VPX_Dual_ADT_RootWindow.this);
+				VPX_ScanWindow ir =  new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
 				ir.setVisible(true);
 			}
 		});
@@ -286,7 +288,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		int idx = 0;
 
-		system = XMLParser.readFromFile();
+		system = VPXParser.readFromXMLFile();
 
 		if (system == null) {
 
@@ -318,7 +320,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 			system.addSlot(slot);
 
-			XMLParser.writeToFile(system);
+			VPXParser.writeToXMLFile(system);
 		}
 
 		cageRootNode.setUserObject(system.getName());
@@ -355,4 +357,13 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	}
 
+	
+	public void reloadProcessorTree(VPXSystem vpx){
+
+		if (vpx == null) {
+			System.out.println("VPX Null");
+		}else System.out.println("VPX Object Created");
+
+		System.out.println("Tree Refreshed");
+	}
 }
