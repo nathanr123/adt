@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 public class VPXTCPConnector {
 
-	private static final int PORT = 12346;
+	private static final int PORT = 12345;
 
 	public static String connet(String ipaddress) {
 
