@@ -32,11 +32,11 @@ public class GreetingClient {
 
 			System.out.println("Hello from " + client.getLocalSocketAddress());
 
-			ATP_MSG_COMMAND cmd = new ATP_MSG_COMMAND();
+			ATP_COMMAND cmd = new ATP_COMMAND();
 
-			cmd.msgType.set(ATP_MSG_COMMAND.MSG_TYPE_QUERY);
+			cmd.msgType.set(ATP_COMMAND.MSG_TYPE_QUERY);
 
-			cmd.msgID.set(ATP_MSG_COMMAND.MSG_ID_INFO);
+			cmd.msgID.set(ATP_COMMAND.MSG_ID_INFO);
 
 			cmd.write(out);
 
@@ -44,7 +44,7 @@ public class GreetingClient {
 
 			DataInputStream in = new DataInputStream(inFromServer);
 
-			ATP_MSG_COMMAND msg = new ATP_MSG_COMMAND();
+			ATP_COMMAND msg = new ATP_COMMAND();
 
 			ByteBuffer bf = ByteBuffer.allocate(msg.size());
 

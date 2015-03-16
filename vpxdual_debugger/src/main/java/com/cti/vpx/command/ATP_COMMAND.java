@@ -6,7 +6,7 @@ import javolution.io.Struct;
 
 import javolution.io.Union;
 
-public class ATP_MSG_COMMAND extends Struct implements ATP {
+public class ATP_COMMAND extends Struct implements ATP {
 
 	public final Unsigned32 msgType = new Unsigned32();
 
@@ -14,11 +14,11 @@ public class ATP_MSG_COMMAND extends Struct implements ATP {
 
 	public final MSGParamaenters params = inner(new MSGParamaenters());
 
-	public ATP_MSG_COMMAND() {
+	public ATP_COMMAND() {
 
 	}
 
-	class ProcessorInfo extends Struct {
+	public class ProcessorInfo extends Struct {
 
 		public final Unsigned32 slotID = new Unsigned32();
 
@@ -30,7 +30,7 @@ public class ATP_MSG_COMMAND extends Struct implements ATP {
 		}
 	}
 
-	class MSGParamaenters extends Union {
+	public class MSGParamaenters extends Union {
 		public final ProcessorInfo proccesorInfo = inner(new ProcessorInfo());
 
 		public MSGParamaenters() {
@@ -39,8 +39,11 @@ public class ATP_MSG_COMMAND extends Struct implements ATP {
 
 	@Override
 	public ByteOrder byteOrder() {
-
-		return ByteOrder.LITTLE_ENDIAN;
+		return ByteOrder.nativeOrder();
 	}
 
+	@Override
+	public boolean isPacked() {
+		return true;
+	}
 }

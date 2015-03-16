@@ -27,6 +27,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.cti.vpx.command.ATP_COMMAND;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
@@ -363,17 +364,22 @@ public class VPX_ScanWindow extends JDialog {
 				long size = en - st;
 
 				int ii = 1;
+
+				String ip;
+				
 				for (long i = st; i <= en; i++) {
 
 					publish(i);
 
-					String s = VPXTCPConnector.connet(VPXUtilities.getIPFromLong(i));
-					
-					if(s != null){
-						System.out.println(s);
+					ip = VPXUtilities.getIPFromLong(i);
+
+					ATP_COMMAND s = VPXTCPConnector.identifyProcessor(ip);
+
+					if (s != null) {
+						System.out.println("IP : " + VPXUtilities.getIPFromLong(i) + " Type : "
+								+ s.params.proccesorInfo.processorTYPE.get());
 					}
-					
-					
+
 					long p = (ii + 1) * 100 / size;
 
 					if (p <= 100) {
