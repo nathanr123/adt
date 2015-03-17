@@ -79,6 +79,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private DefaultMutableTreeNode cageRootNode;
 
+	private VPX_LoggerPanel logger;
+
 	/**
 	 * Create the frame.
 	 */
@@ -94,14 +96,16 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		setTitle(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version"));
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		setBounds(0, 0,500, 500);
 
-	//	setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
+		// ssetBounds(0, 0, 500, 500);
+
+		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
 		// setAlwaysOnTop(true);
 
 		loadComponents();
+
+		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
 	}
 
 	private void loadComponents() {
@@ -134,7 +138,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				VPX_ScanWindow ir =  new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
+				VPX_ScanWindow ir = new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
 				ir.setVisible(true);
 			}
 		});
@@ -247,9 +251,11 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		JTabbedPane tb1 = new JTabbedPane();
 
-		tb1.addTab("Message", new VPX_MessagePanel());
+		logger = new VPX_LoggerPanel();
 
-		tb1.addTab("Logger", new VPX_LoggerPanel());
+		tb1.addTab("Logger", logger);
+		
+		tb1.addTab("Message", new VPX_MessagePanel());
 
 		vpx_Right_SplitPane.setRightComponent(tb1);
 
@@ -357,13 +363,22 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	}
 
-	
-	public void reloadProcessorTree(VPXSystem vpx){
+	public void reloadProcessorTree(VPXSystem vpx) {
 
 		if (vpx == null) {
-			System.out.println("VPX Null");
-		}else System.out.println("VPX Object Created");
+			// System.out.println("VPX Null");
+			updateLog(VPX_LoggerPanel.ERROR, "VPX Null");
+		} else
+			updateLog("VPX Object Created");
 
-		System.out.println("Tree Refreshed");
+		updateLog("Tree Refreshed");
+	}
+
+	public void updateLog(String logMsg) {
+		logger.updateLog(logMsg);
+	}
+
+	public void updateLog(int level, String logMsg) {
+		logger.updateLog(level, logMsg);
 	}
 }

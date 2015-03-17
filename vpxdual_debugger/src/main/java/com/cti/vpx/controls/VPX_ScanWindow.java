@@ -78,7 +78,7 @@ public class VPX_ScanWindow extends JDialog {
 
 		setTitle("IP Scanning Window");
 
-		setBounds(100, 100, 305, 199);
+		setBounds(100, 100, 305, 230);
 
 		getContentPane().setLayout(new BorderLayout());
 
@@ -169,10 +169,11 @@ public class VPX_ScanWindow extends JDialog {
 
 			VPX_ScanWindow.this.setVisible(false);
 
+			parent.updateLog("Scanning Processors between " + fromIP.getText() + " and " + toIP.getText());
+
 			new ScanStatusWindow(fromIP.getText(), toIP.getText());
 
 		}
-
 	}
 
 	class CancelAction extends AbstractAction {
@@ -258,16 +259,18 @@ public class VPX_ScanWindow extends JDialog {
 
 								parent.reloadProcessorTree(vpx);
 
+								parent.updateLog("Scanning Completed.");
+
 								ScanStatusWindow.this.dispose();
 
 							} catch (InterruptedException | ExecutionException e) {
-								e.printStackTrace();
+								parent.updateLog("Scanning Canceled.");
 							}
 
 							break;
 
 						case STARTED:
-
+							parent.updateLog("Scanning Started.");
 						case PENDING:
 
 							break;
@@ -366,7 +369,7 @@ public class VPX_ScanWindow extends JDialog {
 				int ii = 1;
 
 				String ip;
-				
+
 				for (long i = st; i <= en; i++) {
 
 					publish(i);
@@ -376,7 +379,8 @@ public class VPX_ScanWindow extends JDialog {
 					ATP_COMMAND s = VPXTCPConnector.identifyProcessor(ip);
 
 					if (s != null) {
-						System.out.println("IP : " + VPXUtilities.getIPFromLong(i) + " Type : "
+
+						parent.updateLog("IP : " + VPXUtilities.getIPFromLong(i) + " Type : "
 								+ s.params.proccesorInfo.processorTYPE.get());
 					}
 
