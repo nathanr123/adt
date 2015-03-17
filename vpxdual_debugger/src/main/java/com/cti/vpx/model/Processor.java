@@ -24,13 +24,13 @@ public class Processor implements VPX {
 
 	private List<Core> cores;
 
-	private PROCESSOR_TYPE processorType;
+	private PROCESSOR_LIST processorType;
 	
 	public Processor() {
 	
 	}
 
-	public Processor(PROCESSOR_TYPE pType) {
+	public Processor(PROCESSOR_LIST pType) {
 
 		this.processorType = pType;
 
@@ -64,13 +64,14 @@ public class Processor implements VPX {
 		this.cores = cores;
 	}
 
-	public PROCESSOR_TYPE getProcessorType() {
+	public PROCESSOR_LIST getProcessorType() {
 		return processorType;
 	}
 
 	@XmlElement
-	public void setProcessorType(PROCESSOR_TYPE processorType) {
+	public void setProcessorType(PROCESSOR_LIST processorType) {
 		this.processorType = processorType;
+		setName(processorType); 
 	}
 
 	public static int getPortno() {
@@ -86,14 +87,14 @@ public class Processor implements VPX {
 		this.name = name;
 	}
 
-	public void setName(PROCESSOR_TYPE pType) {
-		if (pType == PROCESSOR_TYPE.DSP1) {
+	public void setName(PROCESSOR_LIST pType) {
+		if (pType == PROCESSOR_LIST.PROCESSOR_DSP1) {
 			this.name = "DSP - 1";
 			this.ID = 0;
-		} else if (pType == PROCESSOR_TYPE.DSP2) {
+		} else if (pType == PROCESSOR_LIST.PROCESSOR_DSP2) {
 			this.name = "DSP - 2";
 			this.ID = 1;
-		} else if (pType == PROCESSOR_TYPE.P2020) {
+		} else if (pType == PROCESSOR_LIST.PROCESSOR_P2020) {
 			this.name = "P2020";
 			this.ID = 2;
 		}

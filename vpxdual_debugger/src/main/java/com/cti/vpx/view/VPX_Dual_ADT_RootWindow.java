@@ -28,7 +28,7 @@ import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPX;
-import com.cti.vpx.model.VPX.PROCESSOR_TYPE;
+import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
@@ -81,6 +81,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private VPX_LoggerPanel logger;
 
+	private VPX_ProcessorTree tree;
+
 	/**
 	 * Create the frame.
 	 */
@@ -97,9 +99,10 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// ssetBounds(0, 0, 500, 500);
+		setBounds(0, 0, 500, 500);
 
-		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
+		// setBounds(0, 0, VPXUtilities.getScreenWidth(),
+		// VPXUtilities.getScreenHeight());
 
 		// setAlwaysOnTop(true);
 
@@ -254,7 +257,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		logger = new VPX_LoggerPanel();
 
 		tb1.addTab("Logger", logger);
-		
+
 		tb1.addTab("Message", new VPX_MessagePanel());
 
 		vpx_Right_SplitPane.setRightComponent(tb1);
@@ -273,7 +276,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		createCageObject();
 
-		VPX_ProcessorTree tree = new VPX_ProcessorTree(cageRootNode);
+		tree = new VPX_ProcessorTree(cageRootNode);
 
 		JScrollPane jp = new JScrollPane(tree);
 
@@ -300,7 +303,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 			system = new VPXSystem();
 
-			for (PROCESSOR_TYPE pType : PROCESSOR_TYPE.values()) {
+			for (PROCESSOR_LIST pType : PROCESSOR_LIST.values()) {
 
 				Processor p = new Processor(pType);
 
@@ -312,7 +315,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 				int loop = VPX.MAX_CORE_DSP;
 
-				if (pType == PROCESSOR_TYPE.P2020) {
+				if (pType == PROCESSOR_LIST.PROCESSOR_P2020) {
 					loop = VPX.MAX_CORE_P2020;
 				}
 				for (int i = 0; i < loop; i++) {
@@ -363,13 +366,67 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	}
 
+	private void reloadVPXSystemTree(VPXSystem system) {
+
+		cageRootNode.removeAllChildren();
+
+		List<Slot> sl = system.getSlots();
+
+		if (sl != null) {
+
+			for (Iterator<Slot> iterator = sl.iterator(); iterator.hasNext();) {
+
+				Slot slt = iterator.next();
+
+				DefaultMutableTreeNode slotNode = new DefaultMutableTreeNode(slt.getName());
+
+				List<Processor> prc = slt.getProcessors();
+
+				if (prc != null) {
+					for (Iterator<Processor> iterator2 = prc.iterator(); iterator2.hasNext();) {
+
+						Processor processor = iterator2.next();
+
+						DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(processor.getName());
+
+						List<Core> crs = processor.getCores();
+
+						if (crs != null) {
+							for (Iterator<Core> iterator3 = crs.iterator(); iterator3.hasNext();) {
+
+								Core core = iterator3.next();
+
+								processorNode.add(new DefaultMutableTreeNode(core.getName()));
+							}
+						}
+						slotNode.add(processorNode);
+					}
+				}
+				cageRootNode.add(slotNode);
+			}
+		}
+
+		
+		
+		tree.updateUI();
+		
+		for (int i = 0; i < tree.getRowCount(); i++) {
+			tree.expandRow(i);
+		}
+
+	}
+
 	public void reloadProcessorTree(VPXSystem vpx) {
 
 		if (vpx == null) {
 			// System.out.println("VPX Null");
 			updateLog(VPX_LoggerPanel.ERROR, "VPX Null");
-		} else
+		} else {
 			updateLog("VPX Object Created");
+			updateLog("VPX Size : " + vpx.getSlots().size());
+		}
+
+		reloadVPXSystemTree(vpx);
 
 		updateLog("Tree Refreshed");
 	}

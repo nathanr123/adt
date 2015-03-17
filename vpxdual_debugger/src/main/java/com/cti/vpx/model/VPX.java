@@ -11,13 +11,8 @@ import java.io.Serializable;
  */
 public interface VPX extends Serializable {
 
-	public enum PROCESSOR_TYPE {
-
-		DSP1,
-
-		DSP2,
-
-		P2020
+	public enum PROCESSOR_LIST {
+		PROCESSOR_P2020, PROCESSOR_DSP1, PROCESSOR_DSP2
 	};
 
 	public int MAX_CORE_DSP = 8;

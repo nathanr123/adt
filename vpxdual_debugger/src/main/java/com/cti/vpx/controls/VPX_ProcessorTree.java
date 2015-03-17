@@ -101,7 +101,7 @@ public class VPX_ProcessorTree extends JTree {
 		
 		ImageIcon slotIcon = VPXUtilities.getImageIcon("images\\Slot.jpg", 18, 18);
 		
-		ImageIcon processorIcon = VPXUtilities.getImageIcon("images\\Processor4.jpg", 18, 18);
+		ImageIcon processorIcon = VPXUtilities.getImageIcon("images\\Processor4.jpg", 14, 14);
 		
 		ImageIcon coreIcon = VPXUtilities.getImageIcon("images\\Core.png", 14, 14);
 
@@ -116,7 +116,8 @@ public class VPX_ProcessorTree extends JTree {
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
 			String nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
-
+			
+			
 			if (nodo.startsWith(VPXSystem.class.getSimpleName())) {
 				setIcon(systemIcon);
 			} else if (nodo.startsWith(Slot.class.getSimpleName())) {

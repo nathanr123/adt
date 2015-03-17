@@ -46,6 +46,7 @@ public class Slot implements VPX {
 
 	@XmlElement
 	public void setID(int iD) {
+		this.name = this.getClass().getSimpleName() + " : " + iD;
 		ID = iD;
 	}
 

@@ -6,8 +6,10 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -25,9 +27,14 @@ import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.EmptyBorder;
 
+import javolution.io.Struct.Enum32;
 import net.miginfocom.swing.MigLayout;
 
+import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATP_COMMAND;
+import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.Slot;
+import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
@@ -264,6 +271,9 @@ public class VPX_ScanWindow extends JDialog {
 								ScanStatusWindow.this.dispose();
 
 							} catch (InterruptedException | ExecutionException e) {
+
+								e.printStackTrace();
+
 								parent.updateLog("Scanning Canceled.");
 							}
 
@@ -332,6 +342,14 @@ public class VPX_ScanWindow extends JDialog {
 
 			JButton cancelButton = new JButton("Cancel");
 
+			cancelButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ScanStatusWindow.this.dispose();
+				}
+			});
+
 			cancelButton.setActionCommand("Cancel");
 
 			buttonPane.add(cancelButton);
@@ -354,6 +372,8 @@ public class VPX_ScanWindow extends JDialog {
 		}
 
 		class PingerThread extends SwingWorker<VPXSystem, Long> {
+
+			VPXSystem vpxSystem = new VPXSystem();
 
 			@Override
 			protected VPXSystem doInBackground() throws Exception {
@@ -380,8 +400,9 @@ public class VPX_ScanWindow extends JDialog {
 
 					if (s != null) {
 
-						parent.updateLog("IP : " + VPXUtilities.getIPFromLong(i) + " Type : "
-								+ s.params.proccesorInfo.processorTYPE.get());
+						parseCMD(ip, s);
+
+						parent.updateLog("IP : " + ip + " Type : " + s.params.proccesorInfo.processorTYPE.get());
 					}
 
 					long p = (ii + 1) * 100 / size;
@@ -397,7 +418,7 @@ public class VPX_ScanWindow extends JDialog {
 					}
 				}
 
-				return new VPXSystem();
+				return vpxSystem;
 			}
 
 			@Override
@@ -410,6 +431,122 @@ public class VPX_ScanWindow extends JDialog {
 				for (final Long string : chunks) {
 					lblNewLabel.setText("IP Address : " + VPXUtilities.getIPFromLong(string));
 				}
+			}
+
+			private void parseCMD(String ip, ATP_COMMAND cmd) {
+				List<Slot> slots = vpxSystem.getSlots();
+
+				if (slots == null) {
+
+					Slot sl = new Slot();
+
+					sl.setID((int) cmd.params.proccesorInfo.slotID.get());
+
+					Processor pr = new Processor();
+
+					pr.setID((int) cmd.params.proccesorInfo.processorID.get());
+
+					pr.addIPAddress(ip);
+
+					pr.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+					sl.addProcessor(pr);
+
+					vpxSystem.addSlot(sl);
+				} else {
+
+					Slot slot = null;
+
+					for (Iterator<Slot> iterator = slots.iterator(); iterator.hasNext();) {
+
+						slot = iterator.next();
+
+						if (slot.getID() == cmd.params.proccesorInfo.slotID.get()) {
+							break;
+						} else {
+							slot = null;
+						}
+					}
+
+					if (slot == null) {
+
+						slot = new Slot();
+
+						slot.setID((int) cmd.params.proccesorInfo.slotID.get());
+
+						Processor p = new Processor();
+
+						p.setID((int) cmd.params.proccesorInfo.processorID.get());
+
+						p.addIPAddress(ip);
+
+						p.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+						slot.addProcessor(p);
+
+						vpxSystem.addSlot(slot);
+					} else {
+
+						List<Processor> plist = slot.getProcessors();
+
+						if (plist == null) {
+							Processor p = new Processor();
+
+							p.setID((int) cmd.params.proccesorInfo.processorID.get());
+
+							p.addIPAddress(ip);
+
+							p.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+							slot.addProcessor(p);
+						} else {
+
+							Processor processor = null;
+
+							for (Iterator<Processor> iterator = plist.iterator(); iterator.hasNext();) {
+
+								processor = iterator.next();
+
+								if ((processor.getID() == cmd.params.proccesorInfo.processorID.get())
+										&& (slot.getID() != cmd.params.proccesorInfo.slotID.get())) {
+									break;
+								} else {
+									processor = null;
+								}
+
+							}
+
+							if (processor == null) {
+								Processor p = new Processor();
+
+								p.setID((int) cmd.params.proccesorInfo.processorID.get());
+
+								p.addIPAddress(ip);
+
+								p.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+								slot.addProcessor(p);
+							} else {
+								processor.addIPAddress(ip);
+							}
+						}
+
+					}
+				}
+
+			}
+
+			private PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
+
+				if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
+					return PROCESSOR_LIST.PROCESSOR_P2020;
+				} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP1.toString())) {
+					return PROCESSOR_LIST.PROCESSOR_DSP1;
+				} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP2.toString())) {
+					return PROCESSOR_LIST.PROCESSOR_DSP2;
+				}
+				return null;
+
 			}
 		}
 	}

@@ -8,12 +8,15 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EtchedBorder;
-import javax.swing.JScrollPane;
 
 public class VPX_MessagePanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1739175553026398101L;
 	private JTextField textField;
 
 	/**
