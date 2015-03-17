@@ -77,7 +77,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private VPXSystem system;
 
-	private DefaultMutableTreeNode cageRootNode;
+	private DefaultMutableTreeNode systemRootNode;
 
 	private VPX_LoggerPanel logger;
 
@@ -272,11 +272,11 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private JScrollPane getSystemTree() {
 
-		cageRootNode = new DefaultMutableTreeNode();
+		systemRootNode = new DefaultMutableTreeNode();
 
-		createCageObject();
+		createVPXObject();
 
-		tree = new VPX_ProcessorTree(cageRootNode);
+		tree = new VPX_ProcessorTree(this,systemRootNode);
 
 		JScrollPane jp = new JScrollPane(tree);
 
@@ -286,7 +286,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		return jp;
 	}
 
-	private void createCageObject() {
+	private void createVPXObject() {
 		system = new VPXSystem();
 
 		system.setID(0);
@@ -332,7 +332,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			VPXParser.writeToXMLFile(system);
 		}
 
-		cageRootNode.setUserObject(system.getName());
+		systemRootNode.setUserObject(system.getName());
 
 		List<Slot> sl = system.getSlots();
 
@@ -361,14 +361,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 				slotNode.add(processorNode);
 			}
 
-			cageRootNode.add(slotNode);
+			systemRootNode.add(slotNode);
 		}
 
 	}
 
 	private void reloadVPXSystemTree(VPXSystem system) {
 
-		cageRootNode.removeAllChildren();
+		systemRootNode.removeAllChildren();
 
 		List<Slot> sl = system.getSlots();
 
@@ -402,7 +402,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 						slotNode.add(processorNode);
 					}
 				}
-				cageRootNode.add(slotNode);
+				systemRootNode.add(slotNode);
 			}
 		}
 
@@ -414,6 +414,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			tree.expandRow(i);
 		}
 
+	//	VPXParser.writeToXMLFile(system);
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {
@@ -422,8 +423,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			// System.out.println("VPX Null");
 			updateLog(VPX_LoggerPanel.ERROR, "VPX Null");
 		} else {
-			updateLog("VPX Object Created");
-			updateLog("VPX Size : " + vpx.getSlots().size());
+			updateLog("VPX Object Created");			
 		}
 
 		reloadVPXSystemTree(vpx);

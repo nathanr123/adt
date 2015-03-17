@@ -4,10 +4,17 @@
 package com.cti.vpx.controls;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -18,17 +25,20 @@ import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
 
 /**
  * @author Abi_Achu
  *
  */
-public class VPX_ProcessorTree extends JTree {
+public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4220657730002684130L;
+	
+	private VPX_Dual_ADT_RootWindow parent;
 
 	/**
 	 * 
@@ -64,8 +74,9 @@ public class VPX_ProcessorTree extends JTree {
 	/**
 	 * @param root
 	 */
-	public VPX_ProcessorTree(TreeNode root) {
+	public VPX_ProcessorTree(VPX_Dual_ADT_RootWindow prnt,TreeNode root) {
 		super(root);
+		this.parent = prnt;
 		initTree();
 	}
 
@@ -87,26 +98,26 @@ public class VPX_ProcessorTree extends JTree {
 	}
 
 	private void initTree() {
+		addMouseListener(this);
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
 	}
 
-	
 	private class VPX_ProcessorTreeCellRenderer extends DefaultTreeCellRenderer {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 3402533538077987491L;
-		
+
 		ImageIcon systemIcon = VPXUtilities.getImageIcon("images\\System.jpg", 18, 18);
-		
+
 		ImageIcon slotIcon = VPXUtilities.getImageIcon("images\\Slot.jpg", 18, 18);
-		
+
 		ImageIcon processorIcon = VPXUtilities.getImageIcon("images\\Processor4.jpg", 14, 14);
-		
+
 		ImageIcon coreIcon = VPXUtilities.getImageIcon("images\\Core.png", 14, 14);
 
 		public VPX_ProcessorTreeCellRenderer() {
-			
+
 		}
 
 		@Override
@@ -116,8 +127,7 @@ public class VPX_ProcessorTree extends JTree {
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
 			String nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
-			
-			
+
 			if (nodo.startsWith(VPXSystem.class.getSimpleName())) {
 				setIcon(systemIcon);
 			} else if (nodo.startsWith(Slot.class.getSimpleName())) {
@@ -131,5 +141,82 @@ public class VPX_ProcessorTree extends JTree {
 
 		}
 	}
-	
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		int row = getRowForLocation(e.getX(), e.getY());
+		if (row == -1) {
+			return;
+		}
+		setSelectionRow(row);
+		showConextMenu(e.getX(), e.getY(), ((DefaultMutableTreeNode) getLastSelectedPathComponent()).getUserObject()
+				.toString());
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void showConextMenu(int x, int y, String node) {
+
+		JPopupMenu popup = new JPopupMenu();
+
+		if (node.startsWith("VPXSystem")) {
+			JMenuItem itemScan = new JMenuItem("Scan");
+			itemScan.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					VPX_ScanWindow ir = new VPX_ScanWindow(parent);
+					ir.setVisible(true);
+
+				}
+			});
+
+			JMenuItem itemRefresh = new JMenuItem("Refresh");
+
+			popup.add(itemScan);
+
+			popup.add(itemRefresh);
+
+		} else if ((node.startsWith("Slot"))) {
+
+			JMenuItem itemConnectAll = new JMenuItem("Connect All Processors");
+
+			popup.add(itemConnectAll);
+
+		} else if ((node.startsWith("DSP")) || (node.startsWith("P2020"))) {
+
+			JMenuItem itemConnect = new JMenuItem("Connect");
+
+			popup.add(itemConnect);
+		}
+
+		popup.add(new JSeparator());
+
+		JMenuItem itemDetail = new JMenuItem("Detail");
+
+		popup.add(itemDetail);
+
+		popup.show(this, x, y);
+	}
 }
