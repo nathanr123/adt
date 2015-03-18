@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -81,7 +82,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private VPX_LoggerPanel logger;
 
-	private VPX_ProcessorTree tree;
+	private VPX_ProcessorTree vpx_Processor_Tree;
+
+	private JTabbedPane vpx_Content_Tabbed_Pane_Message;
 
 	/**
 	 * Create the frame.
@@ -99,10 +102,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setBounds(0, 0, 500, 500);
+		// setBounds(0, 0, 500, 500);
 
-		// setBounds(0, 0, VPXUtilities.getScreenWidth(),
-		// VPXUtilities.getScreenHeight());
+		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
 		// setAlwaysOnTop(true);
 
@@ -136,17 +138,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_MenuBar.add(vpx_Menu_File);
 
-		vpx_Menu_File_Scan = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Scan"));
-		vpx_Menu_File_Scan.addActionListener(new ActionListener() {
+		vpx_Menu_File_Scan = ComponentFactory.createJMenuItem(new ScanAction(rBundle.getString("Menu.File.Scan")));
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				VPX_ScanWindow ir = new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
-				ir.setVisible(true);
-			}
-		});
-
-		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Exit"));
+		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(new ExitAction(rBundle.getString("Menu.File.Exit")));
 
 		vpx_Menu_File.add(vpx_Menu_File_Scan);
 
@@ -168,20 +162,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_MenuBar.add(vpx_Menu_Window);
 
-		vpx_Menu_Window_MemoryBrowser = ComponentFactory
-				.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser"));
-
-		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
-
-				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
-
-			}
-		});
+		vpx_Menu_Window_MemoryBrowser = ComponentFactory.createJMenuItem(new MemoryAction(rBundle
+				.getString("Menu.Window.MemoryBrowser")));
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
 
@@ -252,15 +234,15 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Right_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
 
-		JTabbedPane tb1 = new JTabbedPane();
+		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
 
 		logger = new VPX_LoggerPanel();
 
-		tb1.addTab("Logger", logger);
+		vpx_Content_Tabbed_Pane_Message.addTab("Logger", logger);
 
-		tb1.addTab("Message", new VPX_MessagePanel());
+		vpx_Content_Tabbed_Pane_Message.addTab("Message", new VPX_MessagePanel());
 
-		vpx_Right_SplitPane.setRightComponent(tb1);
+		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
 		vpx_Right_SplitPane.setDividerLocation(((int) VPXUtilities.getScreenHeight() / 2 + (int) VPXUtilities
 				.getScreenHeight() / 10));
@@ -276,14 +258,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		createVPXObject();
 
-		tree = new VPX_ProcessorTree(this,systemRootNode);
+		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this, systemRootNode);
 
-		JScrollPane jp = new JScrollPane(tree);
+		JScrollPane vpx_Processor_Tree_ScrollPane = new JScrollPane(vpx_Processor_Tree);
 
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			tree.expandRow(i);
+		for (int i = 0; i < vpx_Processor_Tree.getRowCount(); i++) {
+			vpx_Processor_Tree.expandRow(i);
 		}
-		return jp;
+		return vpx_Processor_Tree_ScrollPane;
 	}
 
 	private void createVPXObject() {
@@ -406,29 +388,26 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			}
 		}
 
-		
-		
-		tree.updateUI();
-		
-		for (int i = 0; i < tree.getRowCount(); i++) {
-			tree.expandRow(i);
+		vpx_Processor_Tree.updateUI();
+
+		for (int i = 0; i < vpx_Processor_Tree.getRowCount(); i++) {
+			vpx_Processor_Tree.expandRow(i);
 		}
 
-	//	VPXParser.writeToXMLFile(system);
+		// VPXParser.writeToXMLFile(system);
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {
 
 		if (vpx == null) {
-			// System.out.println("VPX Null");
-			updateLog(VPX_LoggerPanel.ERROR, "VPX Null");
+			updateLog(VPX_LoggerPanel.ERROR, "VPX not created");
 		} else {
-			updateLog("VPX Object Created");			
+			updateLog("VPX Object Created");
 		}
 
 		reloadVPXSystemTree(vpx);
 
-		updateLog("Tree Refreshed");
+		updateLog("VPX System Tree Refreshed");
 	}
 
 	public void updateLog(String logMsg) {
@@ -437,5 +416,68 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	public void updateLog(int level, String logMsg) {
 		logger.updateLog(level, logMsg);
+	}
+
+	public class ScanAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public ScanAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			VPX_ScanWindow ir = new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
+
+			ir.setVisible(true);
+
+		}
+	}
+
+	public class MemoryAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public MemoryAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
+
+			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+		}
+	}
+
+	public class ExitAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public ExitAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			VPX_Dual_ADT_RootWindow.this.dispose();
+
+		}
 	}
 }

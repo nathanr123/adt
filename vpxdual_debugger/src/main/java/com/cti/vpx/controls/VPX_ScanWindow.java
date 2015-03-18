@@ -36,6 +36,7 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
 
@@ -48,11 +49,15 @@ public class VPX_ScanWindow extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 
-	private JTextField fromIP;
+	private JTextField txt_From_IP;
 
-	private JTextField toIP;
+	private JTextField txt_To_IP;
 
 	private VPX_Dual_ADT_RootWindow parent;
+
+	private JCheckBox chk_Keep_Old_Values;
+
+	private JCheckBox chk_Refresh_Old_Values;
 
 	/**
 	 * Create the dialog.
@@ -73,11 +78,15 @@ public class VPX_ScanWindow extends JDialog {
 	private void centerFrame() {
 
 		Dimension windowSize = getSize();
+
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
 		Point centerPoint = ge.getCenterPoint();
 
 		int dx = centerPoint.x - windowSize.width / 2;
+
 		int dy = centerPoint.y - windowSize.height / 2;
+
 		setLocation(dx, dy);
 	}
 
@@ -98,53 +107,53 @@ public class VPX_ScanWindow extends JDialog {
 
 	private void loadComponents() {
 
-		JLabel lblNewLabel = new JLabel("From");
+		JLabel lbl_From_IP = ComponentFactory.createJLabel("From");
 
-		lblNewLabel.setBounds(20, 11, 61, 29);
+		lbl_From_IP.setBounds(20, 11, 61, 29);
 
-		contentPanel.add(lblNewLabel);
+		contentPanel.add(lbl_From_IP);
 
-		JLabel lblTo = new JLabel("To");
+		JLabel lbl_To_IP = ComponentFactory.createJLabel("To");
 
-		lblTo.setBounds(20, 51, 61, 29);
+		lbl_To_IP.setBounds(20, 51, 61, 29);
 
-		contentPanel.add(lblTo);
+		contentPanel.add(lbl_To_IP);
 
-		fromIP = new JTextField("172.17.1.27");
+		txt_From_IP = ComponentFactory.createJTextField("172.17.1.27");
 
-		fromIP.setBounds(89, 11, 191, 23);
+		txt_From_IP.setBounds(89, 11, 191, 23);
 
-		contentPanel.add(fromIP);
+		contentPanel.add(txt_From_IP);
 
-		fromIP.setColumns(10);
+		txt_From_IP.setColumns(10);
 
-		toIP = new JTextField("172.17.1.30");
+		txt_To_IP = ComponentFactory.createJTextField("172.17.1.30");
 
-		toIP.setColumns(10);
+		txt_To_IP.setColumns(10);
 
-		toIP.setBounds(89, 51, 191, 23);
+		txt_To_IP.setBounds(89, 51, 191, 23);
 
-		contentPanel.add(toIP);
+		contentPanel.add(txt_To_IP);
 
-		JSeparator separator = new JSeparator();
+		JSeparator separator = ComponentFactory.createJSeparator();
 
 		separator.setBounds(0, 85, 329, 2);
 
 		contentPanel.add(separator);
 
-		JCheckBox chckbxNewCheckBox = new JCheckBox("Keep old values");
+		chk_Keep_Old_Values = ComponentFactory.createJCheckBox("Keep old values");
 
-		chckbxNewCheckBox.setBounds(0, 87, 232, 23);
+		chk_Keep_Old_Values.setBounds(0, 87, 232, 23);
 
-		contentPanel.add(chckbxNewCheckBox);
+		contentPanel.add(chk_Keep_Old_Values);
 
-		JCheckBox chckbxNewCheckBox_1 = new JCheckBox("Revalidate old values");
+		chk_Refresh_Old_Values = ComponentFactory.createJCheckBox("Revalidate old values");
 
-		chckbxNewCheckBox_1.setBounds(0, 113, 232, 23);
+		chk_Refresh_Old_Values.setBounds(0, 113, 232, 23);
 
-		contentPanel.add(chckbxNewCheckBox_1);
+		contentPanel.add(chk_Refresh_Old_Values);
 
-		JPanel buttonPane = new JPanel();
+		JPanel buttonPane = ComponentFactory.createJPanel();
 
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -154,7 +163,7 @@ public class VPX_ScanWindow extends JDialog {
 
 		buttonPane.add(okButton);
 
-		JButton cancelButton = new JButton(new CancelAction("Cancel"));
+		JButton cancelButton = ComponentFactory.createJButton(new CancelAction("Cancel"));
 
 		buttonPane.add(cancelButton);
 	}
@@ -176,9 +185,9 @@ public class VPX_ScanWindow extends JDialog {
 
 			VPX_ScanWindow.this.setVisible(false);
 
-			parent.updateLog("Scanning Processors between " + fromIP.getText() + " and " + toIP.getText());
+			parent.updateLog("Scanning Processors between " + txt_From_IP.getText() + " and " + txt_To_IP.getText());
 
-			new ScanStatusWindow(fromIP.getText(), toIP.getText());
+			new VPX_ScanStatusWindow(txt_From_IP.getText(), txt_To_IP.getText());
 
 		}
 	}
@@ -204,7 +213,7 @@ public class VPX_ScanWindow extends JDialog {
 
 	}
 
-	class ScanStatusWindow extends JDialog {
+	class VPX_ScanStatusWindow extends JDialog {
 
 		/**
 		 * 
@@ -215,18 +224,18 @@ public class VPX_ScanWindow extends JDialog {
 
 		private String fromIP, toIP;
 
-		private JLabel lblNewLabel;
+		private JLabel lbl_Current_Scanning_IP;
 
 		private PingerThread scan;
 
 		private JProgressBar progressBar;
 
-		private JLabel lblNewLabel_1;
+		private JLabel lbl_Detecting_Processor;
 
 		/**
 		 * Create the dialog.
 		 */
-		public ScanStatusWindow(String from_ip, String to_ip) {
+		public VPX_ScanStatusWindow(String from_ip, String to_ip) {
 
 			super(parent);
 
@@ -268,7 +277,7 @@ public class VPX_ScanWindow extends JDialog {
 
 								parent.updateLog("Scanning Completed.");
 
-								ScanStatusWindow.this.dispose();
+								VPX_ScanStatusWindow.this.dispose();
 
 							} catch (InterruptedException | ExecutionException e) {
 
@@ -318,13 +327,13 @@ public class VPX_ScanWindow extends JDialog {
 
 			contentPanel.setLayout(new MigLayout("", "[523.00px]", "[14px][][][][][]"));
 
-			lblNewLabel_1 = new JLabel("Detecting Processors");
+			lbl_Detecting_Processor = ComponentFactory.createJLabel("Detecting Processors");
 
-			contentPanel.add(lblNewLabel_1, "cell 0 0 1 2");
+			contentPanel.add(lbl_Detecting_Processor, "cell 0 0 1 2");
 
-			lblNewLabel = new JLabel("");
+			lbl_Current_Scanning_IP = ComponentFactory.createJLabel("");
 
-			contentPanel.add(lblNewLabel, "cell 0 4,alignx left,aligny top");
+			contentPanel.add(lbl_Current_Scanning_IP, "cell 0 4,alignx left,aligny top");
 
 			progressBar = new JProgressBar(0, 100);
 
@@ -334,19 +343,19 @@ public class VPX_ScanWindow extends JDialog {
 
 			contentPanel.add(progressBar, "cell 0 5,growx");
 
-			JPanel buttonPane = new JPanel();
+			JPanel buttonPane = ComponentFactory.createJPanel();
 
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
-			JButton cancelButton = new JButton("Cancel");
+			JButton cancelButton = ComponentFactory.createJButton("Cancel");
 
 			cancelButton.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					ScanStatusWindow.this.dispose();
+					VPX_ScanStatusWindow.this.dispose();
 				}
 			});
 
@@ -396,23 +405,25 @@ public class VPX_ScanWindow extends JDialog {
 
 					ip = VPXUtilities.getIPFromLong(i);
 
-					ATP_COMMAND s = VPXTCPConnector.identifyProcessor(ip);
+					ATP_COMMAND processorInfo = VPXTCPConnector.identifyProcessor(ip);
 
-					if (s != null) {
+					if (processorInfo != null) {
 
-						parseCMD(ip, s);
+						parseCMD(ip, processorInfo);
 
-						parent.updateLog("IP : " + ip + " Type : " + s.params.proccesorInfo.processorTYPE.get());
+						parent.updateLog("IP : " + ip + " Type : "
+								+ processorInfo.params.proccesorInfo.processorTYPE.get());
 					}
 
-					long p = (ii + 1) * 100 / size;
+					long scanning_IPs_Completed_Percentage = (ii + 1) * 100 / size;
 
-					if (p <= 100) {
-						setProgress(Integer.parseInt("" + p));
+					if (scanning_IPs_Completed_Percentage <= 100) {
 
-						Thread.sleep(250);
+						setProgress(Integer.parseInt("" + scanning_IPs_Completed_Percentage));
 
-						lblNewLabel_1.setVisible(!lblNewLabel_1.isVisible());
+						Thread.sleep(150);
+
+						lbl_Detecting_Processor.setVisible(!lbl_Detecting_Processor.isVisible());
 
 						ii++;
 					}
@@ -428,31 +439,35 @@ public class VPX_ScanWindow extends JDialog {
 
 			@Override
 			protected void process(List<Long> chunks) {
+
 				for (final Long string : chunks) {
-					lblNewLabel.setText("IP Address : " + VPXUtilities.getIPFromLong(string));
+
+					lbl_Current_Scanning_IP.setText("IP Address : " + VPXUtilities.getIPFromLong(string));
 				}
 			}
 
 			private void parseCMD(String ip, ATP_COMMAND cmd) {
+
 				List<Slot> slots = vpxSystem.getSlots();
 
 				if (slots == null) {
 
-					Slot sl = new Slot();
+					Slot slotTemp = new Slot();
 
-					sl.setID((int) cmd.params.proccesorInfo.slotID.get());
+					slotTemp.setID((int) cmd.params.proccesorInfo.slotID.get());
 
-					Processor pr = new Processor();
+					Processor processTemp = new Processor();
 
-					pr.setID((int) cmd.params.proccesorInfo.processorID.get());
+					processTemp.setID((int) cmd.params.proccesorInfo.processorID.get());
 
-					pr.addIPAddress(ip);
+					processTemp.addIPAddress(ip);
 
-					pr.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+					processTemp.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
 
-					sl.addProcessor(pr);
+					slotTemp.addProcessor(processTemp);
 
-					vpxSystem.addSlot(sl);
+					vpxSystem.addSlot(slotTemp);
+
 				} else {
 
 					Slot slot = null;
@@ -466,6 +481,7 @@ public class VPX_ScanWindow extends JDialog {
 						} else {
 							slot = null;
 						}
+
 					}
 
 					if (slot == null) {
@@ -474,15 +490,15 @@ public class VPX_ScanWindow extends JDialog {
 
 						slot.setID((int) cmd.params.proccesorInfo.slotID.get());
 
-						Processor p = new Processor();
+						Processor process = new Processor();
 
-						p.setID((int) cmd.params.proccesorInfo.processorID.get());
+						process.setID((int) cmd.params.proccesorInfo.processorID.get());
 
-						p.addIPAddress(ip);
+						process.addIPAddress(ip);
 
-						p.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+						process.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
 
-						slot.addProcessor(p);
+						slot.addProcessor(process);
 
 						vpxSystem.addSlot(slot);
 					} else {
@@ -490,15 +506,17 @@ public class VPX_ScanWindow extends JDialog {
 						List<Processor> plist = slot.getProcessors();
 
 						if (plist == null) {
-							Processor p = new Processor();
 
-							p.setID((int) cmd.params.proccesorInfo.processorID.get());
+							Processor processr = new Processor();
 
-							p.addIPAddress(ip);
+							processr.setID((int) cmd.params.proccesorInfo.processorID.get());
 
-							p.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+							processr.addIPAddress(ip);
 
-							slot.addProcessor(p);
+							processr.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+							slot.addProcessor(processr);
+
 						} else {
 
 							Processor processor = null;
@@ -517,16 +535,19 @@ public class VPX_ScanWindow extends JDialog {
 							}
 
 							if (processor == null) {
-								Processor p = new Processor();
 
-								p.setID((int) cmd.params.proccesorInfo.processorID.get());
+								Processor procsr = new Processor();
 
-								p.addIPAddress(ip);
+								procsr.setID((int) cmd.params.proccesorInfo.processorID.get());
 
-								p.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+								procsr.addIPAddress(ip);
 
-								slot.addProcessor(p);
+								procsr.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+								slot.addProcessor(procsr);
+
 							} else {
+
 								processor.addIPAddress(ip);
 							}
 						}
@@ -539,12 +560,18 @@ public class VPX_ScanWindow extends JDialog {
 			private PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
 
 				if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
+
 					return PROCESSOR_LIST.PROCESSOR_P2020;
+
 				} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP1.toString())) {
+
 					return PROCESSOR_LIST.PROCESSOR_DSP1;
+
 				} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP2.toString())) {
+
 					return PROCESSOR_LIST.PROCESSOR_DSP2;
 				}
+
 				return null;
 
 			}

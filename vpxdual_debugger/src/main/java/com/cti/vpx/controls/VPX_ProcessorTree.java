@@ -37,7 +37,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 4220657730002684130L;
-	
+
 	private VPX_Dual_ADT_RootWindow parent;
 
 	/**
@@ -51,7 +51,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * @param value
 	 */
 	public VPX_ProcessorTree(Object[] value) {
+
 		super(value);
+
 		initTree();
 	}
 
@@ -59,7 +61,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * @param value
 	 */
 	public VPX_ProcessorTree(Vector<?> value) {
+
 		super(value);
+
 		initTree();
 	}
 
@@ -67,16 +71,21 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * @param value
 	 */
 	public VPX_ProcessorTree(Hashtable<?, ?> value) {
+
 		super(value);
+
 		initTree();
 	}
 
 	/**
 	 * @param root
 	 */
-	public VPX_ProcessorTree(VPX_Dual_ADT_RootWindow prnt,TreeNode root) {
+	public VPX_ProcessorTree(VPX_Dual_ADT_RootWindow prnt, TreeNode root) {
+
 		super(root);
+
 		this.parent = prnt;
+
 		initTree();
 	}
 
@@ -84,7 +93,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * @param newModel
 	 */
 	public VPX_ProcessorTree(TreeModel newModel) {
+
 		super(newModel);
+
 		initTree();
 	}
 
@@ -93,12 +104,16 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * @param asksAllowsChildren
 	 */
 	public VPX_ProcessorTree(TreeNode root, boolean asksAllowsChildren) {
+
 		super(root, asksAllowsChildren);
+
 		initTree();
 	}
 
 	private void initTree() {
+
 		addMouseListener(this);
+
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
 	}
 
@@ -129,22 +144,29 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			String nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
 
 			if (nodo.startsWith(VPXSystem.class.getSimpleName())) {
+
 				setIcon(systemIcon);
+
 			} else if (nodo.startsWith(Slot.class.getSimpleName())) {
+
 				setIcon(slotIcon);
+
 			} else if (nodo.startsWith("DSP") || nodo.startsWith("P2020")) {
+
 				setIcon(processorIcon);
+
 			} else if (nodo.startsWith(Core.class.getSimpleName())) {
+
 				setIcon(coreIcon);
 			}
-			return this;
 
+			return this;
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -155,38 +177,41 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		
 		int row = getRowForLocation(e.getX(), e.getY());
+		
 		if (row == -1) {
+			
 			return;
 		}
+		
 		setSelectionRow(row);
+		
 		showConextMenu(e.getX(), e.getY(), ((DefaultMutableTreeNode) getLastSelectedPathComponent()).getUserObject()
 				.toString());
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
+	public void mouseExited(MouseEvent e) {}
 
 	private void showConextMenu(int x, int y, String node) {
 
 		JPopupMenu popup = new JPopupMenu();
 
 		if (node.startsWith("VPXSystem")) {
+			
 			JMenuItem itemScan = new JMenuItem("Scan");
+			
 			itemScan.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					
 					VPX_ScanWindow ir = new VPX_ScanWindow(parent);
+					
 					ir.setVisible(true);
 
 				}

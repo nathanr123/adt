@@ -30,6 +30,8 @@ import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
+import com.cti.vpx.util.ComponentFactory;
+
 public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	/**
@@ -70,27 +72,32 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	private void loadComponents() {
 
-		JPanel panel = new JPanel();
+		JPanel log_Panel = ComponentFactory.createJPanel();
 
-		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
+		FlowLayout flowLayout = (FlowLayout) log_Panel.getLayout();
 
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 
-		add(panel, BorderLayout.SOUTH);
+		add(log_Panel, BorderLayout.SOUTH);
 
-		JButton btn_clear = new JButton(new ClearAction("Clear"));
-		panel.add(btn_clear);
+		JButton btn_Log_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
 
-		JButton btn_Copy = new JButton(new CopyAction("Copy"));
-		panel.add(btn_Copy);
+		log_Panel.add(btn_Log_Clear);
 
-		JButton btn_Save = new JButton(new SaveAction("Save"));
-		panel.add(btn_Save);
+		JButton btn_Log_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
 
-		JScrollPane scrl_Log = new JScrollPane();
+		log_Panel.add(btn_Log_Copy);
+
+		JButton btn_Log_Save = ComponentFactory.createJButton(new SaveAction("Save"));
+
+		log_Panel.add(btn_Log_Save);
+
+		JScrollPane scrl_Log = ComponentFactory.createJScrollPane();
+
 		add(scrl_Log, BorderLayout.CENTER);
 
-		txtA_Log = new JTextArea();
+		txtA_Log = ComponentFactory.createJTextArea();
+
 		scrl_Log.setViewportView(txtA_Log);
 
 		txtA_Log.setEditable(false);
@@ -191,9 +198,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		dialog.setContentPane(optionPane);
 		optionPane.setBorder(new LineBorder(Color.GRAY));
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-	
-		dialog.setSize(new Dimension(350,100));
-		
+
+		dialog.setSize(new Dimension(350, 100));
 
 		// create timer to dispose of dialog after 5 seconds
 		Timer timer = new Timer(1000, new AbstractAction() {

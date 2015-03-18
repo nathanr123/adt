@@ -60,7 +60,7 @@ public class VPXTCPConnector {
 
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(ipaddress, PORT), 500);
+			client.connect(new InetSocketAddress(ipaddress, PORT), 1000);
 
 			client.setSoTimeout(1000);
 

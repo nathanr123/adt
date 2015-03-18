@@ -10,16 +10,26 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.tree.TreeNode;
+
+import com.cti.vpx.controls.VPX_ProcessorTree;
+import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
 
 /**
  * @author nathanr_kamal
@@ -47,6 +57,11 @@ public class ComponentFactory {
 		return new JMenuItem(name);
 	}
 
+	public static JMenuItem createJMenuItem(Action action) {
+
+		return new JMenuItem(action);
+	}
+
 	public static JMenuItem createJMenuItem(String name, ActionListener listener) {
 
 		JMenuItem i = new JMenuItem(name);
@@ -61,6 +76,11 @@ public class ComponentFactory {
 		return new JToolBar();
 	}
 
+	public static JButton createJButton(String name) {
+
+		return new JButton(name);
+	}
+
 	public static JButton createJButton(String name, ActionListener listner) {
 
 		JButton jb = new JButton(name);
@@ -68,6 +88,11 @@ public class ComponentFactory {
 		jb.addActionListener(listner);
 
 		return jb;
+	}
+
+	public static JButton createJButton(Action action) {
+
+		return new JButton(action);
 	}
 
 	public static JButton createJButton(String name, Icon icon, ActionListener listner) {
@@ -87,6 +112,34 @@ public class ComponentFactory {
 	public static JSeparator createJSeparator() {
 
 		return new JSeparator();
+	}
+
+	public static JTextField createJTextField() {
+		return new JTextField();
+	}
+
+	public static JTextField createJTextField(String text) {
+		return new JTextField(text);
+	}
+
+	public static JCheckBox createJCheckBox(String text) {
+		return new JCheckBox(text);
+	}
+
+	public static VPX_ProcessorTree createProcessorTree(VPX_Dual_ADT_RootWindow parent, TreeNode root) {
+		return new VPX_ProcessorTree(parent, root);
+	}
+
+	public static JComboBox createJComboBox() {
+		return new JComboBox();
+	}
+
+	public static JScrollPane createJScrollPane() {
+		return new JScrollPane();
+	}
+
+	public static JTextArea createJTextArea() {
+		return new JTextArea();
 	}
 
 	public static ImageIcon getImageIcon(String path, int w, int h) {
