@@ -1,4 +1,4 @@
-package com.cti.vpx.controls;
+package com.cti.vpx.util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

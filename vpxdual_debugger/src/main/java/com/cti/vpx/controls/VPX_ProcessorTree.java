@@ -40,6 +40,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private VPX_Dual_ADT_RootWindow parent;
 
+	private VPXSystem system;
+
 	/**
 	 * 
 	 */
@@ -117,6 +119,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
 	}
 
+	public void setVPXSystem(VPXSystem sys) {
+		this.system = sys;
+	}
+
 	private class VPX_ProcessorTreeCellRenderer extends DefaultTreeCellRenderer {
 		/**
 		 * 
@@ -166,7 +172,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
 
 	}
 
@@ -177,41 +182,43 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		
+
 		int row = getRowForLocation(e.getX(), e.getY());
-		
+
 		if (row == -1) {
-			
+
 			return;
 		}
-		
+
 		setSelectionRow(row);
-		
+
 		showConextMenu(e.getX(), e.getY(), ((DefaultMutableTreeNode) getLastSelectedPathComponent()).getUserObject()
 				.toString());
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {
+	}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+	}
 
 	private void showConextMenu(int x, int y, String node) {
 
 		JPopupMenu popup = new JPopupMenu();
 
 		if (node.startsWith("VPXSystem")) {
-			
+
 			JMenuItem itemScan = new JMenuItem("Scan");
-			
+
 			itemScan.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					
+
 					VPX_ScanWindow ir = new VPX_ScanWindow(parent);
-					
+
 					ir.setVisible(true);
 
 				}
@@ -239,6 +246,15 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		popup.add(new JSeparator());
 
 		JMenuItem itemDetail = new JMenuItem("Detail");
+
+		itemDetail.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				VPX_DetailPanel detail = new VPX_DetailPanel(system);
+				detail.setVisible(true);
+			}
+		});
 
 		popup.add(itemDetail);
 

@@ -259,6 +259,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		createVPXObject();
 
 		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this, systemRootNode);
+		
+		vpx_Processor_Tree.setVPXSystem(system);
 
 		JScrollPane vpx_Processor_Tree_ScrollPane = new JScrollPane(vpx_Processor_Tree);
 

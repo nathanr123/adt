@@ -37,6 +37,7 @@ import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXTCPConnector;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
 
