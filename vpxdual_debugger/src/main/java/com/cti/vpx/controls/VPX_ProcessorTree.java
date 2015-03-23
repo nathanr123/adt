@@ -147,7 +147,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-			String nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
+			String nodo = "";
+
+			if (((DefaultMutableTreeNode) value).getUserObject() != null)
+				nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
 
 			if (nodo.startsWith(VPXSystem.class.getSimpleName())) {
 

@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -25,7 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JToolBar;
+import javax.swing.text.StyledDocument;
 import javax.swing.tree.TreeNode;
 
 import com.cti.vpx.controls.VPX_ProcessorTree;
@@ -130,8 +133,12 @@ public class ComponentFactory {
 		return new VPX_ProcessorTree(parent, root);
 	}
 
-	public static JComboBox createJComboBox() {
-		return new JComboBox();
+	public static JComboBox<String> createJComboBox() {
+		return new JComboBox<String>();
+	}
+
+	public static JList<String> createJList() {
+		return new JList<String>();
 	}
 
 	public static JScrollPane createJScrollPane() {
@@ -140,6 +147,14 @@ public class ComponentFactory {
 
 	public static JTextArea createJTextArea() {
 		return new JTextArea();
+	}
+
+	public static JTextPane createJTextPane() {
+		return new JTextPane();
+	}
+
+	public static JTextPane createJTextPane(StyledDocument doc) {
+		return new JTextPane(doc);
 	}
 
 	public static ImageIcon getImageIcon(String path, int w, int h) {

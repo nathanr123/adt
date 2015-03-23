@@ -3,16 +3,27 @@
  */
 package com.cti.vpx.util;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import javax.swing.border.LineBorder;
+
+import com.cti.vpx.model.VPXSystem;
 
 /**
  * @author nathanr_kamal
@@ -27,6 +38,8 @@ public class VPXUtilities {
 	private static final String MSG = "VPX_Dual_adt";
 
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(MSG);
+
+	private static VPXSystem vpxSystem = new VPXSystem();
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -76,6 +89,57 @@ public class VPXUtilities {
 
 		return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff,
 				(ipaslong >>> 8) & 0xff, (ipaslong) & 0xff);
+	}
+
+	public static void showPopup(String msg) {
+		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE,
+				JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+
+		final JDialog dialog = new JDialog();
+		dialog.setTitle("Message");
+		dialog.setModal(true);
+		dialog.setUndecorated(true);
+		dialog.setContentPane(optionPane);
+		optionPane.setBorder(new LineBorder(Color.GRAY));
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+		dialog.setSize(new Dimension(450, 100));
+
+		// create timer to dispose of dialog after 5 seconds
+		Timer timer = new Timer(1000, new AbstractAction() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -5640039573419174479L;
+
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				dialog.dispose();
+			}
+		});
+		timer.setRepeats(false);// the timer should only go off once
+
+		// start timer to close JDialog as dialog modal we must start the timer
+		// before its visible
+		timer.start();
+
+		Dimension windowSize = dialog.getSize();
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+		int dy = centerPoint.y - windowSize.height / 2;
+		dialog.setLocation(dx, dy);
+
+		dialog.setVisible(true);
+	}
+
+	public static VPXSystem getVPXSystem() {
+		return vpxSystem;
+	}
+
+	public static void setVPXSystem(VPXSystem sys) {
+		vpxSystem = sys;
 	}
 
 	public static ImageIcon getImageIcon(String path, int w, int h) {

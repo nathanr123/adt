@@ -35,10 +35,8 @@ import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-
 /**
- * Header of the hex table; displays address of the first byte on the
- * row.
+ * Header of the hex table; displays address of the first byte on the row.
  *
  * @author Robert Futrell
  * @version 1.0
@@ -50,14 +48,13 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 	private HexTable table;
 	private RowHeaderListModel model;
 
-	private static final Border CELL_BORDER =
-							BorderFactory.createEmptyBorder(0,5,0,5);
-
+	private static final Border CELL_BORDER = BorderFactory.createEmptyBorder(0, 5, 0, 5);
 
 	/**
 	 * Constructor.
 	 *
-	 * @param table The table displaying the hex content.
+	 * @param table
+	 *            The table displaying the hex content.
 	 */
 	public HexEditorRowHeader(HexTable table) {
 		this.table = table;
@@ -73,14 +70,12 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 		table.getModel().addTableModelListener(this);
 	}
 
-
 	public void addSelectionInterval(int anchor, int lead) {
 		super.addSelectionInterval(anchor, lead);
 		int min = Math.min(anchor, lead);
 		int max = Math.max(anchor, lead);
 		table.setSelectedRows(min, max);
 	}
-
 
 	public void removeSelectionInterval(int index0, int index1) {
 		super.removeSelectionInterval(index0, index1);
@@ -89,30 +84,26 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 		table.setSelectedRows(Math.min(anchor, lead), Math.max(anchor, lead));
 	}
 
-
 	public void setSelectionInterval(int anchor, int lead) {
 		super.setSelectionInterval(anchor, lead);
 		int min = Math.min(anchor, lead);
 		int max = Math.max(anchor, lead);
 		// Table may be showing 0 bytes, but we're showing 1 row header
-		if (max<table.getRowCount()) {
+		if (max < table.getRowCount()) {
 			table.setSelectedRows(min, max);
 		}
 	}
 
-
 	private void syncRowCount() {
-		if (table.getRowCount()!=model.getSize()) {
+		if (table.getRowCount() != model.getSize()) {
 			// Always keep 1 row, even if showing 0 bytes in editor
 			model.setSize(Math.max(1, table.getRowCount()));
 		}
 	}
 
-
 	public void tableChanged(TableModelEvent e) {
 		syncRowCount();
 	}
-
 
 	/**
 	 * Renders the cells of the row header.
@@ -128,18 +119,16 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 			setHorizontalAlignment(JLabel.RIGHT);
 		}
 
-		public Component getListCellRendererComponent(JList list, Object value,
-							int index, boolean selected, boolean hasFocus) {
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected,
+				boolean hasFocus) {
 			// Never paint cells as "selected."
-			super.getListCellRendererComponent(list, value, index,
-												false, hasFocus);
+			super.getListCellRendererComponent(list, value, index, false, hasFocus);
 			setBorder(CELL_BORDER);
-//			setBackground(table.getBackground());
+			// setBackground(table.getBackground());
 			return this;
 		}
 
 	}
-
 
 	/**
 	 * List model used by the header for the hex table.
@@ -154,7 +143,7 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 		private int size;
 
 		public Object getElementAt(int index) {
-			return "0x" + Integer.toHexString(index*16);
+			return "0x" + Integer.toHexString(index * 16);
 		}
 
 		public int getSize() {
@@ -165,21 +154,19 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 			int old = this.size;
 			this.size = size;
 			int diff = size - old;
-			if (diff>0) {
-				fireIntervalAdded(this, old, size-1);
-			}
-			else if (diff<0) {
-				fireIntervalRemoved(this, size+1, old-1);
+			if (diff > 0) {
+				fireIntervalAdded(this, old, size - 1);
+			} else if (diff < 0) {
+				fireIntervalRemoved(this, size + 1, old - 1);
 			}
 		}
 
 	}
 
-
 	/**
-	 * Border for the entire row header.  This draws a line to separate the
-	 * header from the table contents, and gives a small amount of whitespace
-	 * to separate the two.
+	 * Border for the entire row header. This draws a line to separate the
+	 * header from the table contents, and gives a small amount of whitespace to
+	 * separate the two.
 	 *
 	 * @author Robert Futrell
 	 * @version 1.0
@@ -189,19 +176,17 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 		private static final long serialVersionUID = 1L;
 
 		public RowHeaderBorder() {
-			super(0,0,0,2);
+			super(0, 0, 0, 2);
 		}
 
-	    public void paintBorder(Component c, Graphics g, int x, int y,
-	    						int width, int height) {
-	    	x = x + width - this.right;
-//	    	g.setColor(table.getBackground());
-//	    	g.fillRect(x,y, width,height);
-	    	g.setColor(table.getGridColor());
-	    	g.drawLine(x,y, x,y+height);
-	    }
+		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+			x = x + width - this.right;
+			// g.setColor(table.getBackground());
+			// g.fillRect(x,y, width,height);
+			g.setColor(table.getGridColor());
+			g.drawLine(x, y, x, y + height);
+		}
 
 	}
-
 
 }

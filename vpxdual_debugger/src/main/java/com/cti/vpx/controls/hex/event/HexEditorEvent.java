@@ -4,7 +4,6 @@ import java.util.EventObject;
 
 import com.cti.vpx.controls.hex.swing.HexEditor;
 
-
 /**
  * An event that is fired when certain events occur in a hex editor.
  *
@@ -30,14 +29,17 @@ public class HexEditorEvent extends EventObject {
 	 */
 	private int removed;
 
-
 	/**
 	 * Creates a new event object.
 	 *
-	 * @param editor The source of this event.
-	 * @param offs The offset at which bytes were added or removed.
-	 * @param added The number of bytes added, or <code>0</code> for none.
-	 * @param removed The number of bytes removed, or <code>0</code> for none.
+	 * @param editor
+	 *            The source of this event.
+	 * @param offs
+	 *            The offset at which bytes were added or removed.
+	 * @param added
+	 *            The number of bytes added, or <code>0</code> for none.
+	 * @param removed
+	 *            The number of bytes removed, or <code>0</code> for none.
 	 */
 	public HexEditorEvent(HexEditor editor, int offs, int added, int removed) {
 		super(editor);
@@ -46,10 +48,9 @@ public class HexEditorEvent extends EventObject {
 		this.removed = removed;
 	}
 
-
 	/**
-	 * Returns the number of bytes added.  If this value equals the number
-	 * of bytes removed, the bytes were actually modified.
+	 * Returns the number of bytes added. If this value equals the number of
+	 * bytes removed, the bytes were actually modified.
 	 *
 	 * @return The number of bytes added.
 	 * @see #getRemovedCount()
@@ -58,16 +59,14 @@ public class HexEditorEvent extends EventObject {
 		return added;
 	}
 
-
 	/**
 	 * Returns the hex editor that fired this event.
 	 *
 	 * @return The hex editor.
 	 */
 	public HexEditor getHexEditor() {
-		return (HexEditor)getSource();
+		return (HexEditor) getSource();
 	}
-
 
 	/**
 	 * Returns the offset of the change.
@@ -78,10 +77,9 @@ public class HexEditorEvent extends EventObject {
 		return offset;
 	}
 
-
 	/**
-	 * Returns the number of bytes removed.  If this value equals the number
-	 * of bytes added, then the bytes were actually modified.
+	 * Returns the number of bytes removed. If this value equals the number of
+	 * bytes added, then the bytes were actually modified.
 	 *
 	 * @return The number of bytes removed.
 	 * @see #getAddedCount()
@@ -90,17 +88,15 @@ public class HexEditorEvent extends EventObject {
 		return removed;
 	}
 
-
 	/**
 	 * Returns whether this was a "modification" of bytes; that is, no bytes
-	 * were added or removed, bytes were only modified.  This is equivalent
-	 * to <code>getAddedCount() == getRemovedCount()</code>.
+	 * were added or removed, bytes were only modified. This is equivalent to
+	 * <code>getAddedCount() == getRemovedCount()</code>.
 	 *
 	 * @return Whether this is just a "modification" of bytes.
 	 */
 	public boolean isModification() {
-		return getAddedCount()==getRemovedCount();
+		return getAddedCount() == getRemovedCount();
 	}
-
 
 }

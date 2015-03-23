@@ -28,7 +28,6 @@ package com.cti.vpx.controls.hex.event;
 
 import java.util.EventObject;
 
-
 /**
  * Occurs when the cell selection within the hex editor becomes changed.
  * 
@@ -59,25 +58,28 @@ public class SelectionChangedEvent extends EventObject {
 	 */
 	private int newSelecEnd;
 
-
 	/**
 	 * Constructor.
 	 * 
-	 * @param source The instance which creates this event.
-	 * @param previousSelecStart The previous selection start index.
-	 * @param previousSelecEnd The previous selection end index.
-	 * @param newSelecStart The new selection start index.
-	 * @param newSelecEnd The new selection end index.
+	 * @param source
+	 *            The instance which creates this event.
+	 * @param previousSelecStart
+	 *            The previous selection start index.
+	 * @param previousSelecEnd
+	 *            The previous selection end index.
+	 * @param newSelecStart
+	 *            The new selection start index.
+	 * @param newSelecEnd
+	 *            The new selection end index.
 	 */
-	public SelectionChangedEvent(Object source, int previousSelecStart,
-			int previousSelecEnd, int newSelecStart, int newSelecEnd) {
+	public SelectionChangedEvent(Object source, int previousSelecStart, int previousSelecEnd, int newSelecStart,
+			int newSelecEnd) {
 		super(source);
 		this.previousSelecStart = previousSelecStart;
 		this.previousSelecEnd = previousSelecEnd;
 		this.newSelecStart = newSelecStart;
 		this.newSelecEnd = newSelecEnd;
 	}
-
 
 	/**
 	 * @return The new selection end index.
@@ -86,14 +88,12 @@ public class SelectionChangedEvent extends EventObject {
 		return this.newSelecEnd;
 	}
 
-
 	/**
 	 * @return The new selection start index.
 	 */
 	public int getNewSelecStart() {
 		return this.newSelecStart;
 	}
-
 
 	/**
 	 * @return The previous selection end index.
@@ -102,14 +102,12 @@ public class SelectionChangedEvent extends EventObject {
 		return this.previousSelecEnd;
 	}
 
-
 	/**
 	 * @return The previous selection start index.
 	 */
 	public int getPreviousSelecStart() {
 		return this.previousSelecStart;
 	}
-
 
 	public String toString() {
 		StringBuffer result = new StringBuffer("Old selection: [");
@@ -119,6 +117,5 @@ public class SelectionChangedEvent extends EventObject {
 		result.append(getNewSelecEnd()).append(']');
 		return result.toString();
 	}
-
 
 }

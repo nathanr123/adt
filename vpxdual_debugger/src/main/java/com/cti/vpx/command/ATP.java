@@ -4,8 +4,7 @@ public interface ATP {
 
 	// Message Type
 	public static final int MSG_TYPE_QUERY = 0xC0;
-	
-	
+
 	// Message ID
 	public static final int MSG_ID_INFO = 0xA0;
 

@@ -136,9 +136,9 @@ public class VPX_DetailPanel extends JDialog {
 		List<Slot> slots = sys.getSlots();
 
 		tbl_Property_Model.addRow(new String[] { "Total No of Slots", ("" + slots.size()) });
-		
+
 		tbl_Property_Model.addRow(new String[] { "", "" });
-		
+
 		for (Iterator<Slot> iterator = slots.iterator(); iterator.hasNext();) {
 
 			Slot slot = iterator.next();
@@ -158,7 +158,7 @@ public class VPX_DetailPanel extends JDialog {
 				Processor processor = iterator2.next();
 
 				tbl_Property_Model.addRow(new String[] { "", "" });
-				
+
 				tbl_Property_Model.addRow(new String[] { "Processor Name", processor.getName() });
 
 				tbl_Property_Model.addRow(new String[] { "Processor ID", ("" + processor.getID()) });
@@ -176,7 +176,7 @@ public class VPX_DetailPanel extends JDialog {
 						String string = iterator3.next();
 
 						tbl_Property_Model.addRow(new String[] { "IP Address " + i, string });
-						
+
 						i++;
 					}
 				} else {

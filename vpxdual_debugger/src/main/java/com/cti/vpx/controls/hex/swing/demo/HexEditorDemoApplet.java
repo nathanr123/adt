@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.swing.demo;
 import javax.swing.JApplet;
 import javax.swing.UIManager;
 
-
 /**
  * A demo applet for the Swing {@link org.fife.ui.swing.hex.HexEditor}
  * component.
@@ -41,18 +40,15 @@ public class HexEditorDemoApplet extends JApplet {
 
 	private static final long serialVersionUID = 1L;
 
-
 	public void init() {
 		super.init();
 		try {
-			UIManager.setLookAndFeel(
-					UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			e.printStackTrace(); // Do something to keep FindBugs happy
 		}
 		HexEditorDemoPanel cp = new HexEditorDemoPanel();
 		add(cp);
 	}
-
 
 }

@@ -17,7 +17,6 @@ public class VPXSystem implements VPX {
 	/**
 	 * 
 	 */
-	
 
 	private int ID;
 

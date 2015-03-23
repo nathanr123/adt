@@ -44,16 +44,15 @@ import com.cti.vpx.controls.hex.event.HexEditorListener;
 import com.cti.vpx.controls.hex.event.SelectionChangedListener;
 import com.cti.vpx.util.VPXUtilities;
 
-
-
 /**
- * A Swing hex editor component.<p>
+ * A Swing hex editor component.
+ * <p>
  *
  * The hex editor's functionality includes:
  * <ul>
- *    <li>Cut, copy, paste, delete of 1 or more bytes
- *    <li>Undo/redo
- *    <li>Selecting a contiguous block of bytes
+ * <li>Cut, copy, paste, delete of 1 or more bytes
+ * <li>Undo/redo
+ * <li>Selecting a contiguous block of bytes
  * </ul>
  *
  * @author Robert Futrell
@@ -70,28 +69,25 @@ public class HexEditor extends JScrollPane {
 	public static final String PROPERTY_ALTERNATE_COLUMN_BG = "alternateColBG";
 
 	/**
-	 * Property fired when the alternating of row background colors is
-	 * toggled.
+	 * Property fired when the alternating of row background colors is toggled.
 	 */
 	public static final String PROPERTY_ALTERNATE_ROW_BG = "alternateRowBG";
 
 	/**
-	 * Property fired when the highlight color of the ascii dump column
-	 * is changed.
+	 * Property fired when the highlight color of the ascii dump column is
+	 * changed.
 	 */
-	public static final String PROPERTY_ASCII_DUMP_HIGHLIGHT_COLOR =
-												"asciiDumpHighlightColor";
+	public static final String PROPERTY_ASCII_DUMP_HIGHLIGHT_COLOR = "asciiDumpHighlightColor";
 
 	/**
-	 * Property fired when the visibility of the highlight in the "ascii
-	 * dump" column is toggled.
+	 * Property fired when the visibility of the highlight in the "ascii dump"
+	 * column is toggled.
 	 */
-	public static final String PROPERTY_HIGHLIGHT_ASCII_DUMP =
-												"highlightAsciiDump";
+	public static final String PROPERTY_HIGHLIGHT_ASCII_DUMP = "highlightAsciiDump";
 
 	/**
-	 * Property fired when the padding of low bytes (<code>0 - 15</code>)
-	 * is toggled.
+	 * Property fired when the padding of low bytes (<code>0 - 15</code>) is
+	 * toggled.
 	 */
 	public static final String PROPERTY_PAD_LOW_BYTES = "padLowBytes";
 
@@ -107,12 +103,10 @@ public class HexEditor extends JScrollPane {
 	private Color highlightSelectionInAsciiDumpColor;
 	private boolean padLowBytes;
 
-	private static final TransferHandler DEFAULT_TRANSFER_HANDLER =
-							new HexEditorTransferHandler();
+	private static final TransferHandler DEFAULT_TRANSFER_HANDLER = new HexEditorTransferHandler();
 
-	static final int DUMP_COLUMN_WIDTH		= 200;
+	static final int DUMP_COLUMN_WIDTH = 200;
 	private static final String MSG = "org.fife.ui.hex.HexEditor";
-
 
 	/**
 	 * Creates a new <code>HexEditor</code> component.
@@ -129,52 +123,52 @@ public class HexEditor extends JScrollPane {
 		setAlternateRowBG(false);
 		setAlternateColumnBG(false);
 		setHighlightSelectionInAsciiDump(true);
-		setHighlightSelectionInAsciiDumpColor(new Color(255,255,192));
+		setHighlightSelectionInAsciiDumpColor(new Color(255, 255, 192));
 		setPadLowBytes(true);
 
 		setTransferHandler(DEFAULT_TRANSFER_HANDLER);
 
 	}
 
-
 	/**
 	 * Adds a hex editor listener to this editor.
 	 *
-	 * @param l The listener to add.
+	 * @param l
+	 *            The listener to add.
 	 * @see #removeHexEditorListener(HexEditorListener)
 	 */
 	public void addHexEditorListener(HexEditorListener l) {
 		listenerList.add(HexEditorListener.class, l);
 	}
 
-
 	/**
 	 * Registers a prospect who is interested when the text selection from the
 	 * hex editor becomes changed.
 	 * 
-	 * @param l The concerning listener.
+	 * @param l
+	 *            The concerning listener.
 	 * @see #removeSelectionChangedListener(SelectionChangedListener)
 	 */
 	public void addSelectionChangedListener(SelectionChangedListener l) {
 		table.addSelectionChangedListener(l);
 	}
 
-
 	/**
 	 * Returns the offset into the bytes being edited represented at the
 	 * specified cell in the table, if any.
 	 *
-	 * @param row The row in the table.
-	 * @param col The column in the table.
-	 * @return The offset into the byte array, or <code>-1</code> if the
-	 *         cell does not represent part of the byte array (such as the
-	 *         tailing "ascii dump" column's cells).
+	 * @param row
+	 *            The row in the table.
+	 * @param col
+	 *            The column in the table.
+	 * @return The offset into the byte array, or <code>-1</code> if the cell
+	 *         does not represent part of the byte array (such as the tailing
+	 *         "ascii dump" column's cells).
 	 * @see #offsetToCell(int)
 	 */
 	public int cellToOffset(int row, int col) {
 		return table.cellToOffset(row, col);
 	}
-
 
 	/**
 	 * Copies the currently selected bytes to the clipboard.
@@ -187,7 +181,6 @@ public class HexEditor extends JScrollPane {
 		invokeAction(TransferHandler.getCopyAction());
 	}
 
-
 	/**
 	 * Removes the currently selected bytes and moves them to the clipboard.
 	 *
@@ -199,7 +192,6 @@ public class HexEditor extends JScrollPane {
 		invokeAction(TransferHandler.getCutAction());
 	}
 
-
 	/**
 	 * Removes the currently selected bytes.
 	 *
@@ -210,25 +202,27 @@ public class HexEditor extends JScrollPane {
 	public void delete() {
 
 		// Sanity check (should never happen)
-		if (table.leadSelectionIndex==-1 || table.anchorSelectionIndex==-1) {
+		if (table.leadSelectionIndex == -1 || table.anchorSelectionIndex == -1) {
 			UIManager.getLookAndFeel().provideErrorFeedback(table);
 			return;
 		}
 
 		int start = table.getSmallestSelectionIndex();
 		int end = table.getLargestSelectionIndex();
-		int len = end-start+1;
+		int len = end - start + 1;
 		removeBytes(start, len);
 
 	}
 
-
 	/**
 	 * Notifies all interested listeners of an event in this hex editor.
 	 *
-	 * @param offset The offset of the change.
-	 * @param added The number of bytes added.
-	 * @param removed The number of bytes removed.
+	 * @param offset
+	 *            The offset of the change.
+	 * @param added
+	 *            The number of bytes added.
+	 * @param removed
+	 *            The number of bytes removed.
 	 */
 	protected void fireHexEditorEvent(int offset, int added, int removed) {
 		HexEditorEvent e = null;
@@ -236,17 +230,16 @@ public class HexEditor extends JScrollPane {
 		Object[] listeners = listenerList.getListenerList();
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
-		for (int i=listeners.length-2; i>=0; i-=2) {
-			if (listeners[i]==HexEditorListener.class) {
+		for (int i = listeners.length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == HexEditorListener.class) {
 				// Lazily create the event in case there are no listeners.
-				if (e==null) {
+				if (e == null) {
 					e = new HexEditorEvent(this, offset, added, removed);
 				}
-				((HexEditorListener)listeners[i+1]).hexBytesChanged(e);
+				((HexEditorListener) listeners[i + 1]).hexBytesChanged(e);
 			}
 		}
 	}
-
 
 	/**
 	 * Returns whether the color of columns in the hex editor should alternate.
@@ -259,7 +252,6 @@ public class HexEditor extends JScrollPane {
 		return alternateColumnBG;
 	}
 
-
 	/**
 	 * Returns whether the color of rows in the hex editor should alternate.
 	 *
@@ -271,17 +263,16 @@ public class HexEditor extends JScrollPane {
 		return alternateRowBG;
 	}
 
-
 	/**
 	 * Returns the byte at the specified offset.
 	 *
-	 * @param offset The offset.
+	 * @param offset
+	 *            The offset.
 	 * @return The byte.
 	 */
 	public byte getByte(int offset) {
 		return table.getByte(offset);
 	}
-
 
 	/**
 	 * Returns the number of bytes being edited.
@@ -292,10 +283,9 @@ public class HexEditor extends JScrollPane {
 		return table.getByteCount();
 	}
 
-
 	/**
-	 * Returns whether the selected bytes should also appear selected in
-	 * the "ascii dump" column.
+	 * Returns whether the selected bytes should also appear selected in the
+	 * "ascii dump" column.
 	 *
 	 * @return Whether the selected bytes should also be selected in the
 	 *         "ascii dump" column.
@@ -304,7 +294,6 @@ public class HexEditor extends JScrollPane {
 	public boolean getHighlightSelectionInAsciiDump() {
 		return highlightSelectionInAsciiDump;
 	}
-
 
 	/**
 	 * Returns the color used to highlight the selected bytes in the
@@ -318,7 +307,6 @@ public class HexEditor extends JScrollPane {
 		return highlightSelectionInAsciiDumpColor;
 	}
 
-
 	/**
 	 * Returns the largest selection index.
 	 *
@@ -329,20 +317,18 @@ public class HexEditor extends JScrollPane {
 		return table.getLargestSelectionIndex();
 	}
 
-
 	/**
-	 * Returns whether bytes that can be displayed as a single char
-	 * (i.e. <code>0 - 15</code>) are prepended with a "<code>0</code>"
-	 * char to make them two characters wide in the display.
+	 * Returns whether bytes that can be displayed as a single char (i.e.
+	 * <code>0 - 15</code>) are prepended with a "<code>0</code>" char to make
+	 * them two characters wide in the display.
 	 *
-	 * @return Whether bytes with one-character hex representations
-	 *         will be prepended with a "<code>0</code>" in the display.
+	 * @return Whether bytes with one-character hex representations will be
+	 *         prepended with a "<code>0</code>" in the display.
 	 * @see #setPadLowBytes(boolean)
 	 */
 	public boolean getPadLowBytes() {
 		return padLowBytes;
 	}
-
 
 	/**
 	 * Returns the smallest selection index.
@@ -354,7 +340,6 @@ public class HexEditor extends JScrollPane {
 		return table.getSmallestSelectionIndex();
 	}
 
-
 	/**
 	 * Returns the table actually containing the hex data.
 	 *
@@ -364,56 +349,53 @@ public class HexEditor extends JScrollPane {
 		return table;
 	}
 
-
 	private void invokeAction(Action a) {
-		a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
-								(String)a.getValue(Action.NAME),
-								EventQueue.getMostRecentEventTime(),
-								0));
+		a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, (String) a.getValue(Action.NAME),
+				EventQueue.getMostRecentEventTime(), 0));
 	}
 
-
 	/**
-	 * Returns the cell representing the specified offset into the hex
-	 * document.
+	 * Returns the cell representing the specified offset into the hex document.
 	 *
-	 * @param offset The offset into the document.
-	 * @return The cell, in the form <code>(row, col)</code>.  If the
-	 *         specified offset is invalid, <code>(-1, -1)</code> is returned.
+	 * @param offset
+	 *            The offset into the document.
+	 * @return The cell, in the form <code>(row, col)</code>. If the specified
+	 *         offset is invalid, <code>(-1, -1)</code> is returned.
 	 * @see #cellToOffset(int, int)
 	 */
 	public Point offsetToCell(int offset) {
 		return table.offsetToCell(offset);
 	}
 
-
 	/**
 	 * Sets the contents in the hex editor to the contents of the specified
 	 * file.
 	 *
-	 * @param fileName The name of the file to open.
-	 * @throws IOException If an IO error occurs.
+	 * @param fileName
+	 *            The name of the file to open.
+	 * @throws IOException
+	 *             If an IO error occurs.
 	 */
 	public void open(String fileName) throws IOException {
 		table.open(fileName);
 	}
 
-
 	/**
 	 * Sets the contents in the hex editor to the contents of the specified
 	 * input stream.
 	 *
-	 * @param in An input stream.
-	 * @throws IOException If an IO error occurs.
+	 * @param in
+	 *            An input stream.
+	 * @throws IOException
+	 *             If an IO error occurs.
 	 */
 	public void open(InputStream in) throws IOException {
 		table.open(in);
 	}
 
-
 	/**
-	 * "Pastes" the bytes in the clipboard into the current selection in
-	 * the hex editor.
+	 * "Pastes" the bytes in the clipboard into the current selection in the hex
+	 * editor.
 	 *
 	 * @see #copy()
 	 * @see #cut()
@@ -422,7 +404,6 @@ public class HexEditor extends JScrollPane {
 	public void paste() {
 		invokeAction(TransferHandler.getPasteAction());
 	}
-
 
 	/**
 	 * Tries to redo the last action undone.
@@ -434,12 +415,13 @@ public class HexEditor extends JScrollPane {
 		return table.redo();
 	}
 
-
 	/**
 	 * Removes a range of bytes.
 	 *
-	 * @param offs The offset of the range of bytes to remove.
-	 * @param len The number of bytes to remove.
+	 * @param offs
+	 *            The offset of the range of bytes to remove.
+	 * @param len
+	 *            The number of bytes to remove.
 	 * @see #replaceBytes(int, int, byte[])
 	 */
 	public void removeBytes(int offs, int len) {
@@ -447,134 +429,134 @@ public class HexEditor extends JScrollPane {
 		table.changeSelectionByOffset(offs, false);
 	}
 
-
 	/**
 	 * Removes the specified hex editor listener from this editor.
 	 *
-	 * @param l The listener to remove.
+	 * @param l
+	 *            The listener to remove.
 	 * @see #addHexEditorListener(HexEditorListener)
 	 */
 	public void removeHexEditorListener(HexEditorListener l) {
 		listenerList.remove(HexEditorListener.class, l);
 	}
 
-
 	/**
 	 * Removes a listener who isn't any longer interested whether the text
 	 * selection from the hex editor becomes changed.
 	 * 
-	 * @param l The concerning previous prospect.
+	 * @param l
+	 *            The concerning previous prospect.
 	 * @see #addSelectionChangedListener(SelectionChangedListener)
 	 */
 	public void removeSelectionChangedListener(SelectionChangedListener l) {
 		table.removeSelectionChangedListener(l);
 	}
 
-
 	/**
 	 * Replaces a range of bytes.
 	 *
-	 * @param offset The offset of the range of bytes to replace.
-	 * @param len The number of bytes to replace.
-	 * @param bytes The bytes to replace the range with.
+	 * @param offset
+	 *            The offset of the range of bytes to replace.
+	 * @param len
+	 *            The number of bytes to replace.
+	 * @param bytes
+	 *            The bytes to replace the range with.
 	 * @see #removeBytes(int, int)
 	 * @see #replaceSelection(byte[])
 	 */
 	public void replaceBytes(int offset, int len, byte[] bytes) {
-		if (len==1) { // Just insert if 1 bytes is selected.
+		if (len == 1) { // Just insert if 1 bytes is selected.
 			len = 0;
 		}
 		table.replaceBytes(offset, len, bytes);
 		table.changeSelectionByOffset(table.anchorSelectionIndex, false);
-		int count = bytes==null ? 0 : bytes.length;
-		table.setSelectionByOffsets(offset, offset+count-1);
+		int count = bytes == null ? 0 : bytes.length;
+		table.setSelectionByOffsets(offset, offset + count - 1);
 	}
 
-
 	/**
-	 * Replaces the currently selected bytes (if >=1) with the specified
-	 * new bytes.
+	 * Replaces the currently selected bytes (if >=1) with the specified new
+	 * bytes.
 	 *
-	 * @param bytes The new bytes.  If this is <code>null</code> or an empty
-	 *        array, calling this method simply removes the currently
-	 *        selected bytes.
+	 * @param bytes
+	 *            The new bytes. If this is <code>null</code> or an empty array,
+	 *            calling this method simply removes the currently selected
+	 *            bytes.
 	 * @see #replaceBytes(int, int, byte[])
 	 */
 	public void replaceSelection(byte[] bytes) {
 		int offset = table.getSmallestSelectionIndex();
-		int len = table.getLargestSelectionIndex()-offset+1;
+		int len = table.getLargestSelectionIndex() - offset + 1;
 		replaceBytes(offset, len, bytes);
 	}
 
-
 	/**
-	 * Sets whether the column color should alternate in the hex editor.
-	 * This method fires a property change event of type
+	 * Sets whether the column color should alternate in the hex editor. This
+	 * method fires a property change event of type
 	 * {@link #PROPERTY_ALTERNATE_COLUMN_BG}.
 	 *
-	 * @param alternate Whether the column color should alternate.
+	 * @param alternate
+	 *            Whether the column color should alternate.
 	 * @see #getAlternateColumnBG()
 	 * @see #setAlternateRowBG(boolean)
 	 */
 	public void setAlternateColumnBG(boolean alternate) {
-		if (alternate!=alternateColumnBG) {
+		if (alternate != alternateColumnBG) {
 			this.alternateColumnBG = alternate;
 			table.repaint();
-			firePropertyChange(PROPERTY_ALTERNATE_COLUMN_BG,
-									!alternate, alternate);
+			firePropertyChange(PROPERTY_ALTERNATE_COLUMN_BG, !alternate, alternate);
 		}
 	}
 
-
 	/**
-	 * Sets whether the row color should alternate in the hex editor.  This
+	 * Sets whether the row color should alternate in the hex editor. This
 	 * method fires a property change event of type
 	 * {@link #PROPERTY_ALTERNATE_ROW_BG}.
 	 *
-	 * @param alternate Whether the row color should alternate.
+	 * @param alternate
+	 *            Whether the row color should alternate.
 	 * @see #getAlternateRowBG()
 	 * @see #setAlternateColumnBG(boolean)
 	 */
 	public void setAlternateRowBG(boolean alternate) {
-		if (alternate!=alternateRowBG) {
+		if (alternate != alternateRowBG) {
 			this.alternateRowBG = alternate;
 			table.repaint();
-			firePropertyChange(PROPERTY_ALTERNATE_ROW_BG,!alternate, alternate);
+			firePropertyChange(PROPERTY_ALTERNATE_ROW_BG, !alternate, alternate);
 		}
 	}
 
-
 	/**
 	 * Sets whether the selected bytes should also appear selected in the
-	 * "ascii dump" column.  This method fires a property change event of
-	 * type {@link #PROPERTY_HIGHLIGHT_ASCII_DUMP}.
+	 * "ascii dump" column. This method fires a property change event of type
+	 * {@link #PROPERTY_HIGHLIGHT_ASCII_DUMP}.
 	 *
-	 * @param highlight Whether the selected bytes should also appear
-	 *        selected in the "ascii dump" column.
+	 * @param highlight
+	 *            Whether the selected bytes should also appear selected in the
+	 *            "ascii dump" column.
 	 * @see #getHighlightSelectionInAsciiDump()
 	 * @see #setHighlightSelectionInAsciiDumpColor(Color)
 	 */
 	public void setHighlightSelectionInAsciiDump(boolean highlight) {
-		if (highlight!=highlightSelectionInAsciiDump) {
+		if (highlight != highlightSelectionInAsciiDump) {
 			highlightSelectionInAsciiDump = highlight;
 			table.repaint();
-			firePropertyChange(PROPERTY_HIGHLIGHT_ASCII_DUMP,
-								!highlight, highlight);
+			firePropertyChange(PROPERTY_HIGHLIGHT_ASCII_DUMP, !highlight, highlight);
 		}
 	}
 
-
 	/**
-	 * Sets what color should be used for the "ascii dump" selection.
-	 * This method fires a property change event of type
+	 * Sets what color should be used for the "ascii dump" selection. This
+	 * method fires a property change event of type
 	 * {@link #PROPERTY_ASCII_DUMP_HIGHLIGHT_COLOR}.
 	 * 
-	 * @param c The color to use.
+	 * @param c
+	 *            The color to use.
 	 * @see #getHighlightSelectionInAsciiDumpColor()
 	 * @see #setHighlightSelectionInAsciiDump(boolean)
 	 */
 	public void setHighlightSelectionInAsciiDumpColor(Color c) {
-		if (c!=null && !c.equals(highlightSelectionInAsciiDumpColor)) {
+		if (c != null && !c.equals(highlightSelectionInAsciiDumpColor)) {
 			Color old = highlightSelectionInAsciiDumpColor;
 			highlightSelectionInAsciiDumpColor = c;
 			table.repaint();
@@ -582,40 +564,41 @@ public class HexEditor extends JScrollPane {
 		}
 	}
 
-
 	/**
-	 * Sets whether bytes that can be displayed as a single char
-	 * (i.e. <code>0 - 15</code>) are prepended with a "<code>0</code>"
-	 * char to make them two characters wide in the display.  This method
-	 * fires a property change event of type {@link #PROPERTY_PAD_LOW_BYTES}.
+	 * Sets whether bytes that can be displayed as a single char (i.e.
+	 * <code>0 - 15</code>) are prepended with a "<code>0</code>" char to make
+	 * them two characters wide in the display. This method fires a property
+	 * change event of type {@link #PROPERTY_PAD_LOW_BYTES}.
 	 *
-	 * @param pad Whether to pad such bytes in the display.
+	 * @param pad
+	 *            Whether to pad such bytes in the display.
 	 * @see #getPadLowBytes()
 	 */
 	public void setPadLowBytes(boolean pad) {
-		if (padLowBytes!=pad) {
+		if (padLowBytes != pad) {
 			padLowBytes = pad;
 			table.repaint();
 			firePropertyChange(PROPERTY_PAD_LOW_BYTES, !pad, pad);
 		}
 	}
 
-
 	/**
 	 * Sets the range of bytes to select in the hex editor.
 	 *
-	 * @param startOffs The first byte to select.
-	 * @param endOffs The last byte to select.
+	 * @param startOffs
+	 *            The first byte to select.
+	 * @param endOffs
+	 *            The last byte to select.
 	 */
 	public void setSelectedRange(int startOffs, int endOffs) {
 		table.setSelectionByOffsets(startOffs, endOffs);
 	}
 
-
 	/**
 	 * Toggles whether table's column header is visible.
 	 *
-	 * @param show Whether to show the table column header.
+	 * @param show
+	 *            Whether to show the table column header.
 	 * @see #setShowRowHeader(boolean)
 	 */
 	public void setShowColumnHeader(boolean show) {
@@ -625,32 +608,31 @@ public class HexEditor extends JScrollPane {
 		setColumnHeaderView(show ? table.getTableHeader() : null);
 	}
 
-
 	/**
-	 * Toggles whether the table's grid lines are visible.  This method
-	 * fires a property change event of type {@link #PROPERTY_SHOW_GRID}.
+	 * Toggles whether the table's grid lines are visible. This method fires a
+	 * property change event of type {@link #PROPERTY_SHOW_GRID}.
 	 *
-	 * @param show Whether grid lines are visible.
+	 * @param show
+	 *            Whether grid lines are visible.
 	 */
 	public void setShowGrid(boolean show) {
-		 // There is no "getShowGrid()" method.
-		if (show!=table.getShowHorizontalLines()) {
+		// There is no "getShowGrid()" method.
+		if (show != table.getShowHorizontalLines()) {
 			table.setShowGrid(show);
 			firePropertyChange(PROPERTY_SHOW_GRID, !show, show);
 		}
 	}
 
-
 	/**
 	 * Toggles whether table's row header is visible.
 	 *
-	 * @param show Whether to show the table row header.
+	 * @param show
+	 *            Whether to show the table row header.
 	 * @see #setShowColumnHeader(boolean)
 	 */
 	public void setShowRowHeader(boolean show) {
 		setRowHeaderView(show ? new HexEditorRowHeader(table) : null);
 	}
-
 
 	/**
 	 * Tries to undo the last action.
@@ -661,6 +643,5 @@ public class HexEditor extends JScrollPane {
 	public boolean undo() {
 		return table.undo();
 	}
-
 
 }

@@ -86,7 +86,7 @@ public class HexEditorDemoPanel extends JPanel implements ActionListener, HexEdi
 	private JCheckBox colHeaderCB;
 	private JCheckBox rowHeaderCB;
 	private JCheckBox showGridCB;
-	//private JComboBox lafCombo;
+	// private JComboBox lafCombo;
 	private JCheckBox altRowBGCB;
 	private JCheckBox altColBGCB;
 	private JCheckBox highlightAsciiSelCB;
@@ -113,8 +113,8 @@ public class HexEditorDemoPanel extends JPanel implements ActionListener, HexEdi
 
 		setLayout(new BorderLayout());
 
-		//createActions(msg);
-		//add(createToolBar(), BorderLayout.NORTH);
+		// createActions(msg);
+		// add(createToolBar(), BorderLayout.NORTH);
 
 		JPanel temp = new JPanel(new BorderLayout());
 		ConfigPanel configPanel = new ConfigPanel();
@@ -170,7 +170,7 @@ public class HexEditorDemoPanel extends JPanel implements ActionListener, HexEdi
 			editor.setShowRowHeader(rowHeaderCB.isSelected());
 		} else if (source == showGridCB) {
 			editor.setShowGrid(showGridCB.isSelected());
-		}  else if (source == altColBGCB) {
+		} else if (source == altColBGCB) {
 			editor.setAlternateColumnBG(altColBGCB.isSelected());
 		} else if (source == altRowBGCB) {
 			editor.setAlternateRowBG(altRowBGCB.isSelected());
@@ -514,7 +514,7 @@ public class HexEditorDemoPanel extends JPanel implements ActionListener, HexEdi
 			temp2.add(new JLabel(text), BorderLayout.LINE_START);
 			temp2.add(highlightAsciiSelCombo);
 			temp.add(temp2);
-			add(temp);	
+			add(temp);
 			add(temp2, BorderLayout.SOUTH);
 
 		}

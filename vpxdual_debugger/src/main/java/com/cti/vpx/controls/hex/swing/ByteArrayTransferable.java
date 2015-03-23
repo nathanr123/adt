@@ -6,7 +6,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringReader;
 
-
 /**
  * A <code>Transferable</code> that transfers an array of bytes.
  *
@@ -18,27 +17,22 @@ class ByteArrayTransferable implements Transferable {
 	private int offset;
 	private byte[] bytes;
 
-	private static final DataFlavor[] FLAVORS = {
-		DataFlavor.stringFlavor,
-		DataFlavor.plainTextFlavor,
-	};
-
+	private static final DataFlavor[] FLAVORS = { DataFlavor.stringFlavor, DataFlavor.plainTextFlavor, };
 
 	/**
 	 * Creates a transferable object.
 	 *
-	 * @param bytes The bytes to transfer.
+	 * @param bytes
+	 *            The bytes to transfer.
 	 */
 	public ByteArrayTransferable(int offset, byte[] bytes) {
 		this.offset = offset;
-		if (bytes!=null) {
-			this.bytes = (byte[])bytes.clone();
-		}
-		else {
+		if (bytes != null) {
+			this.bytes = (byte[]) bytes.clone();
+		} else {
 			this.bytes = new byte[0];
 		}
 	}
-
 
 	/**
 	 * Returns the number of bytes being transferred.
@@ -50,7 +44,6 @@ class ByteArrayTransferable implements Transferable {
 		return bytes.length;
 	}
 
-
 	/**
 	 * Returns the offset of the first byte being transferred.
 	 *
@@ -61,55 +54,52 @@ class ByteArrayTransferable implements Transferable {
 		return offset;
 	}
 
-
 	/**
 	 * Returns the data being transferred in a format specified by the
 	 * <code>DataFlavor</code>.
 	 *
-	 * @param flavor Dictates in what format the data should be returned.
-	 * @throws UnsupportedFlavorException If the specified flavor is not
-	 *         supported.
-	 * @throws IOException If an IO error occurs.
+	 * @param flavor
+	 *            Dictates in what format the data should be returned.
+	 * @throws UnsupportedFlavorException
+	 *             If the specified flavor is not supported.
+	 * @throws IOException
+	 *             If an IO error occurs.
 	 * @see DataFlavor#getRepresentationClass()
 	 */
-	public Object getTransferData(DataFlavor flavor)
-			throws UnsupportedFlavorException, IOException {
+	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
 		if (flavor.equals(FLAVORS[0])) {
 			return new String(bytes); // Use platform default charset.
-		}
-		else if (flavor.equals(FLAVORS[1])) {
+		} else if (flavor.equals(FLAVORS[1])) {
 			return new StringReader(new String(bytes));
 		}
-	    throw new UnsupportedFlavorException(flavor);
+		throw new UnsupportedFlavorException(flavor);
 	}
 
-
 	/**
-	 * Returns an array of DataFlavor objects indicating the flavors the data 
-	 * can be provided in.  The array is ordered according to preference for 
+	 * Returns an array of DataFlavor objects indicating the flavors the data
+	 * can be provided in. The array is ordered according to preference for
 	 * providing the data (from most richly descriptive to least descriptive).
 	 *
 	 * @return An array of data flavors in which this data can be transferred.
 	 */
 	public DataFlavor[] getTransferDataFlavors() {
-		return (DataFlavor[])FLAVORS.clone();
+		return (DataFlavor[]) FLAVORS.clone();
 	}
-
 
 	/**
 	 * Returns whether a data flavor is supported.
 	 *
-	 * @param flavor The flavor to check.
+	 * @param flavor
+	 *            The flavor to check.
 	 * @return Whether the specified flavor is supported.
 	 */
 	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		for (int i=0; i<FLAVORS.length; i++) {
+		for (int i = 0; i < FLAVORS.length; i++) {
 			if (flavor.equals(FLAVORS[i])) {
 				return true;
 			}
 		}
 		return false;
 	}
-
 
 }

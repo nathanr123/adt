@@ -10,11 +10,11 @@ import java.nio.ByteBuffer;
 
 public class GreetingClient {
 	public static void main(String[] args) {
-		
+
 		String serverName = "172.17.1.28";
-		
+
 		int port = 12345;
-		
+
 		try {
 			System.out.println("Connecting to " + serverName + " on port " + port);
 
@@ -23,7 +23,7 @@ public class GreetingClient {
 			client.connect(new InetSocketAddress(serverName, port), 500);
 
 			client.setSoTimeout(1000);
-			
+
 			System.out.println("Just connected to " + client.getRemoteSocketAddress());
 
 			OutputStream outToServer = client.getOutputStream();

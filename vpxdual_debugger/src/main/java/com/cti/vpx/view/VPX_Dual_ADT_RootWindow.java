@@ -3,7 +3,6 @@ package com.cti.vpx.view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -20,20 +19,18 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
+import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
 import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
-import com.cti.vpx.model.VPX;
-import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
-import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.util.VPXParser;
+import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_Dual_ADT_RootWindow extends JFrame {
 
@@ -105,8 +102,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		// setBounds(0, 0, 500, 500);
 
 		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
-
-		// setAlwaysOnTop(true);
 
 		loadComponents();
 
@@ -240,7 +235,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Content_Tabbed_Pane_Message.addTab("Logger", logger);
 
-		vpx_Content_Tabbed_Pane_Message.addTab("Message", new VPX_MessagePanel());
+		vpx_Content_Tabbed_Pane_Message.addTab("Message", new VPX_MessagePanel(this));
 
 		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
@@ -259,7 +254,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		createVPXObject();
 
 		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this, systemRootNode);
-		
+
 		vpx_Processor_Tree.setVPXSystem(system);
 
 		JScrollPane vpx_Processor_Tree_ScrollPane = new JScrollPane(vpx_Processor_Tree);
@@ -267,86 +262,22 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		for (int i = 0; i < vpx_Processor_Tree.getRowCount(); i++) {
 			vpx_Processor_Tree.expandRow(i);
 		}
+
 		return vpx_Processor_Tree_ScrollPane;
 	}
 
 	private void createVPXObject() {
-		system = new VPXSystem();
-
-		system.setID(0);
-
-		Slot slot = new Slot(0);
-
-		slot.setModel("C66778");
-
-		int idx = 0;
 
 		system = VPXParser.readFromXMLFile();
 
 		if (system == null) {
 
-			system = new VPXSystem();
+			system = VPXUtilities.getVPXSystem();
 
-			for (PROCESSOR_LIST pType : PROCESSOR_LIST.values()) {
-
-				Processor p = new Processor(pType);
-
-				p.setID(idx);
-
-				p.addIPAddress("192.168.2.1");
-
-				p.addIPAddress("192.168.2.2");
-
-				int loop = VPX.MAX_CORE_DSP;
-
-				if (pType == PROCESSOR_LIST.PROCESSOR_P2020) {
-					loop = VPX.MAX_CORE_P2020;
-				}
-				for (int i = 0; i < loop; i++) {
-					p.addCore(new Core(i, 5555));
-				}
-
-				slot.addProcessor(p);
-
-				idx++;
-			}
-
-			system.addSlot(slot);
-
-			VPXParser.writeToXMLFile(system);
+			systemRootNode.setUserObject(system.getName());
 		}
 
-		systemRootNode.setUserObject(system.getName());
-
-		List<Slot> sl = system.getSlots();
-
-		for (Iterator<Slot> iterator = sl.iterator(); iterator.hasNext();) {
-
-			Slot slt = iterator.next();
-
-			DefaultMutableTreeNode slotNode = new DefaultMutableTreeNode(slt.getName());
-
-			List<Processor> prc = slt.getProcessors();
-
-			for (Iterator<Processor> iterator2 = prc.iterator(); iterator2.hasNext();) {
-
-				Processor processor = iterator2.next();
-
-				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(processor.getName());
-
-				List<Core> crs = processor.getCores();
-
-				for (Iterator<Core> iterator3 = crs.iterator(); iterator3.hasNext();) {
-
-					Core core = iterator3.next();
-
-					processorNode.add(new DefaultMutableTreeNode(core.getName()));
-				}
-				slotNode.add(processorNode);
-			}
-
-			systemRootNode.add(slotNode);
-		}
+		VPXUtilities.setVPXSystem(system);
 
 	}
 
@@ -396,7 +327,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			vpx_Processor_Tree.expandRow(i);
 		}
 
-		// VPXParser.writeToXMLFile(system);
+		VPXUtilities.setVPXSystem(system);
+
+		VPXParser.writeToXMLFile(system);
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {

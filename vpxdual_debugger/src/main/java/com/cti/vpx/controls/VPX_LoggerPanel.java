@@ -31,6 +31,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
@@ -174,7 +175,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			fw.close();
 
-			showPopup("File Saved at " + path);
+			VPXUtilities.showPopup("File Saved at " + path);
 
 		} catch (Exception e) {
 
@@ -185,44 +186,6 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
 
-	}
-
-	private void showPopup(String msg) {
-		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE,
-				JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
-
-		final JDialog dialog = new JDialog();
-		dialog.setTitle("Message");
-		dialog.setModal(true);
-		dialog.setUndecorated(true);
-		dialog.setContentPane(optionPane);
-		optionPane.setBorder(new LineBorder(Color.GRAY));
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-		dialog.setSize(new Dimension(350, 100));
-
-		// create timer to dispose of dialog after 5 seconds
-		Timer timer = new Timer(1000, new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				dialog.dispose();
-			}
-		});
-		timer.setRepeats(false);// the timer should only go off once
-
-		// start timer to close JDialog as dialog modal we must start the timer
-		// before its visible
-		timer.start();
-
-		Dimension windowSize = dialog.getSize();
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Point centerPoint = ge.getCenterPoint();
-
-		int dx = centerPoint.x - windowSize.width / 2;
-		int dy = centerPoint.y - windowSize.height / 2;
-		dialog.setLocation(dx, dy);
-
-		dialog.setVisible(true);
 	}
 
 	class SaveAction extends AbstractAction {
@@ -278,7 +241,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			setClipboardContents(txtA_Log.getText());
 
-			showPopup("Contents copied to clipboard");
+			VPXUtilities.showPopup("Contents copied to clipboard");
 		}
 	}
 

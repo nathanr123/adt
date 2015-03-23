@@ -25,9 +25,9 @@ public class Processor implements VPX {
 	private List<Core> cores;
 
 	private PROCESSOR_LIST processorType;
-	
+
 	public Processor() {
-	
+
 	}
 
 	public Processor(PROCESSOR_LIST pType) {
@@ -71,7 +71,7 @@ public class Processor implements VPX {
 	@XmlElement
 	public void setProcessorType(PROCESSOR_LIST processorType) {
 		this.processorType = processorType;
-		setName(processorType); 
+		setName(processorType);
 	}
 
 	public static int getPortno() {

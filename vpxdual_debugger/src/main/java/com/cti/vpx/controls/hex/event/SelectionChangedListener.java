@@ -28,7 +28,6 @@ package com.cti.vpx.controls.hex.event;
 
 import java.util.EventListener;
 
-
 /**
  * Somebody who is interested whether the cell selection within the hex editor
  * becomes changed.
@@ -38,15 +37,14 @@ import java.util.EventListener;
  */
 public interface SelectionChangedListener extends EventListener {
 
-
 	/**
 	 * Becomes invoked as soon as the selection of the hex editor's content has
 	 * changed.
 	 * 
-	 * @param event Contains specific information about the previous selection
-	 *        state and the new one.
+	 * @param event
+	 *            Contains specific information about the previous selection
+	 *            state and the new one.
 	 */
 	public void selectionChanged(SelectionChangedEvent event);
-
 
 }
