@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -183,8 +184,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_ToolBar.setFloatable(false);
 
-		vpx_ToolBar.add(ComponentFactory.createJButton("", ComponentFactory.getImageIcon("images\\open.gif", 12, 12),
-				null));
+		vpx_ToolBar.add(
+				ComponentFactory.createJToolBarButton(new ScanAction(VPXUtilities.getImageIcon("images\\scan.png", 14, 14))),
+				null);
 
 		getContentPane().add(vpx_ToolBar, BorderLayout.NORTH);
 	}
@@ -279,11 +281,15 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		VPXUtilities.setVPXSystem(system);
 
+		loadSystemRootNode(system);
+
 	}
 
-	private void reloadVPXSystemTree(VPXSystem system) {
+	private void loadSystemRootNode(VPXSystem system) {
 
 		systemRootNode.removeAllChildren();
+
+		systemRootNode.setUserObject(system.getName());
 
 		List<Slot> sl = system.getSlots();
 
@@ -320,16 +326,25 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 				systemRootNode.add(slotNode);
 			}
 		}
+	}
 
+	private void updateProcessorTree(VPXSystem sys) {
 		vpx_Processor_Tree.updateUI();
 
 		for (int i = 0; i < vpx_Processor_Tree.getRowCount(); i++) {
 			vpx_Processor_Tree.expandRow(i);
 		}
 
-		VPXUtilities.setVPXSystem(system);
+		VPXUtilities.setVPXSystem(sys);
 
-		VPXParser.writeToXMLFile(system);
+		VPXParser.writeToXMLFile(sys);
+	}
+
+	private void reloadVPXSystemTree(VPXSystem system) {
+
+		loadSystemRootNode(system);
+
+		updateProcessorTree(system);
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {
@@ -363,6 +378,12 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		public ScanAction(String name) {
 
 			putValue(NAME, name);
+
+		}
+
+		public ScanAction(ImageIcon icon) {
+
+			super("", icon);
 
 		}
 

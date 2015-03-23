@@ -93,6 +93,17 @@ public class ComponentFactory {
 		return jb;
 	}
 
+	public static JButton createJToolBarButton(Action action) {
+
+		JButton jb = new JButton(action);
+		
+		jb.setFocusable(false);
+		
+		jb.setBorderPainted(false);
+		
+		return jb;
+	}
+
 	public static JButton createJButton(Action action) {
 
 		return new JButton(action);

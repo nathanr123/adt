@@ -186,17 +186,20 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 
-		int row = getRowForLocation(e.getX(), e.getY());
+		if (e.getButton() == 3) {
 
-		if (row == -1) {
+			int row = getRowForLocation(e.getX(), e.getY());
 
-			return;
+			if (row == -1) {
+
+				return;
+			}
+
+			setSelectionRow(row);
+
+			showConextMenu(e.getX(), e.getY(), ((DefaultMutableTreeNode) getLastSelectedPathComponent())
+					.getUserObject().toString());
 		}
-
-		setSelectionRow(row);
-
-		showConextMenu(e.getX(), e.getY(), ((DefaultMutableTreeNode) getLastSelectedPathComponent()).getUserObject()
-				.toString());
 	}
 
 	@Override
