@@ -261,21 +261,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		}
 	}
 
-	private void updateUserMessage(String msg) {
-		try {
-			int eo = txtP_Msg_Display_Document.getLength();
-
-			txtP_Msg_Display_Document.insertString(eo, msg, null);
-
-			txtP_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), user_Msg_Style, false);
-
-			txtP_Msg_Display_Document.setLogicalStyle(eo, user_Msg_Style);
-
-		} catch (BadLocationException e) {
-
-			e.printStackTrace();
-		}
-	}
 
 	private void updateUserMessage(String msg, Style style) {
 		try {

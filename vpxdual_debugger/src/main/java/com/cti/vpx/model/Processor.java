@@ -22,6 +22,8 @@ public class Processor implements VPX {
 
 	public static final int PORTNO = 12345;
 
+	public static final int UDP_PORTNO = 12346;
+
 	private List<Core> cores;
 
 	private PROCESSOR_LIST processorType;

@@ -1,7 +1,6 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +23,7 @@ import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_ScanWindow;
+import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
 import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
@@ -83,6 +83,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	private VPX_ProcessorTree vpx_Processor_Tree;
 
 	private JTabbedPane vpx_Content_Tabbed_Pane_Message;
+
+	private VPX_StatusBar statusBar;
 
 	/**
 	 * Create the frame.
@@ -184,9 +186,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_ToolBar.setFloatable(false);
 
-		vpx_ToolBar.add(
-				ComponentFactory.createJToolBarButton(new ScanAction(VPXUtilities.getImageIcon("images\\scan.png", 14, 14))),
-				null);
+		vpx_ToolBar.add(ComponentFactory.createJToolBarButton(new ScanAction(VPXUtilities.getImageIcon(
+				"images\\scan.png", 14, 14))), null);
 
 		getContentPane().add(vpx_ToolBar, BorderLayout.NORTH);
 	}
@@ -212,13 +213,11 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private void loadStatusPane() {
 
-		JPanel jp = new JPanel();
+		statusBar = new VPX_StatusBar();
 
-		jp.setOpaque(true);
+		statusBar.setOpaque(true);
 
-		jp.setPreferredSize(new Dimension(VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight() / 35));
-
-		getContentPane().add(jp, BorderLayout.SOUTH);
+		getContentPane().add(statusBar, BorderLayout.SOUTH);
 	}
 
 	private JSplitPane getRightComponent() {
@@ -358,14 +357,25 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		reloadVPXSystemTree(vpx);
 
 		updateLog("VPX System Tree Refreshed");
+
+		updateStatus("VPX System Tree Refreshed");
+	}
+
+	public void updateStatus(String stats) {
+		statusBar.updateStatus(stats);
 	}
 
 	public void updateLog(String logMsg) {
+
 		logger.updateLog(logMsg);
+
+		updateStatus(logMsg);
 	}
 
 	public void updateLog(int level, String logMsg) {
 		logger.updateLog(level, logMsg);
+
+		updateStatus(logMsg);
 	}
 
 	public class ScanAction extends AbstractAction {
