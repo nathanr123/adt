@@ -14,6 +14,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.plaf.TabbedPaneUI;
 
+import com.cti.vpx.util.VPXUtilities;
+
 public class VPX_TabbedPane extends JTabbedPane {
 
 	private static final long serialVersionUID = -8801063107184397010L;
@@ -22,17 +24,29 @@ public class VPX_TabbedPane extends JTabbedPane {
 
 	private VPX_BasicTabPaneUI paneUI;
 
-	public VPX_TabbedPane(boolean enhancedUI) {
+	public VPX_TabbedPane(boolean isDetachable, boolean isClosable) {
+
 		super.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-		if (enhancedUI)
-			paneUI = new VPX_TabbedPaneUI();
-		else
-			paneUI = new VPX_BasicTabPaneUI();
+		paneUI = new VPX_TabbedPaneUI();
+
+		paneUI.setMaxIcon(isDetachable);
+
+		paneUI.setCloseIcon(isClosable);
 
 		super.setUI(paneUI);
 	}
 
+	/*
+	 * 
+	 * public VPX_TabbedPane(boolean enhancedUI) {
+	 * super.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	 * 
+	 * if (enhancedUI) paneUI = new VPX_TabbedPaneUI(); else paneUI = new
+	 * VPX_BasicTabPaneUI();
+	 * 
+	 * super.setUI(paneUI); }
+	 */
 	public int getOverTabIndex() {
 		return overTabIndex;
 	}
@@ -62,12 +76,18 @@ public class VPX_TabbedPane extends JTabbedPane {
 		paneUI.setMaxIcon(b);
 	}
 
+	public void closeTab(int index) {
+		removeTabAt(index);
+	}
+
 	public void detachTab(int index) {
 
 		if (index < 0 || index >= getTabCount())
 			return;
 
 		final JFrame frame = new JFrame();
+		
+		frame.setIconImage(VPXUtilities.getAppIcon());
 
 		Window parentWindow = SwingUtilities.windowForComponent(this);
 
@@ -130,7 +150,7 @@ public class VPX_TabbedPane extends JTabbedPane {
 
 	public void fireCloseTabEvent(MouseEvent e, int overTabIndex) {
 		this.overTabIndex = overTabIndex;
-
+		closeTab(overTabIndex);
 	}
 
 	public void fireMaxTabEvent(MouseEvent e, int overTabIndex) {
@@ -142,7 +162,7 @@ public class VPX_TabbedPane extends JTabbedPane {
 
 	public void fireDoubleClickTabEvent(MouseEvent e, int overTabIndex) {
 		this.overTabIndex = overTabIndex;
-
+		detachTab(overTabIndex);
 	}
 
 	public void firePopupOutsideTabEvent(MouseEvent e) {

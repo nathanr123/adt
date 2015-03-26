@@ -19,14 +19,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.cti.vpx.controls.VPX_FlashProcessor;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
-import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
+import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
-import com.cti.vpx.controls.tab.VPX_TabbedPaneUI;
 import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
@@ -67,6 +67,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	private JMenuItem vpx_Menu_Help_About;
 
 	private JMenuItem vpx_Menu_Window_MemoryBrowser;
+
+	private JMenuItem vpx_Menu_Window_Flash;
 
 	private JToolBar vpx_ToolBar;
 
@@ -171,6 +173,11 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
 
+		vpx_Menu_Window_Flash = ComponentFactory.createJMenuItem(new FlashAction(rBundle
+				.getString("Menu.Window.FlashProcessor")));
+
+		vpx_Menu_Window.add(vpx_Menu_Window_Flash);
+
 		vpx_MenuBar.add(vpx_Menu_Help);
 
 		vpx_Menu_Help_Help = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Help"));
@@ -230,7 +237,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true);
+		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
 
 		vpx_Content_Tabbed_Pane_Right.addTab("Processor", new JPanel());
 
@@ -427,10 +434,51 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new HexEditorDemoPanel());
+			// vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new
+			// HexEditorDemoPanel());
+			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new VPX_MemoryBrowser());
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 		}
+	}
+
+	public class FlashAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public FlashAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new
+			// HexEditorDemoPanel());
+			int i = isAlreadyExist();
+			if (i == -1) {
+				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_FlashProcessor()));
+
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+			} else
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
+		}
+	}
+
+	private int isAlreadyExist() {
+		int ret = -1;
+
+		for (int i = 0; i < vpx_Content_Tabbed_Pane_Right.getTabCount(); i++) {
+			if (vpx_Content_Tabbed_Pane_Right.getTitleAt(i).equals("Flash")) {
+				ret = i;
+				break;
+			}
+		}
+		return ret;
 	}
 
 	public class ExitAction extends AbstractAction {
