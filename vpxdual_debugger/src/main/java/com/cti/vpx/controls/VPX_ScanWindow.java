@@ -97,6 +97,8 @@ public class VPX_ScanWindow extends JDialog {
 
 		setBounds(100, 100, 305, 230);
 
+		setIconImage(VPXUtilities.getAppIcon());
+		
 		getContentPane().setLayout(new BorderLayout());
 
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -311,6 +313,8 @@ public class VPX_ScanWindow extends JDialog {
 
 			setType(Type.NORMAL);
 
+			setIconImage(VPXUtilities.getAppIcon());
+			
 			setAlwaysOnTop(true);
 
 			setModal(true);

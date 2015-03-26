@@ -25,6 +25,8 @@ import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
+import com.cti.vpx.controls.tab.VPX_TabbedPane;
+import com.cti.vpx.controls.tab.VPX_TabbedPaneUI;
 import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.Slot;
@@ -72,7 +74,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private JSplitPane vpx_Right_SplitPane;
 
-	private JTabbedPane vpx_Content_Tabbed_Pane_Right;
+	private VPX_TabbedPane vpx_Content_Tabbed_Pane_Right;
 
 	private VPXSystem system;
 
@@ -104,11 +106,15 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		// setBounds(0, 0, 500, 500);
 
+		setIconImage(VPXUtilities.getAppIcon());
+
 		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
 		loadComponents();
 
 		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
+
+		toFront();
 	}
 
 	private void loadComponents() {
@@ -224,7 +230,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-		vpx_Content_Tabbed_Pane_Right = new JTabbedPane();
+		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true);
 
 		vpx_Content_Tabbed_Pane_Right.addTab("Processor", new JPanel());
 

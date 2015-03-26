@@ -142,6 +142,10 @@ public class VPXUtilities {
 		vpxSystem = sys;
 	}
 
+	public static Image getAppIcon() {
+		return getImageIcon("images\\cornet.png", 24, 24).getImage();
+	}
+
 	public static ImageIcon getImageIcon(String path, int w, int h) {
 
 		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
