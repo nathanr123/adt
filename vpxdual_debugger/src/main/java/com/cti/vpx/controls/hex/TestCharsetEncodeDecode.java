@@ -1,6 +1,7 @@
 package com.cti.vpx.controls.hex;
 
 import java.nio.ByteBuffer;
+
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 

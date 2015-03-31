@@ -26,6 +26,7 @@
  */
 package com.cti.vpx.controls.hex;
 
+
 import java.io.*;
 
 public class ByteBuffer {

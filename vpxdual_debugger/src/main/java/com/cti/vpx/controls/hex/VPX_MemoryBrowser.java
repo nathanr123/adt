@@ -32,7 +32,9 @@ public class VPX_MemoryBrowser extends JPanel {
 	private JLabel lbl_Addr_View;
 
 	private VPX_TabbedPane memoryBrowser;
+	
 	private JPanel panel;
+	
 	private JComboBox<String> comboBox;
 
 	/**
