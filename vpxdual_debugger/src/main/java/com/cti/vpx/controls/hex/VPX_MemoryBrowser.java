@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import com.cti.vpx.controls.hex.swing.demo.HexEditorDemoPanel;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.util.ComponentFactory;
 import com.jgoodies.forms.layout.FormLayout;
@@ -112,8 +111,8 @@ public class VPX_MemoryBrowser extends JPanel {
 
 	}
 
-	private HexEditorDemoPanel createHexPanel() {
-		return new HexEditorDemoPanel();
+	private HexEditorPanel createHexPanel() {
+		return new HexEditorPanel();
 	}
 
 	private class NewTabAction extends AbstractAction {
