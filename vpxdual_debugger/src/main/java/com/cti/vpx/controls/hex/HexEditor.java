@@ -26,7 +26,6 @@
  */
 package com.cti.vpx.controls.hex;
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -40,6 +39,7 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 
@@ -107,7 +107,6 @@ public class HexEditor extends JScrollPane {
 	private static final TransferHandler DEFAULT_TRANSFER_HANDLER = new HexEditorTransferHandler();
 
 	static final int DUMP_COLUMN_WIDTH = 200;
-	private static final String MSG = "org.fife.ui.hex.HexEditor";
 
 	/**
 	 * Creates a new <code>HexEditor</code> component.
@@ -125,22 +124,27 @@ public class HexEditor extends JScrollPane {
 		HexTableModel model = new HexTableModel(this, msg);
 
 		table = new HexTable(this, model);
-
+		
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);		
+				
 		jp.add(table, BorderLayout.CENTER);
 
 		jp.add(jl, BorderLayout.EAST);
 
-		
-		
 		setViewportView(jp);
 		
 		setShowColumnHeader(true);
+		
 		setShowRowHeader(true);
 
 		setAlternateRowBG(false);
+		
 		setAlternateColumnBG(false);
+		
 		setHighlightSelectionInAsciiDump(true);
+		
 		setHighlightSelectionInAsciiDumpColor(new Color(255, 255, 192));
+		
 		setPadLowBytes(true);
 
 		setTransferHandler(DEFAULT_TRANSFER_HANDLER);

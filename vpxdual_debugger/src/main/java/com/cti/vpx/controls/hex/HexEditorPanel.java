@@ -37,10 +37,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -67,7 +73,6 @@ import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXUtilities;
-
 
 /**
  * Content pane for the demo applet/standalone app, that demonstrates the
@@ -108,6 +113,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	private ConfigPanel settingsPanel;
 
+	private DumpAction dumpAction;
+
 	private static final ResourceBundle msg = VPXUtilities.getResourceBundle();
 
 	/**
@@ -118,11 +125,10 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		setLayout(new BorderLayout());
 
 		createActions(msg);
+
 		add(createToolBar(), BorderLayout.NORTH);
 
 		JPanel temp = new JPanel(new BorderLayout());
-		// ConfigPanel configPanel = new ConfigPanel();
-		// temp.add(configPanel, BorderLayout.LINE_START);
 
 		infoField = new JTextField();
 		infoField.setEditable(false);
@@ -152,7 +158,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		editor = new HexEditor();
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
-		// handleOpenFile("org/fife/ui/hex/swing/demo/HexEditorDemoPanel.class");
 		handleOpenFile("images\\copy.gif");
 		add(editor);
 
@@ -203,6 +208,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		undoAction = new UndoAction();
 		redoAction = new RedoAction();
 		settingsAction = new SettingsAction();
+		dumpAction = new DumpAction();
 	}
 
 	/**
@@ -222,6 +228,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		toolbar.addSeparator();
 
 		toolbar.add(createToolBarButton(openAction));
+		toolbar.add(createToolBarButton(dumpAction));
 		toolbar.addSeparator();
 
 		toolbar.add(createToolBarButton(cutAction));
@@ -271,12 +278,35 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		settingsPanel.setVisible(true);
 	}
 
+	public void dumpToFile() {
+		try {
+			int rc = getFileChooser("Specify a file to save").showSaveDialog(this);
+
+			if (rc == JFileChooser.APPROVE_OPTION) {
+				String path = chooser.getSelectedFile().getPath();
+
+				if (!path.endsWith(".dat")) {
+					path += ".dat";
+				}
+
+				FileOutputStream fos = new FileOutputStream(path);
+
+				fos.write(getClipboardContents().getBytes());
+
+				fos.close();
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Prompts the user for a file to open, and opens it.
 	 */
 	public void doOpen() {
-		JFileChooser chooser = getFileChooser();
-		int rc = chooser.showOpenDialog(this);
+		int rc = getFileChooser("Select file to Open").showOpenDialog(this);
+
 		if (rc == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
 			handleOpenFile(file.getAbsolutePath());
@@ -289,10 +319,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 *
 	 * @return The file chooser.
 	 */
-	private JFileChooser getFileChooser() {
+	private JFileChooser getFileChooser(String title) {
 		if (chooser == null) {
 			chooser = new JFileChooser();
 		}
+		chooser.setDialogTitle(title);
 		return chooser;
 	}
 
@@ -618,6 +649,55 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			setLocation(dx, dy);
 		}
+	}
+
+	/**
+	 * Saves the currently selected bytes to the file.
+	 *
+	 * @author Robert Futrell
+	 * @version 1.0
+	 */
+	private class DumpAction extends ActionBase {
+
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+				editor.copy();
+
+				dumpToFile();
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
+		}
+
+		protected String getNameKey() {
+			return "Action.Dump.Name";
+		}
+
+		protected String getIconKey() {
+			return "save.gif";
+		}
+
+	}
+
+	public String getClipboardContents() {
+		String result = "";
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		// odd: the Object param of getContents is not currently used
+		Transferable contents = clipboard.getContents(null);
+		boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+		if (hasTransferableText) {
+			try {
+				result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+			} catch (UnsupportedFlavorException | IOException ex) {
+				System.out.println(ex);
+				ex.printStackTrace();
+			}
+		}
+		return result;
 	}
 
 	/**
