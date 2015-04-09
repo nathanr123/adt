@@ -35,10 +35,16 @@
 			<version>4.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.swinglabs.swingx</groupId>
-			<artifactId>swingx-all</artifactId>
-			<version>1.6.5-1</version>
-		</dependency>		
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-common</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-forms</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

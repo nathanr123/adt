@@ -24,6 +24,7 @@ import javax.swing.border.EtchedBorder;
 
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
+import java.awt.Dimension;
 
 public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
@@ -71,17 +72,26 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 
-		add(log_Panel, BorderLayout.SOUTH);
+		add(log_Panel, BorderLayout.NORTH);
 
 		JButton btn_Log_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
+		btn_Log_Clear.setFocusPainted(false);
+		btn_Log_Clear.setBorderPainted(false);
+		btn_Log_Clear.setPreferredSize(new Dimension(20, 16));
 
 		log_Panel.add(btn_Log_Clear);
 
 		JButton btn_Log_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
+		btn_Log_Copy.setFocusPainted(false);
+		btn_Log_Copy.setBorderPainted(false);
+		btn_Log_Copy.setPreferredSize(new Dimension(20, 16));
 
 		log_Panel.add(btn_Log_Copy);
 
 		JButton btn_Log_Save = ComponentFactory.createJButton(new SaveAction("Save"));
+		btn_Log_Save.setFocusPainted(false);
+		btn_Log_Save.setBorderPainted(false);
+		btn_Log_Save.setPreferredSize(new Dimension(20, 16));
 
 		log_Panel.add(btn_Log_Save);
 
@@ -187,7 +197,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		 */
 
 		public SaveAction(String name) {
-			putValue(Action.NAME, name);
+			putValue(Action.SHORT_DESCRIPTION, name);
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("images\\save.gif"), 14, 14));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -205,7 +216,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		 */
 
 		public ClearAction(String name) {
-			putValue(Action.NAME, name);
+			putValue(Action.SHORT_DESCRIPTION, name);
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("images\\delete.gif"), 14, 14));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -223,7 +235,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		 */
 
 		public CopyAction(String name) {
-			putValue(Action.NAME, name);
+			putValue(Action.SHORT_DESCRIPTION, name);
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("images\\copy.gif"), 14, 14));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;

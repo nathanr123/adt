@@ -9,14 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,7 +31,6 @@ import net.miginfocom.swing.MigLayout;
 import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATP_COMMAND;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
@@ -55,10 +52,6 @@ public class VPX_ScanWindow extends JDialog {
 	private JTextField txt_To_IP;
 
 	private VPX_Dual_ADT_RootWindow parent;
-
-	private JCheckBox chk_Keep_Old_Values;
-
-	private JCheckBox chk_Refresh_Old_Values;
 
 	/**
 	 * Create the dialog.
@@ -95,10 +88,10 @@ public class VPX_ScanWindow extends JDialog {
 
 		setTitle("IP Scanning Window");
 
-		setBounds(100, 100, 305, 230);
+		setBounds(100, 100, 305, 165);
 
 		setIconImage(VPXUtilities.getAppIcon());
-		
+
 		getContentPane().setLayout(new BorderLayout());
 
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -143,18 +136,6 @@ public class VPX_ScanWindow extends JDialog {
 		separator.setBounds(0, 85, 329, 2);
 
 		contentPanel.add(separator);
-
-		chk_Keep_Old_Values = ComponentFactory.createJCheckBox("Keep old values");
-
-		chk_Keep_Old_Values.setBounds(0, 87, 232, 23);
-
-		contentPanel.add(chk_Keep_Old_Values);
-
-		chk_Refresh_Old_Values = ComponentFactory.createJCheckBox("Revalidate old values");
-
-		chk_Refresh_Old_Values.setBounds(0, 113, 232, 23);
-
-		contentPanel.add(chk_Refresh_Old_Values);
 
 		JPanel buttonPane = ComponentFactory.createJPanel();
 
@@ -314,7 +295,7 @@ public class VPX_ScanWindow extends JDialog {
 			setType(Type.NORMAL);
 
 			setIconImage(VPXUtilities.getAppIcon());
-			
+
 			setAlwaysOnTop(true);
 
 			setModal(true);
@@ -453,112 +434,7 @@ public class VPX_ScanWindow extends JDialog {
 
 			private void parseCMD(String ip, ATP_COMMAND cmd) {
 
-				List<Slot> slots = vpxSystem.getSlots();
-
-				if (slots == null) {
-
-					Slot slotTemp = new Slot();
-
-					slotTemp.setID((int) cmd.params.proccesorInfo.slotID.get());
-
-					Processor processTemp = new Processor();
-
-					processTemp.setID((int) cmd.params.proccesorInfo.processorID.get());
-
-					processTemp.addIPAddress(ip);
-
-					processTemp.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
-
-					slotTemp.addProcessor(processTemp);
-
-					vpxSystem.addSlot(slotTemp);
-
-				} else {
-
-					Slot slot = null;
-
-					for (Iterator<Slot> iterator = slots.iterator(); iterator.hasNext();) {
-
-						slot = iterator.next();
-
-						if (slot.getID() == cmd.params.proccesorInfo.slotID.get()) {
-							break;
-						} else {
-							slot = null;
-						}
-
-					}
-
-					if (slot == null) {
-
-						slot = new Slot();
-
-						slot.setID((int) cmd.params.proccesorInfo.slotID.get());
-
-						Processor process = new Processor();
-
-						process.setID((int) cmd.params.proccesorInfo.processorID.get());
-
-						process.addIPAddress(ip);
-
-						process.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
-
-						slot.addProcessor(process);
-
-						vpxSystem.addSlot(slot);
-					} else {
-
-						List<Processor> plist = slot.getProcessors();
-
-						if (plist == null) {
-
-							Processor processr = new Processor();
-
-							processr.setID((int) cmd.params.proccesorInfo.processorID.get());
-
-							processr.addIPAddress(ip);
-
-							processr.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
-
-							slot.addProcessor(processr);
-
-						} else {
-
-							Processor processor = null;
-
-							for (Iterator<Processor> iterator = plist.iterator(); iterator.hasNext();) {
-
-								processor = iterator.next();
-
-								if ((processor.getID() == cmd.params.proccesorInfo.processorID.get())
-										&& (slot.getID() != cmd.params.proccesorInfo.slotID.get())) {
-									break;
-								} else {
-									processor = null;
-								}
-
-							}
-
-							if (processor == null) {
-
-								Processor procsr = new Processor();
-
-								procsr.setID((int) cmd.params.proccesorInfo.processorID.get());
-
-								procsr.addIPAddress(ip);
-
-								procsr.setProcessorType(getProcessor(cmd.params.proccesorInfo.processorTYPE));
-
-								slot.addProcessor(procsr);
-
-							} else {
-
-								processor.addIPAddress(ip);
-							}
-						}
-
-					}
-				}
+				vpxSystem.addProcessor(new Processor(ip, getProcessor(cmd.params.proccesorInfo.processorTYPE)));
 
 			}
 

@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -23,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 
+import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 
 /**
@@ -102,7 +105,7 @@ public class VPXUtilities {
 		dialog.setContentPane(optionPane);
 		optionPane.setBorder(new LineBorder(Color.GRAY));
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
+		dialog.setAlwaysOnTop(true);
 		dialog.setSize(new Dimension(450, 100));
 
 		// create timer to dispose of dialog after 5 seconds
@@ -181,5 +184,23 @@ public class VPXUtilities {
 		}
 
 		return null;
+	}
+
+	public static Processor getSelectedProcessor(String path) {
+
+		Processor pros = null;
+
+		List<Processor> ps = VPXUtilities.getVPXSystem().getProcessors();
+
+		for (Iterator<Processor> iterator = ps.iterator(); iterator.hasNext();) {
+			Processor processor = iterator.next();
+			if (path.startsWith(processor.getiP_Addresses())) {
+				pros = processor;
+				break;
+			}
+
+		}
+
+		return pros;
 	}
 }

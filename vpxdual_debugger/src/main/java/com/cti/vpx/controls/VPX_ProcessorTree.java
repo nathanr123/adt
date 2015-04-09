@@ -8,21 +8,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.EventObject;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
-import com.cti.vpx.model.Core;
-import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
@@ -117,6 +120,16 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		addMouseListener(this);
 
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
+
+		setEditable(true);
+
+		setRowHeight(20);
+
+		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
+
+		TreeCellEditor editor = new VPX_Processor_Leaf_Cell_Editor(this, renderer, new VPX_Processor_Leaf_Editor());
+
+		setCellEditor(editor);
 	}
 
 	public void setVPXSystem(VPXSystem sys) {
@@ -131,11 +144,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		ImageIcon systemIcon = VPXUtilities.getImageIcon("images\\System.jpg", 18, 18);
 
-		ImageIcon slotIcon = VPXUtilities.getImageIcon("images\\Slot.jpg", 18, 18);
-
 		ImageIcon processorIcon = VPXUtilities.getImageIcon("images\\Processor4.jpg", 14, 14);
-
-		ImageIcon coreIcon = VPXUtilities.getImageIcon("images\\Core.png", 14, 14);
 
 		public VPX_ProcessorTreeCellRenderer() {
 
@@ -156,19 +165,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				setIcon(systemIcon);
 
-			} else if (nodo.startsWith(Slot.class.getSimpleName())) {
-
-				setIcon(slotIcon);
-
-			} else if (nodo.startsWith("DSP") || nodo.startsWith("P2020")) {
+			} else {
 
 				setIcon(processorIcon);
 
-			} else if (nodo.startsWith(Core.class.getSimpleName())) {
-
-				setIcon(coreIcon);
 			}
-
 			return this;
 		}
 	}
@@ -236,17 +237,34 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			popup.add(itemRefresh);
 
-		} else if ((node.startsWith("Slot"))) {
-
-			JMenuItem itemConnectAll = new JMenuItem("Connect All Processors");
-
-			popup.add(itemConnectAll);
-
-		} else if ((node.startsWith("DSP")) || (node.startsWith("P2020"))) {
+		} else {
 
 			JMenuItem itemConnect = new JMenuItem("Connect");
 
+			itemConnect.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					parent.connectProcessor(VPXUtilities.getSelectedProcessor(VPX_ProcessorTree.this
+							.getLastSelectedPathComponent().toString()));
+				}
+			});
+
 			popup.add(itemConnect);
+
+			JMenuItem itemRename = new JMenuItem("Rename");
+
+			itemRename.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					VPX_ProcessorTree.this.startEditingAtPath(VPX_ProcessorTree.this.getSelectionPath());
+				}
+			});
+
+			popup.add(itemRename);
 		}
 
 		popup.add(new JSeparator());
@@ -257,7 +275,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				VPX_DetailPanel detail = new VPX_DetailPanel(system);
+				VPX_DetailPanel detail = new VPX_DetailPanel(VPX_ProcessorTree.this.getLastSelectedPathComponent()
+						.toString());
 				detail.setVisible(true);
 			}
 		});
@@ -265,5 +284,74 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		popup.add(itemDetail);
 
 		popup.show(this, x, y);
+	}
+
+	class VPX_Processor_Leaf_Cell_Editor extends DefaultTreeCellEditor {
+		public VPX_Processor_Leaf_Cell_Editor(JTree tree, DefaultTreeCellRenderer renderer) {
+			super(tree, renderer);
+		}
+
+		public VPX_Processor_Leaf_Cell_Editor(JTree tree, DefaultTreeCellRenderer renderer, TreeCellEditor editor) {
+			super(tree, renderer, editor);
+		}
+	}
+
+	class VPX_Processor_Leaf_Editor extends AbstractCellEditor implements TreeCellEditor, ActionListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2053120822277708914L;
+
+		String old_Value;
+		String old_name;
+
+		JTextField textField;
+
+		public VPX_Processor_Leaf_Editor() {
+			textField = new JTextField();
+			textField.addActionListener(this);
+		}
+
+		public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
+				boolean leaf, int row) {
+
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+
+			old_Value = node.toString();
+
+			old_name = old_Value.substring(old_Value.indexOf("(") + 1, old_Value.indexOf(")"));
+
+			textField.setText(old_name);
+
+			return textField;
+		}
+
+		public boolean isCellEditable(EventObject event) {
+			// System.out.println("event = " + event);
+			// Get initial setting
+			boolean returnValue = super.isCellEditable(event);
+			if (event instanceof MouseEvent) {
+				// If still possible, check if current tree node is a leaf
+				if (returnValue) {
+					JTree tree = (JTree) event.getSource();
+					Object node = tree.getLastSelectedPathComponent();
+					if ((node != null) && (node instanceof TreeNode)) {
+						TreeNode treeNode = (TreeNode) node;
+						returnValue = treeNode.isLeaf();
+					}
+				}
+			}
+			return returnValue;
+		}
+
+		public Object getCellEditorValue() {
+
+			return old_Value.replaceAll(old_name, textField.getText());
+		}
+
+		/** Press enter key to save the edited value. */
+		public void actionPerformed(ActionEvent e) {
+			super.stopCellEditing();
+		}
 	}
 }

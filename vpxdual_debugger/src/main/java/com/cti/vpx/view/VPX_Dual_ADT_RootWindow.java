@@ -19,6 +19,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_FlashProcessor;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
@@ -27,9 +28,7 @@ import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
-import com.cti.vpx.model.Core;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXParser;
@@ -106,7 +105,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// setBounds(0, 0, 500, 500);
+		setAlwaysOnTop(true);
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -239,8 +238,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
 
-		vpx_Content_Tabbed_Pane_Right.addTab("Processor", new JPanel());
-
 		vpx_Right_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
 
 		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
@@ -249,12 +246,10 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		vpx_Content_Tabbed_Pane_Message.addTab("Logger", logger);
 
-		vpx_Content_Tabbed_Pane_Message.addTab("Message", new VPX_MessagePanel(this));
-
 		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
 		vpx_Right_SplitPane.setDividerLocation(((int) VPXUtilities.getScreenHeight() / 2 + (int) VPXUtilities
-				.getScreenHeight() / 10));
+				.getScreenHeight() / 7));
 
 		vpx_Right_SplitPane.setDividerSize(2);
 
@@ -303,41 +298,20 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		systemRootNode.setUserObject(system.getName());
 
-		List<Slot> sl = system.getSlots();
+		List<Processor> processorList = system.getProcessors();
 
-		if (sl != null) {
+		if (processorList != null) {
+			for (Iterator<Processor> iterator = processorList.iterator(); iterator.hasNext();) {
 
-			for (Iterator<Slot> iterator = sl.iterator(); iterator.hasNext();) {
+				Processor processor = iterator.next();
 
-				Slot slt = iterator.next();
+				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(String.format("%s(%s)",
+						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
 
-				DefaultMutableTreeNode slotNode = new DefaultMutableTreeNode(slt.getName());
-
-				List<Processor> prc = slt.getProcessors();
-
-				if (prc != null) {
-					for (Iterator<Processor> iterator2 = prc.iterator(); iterator2.hasNext();) {
-
-						Processor processor = iterator2.next();
-
-						DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(processor.getName());
-
-						List<Core> crs = processor.getCores();
-
-						if (crs != null) {
-							for (Iterator<Core> iterator3 = crs.iterator(); iterator3.hasNext();) {
-
-								Core core = iterator3.next();
-
-								processorNode.add(new DefaultMutableTreeNode(core.getName()));
-							}
-						}
-						slotNode.add(processorNode);
-					}
-				}
-				systemRootNode.add(slotNode);
+				systemRootNode.add(processorNode);
 			}
 		}
+
 	}
 
 	private void updateProcessorTree(VPXSystem sys) {
@@ -389,6 +363,13 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		logger.updateLog(level, logMsg);
 
 		updateStatus(logMsg);
+	}
+
+	public void connectProcessor(Processor pro) {
+		vpx_Content_Tabbed_Pane_Right.addTab(String.format("%s(%s)", pro.getiP_Addresses(),pro.getName()),
+				new VPX_ConnectedProcessor(VPX_Dual_ADT_RootWindow.this));
+
+		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 	}
 
 	public class ScanAction extends AbstractAction {
@@ -457,10 +438,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new
-			// HexEditorDemoPanel());
 			int i = isAlreadyExist();
-			if (i == -1) {
+			if (isAlreadyExist() == -1) {
 				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_FlashProcessor()));
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);

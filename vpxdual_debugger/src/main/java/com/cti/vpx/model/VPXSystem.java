@@ -14,44 +14,12 @@ public class VPXSystem implements VPX {
 	 */
 	private static final long serialVersionUID = 1422619400056758867L;
 
-	/**
-	 * 
-	 */
-
-	private int ID;
-
 	private String name;
 
-	private List<Slot> slots;
+	private List<Processor> processors;
 
 	public VPXSystem() {
 		this.name = this.getClass().getSimpleName();
-	}
-
-	public VPXSystem(int iD, List<Slot> slots) {
-		super();
-
-		this.name = this.getClass().getSimpleName();
-		ID = iD;
-		this.slots = slots;
-	}
-
-	public int getID() {
-		return ID;
-	}
-
-	@XmlElement
-	public void setID(int iD) {
-		ID = iD;
-	}
-
-	public List<Slot> getSlots() {
-		return slots;
-	}
-
-	@XmlElement
-	public void setSlots(List<Slot> slots) {
-		this.slots = slots;
 	}
 
 	public String getName() {
@@ -63,11 +31,20 @@ public class VPXSystem implements VPX {
 		this.name = name;
 	}
 
-	public void addSlot(Slot slot) {
-		if (slots == null) {
-			slots = new ArrayList<Slot>();
+	public List<Processor> getProcessors() {
+		return processors;
+	}
+
+	@XmlElement
+	public void setProcessors(List<Processor> processors) {
+		this.processors = processors;
+	}
+
+	public void addProcessor(Processor porcessor) {
+		if (processors == null) {
+			processors = new ArrayList<Processor>();
 		}
 
-		slots.add(slot);
+		processors.add(porcessor);
 	}
 }

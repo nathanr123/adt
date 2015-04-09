@@ -1,8 +1,5 @@
 package com.cti.vpx.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -18,18 +15,24 @@ public class Processor implements VPX {
 
 	private String name;
 
-	private List<String> iP_Addresses;
+	private String iP_Addresses;
 
 	public static final int PORTNO = 12345;
 
 	public static final int UDP_PORTNO = 12346;
 
-	private List<Core> cores;
-
 	private PROCESSOR_LIST processorType;
 
 	public Processor() {
 
+	}
+
+	public Processor(String ipAddress, PROCESSOR_LIST pType) {
+		this.iP_Addresses = ipAddress;
+
+		this.processorType = pType;
+
+		setName(pType);
 	}
 
 	public Processor(PROCESSOR_LIST pType) {
@@ -48,24 +51,6 @@ public class Processor implements VPX {
 		ID = iD;
 	}
 
-	public List<String> getiP_Addresses() {
-		return iP_Addresses;
-	}
-
-	@XmlElement
-	public void setiP_Addresses(List<String> iP_Addresses) {
-		this.iP_Addresses = iP_Addresses;
-	}
-
-	public List<Core> getCores() {
-		return cores;
-	}
-
-	@XmlElement
-	public void setCores(List<Core> cores) {
-		this.cores = cores;
-	}
-
 	public PROCESSOR_LIST getProcessorType() {
 		return processorType;
 	}
@@ -76,8 +61,12 @@ public class Processor implements VPX {
 		setName(processorType);
 	}
 
-	public static int getPortno() {
+	public int getPortno() {
 		return PORTNO;
+	}
+
+	public static int getUdpPortno() {
+		return UDP_PORTNO;
 	}
 
 	public String getName() {
@@ -87,6 +76,15 @@ public class Processor implements VPX {
 	@XmlElement
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getiP_Addresses() {
+		return iP_Addresses;
+	}
+
+	@XmlElement
+	public void setiP_Addresses(String iP_Addresses) {
+		this.iP_Addresses = iP_Addresses;
 	}
 
 	public void setName(PROCESSOR_LIST pType) {
@@ -101,23 +99,4 @@ public class Processor implements VPX {
 			this.ID = 2;
 		}
 	}
-
-	public void addIPAddress(String ipAddress) {
-		if (iP_Addresses == null) {
-			iP_Addresses = new ArrayList<String>();
-		}
-
-		iP_Addresses.add(ipAddress);
-
-	}
-
-	public void addCore(Core core) {
-		if (cores == null) {
-			cores = new ArrayList<Core>();
-		}
-
-		cores.add(core);
-
-	}
-
 }

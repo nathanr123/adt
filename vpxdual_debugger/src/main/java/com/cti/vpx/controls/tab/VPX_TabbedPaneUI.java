@@ -46,6 +46,11 @@ public class VPX_TabbedPaneUI extends VPX_BasicTabPaneUI {
 
 	}
 
+	@Override
+	protected int calculateTabWidth(int tabPlacement, int tabIndex, FontMetrics metrics) {
+		// TODO Auto-generated method stub
+		return super.calculateTabWidth(tabPlacement, tabIndex, metrics);
+	}
 	protected void paintContentBorderTopEdge(Graphics g, int tabPlacement,
 			int selectedIndex, int x, int y, int w, int h) {
 

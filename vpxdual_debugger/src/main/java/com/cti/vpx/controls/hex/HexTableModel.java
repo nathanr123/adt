@@ -47,7 +47,6 @@ import javax.swing.undo.UndoManager;
  */
 public class HexTableModel extends AbstractTableModel {
 
-	
 	private static final long serialVersionUID = 1L;
 
 	private HexEditor editor;

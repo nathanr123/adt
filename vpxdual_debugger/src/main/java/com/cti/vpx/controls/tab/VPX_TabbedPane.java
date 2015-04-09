@@ -1,5 +1,11 @@
 package com.cti.vpx.controls.tab;
 
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -7,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -86,7 +93,7 @@ public class VPX_TabbedPane extends JTabbedPane {
 			return;
 
 		final JFrame frame = new JFrame();
-		
+
 		frame.setIconImage(VPXUtilities.getAppIcon());
 
 		Window parentWindow = SwingUtilities.windowForComponent(this);

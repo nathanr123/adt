@@ -18,8 +18,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.Slot;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_DetailPanel extends JDialog {
 	/**
@@ -32,50 +32,15 @@ public class VPX_DetailPanel extends JDialog {
 	private DefaultTableModel tbl_Property_Model;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			VPX_DetailPanel dialog = new VPX_DetailPanel(new VPXSystem());
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Create the dialog.
 	 */
-	public VPX_DetailPanel(VPXSystem system) {
 
+	public VPX_DetailPanel(String path) {
 		init();
 
 		loadComponents();
 
-		loadProperties(system);
-
-		centerFrame();
-	}
-
-	public VPX_DetailPanel(Slot slot) {
-
-		init();
-
-		loadComponents();
-
-		loadProperties(slot);
-
-		centerFrame();
-	}
-
-	public VPX_DetailPanel(Processor procr) {
-
-		init();
-
-		loadComponents();
-
-		loadProperties(procr);
+		loadProperties(path);
 
 		centerFrame();
 	}
@@ -84,6 +49,8 @@ public class VPX_DetailPanel extends JDialog {
 		setSize(343, 551);
 
 		setAlwaysOnTop(true);
+
+		setIconImage(VPXUtilities.getAppIcon());
 
 		setModal(true);
 	}
@@ -127,35 +94,29 @@ public class VPX_DetailPanel extends JDialog {
 		scrollPane.setViewportView(tbl_Property);
 	}
 
+	private void loadProperties(String path) {
+
+		if (path.startsWith(VPXSystem.class.getSimpleName())) {		
+		} else {
+			loadProperties(VPXUtilities.getSelectedProcessor(path));		
+		}
+
+	}
+
 	private void loadProperties(VPXSystem sys) {
 
 		tbl_Property_Model.addRow(new String[] { "Name", sys.getName() });
 
-		tbl_Property_Model.addRow(new String[] { "ID", ("" + sys.getID()) });
+		List<Processor> processors = sys.getProcessors();
 
-		List<Slot> slots = sys.getSlots();
+		if (processors != null) {
+			tbl_Property_Model.addRow(new String[] { "Total No of Processors", ("" + processors.size()) });
 
-		tbl_Property_Model.addRow(new String[] { "Total No of Slots", ("" + slots.size()) });
+			tbl_Property_Model.addRow(new String[] { "", "" });
 
-		tbl_Property_Model.addRow(new String[] { "", "" });
+			for (Iterator<Processor> iterator = processors.iterator(); iterator.hasNext();) {
 
-		for (Iterator<Slot> iterator = slots.iterator(); iterator.hasNext();) {
-
-			Slot slot = iterator.next();
-
-			tbl_Property_Model.addRow(new String[] { "Slot Name", slot.getName() });
-
-			tbl_Property_Model.addRow(new String[] { "Slot ID", ("" + slot.getID()) });
-
-			tbl_Property_Model.addRow(new String[] { "Slot Model", slot.getModel() });
-
-			List<Processor> procrs = slot.getProcessors();
-
-			tbl_Property_Model.addRow(new String[] { "Total Number of Processors", ("" + procrs.size()) });
-
-			for (Iterator<Processor> iterator2 = procrs.iterator(); iterator2.hasNext();) {
-
-				Processor processor = iterator2.next();
+				Processor processor = (Processor) iterator.next();
 
 				tbl_Property_Model.addRow(new String[] { "", "" });
 
@@ -163,35 +124,35 @@ public class VPX_DetailPanel extends JDialog {
 
 				tbl_Property_Model.addRow(new String[] { "Processor ID", ("" + processor.getID()) });
 
+				tbl_Property_Model.addRow(new String[] { "IP Address", processor.getiP_Addresses() });
+
+				tbl_Property_Model.addRow(new String[] { "Port", ("" + processor.getPortno()) });
+
 				tbl_Property_Model.addRow(new String[] { "Processor Type", processor.getProcessorType().toString() });
-
-				if (processor.getiP_Addresses().size() > 0) {
-
-					List<String> ips = processor.getiP_Addresses();
-
-					int i = 0;
-
-					for (Iterator<String> iterator3 = ips.iterator(); iterator3.hasNext();) {
-
-						String string = iterator3.next();
-
-						tbl_Property_Model.addRow(new String[] { "IP Address " + i, string });
-
-						i++;
-					}
-				} else {
-					tbl_Property_Model.addRow(new String[] { "IP Address", processor.getiP_Addresses().get(0) });
-				}
 
 			}
 		}
+
 	}
 
-	private void loadProperties(Slot slt) {
+	private void loadProperties(Processor processor) {
+
+		if (processor != null) {
+
+			tbl_Property_Model.addRow(new String[] { "Processor Name", processor.getName() });
+
+			tbl_Property_Model.addRow(new String[] { "Processor ID", ("" + processor.getID()) });
+
+			tbl_Property_Model.addRow(new String[] { "IP Address", processor.getiP_Addresses() });
+
+			tbl_Property_Model.addRow(new String[] { "Port", ("" + processor.getPortno()) });
+
+			tbl_Property_Model.addRow(new String[] { "Processor Type", processor.getProcessorType().toString() });
+
+		}
 	}
 
-	private void loadProperties(Processor proc) {
-	}
+	
 
 	private void centerFrame() {
 
