@@ -97,6 +97,7 @@ public class VPX_DetailPanel extends JDialog {
 	private void loadProperties(String path) {
 
 		if (path.startsWith(VPXSystem.class.getSimpleName())) {		
+			loadProperties(VPXUtilities.getVPXSystem());
 		} else {
 			loadProperties(VPXUtilities.getSelectedProcessor(path));		
 		}
@@ -111,8 +112,6 @@ public class VPX_DetailPanel extends JDialog {
 
 		if (processors != null) {
 			tbl_Property_Model.addRow(new String[] { "Total No of Processors", ("" + processors.size()) });
-
-			tbl_Property_Model.addRow(new String[] { "", "" });
 
 			for (Iterator<Processor> iterator = processors.iterator(); iterator.hasNext();) {
 

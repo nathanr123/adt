@@ -2,6 +2,7 @@ package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -19,6 +20,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_FlashProcessor;
 import com.cti.vpx.controls.VPX_LoggerPanel;
@@ -88,6 +90,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	private JTabbedPane vpx_Content_Tabbed_Pane_Message;
 
 	private VPX_StatusBar statusBar;
+
+	private VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
 
 	/**
 	 * Create the frame.
@@ -182,6 +186,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		vpx_Menu_Help_Help = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Help"));
 
 		vpx_Menu_Help_About = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.About"));
+
+		vpx_Menu_Help_About.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				aboutDialog.showDialog();
+			}
+		});
 
 		vpx_Menu_Help.add(vpx_Menu_Help_Help);
 
@@ -366,7 +378,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	}
 
 	public void connectProcessor(Processor pro) {
-		vpx_Content_Tabbed_Pane_Right.addTab(String.format("%s(%s)", pro.getiP_Addresses(),pro.getName()),
+		vpx_Content_Tabbed_Pane_Right.addTab(String.format("%s(%s)", pro.getiP_Addresses(), pro.getName()),
 				new VPX_ConnectedProcessor(VPX_Dual_ADT_RootWindow.this));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
