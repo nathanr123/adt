@@ -86,7 +86,7 @@ public class VPX_ScanWindow extends JDialog {
 
 	private void init() {
 
-		setTitle("IP Scanning Window");
+		setTitle("Processor Scanning Window");
 
 		setBounds(100, 100, 305, 165);
 
@@ -433,29 +433,11 @@ public class VPX_ScanWindow extends JDialog {
 			}
 
 			private void parseCMD(String ip, ATP_COMMAND cmd) {
-
-				vpxSystem.addProcessor(new Processor(ip, getProcessor(cmd.params.proccesorInfo.processorTYPE)));
-
-			}
-
-			private PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
-
-				if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
-
-					return PROCESSOR_LIST.PROCESSOR_P2020;
-
-				} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP1.toString())) {
-
-					return PROCESSOR_LIST.PROCESSOR_DSP1;
-
-				} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP2.toString())) {
-
-					return PROCESSOR_LIST.PROCESSOR_DSP2;
-				}
-
-				return null;
+				
+				vpxSystem.addProcessor(new Processor(ip, VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
 
 			}
+			
 		}
 	}
 

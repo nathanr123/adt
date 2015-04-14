@@ -119,6 +119,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 			txtA_Log.append("\n");
 
 		txtA_Log.append(getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log);
+
+		txtA_Log.setCaretPosition(txtA_Log.getText().length());
 	}
 
 	private String getLevel(int level) {

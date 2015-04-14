@@ -13,18 +13,17 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.cti.vpx.command.ATP_COMMAND;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_FlashProcessor;
 import com.cti.vpx.controls.VPX_LoggerPanel;
-import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
@@ -33,7 +32,7 @@ import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
-import com.cti.vpx.util.VPXParser;
+import com.cti.vpx.util.VPXTCPConnector;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_Dual_ADT_RootWindow extends JFrame {
@@ -93,6 +92,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
 
+	private ProcessorMonitorThread monitor = new ProcessorMonitorThread();
+
 	/**
 	 * Create the frame.
 	 */
@@ -101,6 +102,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		rBundle = VPXUtilities.getResourceBundle();
 
 		initializeRootWindow();
+
 	}
 
 	private void initializeRootWindow() {
@@ -109,7 +111,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setAlwaysOnTop(true);
+		// setAlwaysOnTop(true);
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -289,7 +291,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private void createVPXObject() {
 
-		system = VPXParser.readFromXMLFile();
+		// system = VPXParser.readFromXMLFile();
 
 		if (system == null) {
 
@@ -335,7 +337,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		VPXUtilities.setVPXSystem(sys);
 
-		VPXParser.writeToXMLFile(sys);
+		// VPXParser.writeToXMLFile(sys);
 	}
 
 	private void reloadVPXSystemTree(VPXSystem system) {
@@ -343,6 +345,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		loadSystemRootNode(system);
 
 		updateProcessorTree(system);
+
+		monitor.startMonitor();
+
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {
@@ -405,6 +410,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			monitor.stopMonitor();
+
 			VPX_ScanWindow ir = new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
 
 			ir.setVisible(true);
@@ -491,4 +498,103 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		}
 	}
+
+	private void refreshProcessorTree(ATP_COMMAND cmd, String ip, boolean isRemove) {
+
+		int size = systemRootNode.getChildCount();
+
+		int foundAt = -1;
+
+		for (int i = 0; i < size; i++) {
+
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) systemRootNode.getChildAt(i);
+
+			if (child.getUserObject().toString().startsWith(ip)) {
+
+				foundAt = i;
+
+				break;
+			}
+
+		}
+
+		if (isRemove) {
+			if (foundAt > -1) {
+				systemRootNode.remove(foundAt);
+			}
+		} else {
+			if (foundAt == -1) {
+				Processor processor = new Processor(ip,
+						VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE));
+
+				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(String.format("%s(%s)",
+						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
+
+				systemRootNode.add(processorNode);
+
+			}
+		}
+		
+		vpx_Processor_Tree.updateUI();
+	}
+
+	class ProcessorMonitorThread implements Runnable {
+
+		Thread th;
+
+		private boolean isStarted = true;
+
+		public ProcessorMonitorThread() {
+
+		}
+
+		@Override
+		public void run() {
+			List<Processor> vpxSystemProcessors = VPXUtilities.getVPXSystem().getProcessors();
+
+			while (isStarted) {
+				try {
+
+					Thread.sleep(5000);
+
+					for (Iterator<Processor> iterator = vpxSystemProcessors.iterator(); iterator.hasNext();) {
+
+						Processor processor = iterator.next();
+
+						ATP_COMMAND processorInfo = VPXTCPConnector.identifyProcessor(processor.getiP_Addresses());
+
+						if (processorInfo != null) {
+
+							refreshProcessorTree(processorInfo, processor.getiP_Addresses(), false);
+
+							updateLog(processor.getiP_Addresses() + " Found");
+						} else {
+							refreshProcessorTree(processorInfo, processor.getiP_Addresses(), true);
+
+							updateLog(processor.getiP_Addresses() + " Lost");
+						}
+
+					}
+				} catch (Exception e) {
+
+				}
+			}
+
+		}
+
+		public void startMonitor() {
+			isStarted = true;
+			if (th == null)
+				th = new Thread(this, "Test");
+			th.start();
+		}
+
+		public void stopMonitor() {
+			isStarted = false;
+
+			th = null;
+		}
+
+	}
+
 }

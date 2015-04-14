@@ -25,8 +25,12 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 
+import javolution.io.Struct.Enum32;
+
+import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 
 /**
  * @author nathanr_kamal
@@ -202,5 +206,24 @@ public class VPXUtilities {
 		}
 
 		return pros;
+	}
+	
+	public static PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
+
+		if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
+
+			return PROCESSOR_LIST.PROCESSOR_P2020;
+
+		} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP1.toString())) {
+
+			return PROCESSOR_LIST.PROCESSOR_DSP1;
+
+		} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP2.toString())) {
+
+			return PROCESSOR_LIST.PROCESSOR_DSP2;
+		}
+
+		return null;
+
 	}
 }
