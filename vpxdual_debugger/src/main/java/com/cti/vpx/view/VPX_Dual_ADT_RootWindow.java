@@ -3,6 +3,9 @@ package com.cti.vpx.view;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -17,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.cti.vpx.command.ATP_COMMAND;
@@ -94,6 +98,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private ProcessorMonitorThread monitor = new ProcessorMonitorThread();
 
+	private MsgReceiver msgRecvr = new MsgReceiver();
 	/**
 	 * Create the frame.
 	 */
@@ -347,6 +352,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		updateProcessorTree(system);
 
 		monitor.startMonitor();
+		
+		msgRecvr.execute();
 
 	}
 
@@ -521,6 +528,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		if (isRemove) {
 			if (foundAt > -1) {
 				systemRootNode.remove(foundAt);
+				
+				updateLog(ip + " Lost");
 			}
 		} else {
 			if (foundAt == -1) {
@@ -531,13 +540,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
 
 				systemRootNode.add(processorNode);
-
+				
+				updateLog(processor.getiP_Addresses() + " Found");
 			}
 		}
 		
 		vpx_Processor_Tree.updateUI();
 	}
-
+	
 	class ProcessorMonitorThread implements Runnable {
 
 		Thread th;
@@ -566,12 +576,10 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 						if (processorInfo != null) {
 
 							refreshProcessorTree(processorInfo, processor.getiP_Addresses(), false);
-
-							updateLog(processor.getiP_Addresses() + " Found");
+							
 						} else {
 							refreshProcessorTree(processorInfo, processor.getiP_Addresses(), true);
-
-							updateLog(processor.getiP_Addresses() + " Lost");
+						
 						}
 
 					}
@@ -595,6 +603,44 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			th = null;
 		}
 
+	}
+	
+	class MsgReceiver extends SwingWorker<Void, String> {
+		
+		DatagramSocket serverSocket;
+		
+		byte[] receiveData = new byte[1024];
+		
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+		
+		public MsgReceiver() {
+			try {
+				serverSocket = new DatagramSocket(12346);
+			} catch (SocketException e) {				
+				e.printStackTrace();
+			}
+		}
+		
+		
+		@Override
+		protected Void doInBackground() throws Exception {
+			while(true){
+				serverSocket.receive(receivePacket);
+				
+				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
+				
+				System.out.println(sentence);
+				
+				Thread.sleep(500);
+			}
+		}
+
+		@Override
+		protected void process(List<String> chunks) {
+			// TODO Auto-generated method stub
+			super.process(chunks);
+		}
+	
 	}
 
 }
