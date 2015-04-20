@@ -11,9 +11,13 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -22,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
@@ -73,6 +78,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	private JPanel panel;
 
 	private JPanel panel_2;
+
+	private MsgReceiver msgRecvr = new MsgReceiver();
 
 	/**
 	 * Create the panel.
@@ -239,7 +246,9 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			txtP_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), style, false);
 
 			txtP_Msg_Display_Document.setLogicalStyle(eo, style);
-
+			
+			txtP_Msg_Display.setCaretPosition(txtP_Msg_Display_Document.getLength());
+				
 		} catch (BadLocationException e) {
 
 			e.printStackTrace();
@@ -265,6 +274,14 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	private void clearContents() {
 
 		txtP_Msg_Display.setText("");
+	}
+
+	public void startRecieveMessage() {
+		msgRecvr.execute();
+	}
+
+	public void stopRecieveMessage() {
+		msgRecvr.cancel(true);
 	}
 
 	private void setClipboardContents(String aString) {
@@ -434,5 +451,44 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			VPXUtilities.showPopup("Contents copied to clipboard");
 		}
+	}
+
+	class MsgReceiver extends SwingWorker<Void, String> {
+
+		DatagramSocket serverSocket;
+
+		byte[] receiveData = new byte[1024];
+
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+		public MsgReceiver() {
+			try {
+				serverSocket = new DatagramSocket(12346);
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			while (true) {
+				serverSocket.receive(receivePacket);
+
+				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
+				
+				updateProcessorMessage("Slot : 0 :: DSP - 1: \n", proc_From_Style);
+
+				updateProcessorMessage(sentence+"\n", proc_Msg_Style);
+
+				Thread.sleep(500);
+			}
+		}
+
+		@Override
+		protected void process(List<String> chunks) {
+			// TODO Auto-generated method stub
+			super.process(chunks);
+		}
+
 	}
 }

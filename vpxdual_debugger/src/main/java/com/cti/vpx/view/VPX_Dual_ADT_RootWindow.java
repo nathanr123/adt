@@ -1,11 +1,9 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -16,11 +14,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
-import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.cti.vpx.command.ATP_COMMAND;
@@ -28,6 +26,7 @@ import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_FlashProcessor;
 import com.cti.vpx.controls.VPX_LoggerPanel;
+import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
@@ -98,7 +97,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private ProcessorMonitorThread monitor = new ProcessorMonitorThread();
 
-	private MsgReceiver msgRecvr = new MsgReceiver();
+	private VPX_MessagePanel messagePanel;
+
+
 	/**
 	 * Create the frame.
 	 */
@@ -254,10 +255,22 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	private JSplitPane getRightComponent() {
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		
+		JPanel contentPanel = ComponentFactory.createJPanel();
+		
+		contentPanel.setLayout(new BorderLayout());		
 
+		messagePanel = new VPX_MessagePanel(this);
+		
+		messagePanel.setPreferredSize(new Dimension(375, 300));
+		
+		contentPanel.add(messagePanel, BorderLayout.EAST);
+		
 		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
 
-		vpx_Right_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
+		contentPanel.add(vpx_Content_Tabbed_Pane_Right);
+		
+		vpx_Right_SplitPane.setLeftComponent(contentPanel);
 
 		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
 
@@ -353,8 +366,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		monitor.startMonitor();
 		
-		msgRecvr.execute();
-
+		messagePanel.startRecieveMessage();
+		
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {
@@ -605,42 +618,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	}
 	
-	class MsgReceiver extends SwingWorker<Void, String> {
-		
-		DatagramSocket serverSocket;
-		
-		byte[] receiveData = new byte[1024];
-		
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		
-		public MsgReceiver() {
-			try {
-				serverSocket = new DatagramSocket(12346);
-			} catch (SocketException e) {				
-				e.printStackTrace();
-			}
-		}
-		
-		
-		@Override
-		protected Void doInBackground() throws Exception {
-			while(true){
-				serverSocket.receive(receivePacket);
-				
-				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
-				
-				System.out.println(sentence);
-				
-				Thread.sleep(500);
-			}
-		}
-
-		@Override
-		protected void process(List<String> chunks) {
-			// TODO Auto-generated method stub
-			super.process(chunks);
-		}
 	
-	}
 
 }

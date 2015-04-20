@@ -116,7 +116,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	private void initTree() {
-
+		
 		addMouseListener(this);
 
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
@@ -233,6 +233,15 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			JMenuItem itemRefresh = new JMenuItem("Refresh");
 
+			itemRefresh.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					
+				}
+			});
+			
 			popup.add(itemScan);
 
 			popup.add(itemRefresh);
