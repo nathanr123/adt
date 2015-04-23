@@ -35,6 +35,7 @@ import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.Pinger;
 import com.cti.vpx.util.VPXTCPConnector;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -99,7 +100,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private VPX_MessagePanel messagePanel;
 
-
 	/**
 	 * Create the frame.
 	 */
@@ -117,7 +117,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// setAlwaysOnTop(true);
+		//setAlwaysOnTop(true);
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -255,21 +255,21 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	private JSplitPane getRightComponent() {
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		
+
 		JPanel contentPanel = ComponentFactory.createJPanel();
-		
-		contentPanel.setLayout(new BorderLayout());		
+
+		contentPanel.setLayout(new BorderLayout());
 
 		messagePanel = new VPX_MessagePanel(this);
-		
+
 		messagePanel.setPreferredSize(new Dimension(375, 300));
-		
+
 		contentPanel.add(messagePanel, BorderLayout.EAST);
-		
+
 		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
 
 		contentPanel.add(vpx_Content_Tabbed_Pane_Right);
-		
+
 		vpx_Right_SplitPane.setLeftComponent(contentPanel);
 
 		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
@@ -308,8 +308,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	}
 
 	private void createVPXObject() {
-
-		// system = VPXParser.readFromXMLFile();
 
 		if (system == null) {
 
@@ -355,7 +353,6 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		VPXUtilities.setVPXSystem(sys);
 
-		// VPXParser.writeToXMLFile(sys);
 	}
 
 	private void reloadVPXSystemTree(VPXSystem system) {
@@ -365,9 +362,9 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		updateProcessorTree(system);
 
 		monitor.startMonitor();
-		
+
 		messagePanel.startRecieveMessage();
-		
+
 	}
 
 	public void reloadProcessorTree(VPXSystem vpx) {
@@ -454,8 +451,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new
-			// HexEditorDemoPanel());
+
 			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new VPX_MemoryBrowser());
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
@@ -519,6 +515,48 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		}
 	}
 
+	private void refreshProcessorTree(Processor processor, boolean isRemove) {
+
+		int size = systemRootNode.getChildCount();
+
+		String ip = processor.getiP_Addresses();
+		
+		int foundAt = -1;
+
+		for (int i = 0; i < size; i++) {
+
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) systemRootNode.getChildAt(i);
+
+			if (child.getUserObject().toString().startsWith(ip)) {
+
+				foundAt = i;
+
+				break;
+			}
+
+		}
+
+		if (isRemove) {
+			if (foundAt > -1) {
+				systemRootNode.remove(foundAt);
+
+				updateLog(ip + " Lost");
+			}
+		} else {
+			if (foundAt == -1) {
+
+				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(String.format("%s(%s)",
+						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
+
+				systemRootNode.add(processorNode);
+
+				updateLog(processor.getiP_Addresses() + " Found");
+			}
+		}
+
+		vpx_Processor_Tree.updateUI();
+	}
+
 	private void refreshProcessorTree(ATP_COMMAND cmd, String ip, boolean isRemove) {
 
 		int size = systemRootNode.getChildCount();
@@ -541,7 +579,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		if (isRemove) {
 			if (foundAt > -1) {
 				systemRootNode.remove(foundAt);
-				
+
 				updateLog(ip + " Lost");
 			}
 		} else {
@@ -553,14 +591,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
 
 				systemRootNode.add(processorNode);
-				
+
 				updateLog(processor.getiP_Addresses() + " Found");
 			}
 		}
-		
+
 		vpx_Processor_Tree.updateUI();
 	}
-	
+
 	class ProcessorMonitorThread implements Runnable {
 
 		Thread th;
@@ -578,23 +616,14 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			while (isStarted) {
 				try {
 
-					Thread.sleep(5000);
+					Thread.sleep(10000);
 
 					for (Iterator<Processor> iterator = vpxSystemProcessors.iterator(); iterator.hasNext();) {
 
 						Processor processor = iterator.next();
 
-						ATP_COMMAND processorInfo = VPXTCPConnector.identifyProcessor(processor.getiP_Addresses());
-
-						if (processorInfo != null) {
-
-							refreshProcessorTree(processorInfo, processor.getiP_Addresses(), false);
-							
-						} else {
-							refreshProcessorTree(processorInfo, processor.getiP_Addresses(), true);
+						refreshProcessorTree(processor,!Pinger.ping(processor.getiP_Addresses()));						
 						
-						}
-
 					}
 				} catch (Exception e) {
 
@@ -617,7 +646,5 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		}
 
 	}
-	
-	
 
 }

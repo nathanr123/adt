@@ -59,7 +59,7 @@ public class VPXTCPConnector {
 		try {
 
 			Socket client = new Socket();
-
+			
 			client.connect(new InetSocketAddress(ipaddress, PORT), 1000);
 
 			client.setSoTimeout(1000);
@@ -95,23 +95,7 @@ public class VPXTCPConnector {
 			bf.flip();
 
 			msg.getByteBuffer().put(bf);
-
-			/*
-			 * System.out.println("Message Type : " + ("0x" +
-			 * Long.toHexString(msg.msgType.get()).toUpperCase()));
-			 * 
-			 * System.out.println("Message ID : " + ("0x" +
-			 * Long.toHexString(msg.msgID.get()).toUpperCase()));
-			 * 
-			 * System.out.println("Slot ID : " +
-			 * msg.params.proccesorInfo.slotID.get());
-			 * 
-			 * System.out.println("Processor : " +
-			 * msg.params.proccesorInfo.processorID.get());
-			 * 
-			 * System.out.println("Processor Type : " +
-			 * msg.params.proccesorInfo.processorTYPE);
-			 */
+			
 			client.close();
 
 			return msg;

@@ -15,6 +15,7 @@ import java.util.Vector;
 import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -121,15 +122,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
 
-		setEditable(true);
-
 		setRowHeight(20);
 
-		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
-
-		TreeCellEditor editor = new VPX_Processor_Leaf_Cell_Editor(this, renderer, new VPX_Processor_Leaf_Editor());
-
-		setCellEditor(editor);
+		//DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
 	}
 
 	public void setVPXSystem(VPXSystem sys) {
@@ -267,9 +262,21 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			itemRename.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e) {
-
-					VPX_ProcessorTree.this.startEditingAtPath(VPX_ProcessorTree.this.getSelectionPath());
+				public void actionPerformed(ActionEvent e) {					 
+					 
+					 DefaultMutableTreeNode f = (DefaultMutableTreeNode)VPX_ProcessorTree.this.getLastSelectedPathComponent();
+					 
+					 String old_Value = f.getUserObject().toString();
+					 
+					 String old_name = old_Value.substring(old_Value.indexOf("(") + 1, old_Value.indexOf(")"));
+					 
+					 String new_Name = JOptionPane.showInputDialog(parent, "New Name", old_name);
+					 
+					 String de =  old_Value.substring(0,old_Value.indexOf("("))+"("+new_Name+")";
+					 
+					 f.setUserObject(de);					
+					 
+					 VPX_ProcessorTree.this.updateUI();
 				}
 			});
 
@@ -354,7 +361,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		}
 
 		public Object getCellEditorValue() {
-
+			
 			return old_Value.replaceAll(old_name, textField.getText());
 		}
 
