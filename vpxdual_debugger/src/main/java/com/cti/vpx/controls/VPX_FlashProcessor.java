@@ -1,8 +1,6 @@
 package com.cti.vpx.controls;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -13,12 +11,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.Action;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.util.VPXUtilities;
-import java.awt.Dimension;
+import java.awt.event.ActionListener;
 
 public class VPX_FlashProcessor extends JPanel {
 	/**
@@ -46,6 +43,8 @@ public class VPX_FlashProcessor extends JPanel {
 		setMinimumSize(new Dimension(600, 600));
 		setMaximumSize(new Dimension(600, 600));
 		setLayout(null);
+		
+		fileDialog.setAcceptAllFileFilterUsed(false);
 
 		JLabel lblNewLabel = new JLabel("Select Processor");
 		lblNewLabel.setBounds(36, 25, 79, 14);
@@ -177,6 +176,10 @@ public class VPX_FlashProcessor extends JPanel {
 		panel_1.add(button_7);
 		
 		JButton btnNewButton = new JButton(new SettingsAction("Configuration"));
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnNewButton.setBounds(443, 21, 23, 23);
 		add(btnNewButton);
 		

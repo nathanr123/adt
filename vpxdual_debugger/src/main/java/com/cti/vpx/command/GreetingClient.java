@@ -7,6 +7,12 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Date;
+
+import javax.swing.UIManager;
+
+import com.cti.vpx.controls.VPX_BusyWindow;
+import com.cti.vpx.controls.VPX_FullTestResult;
 
 public class GreetingClient {
 	public static void main(String[] args) {
@@ -20,9 +26,9 @@ public class GreetingClient {
 
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(serverName, port), 500);
+			client.connect(new InetSocketAddress(serverName, port), 3000);
 
-			client.setSoTimeout(1000);
+			client.setSoTimeout(3000);
 
 			System.out.println("Just connected to " + client.getRemoteSocketAddress());
 
@@ -34,11 +40,17 @@ public class GreetingClient {
 
 			ATP_COMMAND cmd = new ATP_COMMAND();
 
-			cmd.msgType.set(ATP_COMMAND.MSG_TYPE_QUERY);
+			cmd.msgType.set(ATP_COMMAND.MSG_TYPE_TEST);
 
-			cmd.msgID.set(ATP_COMMAND.MSG_ID_INFO);
+			cmd.msgID.set(ATP_COMMAND.MSG_ID_GET);
+
+			cmd.params.testType.set(ATP.TEST_P2020_FULL);
+			
+			//VPX_BusyWindow busyWindow = new VPX_BusyWindow(null,"Built in Self Test","Complete Testing on process....");			
 
 			cmd.write(out);
+			
+			long start = System.currentTimeMillis();
 
 			InputStream inFromServer = client.getInputStream();
 
@@ -59,21 +71,133 @@ public class GreetingClient {
 			bf.flip();
 
 			msg.getByteBuffer().put(bf);
+			
+			long end = System.currentTimeMillis();
 
+			try {
+
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+				new VPX_FullTestResult(msg,serverName,start,end);
+			} catch (Exception e) {
+			}
+
+			//busyWindow.close();
+			
 			System.out.println("Message Type : " + ("0x" + Long.toHexString(msg.msgType.get()).toUpperCase()));
 
 			System.out.println("Message ID : " + ("0x" + Long.toHexString(msg.msgID.get()).toUpperCase()));
 
-			System.out.println("Slot ID : " + msg.params.proccesorInfo.slotID.get());
+			System.out.println("Test Type : " + ("0x" + Long.toHexString(msg.params.testType.get()).toUpperCase()));
 
-			System.out.println("Processor : " + msg.params.proccesorInfo.processorID.get());
+			System.out.println("RESULT_P2020_PROCESSOR" + msg.params.testinfo.RESULT_P2020_PROCESSOR.get());
 
-			System.out.println("Processor Type : " + msg.params.proccesorInfo.processorTYPE);
+			System.out.println("msg.params.testinfo.RESULT_P2020_MEMORY : "
+					+ msg.params.testinfo.RESULT_P2020_MEMORY.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_FLASH : "
+					+ msg.params.testinfo.RESULT_P2020_FLASH.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_RTC : " + msg.params.testinfo.RESULT_P2020_RTC.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_USB : " + msg.params.testinfo.RESULT_P2020_USB.get());
+
+			System.out
+					.println("msg.params.testinfo.RESULT_P2020_TEMP : " + msg.params.testinfo.RESULT_P2020_TEMP.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_ETHERNET : "
+					+ msg.params.testinfo.RESULT_P2020_ETHERNET.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_LISTPCI : "
+					+ msg.params.testinfo.RESULT_P2020_LISTPCI.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_SATATUS : "
+					+ msg.params.testinfo.RESULT_P2020_SATATUS.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_AUDIO : "
+					+ msg.params.testinfo.RESULT_P2020_AUDIO.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_PMCXMC : "
+					+ msg.params.testinfo.RESULT_P2020_PMCXMC.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_SRIOLOOP : "
+					+ msg.params.testinfo.RESULT_P2020_SRIOLOOP.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_TEMP1 : "
+					+ msg.params.testinfo.RESULT_P2020_TEMP1.get());
+
+			System.out.println("msg.params.testinfo.RESULT_P2020_TEMP2 : "
+					+ msg.params.testinfo.RESULT_P2020_TEMP2.get());
 
 			client.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		/*
+		 * identification module try { System.out.println("Connecting to " +
+		 * serverName + " on port " + port);
+		 * 
+		 * Socket client = new Socket();
+		 * 
+		 * client.connect(new InetSocketAddress(serverName, port), 500);
+		 * 
+		 * client.setSoTimeout(1000);
+		 * 
+		 * System.out.println("Just connected to " +
+		 * client.getRemoteSocketAddress());
+		 * 
+		 * OutputStream outToServer = client.getOutputStream();
+		 * 
+		 * DataOutputStream out = new DataOutputStream(outToServer);
+		 * 
+		 * System.out.println("Hello from " + client.getLocalSocketAddress());
+		 * 
+		 * ATP_COMMAND cmd = new ATP_COMMAND();
+		 * 
+		 * cmd.msgType.set(ATP_COMMAND.MSG_TYPE_QUERY);
+		 * 
+		 * cmd.msgID.set(ATP_COMMAND.MSG_ID_GET);
+		 * 
+		 * cmd.write(out);
+		 * 
+		 * InputStream inFromServer = client.getInputStream();
+		 * 
+		 * DataInputStream in = new DataInputStream(inFromServer);
+		 * 
+		 * ATP_COMMAND msg = new ATP_COMMAND();
+		 * 
+		 * ByteBuffer bf = ByteBuffer.allocate(msg.size());
+		 * 
+		 * byte[] b = new byte[msg.size()];
+		 * 
+		 * bf.clear();
+		 * 
+		 * in.read(b);
+		 * 
+		 * bf.put(b);
+		 * 
+		 * bf.flip();
+		 * 
+		 * msg.getByteBuffer().put(bf);
+		 * 
+		 * System.out.println("Message Type : " + ("0x" +
+		 * Long.toHexString(msg.msgType.get()).toUpperCase()));
+		 * 
+		 * System.out.println("Message ID : " + ("0x" +
+		 * Long.toHexString(msg.msgID.get()).toUpperCase()));
+		 * 
+		 * System.out.println("Slot ID : " +
+		 * msg.params.proccesorInfo.slotID.get());
+		 * 
+		 * System.out.println("Processor : " +
+		 * msg.params.proccesorInfo.processorID.get());
+		 * 
+		 * System.out.println("Processor Type : " +
+		 * msg.params.proccesorInfo.processorTYPE);
+		 * 
+		 * client.close(); } catch (Exception e) { e.printStackTrace(); }
+		 */
 	}
 
 }

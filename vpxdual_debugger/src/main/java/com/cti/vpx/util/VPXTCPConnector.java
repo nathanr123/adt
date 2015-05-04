@@ -72,7 +72,7 @@ public class VPXTCPConnector {
 
 			cmd.msgType.set(ATP_COMMAND.MSG_TYPE_QUERY);
 
-			cmd.msgID.set(ATP_COMMAND.MSG_ID_INFO);
+			cmd.msgID.set(ATP_COMMAND.MSG_ID_GET);
 
 			cmd.write(out);
 

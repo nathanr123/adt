@@ -27,6 +27,7 @@ import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_FlashProcessor;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
+import com.cti.vpx.controls.VPX_Preference;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
@@ -36,7 +37,6 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.Pinger;
-import com.cti.vpx.util.VPXTCPConnector;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_Dual_ADT_RootWindow extends JFrame {
@@ -73,6 +73,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	private JMenuItem vpx_Menu_Window_MemoryBrowser;
 
 	private JMenuItem vpx_Menu_Window_Flash;
+
+	private JMenuItem vpx_Menu_Preference;
 
 	private JToolBar vpx_ToolBar;
 
@@ -117,7 +119,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//setAlwaysOnTop(true);
+		// setAlwaysOnTop(true);
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -188,6 +190,13 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 				.getString("Menu.Window.FlashProcessor")));
 
 		vpx_Menu_Window.add(vpx_Menu_Window_Flash);
+
+		vpx_Menu_Window.add(ComponentFactory.createJSeparator());
+
+		vpx_Menu_Preference = ComponentFactory.createJMenuItem(new PreferenceAction(rBundle
+				.getString("Menu.Window.Preferences")));
+
+		vpx_Menu_Window.add(vpx_Menu_Preference);
 
 		vpx_MenuBar.add(vpx_Menu_Help);
 
@@ -495,6 +504,25 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		return ret;
 	}
 
+	public class PreferenceAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public PreferenceAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			new VPX_Preference().showPreferenceWindow(); 
+		}
+	}
+
 	public class ExitAction extends AbstractAction {
 
 		/**
@@ -520,7 +548,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		int size = systemRootNode.getChildCount();
 
 		String ip = processor.getiP_Addresses();
-		
+
 		int foundAt = -1;
 
 		for (int i = 0; i < size; i++) {
@@ -622,8 +650,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 						Processor processor = iterator.next();
 
-						refreshProcessorTree(processor,!Pinger.ping(processor.getiP_Addresses()));						
-						
+						refreshProcessorTree(processor, !Pinger.ping(processor.getiP_Addresses()));
+
 					}
 				} catch (Exception e) {
 

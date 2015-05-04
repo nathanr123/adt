@@ -45,8 +45,6 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	private FileWriter fw;
 
-	private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
 	/**
 	 * Create the panel.
 	 */
@@ -118,7 +116,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			txtA_Log.append("\n");
 
-		txtA_Log.append(getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log);
+		txtA_Log.append(VPXUtilities.getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log);
 
 		txtA_Log.setCaretPosition(txtA_Log.getText().length());
 	}
@@ -146,11 +144,6 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		}
 
 		return lvl;
-	}
-
-	private String getCurrentTime() {
-
-		return df.format(Calendar.getInstance().getTime());
 	}
 
 	private void clearContents() {

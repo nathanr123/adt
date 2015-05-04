@@ -10,11 +10,21 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -24,6 +34,10 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.border.LineBorder;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import javolution.io.Struct.Enum32;
 
@@ -45,6 +59,44 @@ public class VPXUtilities {
 	private static final String MSG = "VPX_Dual_adt";
 
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(MSG);
+
+	private static final DateFormat DATEFORMAT_FULL = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+	private static final DateFormat DATEFORMAT_DATE = new SimpleDateFormat("dd-MM-yyyy");
+
+	private static final DateFormat DATEFORMAT_TIME = new SimpleDateFormat("HH:mm:ss");
+
+	private static final DateFormat DATEFORMAT_TIMEFULL = new SimpleDateFormat("HH:mm:ss.SSS");
+
+	public static final String GENERAL_SPLASH = "general.splash";
+
+	public static final String GENERAL_MEMORY = "general.memorybar";
+
+	public static final String LOG_ENABLE = "log.enable";
+
+	public static final String LOG_PROMPT = "log.promptSno";
+
+	public static final String LOG_MAXFILE = "log.maxfile";
+
+	public static final String LOG_MAXFILESIZE = "log.maxfilesize";
+
+	public static final String LOG_FILEPATH = "log.filepath";
+
+	public static final String LOG_FILEFORMAT = "log.fileformat";
+
+	public static final String LOG_APPENDCURTIME = "log.appendcurtime";
+
+	public static final String LOG_OVERWRITE = "log.overwrite";
+
+	public static final String PYTHON_VERSION = "python.version";
+
+	public static final String PYTHON_INTERPRETERPATH = "python.intrptrpath";
+
+	public static final String PYTHON_USEDUMMY = "python.usedummy";
+
+	public static final String PYTHON_DUMMYFILE = "python.dummyfile";
+
+	private static Properties props;
 
 	private static VPXSystem vpxSystem = new VPXSystem();
 
@@ -81,6 +133,75 @@ public class VPXUtilities {
 			getScreenResoultion();
 
 		return scrHeight;
+	}
+
+	public static String getCurrentTime() {
+		return getCurrentTime(0);
+	}
+
+	public static String friendlyTimeDiff(long different) {
+
+		long secondsInMilli = 1000;
+		long minutesInMilli = secondsInMilli * 60;
+		long hoursInMilli = minutesInMilli * 60;
+		long daysInMilli = hoursInMilli * 24;
+
+		long elapsedDays = different / daysInMilli;
+		different = different % daysInMilli;
+
+		long elapsedHours = different / hoursInMilli;
+		different = different % hoursInMilli;
+
+		long elapsedMinutes = different / minutesInMilli;
+		different = different % minutesInMilli;
+
+		long elapsedSeconds = different / secondsInMilli;
+
+		long elapsedMilliSeconds = different % secondsInMilli;
+
+		String str="";
+		
+		if (elapsedDays > 0) {
+			str += elapsedDays+"days";
+		}
+		if (elapsedHours > 0) {
+			str += elapsedHours+" hours";
+		}
+		if (elapsedMinutes > 0) {
+			str += elapsedMinutes+" minutes";
+		}
+		if (elapsedSeconds > 0) {
+			str += elapsedSeconds+" seconds";
+		}
+		if (elapsedMilliSeconds > 0) {
+			str += elapsedMilliSeconds+" milli seconds ";
+		}
+
+		return str;
+	}
+
+	public static String getCurrentTime(int format) {
+		String ret = null;
+		if (format == 0)
+			ret = DATEFORMAT_FULL.format(Calendar.getInstance().getTime());
+		else if (format == 1)
+			ret = DATEFORMAT_DATE.format(Calendar.getInstance().getTime());
+		else if (format == 2)
+			ret = DATEFORMAT_TIME.format(Calendar.getInstance().getTime());
+		return ret;
+	}
+
+	public static String getCurrentTime(int format, long millis) {
+		String ret = null;
+		if (format == 0)
+			ret = DATEFORMAT_FULL.format(millis);
+		else if (format == 1)
+			ret = DATEFORMAT_DATE.format(millis);
+		else if (format == 2)
+			ret = DATEFORMAT_TIME.format(millis);
+		else if (format == 3)
+			ret = DATEFORMAT_TIMEFULL.format(millis);
+		return ret;
 	}
 
 	public static long getLongFromIP(String ip) {
@@ -207,7 +328,7 @@ public class VPXUtilities {
 
 		return pros;
 	}
-	
+
 	public static PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
 
 		if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
@@ -226,4 +347,198 @@ public class VPXUtilities {
 		return null;
 
 	}
+
+	public static void writeToXMLFile(VPXSystem system) {
+		try {
+
+			File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
+
+			if (!folder.exists()) {
+
+				folder.mkdir();
+			}
+
+			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+					+ resourceBundle.getString("Scan.processor.data.xml"));
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
+
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+			// output pretty printed
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+			jaxbMarshaller.marshal(system, file);
+
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void writeProperties() {
+		OutputStream output = null;
+		try {
+
+			Properties prop = new Properties();
+
+			output = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+
+			// General Tab Settings
+			prop.setProperty(GENERAL_SPLASH, String.valueOf(true));
+			prop.setProperty(GENERAL_MEMORY, String.valueOf(true));
+
+			// Log Tab Settings
+			prop.setProperty(LOG_ENABLE, String.valueOf(true));
+			prop.setProperty(LOG_PROMPT, String.valueOf(true));
+			prop.setProperty(LOG_MAXFILE, String.valueOf(true));
+			prop.setProperty(LOG_MAXFILESIZE, "2");
+			prop.setProperty(LOG_FILEPATH, System.getProperty("user.home"));
+			prop.setProperty(LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
+			prop.setProperty(LOG_APPENDCURTIME, String.valueOf(true));
+			prop.setProperty(LOG_OVERWRITE, String.valueOf(false));
+
+			// Python Tab Settings
+			prop.setProperty(PYTHON_INTERPRETERPATH, getPythonInterpreterPath());
+			prop.setProperty(PYTHON_USEDUMMY, String.valueOf(false));
+			prop.setProperty(PYTHON_DUMMYFILE, "");
+			prop.setProperty(PYTHON_VERSION, findPyVersion());
+
+			// save properties to project root folder
+			prop.store(output, null);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			if (output != null) {
+				try {
+					output.close();
+				} catch (IOException ea) {
+					ea.printStackTrace();
+				}
+			}
+		}
+
+	}
+
+	public static String getPropertyValue(String key) {
+
+		if (props == null)
+			readProperties();
+		return props.getProperty(key);
+	}
+
+	public static void updateProperties(Properties prop) {
+		try {
+			props = (Properties) prop.clone();
+
+			FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+
+			prop.store(out, null);
+
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static Properties readProperties() {
+
+		Properties properties = new Properties();
+
+		try {
+
+			File f = new File(resourceBundle.getString("system.preference.property.name"));
+
+			if (!f.exists())
+				writeProperties();
+
+			InputStream in = new FileInputStream(resourceBundle.getString("system.preference.property.name"));
+
+			properties.load(in);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			properties = null;
+		}
+
+		props = (Properties) properties.clone();
+
+		return properties;
+	}
+
+	public static VPXSystem readFromXMLFile() {
+
+		VPXSystem cag = null;
+
+		try {
+
+			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+					+ resourceBundle.getString("Scan.processor.data.xml"));
+
+			if (file.exists()) {
+				JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
+
+				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+				cag = (VPXSystem) jaxbUnmarshaller.unmarshal(file);
+			}
+
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+
+		return cag;
+	}
+
+	public static String[] parseBuffertoString(byte[] buffer) {
+		String[] strArr = new String(buffer).trim().split(";;");
+
+		return strArr;
+	}
+
+	public static String getPythonInterpreterPath() {
+		String ret = null;
+
+		String[] paths = System.getenv().get("Path").split(";");
+
+		for (int i = 0; i < paths.length; i++) {
+			int k = paths[i].indexOf("Python");
+			if (k > -1) {
+				ret = paths[i].substring(0, (paths[i].indexOf("\\", k) + 1));
+				break;
+			}
+		}
+		return ret + "python.exe";
+	}
+
+	public static String findPyVersion() {
+		String version = "", s;
+
+		String Command = "python -V";
+
+		try {
+			Process p = Runtime.getRuntime().exec(Command);
+
+			BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			// reading output stream of the command
+			while ((s = inputStream.readLine()) != null) {
+				if (s.startsWith("Python ")) {
+					version = s.split(" ")[1];
+				}
+			}
+
+			s = null;
+
+			inputStream.close();
+
+		} catch (Exception e) {
+
+		}
+
+		return version;
+	}
+
 }

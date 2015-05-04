@@ -117,14 +117,15 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	private void initTree() {
-		
+
 		addMouseListener(this);
 
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
 
 		setRowHeight(20);
 
-		//DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
+		// DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)
+		// getCellRenderer();
 	}
 
 	public void setVPXSystem(VPXSystem sys) {
@@ -206,6 +207,40 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	public void mouseExited(MouseEvent e) {
 	}
 
+	private void startBIST(){
+		
+	}
+	private void reNameSelectedProcessorNode() {
+		DefaultMutableTreeNode f = (DefaultMutableTreeNode) VPX_ProcessorTree.this.getLastSelectedPathComponent();
+
+		String old_Value = f.getUserObject().toString();
+
+		String old_name = old_Value.substring(old_Value.indexOf("(") + 1, old_Value.indexOf(")"));
+		
+		parent.updateStatus("Rename processor "+old_name);
+
+		String new_Name = JOptionPane.showInputDialog(parent, "New Name", old_name);
+		
+		if(new_Name != null){
+
+		VPXUtilities.getSelectedProcessor(VPX_ProcessorTree.this.getLastSelectedPathComponent().toString()).setName(
+				new_Name);
+
+		String de = old_Value.substring(0, old_Value.indexOf("(")) + "(" + new_Name + ")";
+
+		f.setUserObject(de);
+		
+		parent.updateLog("Processor name "+old_name+" changed to "+new_Name);
+		
+		parent.updateStatus("Processor name "+old_name+" changed to "+new_Name);
+
+		VPX_ProcessorTree.this.updateUI();
+		}
+		else{
+			parent.updateStatus("Rename processor "+old_name+" interrupted");
+		}
+	}
+
 	private void showConextMenu(int x, int y, String node) {
 
 		JPopupMenu popup = new JPopupMenu();
@@ -233,10 +268,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					
 				}
 			});
-			
+
 			popup.add(itemScan);
 
 			popup.add(itemRefresh);
@@ -262,25 +296,26 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			itemRename.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e) {					 
-					 
-					 DefaultMutableTreeNode f = (DefaultMutableTreeNode)VPX_ProcessorTree.this.getLastSelectedPathComponent();
-					 
-					 String old_Value = f.getUserObject().toString();
-					 
-					 String old_name = old_Value.substring(old_Value.indexOf("(") + 1, old_Value.indexOf(")"));
-					 
-					 String new_Name = JOptionPane.showInputDialog(parent, "New Name", old_name);
-					 
-					 String de =  old_Value.substring(0,old_Value.indexOf("("))+"("+new_Name+")";
-					 
-					 f.setUserObject(de);					
-					 
-					 VPX_ProcessorTree.this.updateUI();
+				public void actionPerformed(ActionEvent e) {
+
+					reNameSelectedProcessorNode();
 				}
 			});
 
 			popup.add(itemRename);
+			
+			JMenuItem itemBist = new JMenuItem("Bist");
+
+			itemRename.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					
+				}
+			});
+
+			popup.add(itemBist);
 		}
 
 		popup.add(new JSeparator());
@@ -361,7 +396,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		}
 
 		public Object getCellEditorValue() {
-			
+
 			return old_Value.replaceAll(old_name, textField.getText());
 		}
 

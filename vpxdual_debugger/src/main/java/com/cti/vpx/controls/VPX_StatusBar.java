@@ -44,10 +44,14 @@ public class VPX_StatusBar extends JPanel {
 		statusLbl = ComponentFactory.createJLabel("");
 
 		add(statusLbl, BorderLayout.LINE_START);
+		
+		System.out.println(Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.GENERAL_MEMORY)));
 
-		memBar = getMemoryPanel();
+		if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.GENERAL_MEMORY))) {
+			memBar = getMemoryPanel();
 
-		add(memBar, BorderLayout.EAST);
+			add(memBar, BorderLayout.EAST);
+		}
 
 		setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
@@ -69,7 +73,7 @@ public class VPX_StatusBar extends JPanel {
 		memPanel.add(progressBar);
 
 		MemoryMonitor memMonitor = new MemoryMonitor();
-		
+
 		memMonitor.execute();
 
 		return memPanel;
