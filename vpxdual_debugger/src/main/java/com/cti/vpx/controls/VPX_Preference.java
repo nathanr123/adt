@@ -660,7 +660,7 @@ public class VPX_Preference extends JDialog {
 	private void loadPythonPropertiesPanel() {
 		JPanel tabPanel_Python = new JPanel();
 
-		preference_TabbedPane.addTab("Python", tabPanel_Python);
+	//	preference_TabbedPane.addTab("Python", tabPanel_Python);
 		tabPanel_Python.setLayout(null);
 
 		JPanel panelInterpreterPath = new JPanel();

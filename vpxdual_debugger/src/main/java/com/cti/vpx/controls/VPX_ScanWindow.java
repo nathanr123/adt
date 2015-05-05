@@ -17,6 +17,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
@@ -25,13 +26,10 @@ import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.EmptyBorder;
 
-import javolution.io.Struct.Enum32;
 import net.miginfocom.swing.MigLayout;
 
-import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATP_COMMAND;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXTCPConnector;
@@ -262,6 +260,26 @@ public class VPX_ScanWindow extends JDialog {
 								parent.updateLog("Scanning Completed.");
 
 								VPX_ScanStatusWindow.this.dispose();
+								
+								VPXUtilities.setEnableLog(false);
+
+								Boolean isLogEnabled = Boolean.valueOf(VPXUtilities
+										.getPropertyValue(VPXUtilities.LOG_ENABLE));
+
+								Boolean isSerialPrompt = Boolean.valueOf(VPXUtilities
+										.getPropertyValue(VPXUtilities.LOG_PROMPT));
+
+								if (isLogEnabled && isSerialPrompt) {
+									String new_Name = JOptionPane.showInputDialog(parent, "Enter New Serial number",
+											VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO));
+
+									if (new_Name != null){
+										
+										VPXUtilities.setEnableLog(true);
+										
+										VPXUtilities.updateProperties(VPXUtilities.LOG_SERIALNO, new_Name);
+									}
+								}
 
 							} catch (InterruptedException | ExecutionException e) {
 
@@ -433,11 +451,12 @@ public class VPX_ScanWindow extends JDialog {
 			}
 
 			private void parseCMD(String ip, ATP_COMMAND cmd) {
-				
-				vpxSystem.addProcessor(new Processor(ip, VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
+
+				vpxSystem.addProcessor(new Processor(ip, VPXUtilities
+						.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
 
 			}
-			
+
 		}
 	}
 

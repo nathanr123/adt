@@ -10,17 +10,16 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 import com.cti.vpx.command.ATP_COMMAND;
+import com.cti.vpx.model.Processor;
 
 public class VPXTCPConnector {
-
-	private static final int PORT = 12345;
 
 	public static String connet1(String ipaddress) {
 
 		try {
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(ipaddress, PORT), 100);
+			client.connect(new InetSocketAddress(ipaddress, Processor.PORTNO), 100);
 
 			client.setSoTimeout(1000);
 
@@ -60,7 +59,7 @@ public class VPXTCPConnector {
 
 			Socket client = new Socket();
 			
-			client.connect(new InetSocketAddress(ipaddress, PORT), 1000);
+			client.connect(new InetSocketAddress(ipaddress, Processor.PORTNO), 1000);
 
 			client.setSoTimeout(1000);
 

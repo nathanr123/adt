@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -10,9 +11,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -24,7 +22,6 @@ import javax.swing.border.EtchedBorder;
 
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
-import java.awt.Dimension;
 
 public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
@@ -44,6 +41,12 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 	public static int FATAL = 3;
 
 	private FileWriter fw;
+
+	private FileWriter fwLog;
+
+	private File logFile;
+
+	private boolean isLogEnabled;
 
 	/**
 	 * Create the panel.
@@ -116,9 +119,39 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			txtA_Log.append("\n");
 
-		txtA_Log.append(VPXUtilities.getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log);
+		String logMsg = VPXUtilities.getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log;
+
+		txtA_Log.append(logMsg);
 
 		txtA_Log.setCaretPosition(txtA_Log.getText().length());
+
+		updateLogtoFile(logMsg);
+	}
+
+	public void updateLogtoFile(String log) {
+		try {
+
+			if (VPXUtilities.isLogEnabled()) {
+
+				String filePath = VPXUtilities.getPropertyValue(VPXUtilities.LOG_FILEPATH) + "\\"
+						+ VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO) + ".log";
+
+				if (logFile == null) {
+					logFile = new File(filePath);
+				}
+				if (fwLog == null) {
+					fwLog = new FileWriter(logFile, true);
+
+				}
+				
+				fwLog.append(log);
+				
+				fwLog.close();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private String getLevel(int level) {

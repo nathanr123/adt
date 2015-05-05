@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Date;
 
 import javax.swing.UIManager;
 
@@ -17,7 +16,7 @@ import com.cti.vpx.controls.VPX_FullTestResult;
 public class GreetingClient {
 	public static void main(String[] args) {
 
-		String serverName = "172.17.1.28";
+		String serverName = "172.17.10.1";
 
 		int port = 12345;
 
@@ -26,9 +25,9 @@ public class GreetingClient {
 
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(serverName, port), 3000);
+			client.connect(new InetSocketAddress(serverName, port), 300000);
 
-			client.setSoTimeout(3000);
+			client.setSoTimeout(300000);
 
 			System.out.println("Just connected to " + client.getRemoteSocketAddress());
 
@@ -45,11 +44,12 @@ public class GreetingClient {
 			cmd.msgID.set(ATP_COMMAND.MSG_ID_GET);
 
 			cmd.params.testType.set(ATP.TEST_P2020_FULL);
-			
-			//VPX_BusyWindow busyWindow = new VPX_BusyWindow(null,"Built in Self Test","Complete Testing on process....");			
+
+			VPX_BusyWindow busyWindow = new VPX_BusyWindow(null, "Built in Self Test",
+					"Complete Testing on process....");
 
 			cmd.write(out);
-			
+
 			long start = System.currentTimeMillis();
 
 			InputStream inFromServer = client.getInputStream();
@@ -62,74 +62,45 @@ public class GreetingClient {
 
 			byte[] b = new byte[msg.size()];
 
-			bf.clear();
+			boolean isRecieved = true;
 
-			in.read(b);
+		//	while (isRecieved) {
+				int i = in.read(b);
 
-			bf.put(b);
+				 System.out.println("Listeneing : "+i);
+				//System.out.println(b.length);
+				//if (i == 104) {
 
-			bf.flip();
+					//isRecieved = false;
 
-			msg.getByteBuffer().put(bf);
-			
-			long end = System.currentTimeMillis();
+					System.out.println("Received");
+					//
+					bf.clear();
 
-			try {
+					bf.put(b);
 
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					bf.flip();
 
-				new VPX_FullTestResult(msg,serverName,start,end);
-			} catch (Exception e) {
-			}
+					System.out.println(bf.hasArray());
+					msg.getByteBuffer().clear();
 
-			//busyWindow.close();
-			
-			System.out.println("Message Type : " + ("0x" + Long.toHexString(msg.msgType.get()).toUpperCase()));
+					msg.getByteBuffer().put(bf);
 
-			System.out.println("Message ID : " + ("0x" + Long.toHexString(msg.msgID.get()).toUpperCase()));
+				//	System.out.println("Received And Packed : " + msg.isPacked());
 
-			System.out.println("Test Type : " + ("0x" + Long.toHexString(msg.params.testType.get()).toUpperCase()));
+					long end = System.currentTimeMillis();
 
-			System.out.println("RESULT_P2020_PROCESSOR" + msg.params.testinfo.RESULT_P2020_PROCESSOR.get());
+					try {
+						busyWindow.dispose();
 
-			System.out.println("msg.params.testinfo.RESULT_P2020_MEMORY : "
-					+ msg.params.testinfo.RESULT_P2020_MEMORY.get());
+						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-			System.out.println("msg.params.testinfo.RESULT_P2020_FLASH : "
-					+ msg.params.testinfo.RESULT_P2020_FLASH.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_RTC : " + msg.params.testinfo.RESULT_P2020_RTC.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_USB : " + msg.params.testinfo.RESULT_P2020_USB.get());
-
-			System.out
-					.println("msg.params.testinfo.RESULT_P2020_TEMP : " + msg.params.testinfo.RESULT_P2020_TEMP.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_ETHERNET : "
-					+ msg.params.testinfo.RESULT_P2020_ETHERNET.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_LISTPCI : "
-					+ msg.params.testinfo.RESULT_P2020_LISTPCI.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_SATATUS : "
-					+ msg.params.testinfo.RESULT_P2020_SATATUS.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_AUDIO : "
-					+ msg.params.testinfo.RESULT_P2020_AUDIO.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_PMCXMC : "
-					+ msg.params.testinfo.RESULT_P2020_PMCXMC.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_SRIOLOOP : "
-					+ msg.params.testinfo.RESULT_P2020_SRIOLOOP.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_TEMP1 : "
-					+ msg.params.testinfo.RESULT_P2020_TEMP1.get());
-
-			System.out.println("msg.params.testinfo.RESULT_P2020_TEMP2 : "
-					+ msg.params.testinfo.RESULT_P2020_TEMP2.get());
-
-			client.close();
+						new VPX_FullTestResult(msg, serverName, start, end);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				//}
+		//	}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

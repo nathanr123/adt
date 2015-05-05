@@ -72,6 +72,8 @@ public class VPXUtilities {
 
 	public static final String GENERAL_MEMORY = "general.memorybar";
 
+	public static final String LOG_SERIALNO = "log.serialno";
+
 	public static final String LOG_ENABLE = "log.enable";
 
 	public static final String LOG_PROMPT = "log.promptSno";
@@ -98,6 +100,8 @@ public class VPXUtilities {
 
 	private static Properties props;
 
+	private static boolean isLogEnabled = false;
+	
 	private static VPXSystem vpxSystem = new VPXSystem();
 
 	public static ResourceBundle getResourceBundle() {
@@ -159,22 +163,22 @@ public class VPXUtilities {
 
 		long elapsedMilliSeconds = different % secondsInMilli;
 
-		String str="";
-		
+		String str = "";
+
 		if (elapsedDays > 0) {
-			str += elapsedDays+"days";
+			str += elapsedDays + "days";
 		}
 		if (elapsedHours > 0) {
-			str += elapsedHours+" hours";
+			str += elapsedHours + " hours";
 		}
 		if (elapsedMinutes > 0) {
-			str += elapsedMinutes+" minutes";
+			str += elapsedMinutes + " minutes";
 		}
 		if (elapsedSeconds > 0) {
-			str += elapsedSeconds+" seconds";
+			str += elapsedSeconds + " seconds";
 		}
 		if (elapsedMilliSeconds > 0) {
-			str += elapsedMilliSeconds+" milli seconds ";
+			str += elapsedMilliSeconds + " milli seconds ";
 		}
 
 		return str;
@@ -392,6 +396,7 @@ public class VPXUtilities {
 			prop.setProperty(LOG_ENABLE, String.valueOf(true));
 			prop.setProperty(LOG_PROMPT, String.valueOf(true));
 			prop.setProperty(LOG_MAXFILE, String.valueOf(true));
+			prop.setProperty(LOG_SERIALNO, "");
 			prop.setProperty(LOG_MAXFILESIZE, "2");
 			prop.setProperty(LOG_FILEPATH, System.getProperty("user.home"));
 			prop.setProperty(LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
@@ -435,6 +440,32 @@ public class VPXUtilities {
 			FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
 
 			prop.store(out, null);
+
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void setEnableLog(boolean val){
+		isLogEnabled = val;
+	} 
+	
+	public static boolean isLogEnabled(){
+		return isLogEnabled;
+	}
+	
+	public static void updateProperties(String key, String value) {
+		try {
+			if (props == null)
+				readProperties();
+
+			FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+
+			props.setProperty(key, value);
+
+			props.store(out, null);
 
 			out.close();
 		} catch (Exception e) {

@@ -7,10 +7,16 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -18,9 +24,6 @@ import javax.swing.border.TitledBorder;
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATP_COMMAND;
 import com.cti.vpx.util.VPXUtilities;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class VPX_FullTestResult extends JDialog {
 
@@ -33,7 +36,7 @@ public class VPX_FullTestResult extends JDialog {
 	/**
 	 * Launch the application.
 	 */
-	JLabel lblT1[] = new JLabel[24];
+	JLabel lblT1[];
 
 	private ATP_COMMAND atp;
 
@@ -65,6 +68,8 @@ public class VPX_FullTestResult extends JDialog {
 
 	private JLabel lblTotNoofTests;
 
+	private JPanel moduleTestPanel;
+
 	public static void main(String[] args) {
 		try {
 			VPX_FullTestResult dialog = new VPX_FullTestResult(null, null, 0, 0);
@@ -92,7 +97,7 @@ public class VPX_FullTestResult extends JDialog {
 		loadComponents();
 
 		loadLabels();
-		
+
 		centerFrame();
 
 		setVisible(true);
@@ -113,14 +118,15 @@ public class VPX_FullTestResult extends JDialog {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		setIconImage(VPXUtilities.getAppIcon());
+
+		setResizable(false);
 	}
 
 	private void loadComponents() {
 
-		JPanel panel = new JPanel();
-		panel.setBorder(border);
-		contentPanel.add(panel, BorderLayout.CENTER);
-		panel.setLayout(new GridLayout(6, 4));
+		moduleTestPanel = new JPanel();
+		moduleTestPanel.setBorder(border);
+		contentPanel.add(moduleTestPanel, BorderLayout.CENTER);
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "Test Detail", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -251,16 +257,6 @@ public class VPX_FullTestResult extends JDialog {
 		lblStatusDetail.setBounds(447, 88, 107, 21);
 		panel_2.add(lblStatusDetail);
 
-		Font f = new Font(Font.SANS_SERIF, Font.BOLD, 12);
-		for (int i = 0; i < 24; i++) {
-			lblT1[i] = new JLabel("");
-			if (i % 2 != 0) {
-				lblT1[i].setFont(f);
-
-			}
-			panel.add(lblT1[i]);
-		}
-
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
@@ -271,6 +267,15 @@ public class VPX_FullTestResult extends JDialog {
 				VPX_FullTestResult.this.dispose();
 			}
 		});
+
+		JButton btnSaveToTxt = new JButton("Save");
+		btnSaveToTxt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				savetoFile();
+			}
+		});
+		buttonPane.add(btnSaveToTxt);
 		okButton.setActionCommand("OK");
 		buttonPane.add(okButton);
 		getRootPane().setDefaultButton(okButton);
@@ -285,6 +290,20 @@ public class VPX_FullTestResult extends JDialog {
 		int fail = 0;
 
 		if (atp.params.testType.get() == ATP.TEST_P2020_FULL) {
+
+			moduleTestPanel.setLayout(new GridLayout(6, 4));
+
+			lblT1 = new JLabel[24];
+
+			Font f = new Font(Font.SANS_SERIF, Font.BOLD, 12);
+			for (int i = 0; i < 24; i++) {
+				lblT1[i] = new JLabel("");
+				if (i % 2 != 0) {
+					lblT1[i].setFont(f);
+
+				}
+				moduleTestPanel.add(lblT1[i]);
+			}
 
 			setTitle("P2020 Full Test");
 
@@ -411,7 +430,13 @@ public class VPX_FullTestResult extends JDialog {
 			lblT1[22].setText("Temprature");
 
 			if ((atp.params.testinfo.RESULT_P2020_TEMP.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[23].setText("PASS");
+				String str = String.format("<html><table><tr><td colspan='3' align='left'>PASS</td></tr>"
+						+ "<tr><td><font size='2'>T1<br/>%d&deg;C</font></td>"
+						+ "<td><font size='2'>T2<br/>%d&deg;C</font></td>"
+						+ "<td><font size='2'>T2<br/>%d&deg;C</font></td></tr></table></html>",
+						atp.params.testinfo.RESULT_P2020_TEMP1.get(), atp.params.testinfo.RESULT_P2020_TEMP2.get(),
+						atp.params.testinfo.RESULT_P2020_TEMP3.get());
+				lblT1[23].setText(str);
 				pass++;
 			} else {
 				lblT1[23].setText("FAIL");
@@ -421,8 +446,7 @@ public class VPX_FullTestResult extends JDialog {
 			lblTestStarted.setText(VPXUtilities.getCurrentTime(3, start));
 
 			lblTestCompleted.setText(VPXUtilities.getCurrentTime(3, end));
-
-			System.out.println(end - start);
+			
 			lblTestDuration.setText(VPXUtilities.friendlyTimeDiff(end - start));
 
 			lblTestsFailedCount.setText(fail + " Failed");
@@ -433,34 +457,218 @@ public class VPX_FullTestResult extends JDialog {
 
 			lblStatusDetail.setText("Completed !");
 		} else {
+
+			moduleTestPanel.setLayout(new GridLayout(4, 4));
+
+			lblT1 = new JLabel[16];
+
+			Font f = new Font(Font.SANS_SERIF, Font.BOLD, 12);
+			for (int i = 0; i < 16; i++) {
+				lblT1[i] = new JLabel("");
+				if (i % 2 != 0) {
+					lblT1[i].setFont(f);
+
+				}
+				moduleTestPanel.add(lblT1[i]);
+			}
+
 			border.setTitle("DSP Full Test");
-			lblT1[0].setText("");
-			lblT1[1].setText("");
-			lblT1[2].setText("");
-			lblT1[3].setText("");
-			lblT1[4].setText("");
-			lblT1[5].setText("");
-			lblT1[6].setText("");
-			lblT1[7].setText("");
-			lblT1[8].setText("");
-			lblT1[9].setText("");
-			lblT1[10].setText("");
-			lblT1[11].setText("");
-			lblT1[12].setText("");
-			lblT1[13].setText("");
-			lblT1[14].setText("");
-			lblT1[15].setText("");
-			lblT1[16].setText("");
-			lblT1[17].setText("");
-			lblT1[18].setText("");
-			lblT1[19].setText("");
-			lblT1[20].setText("");
-			lblT1[21].setText("");
-			lblT1[22].setText("");
-			lblT1[23].setText("");
+
+			setTitle("DSP Full Test");
+
+			lblDateVal.setText(VPXUtilities.getCurrentTime(1));
+
+			lblTimeVal.setText(VPXUtilities.getCurrentTime(2));
+
+			lblIPVal.setText(ip);
+
+			lblProcessorVal.setText("DSP");
+
+			lblTestTypeVal.setText("Full Test");
+
+			lblT1[0].setText("DDR");
+
+			if ((atp.params.testinfo.RESULT_DSP_DDR.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[1].setText("PASS");
+				pass++;
+			} else {
+				lblT1[1].setText("FAIL");
+				fail++;
+			}
+			lblT1[2].setText("DMA");
+
+			if ((atp.params.testinfo.RESULT_DSP_DMA.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[3].setText("PASS");
+				pass++;
+			} else {
+				lblT1[3].setText("FAIL");
+				fail++;
+			}
+
+			lblT1[4].setText("NAND");
+
+			if ((atp.params.testinfo.RESULT_DSP_NAND.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[5].setText("PASS");
+				pass++;
+			} else {
+				lblT1[5].setText("FAIL");
+				fail++;
+			}
+			lblT1[6].setText("NOR");
+
+			if ((atp.params.testinfo.RESULT_DSP_NOR.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[7].setText("PASS");
+				pass++;
+			} else {
+				lblT1[7].setText("FAIL");
+				fail++;
+			}
+
+			lblT1[8].setText("Hyperlink Loop");
+
+			if ((atp.params.testinfo.RESULT_DSP_HYPLOOP.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[9].setText("PASS");
+				pass++;
+			} else {
+				lblT1[9].setText("FAIL");
+				fail++;
+			}
+
+			lblT1[10].setText("Ethernet");
+
+			if ((atp.params.testinfo.RESULT_DSP_ETHERNET.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[11].setText("PASS");
+				pass++;
+			} else {
+				lblT1[11].setText("FAIL");
+				fail++;
+			}
+
+			lblT1[12].setText("PCIe");
+
+			if ((atp.params.testinfo.RESULT_DSP_PCIE.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[13].setText("PASS");
+				pass++;
+			} else {
+				lblT1[13].setText("FAIL");
+				fail++;
+			}
+
+			lblT1[14].setText("SRIO");
+
+			if ((atp.params.testinfo.RESULT_DSP_SRIO.get() == ATP.TEST_RESULT_PASS)) {
+				lblT1[15].setText("PASS");
+				pass++;
+			} else {
+				lblT1[15].setText("FAIL");
+				fail++;
+			}
+
+			moduleTestPanel.doLayout();
+
+			lblTestStarted.setText(VPXUtilities.getCurrentTime(3, start));
+
+			lblTestCompleted.setText(VPXUtilities.getCurrentTime(3, end));
+
+			lblTestDuration.setText(VPXUtilities.friendlyTimeDiff(end - start));
+
+			lblTestsFailedCount.setText(fail + " Failed");
+
+			lblTestsPassedCount.setText(pass + " Passed");
+
+			lblTotNoofTests.setText((fail + pass) + " Tests");
+
+			lblStatusDetail.setText("Completed !");
 		}
 	}
-	
+
+	private void savetoFile() {
+		PrintWriter writer;
+		try {
+
+			String fileName = System.getProperty("user.home") + "\\" + getTitle() + ".txt";
+
+			writer = new PrintWriter(fileName, "UTF-8");
+			
+			writer.println("---------------------------------------");
+			writer.println("Test Detail");
+			writer.println("---------------------------------------");
+			
+			writer.println("Test : Built in Self Test");
+
+			writer.println("Test Type : " + lblTestTypeVal.getText());
+
+			writer.println("Processor : " + lblProcessorVal.getText());
+
+			writer.println("IP Address : " + lblIPVal.getText());
+
+			writer.println("Tested Date : " + lblDateVal.getText());
+
+			writer.println("Tested Time : " + lblTimeVal.getText());
+
+			writer.println("---------------------------------------");
+			writer.println(border.getTitle());
+			writer.println("---------------------------------------");
+			
+			if (atp.params.testType.get() == ATP.TEST_P2020_FULL) {
+				writer.println(lblT1[0].getText() + " : " + lblT1[1].getText());
+				writer.println(lblT1[2].getText() + " : " + lblT1[3].getText());
+				writer.println(lblT1[4].getText() + " : " + lblT1[5].getText());
+				writer.println(lblT1[6].getText() + " : " + lblT1[7].getText());
+				writer.println(lblT1[8].getText() + " : " + lblT1[9].getText());
+				writer.println(lblT1[10].getText() + " : " + lblT1[11].getText());
+				writer.println(lblT1[12].getText() + " : " + lblT1[13].getText());
+				writer.println(lblT1[14].getText() + " : " + lblT1[15].getText());
+				writer.println(lblT1[16].getText() + " : " + lblT1[17].getText());
+				writer.println(lblT1[18].getText() + " : " + lblT1[19].getText());
+				writer.println(lblT1[20].getText() + " : " + lblT1[21].getText());
+				writer.println(lblT1[22].getText() + " : "
+						+ ((atp.params.testinfo.RESULT_P2020_TEMP.get() == ATP.TEST_RESULT_PASS) ? "PASS" : "FAIL"));
+
+				writer.println("Temp - 1 : " + atp.params.testinfo.RESULT_P2020_TEMP1.get());
+				writer.println("Temp - 2 : " + atp.params.testinfo.RESULT_P2020_TEMP2.get());
+				writer.println("Temp - 3 : " + atp.params.testinfo.RESULT_P2020_TEMP3.get());
+
+			} else if (atp.params.testType.get() == ATP.TEST_DSP_FULL) {
+
+				writer.println(lblT1[0].getText() + " : " + lblT1[1].getText());
+				writer.println(lblT1[2].getText() + " : " + lblT1[3].getText());
+				writer.println(lblT1[4].getText() + " : " + lblT1[5].getText());
+				writer.println(lblT1[6].getText() + " : " + lblT1[7].getText());
+				writer.println(lblT1[8].getText() + " : " + lblT1[9].getText());
+				writer.println(lblT1[10].getText() + " : " + lblT1[11].getText());
+				writer.println(lblT1[12].getText() + " : " + lblT1[13].getText());
+				writer.println(lblT1[14].getText() + " : " + lblT1[15].getText());
+			}
+
+			writer.println("---------------------------------------");
+			writer.println("Result Detail");
+			writer.println("---------------------------------------");
+			
+			writer.println("Test Started At : " + lblTestStarted.getText());
+
+			writer.println("Test Completed At : " + lblTestCompleted.getText());
+
+			writer.println("Total Test Duration : " + lblTestDuration.getText());
+
+			writer.println("No of Tests Passed : " + lblTestsPassedCount.getText());
+
+			writer.println("No of Tests Failed : " + lblTestsFailedCount.getText());
+
+			writer.println("Total No of Tests : " + lblTotNoofTests.getText());
+
+			writer.println("Test Status : " + lblStatusDetail.getText());
+
+			writer.close();
+
+			JOptionPane.showMessageDialog(VPX_FullTestResult.this, "File Saved at " + fileName, "Result File",
+					JOptionPane.NO_OPTION);
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	private void centerFrame() {
 
 		Dimension windowSize = getSize();

@@ -1,12 +1,17 @@
 package com.cti.vpx.command;
 
+import java.io.Serializable;
 import java.nio.ByteOrder;
 
 import javolution.io.Struct;
-
 import javolution.io.Union;
 
-public class ATP_COMMAND extends Struct implements ATP {
+public class ATP_COMMAND extends Struct implements ATP,Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -799775047978799947L;
 
 	public final Unsigned32 msgType = new Unsigned32();
 
@@ -16,7 +21,7 @@ public class ATP_COMMAND extends Struct implements ATP {
 
 	public ATP_COMMAND() {
 
-	}
+	}	
 
 	public class TestInfo extends Struct {
 	
@@ -48,6 +53,9 @@ public class ATP_COMMAND extends Struct implements ATP {
 		public  final Unsigned32 RESULT_P2020_TEMP1 = new Unsigned32();
 		
 		public  final Unsigned32 RESULT_P2020_TEMP2 = new Unsigned32();
+		
+		public  final Unsigned32 RESULT_P2020_TEMP3 = new Unsigned32();
+
 		
 		//Full Test P2020
 		public  final Unsigned32 RESULT_P2020_FULL = new Unsigned32();
@@ -98,7 +106,7 @@ public class ATP_COMMAND extends Struct implements ATP {
 	
 	@Override
 	public ByteOrder byteOrder() {
-		return ByteOrder.nativeOrder();
+		return ByteOrder.BIG_ENDIAN;
 	}
 
 	@Override
