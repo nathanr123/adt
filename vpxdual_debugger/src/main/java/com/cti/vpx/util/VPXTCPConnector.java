@@ -9,7 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-import com.cti.vpx.command.ATP_COMMAND;
+import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.Processor;
 
 public class VPXTCPConnector {
@@ -53,7 +53,7 @@ public class VPXTCPConnector {
 		}
 	}
 
-	public static ATP_COMMAND identifyProcessor(String ipaddress) {
+	public static ATPCommand identifyProcessor(String ipaddress) {
 
 		try {
 
@@ -67,11 +67,11 @@ public class VPXTCPConnector {
 
 			DataOutputStream out = new DataOutputStream(outToServer);
 
-			ATP_COMMAND cmd = new ATP_COMMAND();
+			ATPCommand cmd = new ATPCommand();
 
-			cmd.msgType.set(ATP_COMMAND.MSG_TYPE_QUERY);
+			cmd.msgType.set(ATPCommand.MSG_TYPE_QUERY);
 
-			cmd.msgID.set(ATP_COMMAND.MSG_ID_GET);
+			cmd.msgID.set(ATPCommand.MSG_ID_GET);
 
 			cmd.write(out);
 
@@ -79,7 +79,7 @@ public class VPXTCPConnector {
 
 			DataInputStream in = new DataInputStream(inFromServer);
 
-			ATP_COMMAND msg = new ATP_COMMAND();
+			ATPCommand msg = new ATPCommand();
 
 			ByteBuffer bf = ByteBuffer.allocate(msg.size());
 

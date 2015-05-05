@@ -21,7 +21,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.cti.vpx.command.ATP_COMMAND;
+import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_FlashProcessor;
@@ -585,7 +585,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		vpx_Processor_Tree.updateUI();
 	}
 
-	private void refreshProcessorTree(ATP_COMMAND cmd, String ip, boolean isRemove) {
+	private void refreshProcessorTree(ATPCommand cmd, String ip, boolean isRemove) {
 
 		int size = systemRootNode.getChildCount();
 

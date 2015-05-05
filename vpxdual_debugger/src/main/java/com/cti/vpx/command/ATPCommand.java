@@ -6,7 +6,7 @@ import java.nio.ByteOrder;
 import javolution.io.Struct;
 import javolution.io.Union;
 
-public class ATP_COMMAND extends Struct implements ATP,Serializable {
+public class ATPCommand extends Struct implements ATP,Serializable {
 
 	/**
 	 * 
@@ -19,7 +19,7 @@ public class ATP_COMMAND extends Struct implements ATP,Serializable {
 
 	public final MSGParamaenters params = inner(new MSGParamaenters());
 
-	public ATP_COMMAND() {
+	public ATPCommand() {
 
 	}	
 

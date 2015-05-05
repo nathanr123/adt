@@ -28,7 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 
-import com.cti.vpx.command.ATP_COMMAND;
+import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
@@ -409,7 +409,7 @@ public class VPX_ScanWindow extends JDialog {
 
 					ip = VPXUtilities.getIPFromLong(i);
 
-					ATP_COMMAND processorInfo = VPXTCPConnector.identifyProcessor(ip);
+					ATPCommand processorInfo = VPXTCPConnector.identifyProcessor(ip);
 
 					if (processorInfo != null) {
 
@@ -450,7 +450,7 @@ public class VPX_ScanWindow extends JDialog {
 				}
 			}
 
-			private void parseCMD(String ip, ATP_COMMAND cmd) {
+			private void parseCMD(String ip, ATPCommand cmd) {
 
 				vpxSystem.addProcessor(new Processor(ip, VPXUtilities
 						.getProcessor(cmd.params.proccesorInfo.processorTYPE)));

@@ -22,7 +22,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.command.ATP;
-import com.cti.vpx.command.ATP_COMMAND;
+import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_FullTestResult extends JDialog {
@@ -38,7 +38,7 @@ public class VPX_FullTestResult extends JDialog {
 	 */
 	JLabel lblT1[];
 
-	private ATP_COMMAND atp;
+	private ATPCommand atp;
 
 	private String ip;
 
@@ -83,7 +83,7 @@ public class VPX_FullTestResult extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_FullTestResult(ATP_COMMAND cmd, String ip, long start, long end) {
+	public VPX_FullTestResult(ATPCommand cmd, String ip, long start, long end) {
 		this.atp = cmd;
 
 		this.ip = ip;

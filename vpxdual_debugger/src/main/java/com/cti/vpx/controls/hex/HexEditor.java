@@ -115,8 +115,6 @@ public class HexEditor extends JScrollPane {
 
 		JPanel jp = new JPanel();
 
-		JLabel jl = new JLabel(VPXUtilities.getImageIcon("images\\graph.png", 650, 750));
-
 		jp.setLayout(new BorderLayout());
 
 		ResourceBundle msg = VPXUtilities.getResourceBundle();
@@ -128,8 +126,6 @@ public class HexEditor extends JScrollPane {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);		
 				
 		jp.add(table, BorderLayout.CENTER);
-
-		jp.add(jl, BorderLayout.EAST);
 
 		setViewportView(jp);
 		
