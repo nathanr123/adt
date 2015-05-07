@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.EventObject;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -20,6 +22,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -27,6 +30,8 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
+import com.cti.vpx.command.ATP;
+import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
@@ -207,37 +212,37 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	public void mouseExited(MouseEvent e) {
 	}
 
-	private void startBIST(){
-		
+	private void startBIST() {
+
 	}
+
 	private void reNameSelectedProcessorNode() {
 		DefaultMutableTreeNode f = (DefaultMutableTreeNode) VPX_ProcessorTree.this.getLastSelectedPathComponent();
 
 		String old_Value = f.getUserObject().toString();
 
 		String old_name = old_Value.substring(old_Value.indexOf("(") + 1, old_Value.indexOf(")"));
-		
-		parent.updateStatus("Rename processor "+old_name);
+
+		parent.updateStatus("Rename processor " + old_name);
 
 		String new_Name = JOptionPane.showInputDialog(parent, "New Name", old_name);
-		
-		if(new_Name != null){
 
-		VPXUtilities.getSelectedProcessor(VPX_ProcessorTree.this.getLastSelectedPathComponent().toString()).setName(
-				new_Name);
+		if (new_Name != null) {
 
-		String de = old_Value.substring(0, old_Value.indexOf("(")) + "(" + new_Name + ")";
+			VPXUtilities.getSelectedProcessor(VPX_ProcessorTree.this.getLastSelectedPathComponent().toString())
+					.setName(new_Name);
 
-		f.setUserObject(de);
-		
-		parent.updateLog("Processor name "+old_name+" changed to "+new_Name);
-		
-		parent.updateStatus("Processor name "+old_name+" changed to "+new_Name);
+			String de = old_Value.substring(0, old_Value.indexOf("(")) + "(" + new_Name + ")";
 
-		VPX_ProcessorTree.this.updateUI();
-		}
-		else{
-			parent.updateStatus("Rename processor "+old_name+" interrupted");
+			f.setUserObject(de);
+
+			parent.updateLog("Processor name " + old_name + " changed to " + new_Name);
+
+			parent.updateStatus("Processor name " + old_name + " changed to " + new_Name);
+
+			VPX_ProcessorTree.this.updateUI();
+		} else {
+			parent.updateStatus("Rename processor " + old_name + " interrupted");
 		}
 	}
 
@@ -303,15 +308,66 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			});
 
 			popup.add(itemRename);
-			
-			JMenuItem itemBist = new JMenuItem("Bist");
 
-			itemRename.addActionListener(new ActionListener() {
+			JMenuItem itemBist = new JMenuItem("BIST");
+
+			itemBist.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					System.out.println("Bist");
+					try {
+						Socket client = new Socket();
 
-					
+						client.connect(new InetSocketAddress("172.17.1.29", 12345), 300000);
+
+						client.setSoTimeout(300000);
+
+						System.out.println("Just connected to " + client.getRemoteSocketAddress());
+
+						System.out.println("Hello from " + client.getLocalSocketAddress());
+
+						/*
+						 * DSPATPCommand cmd = VPXUtilities.createDSPCommand();
+						 * 
+						 * cmd.params.testType.set(ATP.TEST_DSP_FULL);
+						 */
+
+						ATPCommand cmd = VPXUtilities.createATPCommand();
+
+						cmd.params.testType.set(ATP.TEST_P2020_FULL);
+
+						cmd.msgType.set(ATPCommand.MSG_TYPE_TEST);
+
+						cmd.msgID.set(ATPCommand.MSG_ID_GET);
+
+						VPX_BusyWindow busyWindow = new VPX_BusyWindow(null, "Built in Self Test",
+								"Complete Testing on process....");
+
+						cmd.write(client.getOutputStream());
+
+						long start = System.currentTimeMillis();
+
+						ATPCommand msg = new ATPCommand();
+
+						msg.read(client.getInputStream());
+
+						long end = System.currentTimeMillis();
+
+						try {
+							busyWindow.dispose();
+
+							UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+							new VPX_FullTestResult(msg, "172.17.1.29", start, end);
+						} catch (Exception e2) {
+							e2.printStackTrace();
+						}
+						
+						client.close();
+					} catch (Exception e3) {
+						e3.printStackTrace();
+					}
 				}
 			});
 

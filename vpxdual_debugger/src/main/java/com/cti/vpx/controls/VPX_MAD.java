@@ -17,7 +17,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.cti.vpx.util.VPXUtilities;
 import java.awt.event.ActionListener;
 
-public class VPX_FlashProcessor extends JPanel {
+public class VPX_MAD extends JPanel {
 	/**
 	 * 
 	 */
@@ -38,7 +38,7 @@ public class VPX_FlashProcessor extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public VPX_FlashProcessor() {
+	public VPX_MAD() {
 		setPreferredSize(new Dimension(600, 600));
 		setMinimumSize(new Dimension(600, 600));
 		setMaximumSize(new Dimension(600, 600));

@@ -42,12 +42,6 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	private FileWriter fw;
 
-	private FileWriter fwLog;
-
-	private File logFile;
-
-	private boolean isLogEnabled;
-
 	/**
 	 * Create the panel.
 	 */
@@ -136,17 +130,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 				String filePath = VPXUtilities.getPropertyValue(VPXUtilities.LOG_FILEPATH) + "\\"
 						+ VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO) + ".log";
 
-				if (logFile == null) {
-					logFile = new File(filePath);
-				}
-				if (fwLog == null) {
-					fwLog = new FileWriter(logFile, true);
+				VPXUtilities.appendUsingFileWriter(filePath, log);
 
-				}
-				
-				fwLog.append(log);
-				
-				fwLog.close();
 			}
 
 		} catch (Exception e) {

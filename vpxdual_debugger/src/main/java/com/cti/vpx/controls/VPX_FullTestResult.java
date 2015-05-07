@@ -119,6 +119,8 @@ public class VPX_FullTestResult extends JDialog {
 
 		setIconImage(VPXUtilities.getAppIcon());
 
+		setAlwaysOnTop(true);
+		
 		setResizable(false);
 	}
 
@@ -292,12 +294,15 @@ public class VPX_FullTestResult extends JDialog {
 		if (atp.params.testType.get() == ATP.TEST_P2020_FULL) {
 
 			moduleTestPanel.setLayout(new GridLayout(6, 4));
-
+			
 			lblT1 = new JLabel[24];
 
 			Font f = new Font(Font.SANS_SERIF, Font.BOLD, 12);
-			for (int i = 0; i < 24; i++) {
+
+			for (int i = 0; i < lblT1.length; i++) {
+
 				lblT1[i] = new JLabel("");
+
 				if (i % 2 != 0) {
 					lblT1[i].setFont(f);
 
@@ -446,7 +451,7 @@ public class VPX_FullTestResult extends JDialog {
 			lblTestStarted.setText(VPXUtilities.getCurrentTime(3, start));
 
 			lblTestCompleted.setText(VPXUtilities.getCurrentTime(3, end));
-			
+
 			lblTestDuration.setText(VPXUtilities.friendlyTimeDiff(end - start));
 
 			lblTestsFailedCount.setText(fail + " Failed");
@@ -456,14 +461,19 @@ public class VPX_FullTestResult extends JDialog {
 			lblTotNoofTests.setText((fail + pass) + " Tests");
 
 			lblStatusDetail.setText("Completed !");
+			
+			moduleTestPanel.setPreferredSize(new Dimension(0, 150));
 		} else {
 
-			moduleTestPanel.setLayout(new GridLayout(4, 4));
+			setBounds(100, 100, 658, 473);
+			
+			moduleTestPanel.setLayout(new GridLayout(2, 4));
 
-			lblT1 = new JLabel[16];
+			lblT1 = new JLabel[8];
 
 			Font f = new Font(Font.SANS_SERIF, Font.BOLD, 12);
-			for (int i = 0; i < 16; i++) {
+
+			for (int i = 0; i < lblT1.length; i++) {
 				lblT1[i] = new JLabel("");
 				if (i % 2 != 0) {
 					lblT1[i].setFont(f);
@@ -524,46 +534,6 @@ public class VPX_FullTestResult extends JDialog {
 				fail++;
 			}
 
-			lblT1[8].setText("Hyperlink Loop");
-
-			if ((atp.params.testinfo.RESULT_DSP_HYPLOOP.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[9].setText("PASS");
-				pass++;
-			} else {
-				lblT1[9].setText("FAIL");
-				fail++;
-			}
-
-			lblT1[10].setText("Ethernet");
-
-			if ((atp.params.testinfo.RESULT_DSP_ETHERNET.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[11].setText("PASS");
-				pass++;
-			} else {
-				lblT1[11].setText("FAIL");
-				fail++;
-			}
-
-			lblT1[12].setText("PCIe");
-
-			if ((atp.params.testinfo.RESULT_DSP_PCIE.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[13].setText("PASS");
-				pass++;
-			} else {
-				lblT1[13].setText("FAIL");
-				fail++;
-			}
-
-			lblT1[14].setText("SRIO");
-
-			if ((atp.params.testinfo.RESULT_DSP_SRIO.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[15].setText("PASS");
-				pass++;
-			} else {
-				lblT1[15].setText("FAIL");
-				fail++;
-			}
-
 			moduleTestPanel.doLayout();
 
 			lblTestStarted.setText(VPXUtilities.getCurrentTime(3, start));
@@ -589,11 +559,11 @@ public class VPX_FullTestResult extends JDialog {
 			String fileName = System.getProperty("user.home") + "\\" + getTitle() + ".txt";
 
 			writer = new PrintWriter(fileName, "UTF-8");
-			
+
 			writer.println("---------------------------------------");
 			writer.println("Test Detail");
 			writer.println("---------------------------------------");
-			
+
 			writer.println("Test : Built in Self Test");
 
 			writer.println("Test Type : " + lblTestTypeVal.getText());
@@ -609,7 +579,7 @@ public class VPX_FullTestResult extends JDialog {
 			writer.println("---------------------------------------");
 			writer.println(border.getTitle());
 			writer.println("---------------------------------------");
-			
+
 			if (atp.params.testType.get() == ATP.TEST_P2020_FULL) {
 				writer.println(lblT1[0].getText() + " : " + lblT1[1].getText());
 				writer.println(lblT1[2].getText() + " : " + lblT1[3].getText());
@@ -644,7 +614,7 @@ public class VPX_FullTestResult extends JDialog {
 			writer.println("---------------------------------------");
 			writer.println("Result Detail");
 			writer.println("---------------------------------------");
-			
+
 			writer.println("Test Started At : " + lblTestStarted.getText());
 
 			writer.println("Test Completed At : " + lblTestCompleted.getText());

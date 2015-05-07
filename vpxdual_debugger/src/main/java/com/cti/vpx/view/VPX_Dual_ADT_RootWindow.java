@@ -24,7 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
-import com.cti.vpx.controls.VPX_FlashProcessor;
+import com.cti.vpx.controls.VPX_MAD;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_Preference;
@@ -107,6 +107,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	 */
 	public VPX_Dual_ADT_RootWindow() {
 
+		VPXUtilities.setParent(this);
+		
 		rBundle = VPXUtilities.getResourceBundle();
 
 		initializeRootWindow();
@@ -413,6 +415,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 				new VPX_ConnectedProcessor(VPX_Dual_ADT_RootWindow.this));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+		
+		pro.connect();
 	}
 
 	public class ScanAction extends AbstractAction {
@@ -484,7 +488,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			int i = isAlreadyExist();
 			if (isAlreadyExist() == -1) {
-				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_FlashProcessor()));
+				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_MAD()));
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 			} else

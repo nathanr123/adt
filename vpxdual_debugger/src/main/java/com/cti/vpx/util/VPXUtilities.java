@@ -11,9 +11,11 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,7 +23,6 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -42,9 +43,13 @@ import javax.xml.bind.Unmarshaller;
 import javolution.io.Struct.Enum32;
 
 import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
+import com.cti.vpx.command.ATPCommand;
+import com.cti.vpx.command.DSPATPCommand;
+import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
+import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
 
 /**
  * @author nathanr_kamal
@@ -101,8 +106,10 @@ public class VPXUtilities {
 	private static Properties props;
 
 	private static boolean isLogEnabled = false;
-	
+
 	private static VPXSystem vpxSystem = new VPXSystem();
+
+	private static VPX_Dual_ADT_RootWindow parent;
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -141,6 +148,18 @@ public class VPXUtilities {
 
 	public static String getCurrentTime() {
 		return getCurrentTime(0);
+	}
+
+	public static ATPCommand createATPCommand() {
+		return new ATPCommand();
+	}
+
+	public static P2020ATPCommand createP2020Command() {
+		return new P2020ATPCommand();
+	}
+
+	public static DSPATPCommand createDSPCommand() {
+		return new DSPATPCommand();
 	}
 
 	public static String friendlyTimeDiff(long different) {
@@ -182,6 +201,18 @@ public class VPXUtilities {
 		}
 
 		return str;
+	}
+
+	public static void setParent(VPX_Dual_ADT_RootWindow prnt) {
+		parent = prnt;
+	}
+
+	public static void updateLog(String log) {
+		parent.updateLog(log);
+	}
+
+	public static void updateStatus(String status) {
+		parent.updateStatus(status);
 	}
 
 	public static String getCurrentTime(int format) {
@@ -448,14 +479,14 @@ public class VPXUtilities {
 
 	}
 
-	public static void setEnableLog(boolean val){
+	public static void setEnableLog(boolean val) {
 		isLogEnabled = val;
-	} 
-	
-	public static boolean isLogEnabled(){
+	}
+
+	public static boolean isLogEnabled() {
 		return isLogEnabled;
 	}
-	
+
 	public static void updateProperties(String key, String value) {
 		try {
 			if (props == null)
@@ -570,6 +601,89 @@ public class VPXUtilities {
 		}
 
 		return version;
+	}
+
+	/**
+	 * Use Streams when you are dealing with raw data, binary data
+	 * 
+	 * @param data
+	 */
+	public static void appendUsingOutputStream(String fileName, String data) {
+		OutputStream os = null;
+		try {
+			// below true flag tells OutputStream to append
+			os = new FileOutputStream(new File(fileName), true);
+			os.write(data.getBytes(), 0, data.length());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				os.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Use BufferedWriter when number of write operations are more
+	 * 
+	 * @param filePath
+	 * @param text
+	 * @param noOfLines
+	 */
+	public static void appendUsingBufferedWriter(String filePath, String text, int noOfLines) {
+		File file = new File(filePath);
+		FileWriter fr = null;
+		BufferedWriter br = null;
+		try {
+			// to append to file, you need to initialize FileWriter using below
+			// constructor
+			fr = new FileWriter(file, true);
+			br = new BufferedWriter(fr);
+			for (int i = 0; i < noOfLines; i++) {
+				br.newLine();
+				// you can use write or append method
+				br.write(text);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				br.close();
+				fr.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Use FileWriter when number of write operations are less
+	 * 
+	 * @param filePath
+	 * @param text
+	 * @param noOfLines
+	 */
+	public static void appendUsingFileWriter(String filePath, String text) {
+		File file = new File(filePath);
+		BufferedWriter fr = null;
+		try {
+			// Below constructor argument decides whether to append or override
+			fr = new BufferedWriter(new FileWriter(file, true));
+			fr.write(text);
+			fr.newLine();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				fr.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

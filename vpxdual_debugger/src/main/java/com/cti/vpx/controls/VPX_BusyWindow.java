@@ -36,6 +36,7 @@ public class VPX_BusyWindow extends JDialog {
 	private VPX_Dual_ADT_RootWindow parent;
 
 	private String title;
+	
 	private String msg;
 
 	/**
@@ -58,6 +59,12 @@ public class VPX_BusyWindow extends JDialog {
 		centerFrame();
 
 		setVisible(true);
+		
+		toFront();
+		
+		validate();
+		
+		repaint();
 	}
 
 	private void init() {
@@ -69,7 +76,7 @@ public class VPX_BusyWindow extends JDialog {
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setAlwaysOnTop(true);
-
+		
 		setBounds(100, 100, 431, 166);
 
 		getContentPane().setLayout(new BorderLayout());
