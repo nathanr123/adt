@@ -87,7 +87,7 @@ public class VPXUtilities {
 
 	public static final String LOG_MAXFILESIZE = "log.maxfilesize";
 
-	public static final String LOG_FILEPATH = "log.filepath";
+//	public static final String LOG_FILEPATH = "log.filepath";
 
 	public static final String LOG_FILEFORMAT = "log.fileformat";
 
@@ -316,29 +316,11 @@ public class VPXUtilities {
 
 	private static Image getImage(String name) {
 
-		ClassLoader cl = ComponentFactory.class.getClassLoader();
-
-		InputStream in = cl.getResourceAsStream(name);
-
 		try {
-			if (in != null) {
 
-				return ImageIO.read(in);
+			return new ImageIcon(name).getImage();
 
-			} else {
-
-				File file = new File(name);
-
-				if (file.isFile()) {
-
-					return ImageIO.read(file);
-				} else {
-
-					throw new IOException("Image not found: " + name);
-				}
-			}
-
-		} catch (IOException ioe) {
+		} catch (Exception ioe) {
 
 			ioe.printStackTrace();
 		}
@@ -429,7 +411,7 @@ public class VPXUtilities {
 			prop.setProperty(LOG_MAXFILE, String.valueOf(true));
 			prop.setProperty(LOG_SERIALNO, "");
 			prop.setProperty(LOG_MAXFILESIZE, "2");
-			prop.setProperty(LOG_FILEPATH, System.getProperty("user.home"));
+			prop.setProperty(LOG_SERIALNO, "");
 			prop.setProperty(LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
 			prop.setProperty(LOG_APPENDCURTIME, String.valueOf(true));
 			prop.setProperty(LOG_OVERWRITE, String.valueOf(false));
@@ -562,17 +544,22 @@ public class VPXUtilities {
 
 	public static String getPythonInterpreterPath() {
 		String ret = null;
+		String path = System.getenv().get("Path");
+		if (path != null) {
 
-		String[] paths = System.getenv().get("Path").split(";");
+			String[] paths = path.split(";");
 
-		for (int i = 0; i < paths.length; i++) {
-			int k = paths[i].indexOf("Python");
-			if (k > -1) {
-				ret = paths[i].substring(0, (paths[i].indexOf("\\", k) + 1));
-				break;
+			for (int i = 0; i < paths.length; i++) {
+				int k = paths[i].indexOf("Python");
+				if (k > -1) {
+					ret = paths[i].substring(0, (paths[i].indexOf("\\", k) + 1));
+					break;
+				}
 			}
-		}
-		return ret + "python.exe";
+
+			return ret + "python.exe";
+		} else
+			return "";
 	}
 
 	public static String findPyVersion() {

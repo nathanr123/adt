@@ -49,7 +49,7 @@ public class VPX_SplashWindow extends JWindow {
 			if (e == null)
 				e = props.propertyNames();
 			else if (!e.hasMoreElements()) {
-				props =  VPXUtilities.readProperties();
+				props = VPXUtilities.readProperties();
 				e = props.propertyNames();
 			} else {
 				lblCurrreading.setText("");
@@ -57,7 +57,7 @@ public class VPX_SplashWindow extends JWindow {
 
 			String key = (String) e.nextElement();
 
-			lblCurrreading.setText("reading "+key + " = " + props.getProperty(key));
+			lblCurrreading.setText("reading " + key + " = " + props.getProperty(key));
 			try {
 				Thread.sleep(50);
 			} catch (Exception e) {
@@ -86,7 +86,7 @@ public class VPX_SplashWindow extends JWindow {
 		lblCurrreading.setBounds(2, 268, 495, 20);
 		panel.add(lblCurrreading);
 
-		JLabel lblV = new JLabel("V "+rBundle.getString("App.title.version"));
+		JLabel lblV = new JLabel("V " + rBundle.getString("App.title.version"));
 		lblV.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblV.setForeground(SystemColor.activeCaptionBorder);
 		lblV.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 14));
@@ -101,7 +101,7 @@ public class VPX_SplashWindow extends JWindow {
 
 		JLabel lblIcon = new JLabel();
 		lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
-		lblIcon.setIcon(VPXUtilities.getImageIcon("\\images\\cornet.png", 72, 72));
+		lblIcon.setIcon(VPXUtilities.getImageIcon("images\\cornet.png", 72, 72));
 		lblIcon.setBounds(29, 94, 72, 72);
 		panel.add(lblIcon);
 
@@ -113,7 +113,7 @@ public class VPX_SplashWindow extends JWindow {
 
 		JLabel lblBGImage = new JLabel("");
 		lblBGImage.setBounds(2, 2, 495, 290);
-		lblBGImage.setIcon(VPXUtilities.getImageIcon("\\images\\BG.jpg", 596, 596));
+		lblBGImage.setIcon(VPXUtilities.getImageIcon("images\\BG.jpg", 596, 596));
 		panel.add(lblBGImage);
 		progressBar.setPreferredSize(new Dimension(150, 8));
 

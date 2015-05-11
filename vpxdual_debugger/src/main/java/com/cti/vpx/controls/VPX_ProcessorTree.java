@@ -309,7 +309,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			popup.add(itemRename);
 
-			JMenuItem itemBist = new JMenuItem("BIST");
+			JMenuItem itemBist = new JMenuItem("Built In Self Test");
 
 			itemBist.addActionListener(new ActionListener() {
 

@@ -261,25 +261,6 @@ public class VPX_ScanWindow extends JDialog {
 
 								VPX_ScanStatusWindow.this.dispose();
 								
-								VPXUtilities.setEnableLog(false);
-
-								Boolean isLogEnabled = Boolean.valueOf(VPXUtilities
-										.getPropertyValue(VPXUtilities.LOG_ENABLE));
-
-								Boolean isSerialPrompt = Boolean.valueOf(VPXUtilities
-										.getPropertyValue(VPXUtilities.LOG_PROMPT));
-
-								if (isLogEnabled && isSerialPrompt) {
-									String new_Name = JOptionPane.showInputDialog(parent, "Enter New Serial number",
-											VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO));
-
-									if (new_Name != null){
-										
-										VPXUtilities.setEnableLog(true);
-										
-										VPXUtilities.updateProperties(VPXUtilities.LOG_SERIALNO, new_Name);
-									}
-								}
 
 							} catch (InterruptedException | ExecutionException e) {
 

@@ -127,8 +127,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			if (VPXUtilities.isLogEnabled()) {
 
-				String filePath = VPXUtilities.getPropertyValue(VPXUtilities.LOG_FILEPATH) + "\\"
-						+ VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO) + ".log";
+				String filePath = VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO);
 
 				VPXUtilities.appendUsingFileWriter(filePath, log);
 

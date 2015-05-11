@@ -10,22 +10,29 @@ import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import net.miginfocom.swing.MigLayout;
 
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
-import com.cti.vpx.controls.VPX_MAD;
 import com.cti.vpx.controls.VPX_LoggerPanel;
+import com.cti.vpx.controls.VPX_MAD;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_Preference;
 import com.cti.vpx.controls.VPX_ProcessorTree;
@@ -108,6 +115,8 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	public VPX_Dual_ADT_RootWindow() {
 
 		VPXUtilities.setParent(this);
+
+		promptLogFileName();
 		
 		rBundle = VPXUtilities.getResourceBundle();
 
@@ -415,7 +424,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 				new VPX_ConnectedProcessor(VPX_Dual_ADT_RootWindow.this));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
-		
+
 		pro.connect();
 	}
 
@@ -523,7 +532,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			new VPX_Preference().showPreferenceWindow(); 
+			new VPX_Preference().showPreferenceWindow();
 		}
 	}
 
@@ -545,6 +554,69 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			VPX_Dual_ADT_RootWindow.this.dispose();
 
 		}
+	}
+
+	private void promptLogFileName() {
+
+		VPXUtilities.setEnableLog(false);
+
+		Boolean isLogEnabled = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_ENABLE));
+
+		Boolean isSerialPrompt = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_PROMPT));
+
+		if (isLogEnabled && isSerialPrompt) {
+			String new_Name = selectFile(VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO));
+
+			if (new_Name != null) {
+
+				VPXUtilities.setEnableLog(true);
+
+				VPXUtilities.updateProperties(VPXUtilities.LOG_SERIALNO, new_Name);
+			}
+		}
+	}
+
+	private String selectFile(String oldName) {
+		String[] options = { "Apply" };
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout("", "[349.00,grow]", "[][][]"));
+
+		JLabel lblNewLabel = new JLabel("Select Log file");
+		panel.add(lblNewLabel, "cell 0 0");
+
+		JTextField textField = new JTextField(oldName);
+		panel.add(textField, "cell 0 1,growx");
+		textField.setColumns(10);
+
+		JButton btnNewButton = new JButton("Browse");
+		panel.add(btnNewButton, "cell 0 2,alignx right");
+
+		btnNewButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jb = new JFileChooser();
+				int i = jb.showOpenDialog(VPX_Dual_ADT_RootWindow.this);
+				if (i == JFileChooser.APPROVE_OPTION) {
+					String flnmae = jb.getSelectedFile().getPath();
+					if (!flnmae.endsWith(".log"))
+						flnmae += ".log";
+					textField.setText(flnmae);
+				}
+			}
+		});
+
+		int selectedOption = JOptionPane.showOptionDialog(null, panel, "Log Name", JOptionPane.NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+		if (selectedOption == 0) {
+			String flnmae = textField.getText();
+			if (!flnmae.endsWith(".log"))
+				flnmae += ".log";
+			return flnmae;
+		}
+
+		return "";
 	}
 
 	private void refreshProcessorTree(Processor processor, boolean isRemove) {
