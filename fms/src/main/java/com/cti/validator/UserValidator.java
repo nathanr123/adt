@@ -41,8 +41,7 @@ public class UserValidator implements Validator {
 
 		ValidationUtils.rejectIfEmpty(errors, "password", "required.password");
 
-		ValidationUtils.rejectIfEmpty(errors, "confirmPassword",
-				"required.confirmPassword");
+		ValidationUtils.rejectIfEmpty(errors, "confirmPassword", "required.confirmPassword");
 
 		User user = (User) target;
 
@@ -50,9 +49,6 @@ public class UserValidator implements Validator {
 			errors.rejectValue("password", "notmatch.password");
 		}
 
-		if (user.getPriority() == -1) {
-			errors.rejectValue("priority", "required.priority");
-		}
 	}
 
 }

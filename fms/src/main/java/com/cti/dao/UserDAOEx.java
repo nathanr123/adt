@@ -4,7 +4,6 @@
 package com.cti.dao;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Repository;
 import com.cti.model.User;
 import com.cti.model.UserAttempts;
 import com.cti.model.UserDetail;
-import com.cti.model.UsersGroupList;
 
 /**
  * @author nathanr_kamal
@@ -82,10 +80,11 @@ public class UserDAOEx implements UserDAO {
 	@Override
 	public boolean updatePassword(User user) {
 		try {
-			/*user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-			user.setModifiedtime(new Date());
-*/
+			/*
+			 * user.setPassword(passwordEncoder.encode(user.getPassword()));
+			 * 
+			 * user.setModifiedtime(new Date());
+			 */
 			getCurrentSession().save(user);
 
 			return true;
@@ -101,8 +100,7 @@ public class UserDAOEx implements UserDAO {
 		if (userList != null) {
 			List<User> usersList = new ArrayList<User>();
 
-			for (Iterator<String> iterator = userList.iterator(); iterator
-					.hasNext();) {
+			for (Iterator<String> iterator = userList.iterator(); iterator.hasNext();) {
 				String user = (String) iterator.next();
 
 				usersList.add(getUserById(user));
@@ -122,8 +120,7 @@ public class UserDAOEx implements UserDAO {
 
 	private String getDeleteQuery(String table, String username) {
 
-		return String.format("DELETE FROM %s WHERE username= \'%s\'", table,
-				username);
+		return String.format("DELETE FROM %s WHERE username= \'%s\'", table, username);
 	}
 
 	private List<String> getAllDeletingQueries(String username) {
@@ -162,8 +159,6 @@ public class UserDAOEx implements UserDAO {
 		LinkedHashSet<String> childList = new LinkedHashSet<String>();
 
 		childList.add(UserAttempts.class.getName());
-
-		childList.add(UsersGroupList.class.getName());
 
 		childList.add(UserDetail.class.getName());
 

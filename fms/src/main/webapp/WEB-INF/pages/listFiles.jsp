@@ -15,27 +15,23 @@
 		</tr>
 	</c:if>
 
-	<h3>Users List</h3>
-	<c:if test="${!empty grouplist}">
+	<h3>Files List</h3>
+	<c:if test="${!empty fileslist}">
 		<table class="data">
 			<tr>
-				<th>Group Name</th>
-				<th>Priority</th>
-				<th>Created Time</th>
-				<th>Modified Time</th>
-				<th>&nbsp;</th>
-				<th>&nbsp;</th>
+				<th>S.No</th>
+				<th>File Name</th>
+				<th>Size</th>
+				<th>Uploaded Time</th>
+				<th>Request</th>
 			</tr>
-			<c:forEach items="${grouplist}" var="groupDetail">
+			<c:forEach items="${fileslist}" var="upFile">
 				<tr>
-					<td>${groupDetail.groupname}</td>
-					<td>${groupDetail.priority}</td>
-					<td>${groupDetail.createdtime}</td>
-					<td>${groupDetail.modifiedtime}</td>
-					<td><a
-						href="${contextPath}/loadGroupdetail?group=${groupDetail.groupid}">Modify</a></td>
-					<td><a
-						href="${contextPath}/deleteGroup?group=${groupDetail.groupid}">Delete</a></td>
+					<td>${i}</td>
+					<td>${upFile.filepath}</td>
+					<td>${2652 KBs}</td>
+					<td>${upFile.createdtime}</td>
+					<td></td>
 				</tr>
 			</c:forEach>
 		</table>

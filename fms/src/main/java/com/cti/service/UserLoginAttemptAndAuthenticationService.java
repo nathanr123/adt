@@ -37,13 +37,13 @@ public class UserLoginAttemptAndAuthenticationService extends JdbcDaoImpl {
 	}
 
 	@Override
-	@Value("select * from rems_user where username = ?")
+	@Value("select * from user where username = ?")
 	public void setUsersByUsernameQuery(String usersByUsernameQueryString) {
 		super.setUsersByUsernameQuery(usersByUsernameQueryString);
 	}
 
 	@Override
-	@Value("select username, userrole from rems_user where username =?")
+	@Value("select username, userrole from user where username =?")
 	public void setAuthoritiesByUsernameQuery(String queryString) {
 		super.setAuthoritiesByUsernameQuery(queryString);
 	}

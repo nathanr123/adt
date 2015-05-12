@@ -24,13 +24,10 @@
 					href="javascript:formSubmit()"> Logout</a> | <a
 					href="${contextPath}/changePassword">Change Password</a> | <a
 					href="${contextPath}/newuser">Create New User</a>| <a
-					href="${contextPath}/newgroup">Create New Group</a>| <a
 					href="${contextPath}/listusers">List User</a>| <a
-					href="${contextPath}/listgroups">List Group</a>| <a
+					href="${contextPath}/listusers">List Files</a>| <a
 					href="${contextPath}/loadUserdetail?user=${pageContext.request.userPrincipal.name}">Update
-					Profile</a>| <a href="${contextPath}/loadUsersAndGroups">Assign
-					User and Group</a>| <a href="${contextPath}/loadGroupPermission">Create
-					Group Permissions</a>|
+					Profile</a>|
 			
 			</c:if>
 			<c:if test="${not empty msg}">

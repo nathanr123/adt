@@ -1,11 +1,8 @@
 package com.cti.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,13 +10,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "rems_user")
+@Table(name = "user")
 public class User implements Serializable {
 
 	// Variables for corresponding to DB Table
@@ -36,9 +33,7 @@ public class User implements Serializable {
 
 	private String confirmPassword;
 
-	private int priority = -1;
-
-	private String userrole;
+	private String userrole = "ROLE_USER";
 
 	private boolean enabled = true;
 
@@ -52,11 +47,11 @@ public class User implements Serializable {
 
 	private Date modifiedtime;
 
-	private Set<UserGroup> groups = new HashSet<UserGroup>();
-
 	private UserDetail userDetail;
 
 	private UserAttempts userAttempts;
+
+	private Set<UserUploads> userUploads = new HashSet<UserUploads>();
 
 	// Constructors
 
@@ -66,16 +61,12 @@ public class User implements Serializable {
 	public User() {
 	}
 
-	public User(String username, String password, int priority,
-			String userrole, boolean enabled, boolean accountNonExpired,
-			boolean accountNonLocked, boolean credentialsNonExpired,
-			Date createdtime, Date modifiedtime) {
+	public User(String username, String password, String userrole, boolean enabled, boolean accountNonExpired,
+			boolean accountNonLocked, boolean credentialsNonExpired, Date createdtime, Date modifiedtime) {
 
 		this.username = username;
 
 		this.password = password;
-
-		this.priority = priority;
 
 		this.userrole = userrole;
 
@@ -109,14 +100,6 @@ public class User implements Serializable {
 	@Column(name = "password", nullable = false, length = 250)
 	public String getPassword() {
 		return password;
-	}
-
-	/**
-	 * @return the priority
-	 */
-	@Column(name = "priority", nullable = false)
-	public int getPriority() {
-		return priority;
 	}
 
 	/**
@@ -175,7 +158,23 @@ public class User implements Serializable {
 		return modifiedtime;
 	}
 
+	/**
+	 * @return the userUploads
+	 */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+	public Set<UserUploads> getUserUploads() {
+		return userUploads;
+	}
+
 	// Setter Methods
+
+	/**
+	 * @param userUploads
+	 *            the userUploads to set
+	 */
+	public void setUserUploads(Set<UserUploads> userUploads) {
+		this.userUploads = userUploads;
+	}
 
 	/**
 	 * @param username
@@ -191,14 +190,6 @@ public class User implements Serializable {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	/**
-	 * @param priority
-	 *            the priority to set
-	 */
-	public void setPriority(int priority) {
-		this.priority = priority;
 	}
 
 	/**
@@ -274,23 +265,6 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * @return the groups
-	 */
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL)
-	// Users List Variable name in UserGroup "users"
-	public Set<UserGroup> getGroups() {
-		return groups;
-	}
-
-	/**
-	 * @param groups
-	 *            the groups to set
-	 */
-	public void setGroups(Set<UserGroup> groups) {
-		this.groups = groups;
-	}
-
-	/**
 	 * @return the userDetail
 	 */
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
@@ -322,10 +296,6 @@ public class User implements Serializable {
 	 */
 	public void setUserAttempts(UserAttempts userAttempts) {
 		this.userAttempts = userAttempts;
-	}
-
-	public void addGroupToUser(UserGroup usrGRP) {
-		this.groups.add(usrGRP);
 	}
 
 }

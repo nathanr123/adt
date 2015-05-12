@@ -22,14 +22,14 @@ import com.cti.model.UserAttempts;
 public class UserAttepmtDAOEx extends JdbcDaoSupport implements
 		UserAttepmtDAO {
 
-	private static final String SQL_USERS_UPDATE_LOCKED = "UPDATE REMS_USER SET accountNonLocked = ? WHERE username = ?";
-	private static final String SQL_USERS_COUNT = "SELECT count(*) FROM REMS_USER WHERE username = ?";
+	private static final String SQL_USERS_UPDATE_LOCKED = "UPDATE USER SET accountNonLocked = ? WHERE username = ?";
+	private static final String SQL_USERS_COUNT = "SELECT count(*) FROM USER WHERE username = ?";
 
-	private static final String SQL_USER_ATTEMPTS_GET = "SELECT * FROM USER_ATTEMPTS WHERE username = ?";
-	private static final String SQL_USER_ATTEMPTS_INSERT = "INSERT INTO USER_ATTEMPTS (USERNAME, ATTEMPTS, LASTMODIFIED) VALUES(?,?,?)";
+	private static final String SQL_USER_ATTEMPTS_GET = "SELECT * FROM USERATTEMPTS WHERE username = ?";
+	private static final String SQL_USER_ATTEMPTS_INSERT = "INSERT INTO USERATTEMPTS (USERNAME, ATTEMPTS, LASTMODIFIED) VALUES(?,?,?)";
 
-	private static final String SQL_USER_ATTEMPTS_UPDATE_ATTEMPTS = "UPDATE USER_ATTEMPTS SET attempts = attempts + 1, lastmodified = ? WHERE username = ?";
-	private static final String SQL_USER_ATTEMPTS_RESET_ATTEMPTS = "UPDATE USER_ATTEMPTS SET attempts = 0, lastmodified = ? WHERE username = ?";
+	private static final String SQL_USER_ATTEMPTS_UPDATE_ATTEMPTS = "UPDATE USERATTEMPTS SET attempts = attempts + 1, lastmodified = ? WHERE username = ?";
+	private static final String SQL_USER_ATTEMPTS_RESET_ATTEMPTS = "UPDATE USERATTEMPTS SET attempts = 0, lastmodified = ? WHERE username = ?";
 
 	private static final int MAX_ATTEMPTS = 3;
 

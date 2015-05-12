@@ -46,14 +46,6 @@
 				</tr>
 
 				<tr>
-					<td>Priority:</td>
-					<td><form:select path="priority">
-							<form:option value="-1" label="--- Select ---" />
-							<form:options items="${priorityLevel}" />
-						</form:select></td>
-				</tr>
-
-				<tr>
 					<td><form:checkbox path="enabled" label="Enable"
 							title="Enable" /></td>
 					<td></td>

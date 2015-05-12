@@ -3,7 +3,6 @@ package com.cti.controller;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +159,7 @@ public class UserController {
 
 			user.setModifiedtime(d);
 
-			user.setUserrole("ROLE_ADMIN");
+		//	user.setUserrole("ROLE_USER");
 
 			userService.saveUser(user);
 
@@ -319,17 +318,4 @@ public class UserController {
 	private UserDetail getUserDetail(String username) {
 		return userDetailService.getUserDetailById(username);
 	}
-
-	@ModelAttribute("priorityLevel")
-	public Map<Integer, Integer> getPriority() {
-
-		Map<Integer, Integer> userPriorty = new HashMap<Integer, Integer>();
-
-		for (int i = 10; i > 0; i--) {
-			userPriorty.put(i, i);
-		}
-
-		return userPriorty;
-	}
-
 }

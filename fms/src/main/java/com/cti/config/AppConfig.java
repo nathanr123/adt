@@ -42,7 +42,7 @@ public class AppConfig {
 
 		driverManagerDataSource.setDriverClassName("com.mysql.jdbc.Driver");
 
-		driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/rems_db");
+		driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/fms");
 
 		driverManagerDataSource.setUsername("root");
 

@@ -15,7 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 @Entity
-@Table(name = "rems_user_detail")
+@Table(name = "userdetail")
 public class UserDetail implements Serializable {
 
 	/**
@@ -74,7 +74,7 @@ public class UserDetail implements Serializable {
 	/**
 	 * @return the username
 	 */
-	@GenericGenerator(name = "generator", strategy = "foreign", parameters = @Parameter(name = "property", value = "rems_user"))
+	@GenericGenerator(name = "generator", strategy = "foreign", parameters = @Parameter(name = "property", value = "user"))
 	@Id
 	@Column(name = "username", unique = true, nullable = false, length = 16)
 	public String getUsername() {
