@@ -6,7 +6,7 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Uploaded Files</title>
 </head>
 <body>
 	<c:if test="${not empty msg}">
@@ -22,6 +22,7 @@
 				<th>S.No</th>
 				<th>File Name</th>
 				<th>Size</th>
+				<th>Description</th>
 				<th>Uploaded Time</th>
 				<th>Request</th>
 			</tr>
@@ -29,7 +30,8 @@
 				<tr>
 					<td>${i}</td>
 					<td>${upFile.filepath}</td>
-					<td>${2652 KBs}</td>
+					<td>2652 KBs</td>
+					<td>${upFile.description}</td>
 					<td>${upFile.createdtime}</td>
 					<td></td>
 				</tr>

@@ -5,6 +5,7 @@ package com.cti.dao;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,6 +122,22 @@ public class UserUploadDAOEx implements UserUploadDAO {
 		@SuppressWarnings("unchecked")
 		List<UserUploads> grpList = getCurrentSession().createQuery("from UserUploads u where  u.isDeleted=1").list();
 		return grpList;
+	}
+
+	@Override
+	public List<UserUploads> listAllUploads(String username) {
+
+		Query query = getCurrentSession().createQuery("from UserUploads u where  u.username = :username");
+
+		query.setParameter("username", username);
+
+		List<UserUploads> grpList = query.list();
+
+		if (grpList.size() > 0)
+			return grpList;
+
+		else
+			return null;
 	}
 
 }

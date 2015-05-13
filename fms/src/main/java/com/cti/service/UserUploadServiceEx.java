@@ -6,6 +6,7 @@ package com.cti.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.cti.dao.UserUploadDAO;
 import com.cti.model.UserUploads;
@@ -14,6 +15,7 @@ import com.cti.model.UserUploads;
  * @author nathanr_kamal
  *
  */
+@Service
 public class UserUploadServiceEx implements UserUploadService {
 
 	@Autowired
@@ -106,6 +108,11 @@ public class UserUploadServiceEx implements UserUploadService {
 	public List<UserUploads> listDeletedRequests() {
 
 		return userUploadDAO.listDeletedRequests();
+	}
+
+	@Override
+	public List<UserUploads> listAllUploads(String username) {
+		return null;
 	}
 
 }

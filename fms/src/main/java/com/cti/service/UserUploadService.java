@@ -16,6 +16,8 @@ public interface UserUploadService {
 	public boolean deleteUploads(UserUploads upload);
 
 	public List<UserUploads> listAllUploads();
+	
+	public List<UserUploads> listAllUploads(String username);
 
 	public List<UserUploads> listRequestedUploads();
 

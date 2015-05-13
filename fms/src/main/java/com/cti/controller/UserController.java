@@ -27,8 +27,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.cti.model.ChangePassword;
 import com.cti.model.User;
 import com.cti.model.UserDetail;
+import com.cti.model.UserUploads;
 import com.cti.service.UserDetailsService;
 import com.cti.service.UserService;
+import com.cti.service.UserUploadService;
 
 @Controller
 @EnableWebMvcSecurity
@@ -39,6 +41,9 @@ public class UserController {
 
 	@Autowired
 	UserDetailsService userDetailService;
+
+	@Autowired
+	UserUploadService userUploadService;
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
@@ -71,8 +76,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/newuser", method = RequestMethod.GET)
-	public @ResponseBody ModelAndView goToNewUserRegistration(
-			Map<String, Object> model) {
+	public @ResponseBody ModelAndView goToNewUserRegistration(Map<String, Object> model) {
 
 		ModelAndView mav = new ModelAndView();
 
@@ -86,8 +90,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/changePassword", method = RequestMethod.GET)
-	public @ResponseBody ModelAndView goToChangePassword(Principal principal,
-			Map<String, Object> model) {
+	public @ResponseBody ModelAndView goToChangePassword(Principal principal, Map<String, Object> model) {
 
 		ModelAndView mav = new ModelAndView();
 
@@ -104,14 +107,13 @@ public class UserController {
 
 	@RequestMapping(value = "/doChangePassword", method = RequestMethod.POST)
 	public @ResponseBody ModelAndView doChangePassword(
-			@ModelAttribute("changePasswordForm") ChangePassword changePasswordForm,
-			BindingResult result, Map<String, Object> model,
-			SessionStatus status) {
+			@ModelAttribute("changePasswordForm") ChangePassword changePasswordForm, BindingResult result,
+			Map<String, Object> model, SessionStatus status) {
 
 		ModelAndView mav = new ModelAndView();
 
 		changePasswordValidator.validate(changePasswordForm, result);
-		
+
 		User usr = userService.getUserById(changePasswordForm.getUsername());
 
 		if (result.hasErrors()) {
@@ -120,9 +122,8 @@ public class UserController {
 		}
 
 		else {
-			
-			usr.setPassword(passwordEncoder.encode(changePasswordForm
-					.getNewPassword()));
+
+			usr.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
 
 			usr.setModifiedtime(new Date());
 
@@ -137,9 +138,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/createnewuser", method = RequestMethod.POST)
-	public ModelAndView doCreateNewUser(@ModelAttribute("userForm") User user,
-			BindingResult result, Map<String, Object> model,
-			SessionStatus status) {
+	public ModelAndView doCreateNewUser(@ModelAttribute("userForm") User user, BindingResult result,
+			Map<String, Object> model, SessionStatus status) {
 
 		ModelAndView mav = new ModelAndView();
 
@@ -159,7 +159,7 @@ public class UserController {
 
 			user.setModifiedtime(d);
 
-		//	user.setUserrole("ROLE_USER");
+			// user.setUserrole("ROLE_USER");
 
 			userService.saveUser(user);
 
@@ -169,8 +169,7 @@ public class UserController {
 
 			model.put("userdetailForm", userdetailForm);
 
-			mav.addObject("msg", "New User " + user.getUsername()
-					+ " Created Successfully");
+			mav.addObject("msg", "New User " + user.getUsername() + " Created Successfully");
 
 			mav.setViewName("userdetail");
 
@@ -180,8 +179,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/loadUserdetail", method = RequestMethod.GET)
-	public ModelAndView goUserProfileupdate(@RequestParam("user") String user,
-			Map<String, Object> model) {
+	public ModelAndView goUserProfileupdate(@RequestParam("user") String user, Map<String, Object> model) {
 
 		ModelAndView mav = new ModelAndView();
 
@@ -203,8 +201,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/deleteUser", method = RequestMethod.GET)
-	public ModelAndView deleteUser(@RequestParam("user") String user,
-			Map<String, Object> model) {
+	public ModelAndView deleteUser(@RequestParam("user") String user, Map<String, Object> model) {
 
 		ModelAndView mav = new ModelAndView();
 
@@ -223,8 +220,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/updateuserdetail", method = RequestMethod.POST)
-	public ModelAndView updateUserProfile(
-			@ModelAttribute("userdetailForm") UserDetail userDetail,
+	public ModelAndView updateUserProfile(@ModelAttribute("userdetailForm") UserDetail userDetail,
 			BindingResult result, Map<String, Object> model) {
 
 		ModelAndView mav = new ModelAndView();
@@ -248,8 +244,7 @@ public class UserController {
 
 			userDetail.setModifiedtime(d);
 
-			if (userDetailService.isUserProfileAlreadyAvailable(userDetail
-					.getUsername())) {
+			if (userDetailService.isUserProfileAlreadyAvailable(userDetail.getUsername())) {
 				userDetailService.updateUserDetail(userDetail);
 
 				view = "hello";
@@ -260,8 +255,7 @@ public class UserController {
 
 				userDetailService.saveUserDetail(userDetail);
 
-				msg = userDetail.getFullname()
-						+ " Profile Updated Successfully !!";
+				msg = userDetail.getFullname() + " Profile Updated Successfully !!";
 
 				mav.addObject("userlist", getAllUsersDetail());
 			}
@@ -285,6 +279,24 @@ public class UserController {
 
 		return mav;
 
+	}
+
+	@RequestMapping(value = "/listfiles", method = RequestMethod.GET)
+	public ModelAndView listFiles(Map<String, Object> model) {
+
+		ModelAndView mav = new ModelAndView();
+
+		mav.addObject("fileslist", getAllUserFiles());
+
+		mav.setViewName("listfile");
+
+		return mav;
+
+	}
+
+	public List<UserUploads> getAllUserFiles() {
+
+		return userUploadService.listAllUploads();
 	}
 
 	public List<UserDetail> getAllUsersDetail() {

@@ -46,12 +46,17 @@ public class UserUploads implements Serializable {
 
 	private String filepath;
 
+	private String description = "";
+
 	private Date createdtime;
 
 	private Date modifiedtime;
 
 	private User user;
 
+	public UserUploads() {
+		// TODO Auto-generated constructor stub
+	}
 	/**
 	 * @param username
 	 * @param adminuser
@@ -60,11 +65,12 @@ public class UserUploads implements Serializable {
 	 * @param isDeleted
 	 * @param isAccepted
 	 * @param filepath
+	 * @param description
 	 * @param createdtime
 	 * @param modifiedtime
 	 */
 	public UserUploads(String username, String adminuser, int fileid, boolean isCanceled, boolean isDeleted,
-			boolean isAccepted, String filepath, Date createdtime, Date modifiedtime) {
+			boolean isAccepted, String filepath, String description, Date createdtime, Date modifiedtime) {
 		super();
 		this.username = username;
 		this.adminuser = adminuser;
@@ -73,6 +79,7 @@ public class UserUploads implements Serializable {
 		this.isDeleted = isDeleted;
 		this.isAccepted = isAccepted;
 		this.filepath = filepath;
+		this.description = description;
 		this.createdtime = createdtime;
 		this.modifiedtime = modifiedtime;
 	}
@@ -154,6 +161,14 @@ public class UserUploads implements Serializable {
 	}
 
 	/**
+	 * @return the description
+	 */
+	@Column(name = "description", nullable = false)
+	public String getDescription() {
+		return description;
+	}
+
+	/**
 	 * @return the user
 	 */
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -224,6 +239,14 @@ public class UserUploads implements Serializable {
 	 */
 	public void setFilepath(String filepath) {
 		this.filepath = filepath;
+	}
+
+	/**
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	/**

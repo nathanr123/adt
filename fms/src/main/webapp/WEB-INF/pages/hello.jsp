@@ -25,7 +25,7 @@
 					href="${contextPath}/changePassword">Change Password</a> | <a
 					href="${contextPath}/newuser">Create New User</a>| <a
 					href="${contextPath}/listusers">List User</a>| <a
-					href="${contextPath}/listusers">List Files</a>| <a
+					href="${contextPath}/listfiles">List Files</a>| <a
 					href="${contextPath}/loadUserdetail?user=${pageContext.request.userPrincipal.name}">Update
 					Profile</a>|
 			
