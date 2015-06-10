@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cti.dao.UserDAO;
+import com.cti.model.SaveSettings;
 import com.cti.model.User;
 
 /**
@@ -83,6 +84,26 @@ public class UserServiceEx implements UserService {
 	public List<User> listUsers(List<String> userList) {
 		// TODO Auto-generated method stub
 		return userDAO.listUsers(userList);
+	}
+
+	@Override
+	public void saveSettings(SaveSettings saveSettings) {
+
+		String path = saveSettings.getFolderpath();
+		
+		if (!path.endsWith("\\"))
+			path += "\\";
+
+		saveSettings.setFolderpath(path);
+		
+		userDAO.saveSettings(saveSettings);
+
+	}
+
+	@Override
+	public SaveSettings getSettings() {
+
+		return userDAO.getSettings();
 	}
 
 }

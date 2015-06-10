@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cti.model.SaveSettings;
 import com.cti.model.User;
 
 @Transactional
@@ -22,4 +23,8 @@ public boolean saveUser(User user);
 	public List<User> listUsers();	
 	
 	public List<User> listUsers(List<String> userList);
+	
+	public void saveSettings(SaveSettings saveSettings);
+	
+	public SaveSettings getSettings();
 }

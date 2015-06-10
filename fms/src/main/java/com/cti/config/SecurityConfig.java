@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.loginPage("/login").failureUrl("/login?error")
 				.usernameParameter("username")
 				.passwordParameter("password")
-				.and().logout().logoutSuccessUrl("/login?logout").and().csrf();
+				.and().logout().logoutSuccessUrl("/login?logout").and().csrf().disable();
 	}
 	
 	@Bean(name="passwordEncoder")

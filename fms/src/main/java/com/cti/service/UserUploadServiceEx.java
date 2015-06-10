@@ -112,7 +112,7 @@ public class UserUploadServiceEx implements UserUploadService {
 
 	@Override
 	public List<UserUploads> listAllUploads(String username) {
-		return null;
+		return userUploadDAO.listAllUploads(username);
 	}
 
 }

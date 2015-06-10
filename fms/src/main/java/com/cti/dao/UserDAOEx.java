@@ -4,6 +4,7 @@
 package com.cti.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import com.cti.model.SaveSettings;
 import com.cti.model.User;
 import com.cti.model.UserAttempts;
 import com.cti.model.UserDetail;
+import com.cti.model.UserUploads;
 
 /**
  * @author nathanr_kamal
@@ -164,6 +167,46 @@ public class UserDAOEx implements UserDAO {
 
 		childList.add(User.class.getName());
 
+		childList.add(UserUploads.class.getName());
+
 		return childList;
+	}
+
+	@Override
+	public void saveSettings(SaveSettings saveSettings) {
+		try {
+
+			Date d = new Date();
+			
+			saveSettings.setCreatedtime(d);
+			
+			saveSettings.setModifiedtime(d);
+			
+			getCurrentSession().saveOrUpdate(saveSettings);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public SaveSettings getSettings() {
+		try{
+		SaveSettings s = (SaveSettings) getCurrentSession().createQuery("from SaveSettings").list().get(0);
+		
+		
+		if(s.getFolderpath() == null){
+			s.setFolderpath("");
+		}
+		
+		if(s.getFoldername() == null){
+			s.setFoldername("");
+			s.setModifiedtime(null);
+		}
+		
+		return s;
+		}catch(Exception e){
+			return new SaveSettings();
+		}
 	}
 }

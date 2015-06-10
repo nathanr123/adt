@@ -1,5 +1,8 @@
 package com.cti.controller;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +13,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -22,9 +26,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.cti.model.ChangePassword;
+import com.cti.model.FileUpload;
+import com.cti.model.SaveSettings;
 import com.cti.model.User;
 import com.cti.model.UserDetail;
 import com.cti.model.UserUploads;
@@ -60,6 +67,10 @@ public class UserController {
 	@Qualifier("changePasswordFormValidator")
 	Validator changePasswordValidator;
 
+	@Autowired
+	@Qualifier("savesettingsFormValidator")
+	Validator savesettingsValidator;
+
 	@InitBinder("userForm")
 	protected void initUserBinder(WebDataBinder binder) {
 		binder.setValidator(userValidator);
@@ -73,6 +84,11 @@ public class UserController {
 	@InitBinder("changePasswordForm")
 	protected void initChangePasswordBinder(WebDataBinder binder) {
 		binder.setValidator(changePasswordValidator);
+	}
+
+	@InitBinder("savesettingsForm")
+	protected void initsavesettingsBinder(WebDataBinder binder) {
+		binder.setValidator(savesettingsValidator);
 	}
 
 	@RequestMapping(value = "/newuser", method = RequestMethod.GET)
@@ -282,11 +298,11 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/listfiles", method = RequestMethod.GET)
-	public ModelAndView listFiles(Map<String, Object> model) {
+	public ModelAndView listFiles(Principal principal, Map<String, Object> model) {
 
 		ModelAndView mav = new ModelAndView();
 
-		mav.addObject("fileslist", getAllUserFiles());
+		mav.addObject("fileslist", getAllUserFiles(principal.getName()));
 
 		mav.setViewName("listfile");
 
@@ -294,9 +310,130 @@ public class UserController {
 
 	}
 
-	public List<UserUploads> getAllUserFiles() {
+	@RequestMapping(value = "/douploadfile", method = RequestMethod.POST)
+	public ModelAndView doUploadFile(@ModelAttribute("uploadForm") FileUpload fileUpload, BindingResult result,
+			Map<String, Object> model) {
 
-		return userUploadService.listAllUploads();
+		ModelAndView mav = new ModelAndView("redirect:/listfiles");
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		String fileName = null;
+
+		MultipartFile file = fileUpload.getFile();
+
+		if (!file.isEmpty()) {
+			try {
+				fileName = file.getOriginalFilename();
+
+				byte[] bytes = file.getBytes();
+
+				String filepath = createUserFolder(username);
+
+				File fs = new File(filepath + "\\" + fileName);
+
+				BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(fs));
+
+				buffStream.write(bytes);
+
+				buffStream.close();
+				Date d = new Date();
+				UserUploads uu = new UserUploads();
+
+				uu.setUsername(username);
+				uu.setFilepath(fileName);
+				uu.setDescription(fileUpload.getDesc());
+				uu.setSize(fs.length());
+				uu.setCreatedtime(d);
+
+				uu.setModifiedtime(d);
+
+				userUploadService.saveUploads(uu);
+
+				mav.addObject("msg", "You have successfully uploaded " + fileName);
+			} catch (Exception e) {
+				e.printStackTrace();
+				mav.addObject("msg", "You failed to upload " + fileName);
+			}
+		} else {
+			mav.addObject("msg", "Unable to upload. File is empty.");
+		}
+
+		// mav.setViewName("fileuploadsuccess");
+
+		return mav;
+
+	}
+
+	@RequestMapping(value = "/settings", method = RequestMethod.GET)
+	public ModelAndView settings(Map<String, Object> model) {
+
+		ModelAndView mav = new ModelAndView();
+
+		SaveSettings st = userService.getSettings();
+		if (st == null) {
+			st = new SaveSettings();
+			st.setId(0);
+			Date d = new Date();
+			st.setCreatedtime(d);
+			st.setModifiedtime(d);
+		}
+		;
+		model.put("savesettingsForm", st);
+
+		mav.setViewName("settings");
+
+		return mav;
+
+	}
+
+	@RequestMapping(value = "/savesettings", method = RequestMethod.POST)
+	public ModelAndView savesettings(@ModelAttribute("savesettingsForm") SaveSettings savesettingsForm,
+			BindingResult result, Map<String, Object> model) {
+
+		ModelAndView mav = new ModelAndView();
+
+		savesettingsValidator.validate(savesettingsForm, result);
+
+		if (result.hasErrors()) {
+
+			mav.setViewName("settings");
+		} else {
+
+			userService.saveSettings(savesettingsForm);
+
+			mav.addObject("msg", "File name and path updated successfully!");
+
+			mav.setViewName("hello");
+		}
+
+		return mav;
+
+	}
+
+	@RequestMapping(value = "/uploadfile", method = RequestMethod.GET)
+	public ModelAndView uploadFile(Map<String, Object> model) {
+
+		ModelAndView mav = new ModelAndView();
+
+		mav.setViewName("uploadfile");
+
+		return mav;
+
+	}
+
+	public List<UserUploads> getAllUserFiles(String username) {
+
+		String role = userService.getUserById(username).getUserrole();
+
+		System.out.println(role);
+
+		System.out.println(username);
+
+		if ("ROLE_ADMIN".equals(role))
+			return userUploadService.listAllUploads();
+		else
+			return userUploadService.listAllUploads(username);
 	}
 
 	public List<UserDetail> getAllUsersDetail() {
@@ -329,5 +466,29 @@ public class UserController {
 
 	private UserDetail getUserDetail(String username) {
 		return userDetailService.getUserDetailById(username);
+	}
+
+	private String createUserFolder(String name) {
+		SaveSettings s = userService.getSettings();
+		String path = s.getFolderpath();// System.getProperty("user.home");
+		String folder = s.getFoldername();
+
+		String folderName = path + folder;
+
+		File f1 = new File(folderName);
+
+		if (!f1.exists()) {
+			f1.mkdir();
+		}
+
+		String fName = folderName + "\\" + name;
+
+		File f = new File(fName);
+
+		if (!f.exists()) {
+			f.mkdir();
+		}
+
+		return fName;
 	}
 }

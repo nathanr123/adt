@@ -18,6 +18,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
@@ -50,16 +51,16 @@ public class AppConfig {
 
 		return driverManagerDataSource;
 	}
-	
+
 	@Bean
-    public MessageSource messageSource() { 
-        
+	public MessageSource messageSource() {
+
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        
+
 		messageSource.setBasename("message");
-        
+
 		return messageSource;
-    }  
+	}
 
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
@@ -68,8 +69,7 @@ public class AppConfig {
 
 		sessionFactory.setDataSource(dataSource());
 
-		sessionFactory
-				.setPackagesToScan(new String[] { PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN });
+		sessionFactory.setPackagesToScan(new String[] { PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN });
 
 		sessionFactory.setHibernateProperties(hibProperties());
 
@@ -79,20 +79,19 @@ public class AppConfig {
 	private Properties hibProperties() {
 
 		Properties prop = new Properties();
-		
+
 		prop.put("hibernate.format_sql", "true");
-		
-		prop.put("hibernate.show_sql", "false");
-		
+
+		prop.put("hibernate.show_sql", "true");
+
 		prop.put("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
-		
+
 		return prop;
 	}
 
 	@Bean
 	@Autowired
-	public HibernateTransactionManager transactionManager(
-			SessionFactory sessionFactory) {
+	public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
 
 		HibernateTransactionManager txManager = new HibernateTransactionManager();
 
@@ -115,4 +114,10 @@ public class AppConfig {
 		return viewResolver;
 	}
 
+	@Bean(name = "multipartResolver")
+	public CommonsMultipartResolver createMultipartResolver() {
+		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+		resolver.setDefaultEncoding("utf-8");
+		return resolver;
+	}
 }

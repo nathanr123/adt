@@ -3,6 +3,7 @@
  */
 package com.cti.dao;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -65,9 +66,8 @@ public class UserUploadDAOEx implements UserUploadDAO {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.cti.dao.UserUploadDAO#listAllUploads()
-	 */
-	@SuppressWarnings("unchecked")
+	 * @see com.cti.dao.UserUploadDAO#listAllUploads()	 */
+	
 	@Override
 	public List<UserUploads> listAllUploads() {
 
@@ -127,6 +127,8 @@ public class UserUploadDAOEx implements UserUploadDAO {
 	@Override
 	public List<UserUploads> listAllUploads(String username) {
 
+		System.out.println(username);
+		
 		Query query = getCurrentSession().createQuery("from UserUploads u where  u.username = :username");
 
 		query.setParameter("username", username);

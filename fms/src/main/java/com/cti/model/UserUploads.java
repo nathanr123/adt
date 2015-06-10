@@ -34,9 +34,9 @@ public class UserUploads implements Serializable {
 
 	private String username;
 
-	private String adminuser;
-
 	private int fileid;
+
+	private boolean request = false;
 
 	private boolean isCanceled = false;
 
@@ -48,6 +48,8 @@ public class UserUploads implements Serializable {
 
 	private String description = "";
 
+	private double size;
+
 	private Date createdtime;
 
 	private Date modifiedtime;
@@ -57,37 +59,43 @@ public class UserUploads implements Serializable {
 	public UserUploads() {
 		// TODO Auto-generated constructor stub
 	}
+
 	/**
 	 * @param username
-	 * @param adminuser
 	 * @param fileid
+	 * @param request
 	 * @param isCanceled
 	 * @param isDeleted
 	 * @param isAccepted
 	 * @param filepath
 	 * @param description
+	 * @param size
 	 * @param createdtime
 	 * @param modifiedtime
+	 * @param user
 	 */
-	public UserUploads(String username, String adminuser, int fileid, boolean isCanceled, boolean isDeleted,
-			boolean isAccepted, String filepath, String description, Date createdtime, Date modifiedtime) {
+	public UserUploads(String username, int fileid, boolean request, boolean isCanceled, boolean isDeleted,
+			boolean isAccepted, String filepath, String description, double size, Date createdtime, Date modifiedtime,
+			User user) {
 		super();
 		this.username = username;
-		this.adminuser = adminuser;
 		this.fileid = fileid;
+		this.request = request;
 		this.isCanceled = isCanceled;
 		this.isDeleted = isDeleted;
 		this.isAccepted = isAccepted;
 		this.filepath = filepath;
 		this.description = description;
+		this.size = size;
 		this.createdtime = createdtime;
 		this.modifiedtime = modifiedtime;
+		this.user = user;
 	}
 
 	/**
 	 * @return the username
 	 */
-	@Id
+	
 	@GenericGenerator(name = "generator", strategy = "foreign", parameters = @Parameter(name = "property", value = "user"))
 	@Column(name = "username", nullable = false, length = 16)
 	public String getUsername() {
@@ -95,17 +103,9 @@ public class UserUploads implements Serializable {
 	}
 
 	/**
-	 * @return the adminuser
-	 */
-	@GenericGenerator(name = "generator", strategy = "foreign", parameters = @Parameter(name = "property", value = "user"))
-	@Column(name = "adminuser", nullable = false, length = 10)
-	public String getAdminuser() {
-		return adminuser;
-	}
-
-	/**
 	 * @return the fileid
 	 */
+	@Id
 	@Column(name = "fileid", nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public int getFileid() {
@@ -178,6 +178,30 @@ public class UserUploads implements Serializable {
 	}
 
 	/**
+	 * @return the request
+	 */
+	@Column(name = "request", nullable = false)
+	public boolean isRequest() {
+		return request;
+	}
+
+	/**
+	 * @return the size
+	 */
+	@Column(name = "size", nullable = false)
+	public double getSize() {
+		return size;
+	}
+
+	/**
+	 * @param size
+	 *            the size to set
+	 */
+	public void setSize(double size) {
+		this.size = size;
+	}
+
+	/**
 	 * @param user
 	 *            the user to set
 	 */
@@ -191,14 +215,6 @@ public class UserUploads implements Serializable {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	/**
-	 * @param adminuser
-	 *            the adminuser to set
-	 */
-	public void setAdminuser(String adminuser) {
-		this.adminuser = adminuser;
 	}
 
 	/**
@@ -264,4 +280,13 @@ public class UserUploads implements Serializable {
 	public void setModifiedtime(Date modifiedtime) {
 		this.modifiedtime = modifiedtime;
 	}
+
+	/**
+	 * @param request
+	 *            the request to set
+	 */
+	public void setRequest(boolean request) {
+		this.request = request;
+	}
+
 }
