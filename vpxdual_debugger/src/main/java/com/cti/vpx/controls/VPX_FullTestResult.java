@@ -120,7 +120,7 @@ public class VPX_FullTestResult extends JDialog {
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setAlwaysOnTop(true);
-		
+
 		setResizable(false);
 	}
 
@@ -293,9 +293,9 @@ public class VPX_FullTestResult extends JDialog {
 
 		if (atp.params.testType.get() == ATP.TEST_P2020_FULL) {
 
-			moduleTestPanel.setLayout(new GridLayout(6, 4));
-			
-			lblT1 = new JLabel[24];
+			moduleTestPanel.setLayout(new GridLayout(8, 4));
+
+			lblT1 = new JLabel[32];
 
 			Font f = new Font(Font.SANS_SERIF, Font.BOLD, 12);
 
@@ -333,7 +333,7 @@ public class VPX_FullTestResult extends JDialog {
 				lblT1[1].setText("FAIL");
 				fail++;
 			}
-			lblT1[2].setText("Memory");
+			lblT1[2].setText("DDR");
 
 			if ((atp.params.testinfo.RESULT_P2020_MEMORY.get() == ATP.TEST_RESULT_PASS)) {
 				lblT1[3].setText("PASS");
@@ -343,7 +343,7 @@ public class VPX_FullTestResult extends JDialog {
 				fail++;
 			}
 
-			lblT1[4].setText("Flash");
+			lblT1[4].setText("NOR Flash");
 
 			if ((atp.params.testinfo.RESULT_P2020_FLASH.get() == ATP.TEST_RESULT_PASS)) {
 				lblT1[5].setText("PASS");
@@ -352,7 +352,7 @@ public class VPX_FullTestResult extends JDialog {
 				lblT1[5].setText("FAIL");
 				fail++;
 			}
-			lblT1[6].setText("RTC");
+			lblT1[6].setText("Ethernet");
 
 			if ((atp.params.testinfo.RESULT_P2020_RTC.get() == ATP.TEST_RESULT_PASS)) {
 				lblT1[7].setText("PASS");
@@ -362,7 +362,7 @@ public class VPX_FullTestResult extends JDialog {
 				fail++;
 			}
 
-			lblT1[8].setText("USB");
+			lblT1[8].setText("PCI");
 
 			if ((atp.params.testinfo.RESULT_P2020_USB.get() == ATP.TEST_RESULT_PASS)) {
 				lblT1[9].setText("PASS");
@@ -372,7 +372,7 @@ public class VPX_FullTestResult extends JDialog {
 				fail++;
 			}
 
-			lblT1[10].setText("Ethernet");
+			lblT1[10].setText("SRIO");
 
 			if ((atp.params.testinfo.RESULT_P2020_ETHERNET.get() == ATP.TEST_RESULT_PASS)) {
 				lblT1[11].setText("PASS");
@@ -382,71 +382,45 @@ public class VPX_FullTestResult extends JDialog {
 				fail++;
 			}
 
-			lblT1[12].setText("List PCI");
+			lblT1[12].setText("Temp - 1");
 
-			if ((atp.params.testinfo.RESULT_P2020_LISTPCI.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[13].setText("PASS");
-				pass++;
-			} else {
-				lblT1[13].setText("FAIL");
-				fail++;
-			}
+			lblT1[13].setText("<html>41 &deg;C</html>");
 
-			lblT1[14].setText("Status");
+			lblT1[14].setText("Temp - 2");
 
-			if ((atp.params.testinfo.RESULT_P2020_SATATUS.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[15].setText("PASS");
-				pass++;
-			} else {
-				lblT1[15].setText("FAIL");
-				fail++;
-			}
+			lblT1[15].setText("<html>45 &deg;C</html>");
 
-			lblT1[16].setText("Audio");
+			lblT1[16].setText("Temp - 3");
 
-			if ((atp.params.testinfo.RESULT_P2020_AUDIO.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[17].setText("PASS");
-				pass++;
-			} else {
-				lblT1[17].setText("FAIL");
-				fail++;
-			}
+			lblT1[17].setText("<html>36 &deg;C</html>");
 
-			lblT1[18].setText("PMC XMC");
+			lblT1[18].setText("Voltage - 1");
 
-			if ((atp.params.testinfo.RESULT_P2020_PMCXMC.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[19].setText("PASS");
-				pass++;
-			} else {
-				lblT1[19].setText("FAIL");
-				fail++;
-			}
+			lblT1[19].setText("3.3 V");
 
-			lblT1[20].setText("SRIO Loop");
+			lblT1[20].setText("Voltage - 2");
 
-			if ((atp.params.testinfo.RESULT_P2020_SRIOLOOP.get() == ATP.TEST_RESULT_PASS)) {
-				lblT1[21].setText("PASS");
-				pass++;
-			} else {
-				lblT1[21].setText("FAIL");
-				fail++;
-			}
+			lblT1[21].setText("2.5 V");
 
-			lblT1[22].setText("Temprature");
+			lblT1[22].setText("Voltage - 3");
 
-			if ((atp.params.testinfo.RESULT_P2020_TEMP.get() == ATP.TEST_RESULT_PASS)) {
-				String str = String.format("<html><table><tr><td colspan='3' align='left'>PASS</td></tr>"
-						+ "<tr><td><font size='2'>T1<br/>%d&deg;C</font></td>"
-						+ "<td><font size='2'>T2<br/>%d&deg;C</font></td>"
-						+ "<td><font size='2'>T2<br/>%d&deg;C</font></td></tr></table></html>",
-						atp.params.testinfo.RESULT_P2020_TEMP1.get(), atp.params.testinfo.RESULT_P2020_TEMP2.get(),
-						atp.params.testinfo.RESULT_P2020_TEMP3.get());
-				lblT1[23].setText(str);
-				pass++;
-			} else {
-				lblT1[23].setText("FAIL");
-				fail++;
-			}
+			lblT1[23].setText("1.8 V");
+
+			lblT1[24].setText("Voltage - 4");
+
+			lblT1[25].setText("1.5 V");
+
+			lblT1[26].setText("Voltage - 5");
+
+			lblT1[27].setText("1.2 V");
+
+			lblT1[28].setText("Voltage - 6");
+
+			lblT1[29].setText("1.0 V");
+
+			lblT1[30].setText("Voltage - 7");
+
+			lblT1[31].setText("1.05");
 
 			lblTestStarted.setText(VPXUtilities.getCurrentTime(3, start));
 
@@ -461,12 +435,12 @@ public class VPX_FullTestResult extends JDialog {
 			lblTotNoofTests.setText((fail + pass) + " Tests");
 
 			lblStatusDetail.setText("Completed !");
-			
+
 			moduleTestPanel.setPreferredSize(new Dimension(0, 150));
 		} else {
 
 			setBounds(100, 100, 658, 473);
-			
+
 			moduleTestPanel.setLayout(new GridLayout(2, 4));
 
 			lblT1 = new JLabel[8];

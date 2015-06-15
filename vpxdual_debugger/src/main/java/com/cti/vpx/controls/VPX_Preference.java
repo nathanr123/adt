@@ -26,6 +26,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -75,6 +76,7 @@ public class VPX_Preference extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			VPX_Preference dialog = new VPX_Preference();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.showPreferenceWindow();
@@ -195,7 +197,7 @@ public class VPX_Preference extends JDialog {
 
 			prop.setProperty(VPXUtilities.LOG_SERIALNO, "");
 
-			prop.setProperty(VPXUtilities.LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
+			prop.setProperty(VPXUtilities.LOG_FILEFORMAT, "$(FileName)_$(CurrentTime)");
 
 			prop.setProperty(VPXUtilities.LOG_APPENDCURTIME, String.valueOf(true));
 
@@ -452,13 +454,13 @@ public class VPX_Preference extends JDialog {
 		tabPanel_Log.add(chkEnableLog);
 
 		JPanel panelSerialNo = new JPanel();
-		panelSerialNo.setBorder(new TitledBorder(null, "Serial Number", TitledBorder.LEADING, TitledBorder.TOP, null,
+		panelSerialNo.setBorder(new TitledBorder(null, "Log File Name", TitledBorder.LEADING, TitledBorder.TOP, null,
 				null));
 		panelSerialNo.setLayout(null);
 		panelSerialNo.setBounds(10, 36, 370, 90);
 		tabPanel_Log.add(panelSerialNo);
 
-		chkPromptSerialNo = new JCheckBox("Prompt serial number after scanning processors", true);
+		chkPromptSerialNo = new JCheckBox("Prompt log filename on startup", true);
 		chkPromptSerialNo.setBounds(6, 20, 354, 23);
 		panelSerialNo.add(chkPromptSerialNo);
 
@@ -468,7 +470,7 @@ public class VPX_Preference extends JDialog {
 		panelSerialNo.add(label_2);
 
 		JLabel lblAlwaysPromptBoard = new JLabel(
-				"<html>Always prompt Board serial number from user.<br/>If new scan has performed</html>");
+				"<html>Always prompt log filename from user.<br/>on application startup</html>");
 		lblAlwaysPromptBoard.setVerticalAlignment(SwingConstants.TOP);
 		lblAlwaysPromptBoard.setBounds(66, 50, 294, 32);
 		panelSerialNo.add(lblAlwaysPromptBoard);
@@ -649,9 +651,9 @@ public class VPX_Preference extends JDialog {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					txtLogFileFormat.setText("$(SerialNumber)_$(CurrentTime)");
+					txtLogFileFormat.setText("$(FileName)_$(CurrentTime)");
 				} else {
-					txtLogFileFormat.setText("$(SerialNumber)");
+					txtLogFileFormat.setText("$(FileName)");
 				}
 			}
 		});

@@ -14,9 +14,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.cti.vpx.util.VPXUtilities;
+import javax.swing.ImageIcon;
 
 public class VPX_About_Dialog extends JDialog {
 
@@ -31,6 +33,7 @@ public class VPX_About_Dialog extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			VPX_About_Dialog dialog = new VPX_About_Dialog();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.showDialog();
@@ -75,7 +78,7 @@ public class VPX_About_Dialog extends JDialog {
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setBounds(10, 11, 50, 50);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setIcon(VPXUtilities.getImageIcon("\\images\\cornet.png", 50, 50));
+		lblNewLabel.setIcon(VPXUtilities.getImageIcon("C:\\debugger\\images\\cornet.png",50,50));
 		contentPanel.add(lblNewLabel);
 
 		JLabel lblNewLabel_1 = new JLabel("VPX Dual Application Debugger Tool");

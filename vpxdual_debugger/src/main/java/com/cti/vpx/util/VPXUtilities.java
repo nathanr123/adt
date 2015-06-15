@@ -197,7 +197,7 @@ public class VPXUtilities {
 			str += elapsedSeconds + " seconds";
 		}
 		if (elapsedMilliSeconds > 0) {
-			str += elapsedMilliSeconds + " milli seconds ";
+			str += elapsedMilliSeconds + "  milli seconds ";
 		}
 
 		return str;

@@ -319,7 +319,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 					try {
 						Socket client = new Socket();
 
-						client.connect(new InetSocketAddress("172.17.1.29", 12345), 300000);
+						client.connect(new InetSocketAddress("172.17.1.28", 12345), 300000);
 
 						client.setSoTimeout(300000);
 
@@ -359,7 +359,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 							UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-							new VPX_FullTestResult(msg, "172.17.1.29", start, end);
+							new VPX_FullTestResult(msg, "172.17.1.28", start, end);
 						} catch (Exception e2) {
 							e2.printStackTrace();
 						}
