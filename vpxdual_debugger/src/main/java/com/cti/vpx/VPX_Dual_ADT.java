@@ -4,9 +4,10 @@ import java.awt.EventQueue;
 
 import javax.swing.UIManager;
 
+import com.cti.vpx.controls.VPX_AppMode;
 import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_Dual_ADT {
 
@@ -27,7 +28,9 @@ public class VPX_Dual_ADT {
 						
 					} else {
 
-						VPX_Dual_ADT_RootWindow window = new VPX_Dual_ADT_RootWindow();
+						//VPX_Dual_ADT_RootWindow window = new VPX_Dual_ADT_RootWindow();
+						
+						VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
 
 						window.setVisible(true);
 					}

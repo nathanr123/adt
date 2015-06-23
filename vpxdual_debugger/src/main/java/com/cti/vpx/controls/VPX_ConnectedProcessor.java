@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_ConnectedProcessor extends JPanel {
 
@@ -16,9 +16,9 @@ public class VPX_ConnectedProcessor extends JPanel {
 	 * Create the panel.
 	 */
 
-	private VPX_Dual_ADT_RootWindow parent;
+	private VPX_ETHWindow parent;
 
-	public VPX_ConnectedProcessor(VPX_Dual_ADT_RootWindow prnt) {
+	public VPX_ConnectedProcessor(VPX_ETHWindow prnt) {
 
 		this.parent = prnt;
 

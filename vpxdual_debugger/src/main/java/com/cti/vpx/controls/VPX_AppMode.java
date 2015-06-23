@@ -1,9 +1,5 @@
 package com.cti.vpx.controls;
 
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.PortInUseException;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -12,20 +8,31 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
-import java.util.HashSet;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import com.cti.vpx.model.NWInterface;
+import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
+import com.cti.vpx.view.VPX_UARTWindow;
 
 public class VPX_AppMode extends JFrame {
 
@@ -42,7 +49,7 @@ public class VPX_AppMode extends JFrame {
 
 	private static String ETHNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ethernet Mode will be switched into full functional windows.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User must program LAN Configuration</left></body></html>";
 
-	private JPanel contentPane;
+	private JPanel contentPane, basePane;
 
 	private final ButtonGroup debugModeGroup = new ButtonGroup();
 
@@ -54,11 +61,39 @@ public class VPX_AppMode extends JFrame {
 
 	private JPanel centerPanel;
 
-	private JPanel uart_Panel, eth_Panel;
-
 	private JTextField txtSpeed;
 
-	private JComboBox cmbCOMM;
+	private JComboBox<String> cmbCOMM;
+
+	private JTextField txtLogFileName;
+
+	private int currentMode = -1;
+
+	private List<NWInterface> nwIFaces = null;
+
+	private List<String> cmmPorts = null;
+
+	private JComboBox<String> cmbNWIface;
+
+	private DefaultComboBoxModel<String> nwIFModel = new DefaultComboBoxModel<String>();
+
+	private DefaultComboBoxModel<String> commModel = new DefaultComboBoxModel<String>();
+
+	private JTextField txtIPAddress;
+
+	private JTextField txtSubnet;
+
+	private JTextField txtGateway;
+
+	private JTextField txtPeriodicity;
+
+	private JButton btnBrowse;
+
+	private Boolean isLogEnabled;
+
+	private JCheckBox chkLog;
+
+	private NWInterface nw;
 
 	/**
 	 * Launch the application.
@@ -68,7 +103,7 @@ public class VPX_AppMode extends JFrame {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					VPX_AppMode frame = new VPX_AppMode();
+					VPX_AppMode frame = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -80,6 +115,21 @@ public class VPX_AppMode extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+
+	public VPX_AppMode(List<NWInterface> nws, List<String> comms) {
+
+		this.nwIFaces = nws;
+
+		this.cmmPorts = comms;
+
+		init();
+
+		loadComponents();
+
+		centerFrame();
+
+	}
+
 	public VPX_AppMode() {
 		init();
 
@@ -90,27 +140,34 @@ public class VPX_AppMode extends JFrame {
 
 	private void init() {
 
-		setTitle("Connection Mode");
+		setTitle("Debugg Wizard");
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setSize(430, 420);
+		setResizable(false);
+
+		basePane = new JPanel();
+
+		basePane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(basePane);
+
+		basePane.setLayout(new BorderLayout(0, 0));
 
 		contentPane = new JPanel();
 
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(new TitledBorder(null, "Debugging Mode", TitledBorder.LEADING, TitledBorder.TOP, null,
+				null));
 
-		setContentPane(contentPane);
+		basePane.add(contentPane, BorderLayout.CENTER);
 
 		contentPane.setLayout(new BorderLayout(0, 0));
-
-		uart_Panel = getUARTComponents();
-
-		eth_Panel = getEthernetComponents();
 
 	}
 
 	private void loadComponents() {
+
+		loadLogComponents();
 
 		loadTopComponents();
 
@@ -119,6 +176,77 @@ public class VPX_AppMode extends JFrame {
 		loadBottomComponents();
 
 		reloadCenterComponents(UARTMODE);
+
+	}
+
+	private void loadLogComponents() {
+
+		JPanel logPanel = new JPanel();
+
+		logPanel.setBorder(new TitledBorder(null, "Log", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		logPanel.setPreferredSize(new Dimension(10, 135));
+
+		contentPane.add(logPanel, BorderLayout.NORTH);
+
+		logPanel.setLayout(null);
+
+		chkLog = new JCheckBox("Enable Log");
+
+		chkLog.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				boolean val = (e.getStateChange() == ItemEvent.SELECTED);
+
+				txtLogFileName.setEnabled(val);
+
+				btnBrowse.setEnabled(val);
+			}
+		});
+
+		chkLog.setBounds(16, 20, 157, 14);
+
+		logPanel.add(chkLog);
+
+		JLabel lblLog = new JLabel("Select Log file name");
+
+		lblLog.setBounds(16, 40, 157, 14);
+
+		logPanel.add(lblLog);
+
+		txtLogFileName = new JTextField();
+
+		txtLogFileName.setBounds(16, 65, 425, 20);
+
+		logPanel.add(txtLogFileName);
+
+		txtLogFileName.setColumns(10);
+
+		btnBrowse = new JButton("Browse");
+
+		btnBrowse.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jb = new JFileChooser();
+				int i = jb.showOpenDialog(VPX_AppMode.this);
+				if (i == JFileChooser.APPROVE_OPTION) {
+					String flnmae = jb.getSelectedFile().getPath();
+					if (!flnmae.endsWith(".log"))
+						flnmae += ".log";
+					txtLogFileName.setText(flnmae);
+				}
+			}
+		});
+
+		btnBrowse.setBounds(350, 100, 91, 23);
+
+		logPanel.add(btnBrowse);
+
+		basePane.add(logPanel, BorderLayout.NORTH);
+
 	}
 
 	private void loadBottomComponents() {
@@ -127,7 +255,7 @@ public class VPX_AppMode extends JFrame {
 
 		bottomPanel.setPreferredSize(new Dimension(10, 105));
 
-		contentPane.add(bottomPanel, BorderLayout.SOUTH);
+		basePane.add(bottomPanel, BorderLayout.SOUTH);
 
 		bottomPanel.setLayout(null);
 
@@ -135,7 +263,7 @@ public class VPX_AppMode extends JFrame {
 
 		lblNote.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
-		lblNote.setBounds(0, 0, 402, 65);
+		lblNote.setBounds(10, 0, 402, 65);
 
 		bottomPanel.add(lblNote);
 
@@ -145,8 +273,8 @@ public class VPX_AppMode extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("App Opened");
 
+				openDebugWindow();
 			}
 		});
 
@@ -174,7 +302,8 @@ public class VPX_AppMode extends JFrame {
 
 		JPanel topPanel = new JPanel();
 
-		topPanel.setBorder(new TitledBorder(null, "Debugging Mode", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		// topPanel.setBorder(new TitledBorder(null, "Debugging Mode",
+		// TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		contentPane.add(topPanel, BorderLayout.NORTH);
 
@@ -194,7 +323,9 @@ public class VPX_AppMode extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				reloadCenterComponents(UARTMODE);
+
+				if (currentMode != UARTMODE)
+					reloadCenterComponents(UARTMODE);
 
 			}
 		});
@@ -213,10 +344,13 @@ public class VPX_AppMode extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				reloadCenterComponents(ETHMODE);
+				if (currentMode != ETHMODE)
+					reloadCenterComponents(ETHMODE);
 
 			}
 		});
+
+		// radETH.setSelected(true);
 
 		debugModeGroup.add(radETH);
 
@@ -226,30 +360,41 @@ public class VPX_AppMode extends JFrame {
 	}
 
 	private void reloadCenterComponents(int mode) {
+
+		currentMode = mode;
+
 		if (mode == UARTMODE) {
 
 			centerPanel.removeAll();
 
-			setSize(430, 303);
+			setSize(470, 450);
 
-			centerPanel.setBounds(5, 80, 412, 86);
+			centerPanel.setBounds(5, 80, 412, 100);
 
-			centerPanel.add(uart_Panel, BorderLayout.CENTER);
+			centerPanel.add(getUARTComponents(), BorderLayout.CENTER);
 
 			lblNote.setText(UARTNOTE);
 
 			loadUARTProperties();
 
+			cmbCOMM.setSelectedIndex(0);
+
+			populateUARTValues(cmbCOMM.getSelectedItem().toString());
+
 		} else if (mode == ETHMODE) {
 			centerPanel.removeAll();
 
-			setSize(430, 420);
+			setSize(470, 570);
 
-			centerPanel.setBounds(5, 80, 412, 215);
+			centerPanel.setBounds(5, 80, 412, 220);
 
-			centerPanel.add(eth_Panel, BorderLayout.CENTER);
+			centerPanel.add(getEthernetComponents(), BorderLayout.CENTER);
 
 			lblNote.setText(ETHNOTE);
+
+			loadETHProperties();
+
+			cmbNWIface.setSelectedIndex(0);
 		}
 	}
 
@@ -259,7 +404,8 @@ public class VPX_AppMode extends JFrame {
 
 		centerPanel.setLayout(new BorderLayout());
 
-		centerPanel.setBorder(new TitledBorder(null, "Options", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		// centerPanel.setBorder(new TitledBorder(null, "Options",
+		// TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		centerPanel.add(getEthernetComponents(), BorderLayout.CENTER);
 
@@ -269,6 +415,7 @@ public class VPX_AppMode extends JFrame {
 	}
 
 	private JPanel getUARTComponents() {
+
 		JPanel uartPanel = new JPanel();
 
 		uartPanel.setLayout(null);
@@ -285,9 +432,20 @@ public class VPX_AppMode extends JFrame {
 
 		uartPanel.add(lblSpeed);
 
-		cmbCOMM = new JComboBox();
+		cmbCOMM = new JComboBox<String>(commModel);
 
-		cmbCOMM.setBounds(148, 14, 248, 22);
+		cmbCOMM.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if (arg0.getStateChange() == ItemEvent.SELECTED) {
+					// System.out.println("Item Changed");
+				}
+
+			}
+		});
+
+		cmbCOMM.setBounds(148, 14, 260, 22);
 
 		uartPanel.add(cmbCOMM);
 
@@ -295,7 +453,7 @@ public class VPX_AppMode extends JFrame {
 
 		txtSpeed.setEditable(false);
 
-		txtSpeed.setBounds(148, 50, 165, 22);
+		txtSpeed.setBounds(148, 50, 155, 22);
 
 		uartPanel.add(txtSpeed);
 
@@ -340,37 +498,52 @@ public class VPX_AppMode extends JFrame {
 
 		ethPanel.add(lblPeriodicity);
 
-		JComboBox cmbNWIface = new JComboBox();
+		cmbNWIface = new JComboBox<String>(nwIFModel);
 
-		cmbNWIface.setBounds(148, 15, 248, 22);
+		cmbNWIface.setFocusable(false);
+
+		cmbNWIface.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbNWIface)) {
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+						populateETHValues(arg0.getItem().toString());
+					}
+				}
+			}
+		});
+
+		cmbNWIface.setBounds(148, 15, 260, 22);
 
 		ethPanel.add(cmbNWIface);
 
-		JTextField txtIPAddress = new JTextField();
+		txtIPAddress = new JTextField();
 
-		txtIPAddress.setBounds(148, 52, 248, 22);
+		txtIPAddress.setBounds(148, 52, 260, 22);
 
 		ethPanel.add(txtIPAddress);
 
 		txtIPAddress.setColumns(10);
 
-		JTextField txtSubnet = new JTextField();
+		txtSubnet = new JTextField();
 
 		txtSubnet.setColumns(10);
 
-		txtSubnet.setBounds(148, 89, 248, 22);
+		txtSubnet.setBounds(148, 89, 260, 22);
 
 		ethPanel.add(txtSubnet);
 
-		JTextField txtGateway = new JTextField();
+		txtGateway = new JTextField();
 
 		txtGateway.setColumns(10);
 
-		txtGateway.setBounds(148, 126, 248, 22);
+		txtGateway.setBounds(148, 126, 260, 22);
 
 		ethPanel.add(txtGateway);
 
-		JTextField txtPeriodicity = new JTextField();
+		txtPeriodicity = new JTextField();
 
 		txtPeriodicity.setColumns(10);
 
@@ -404,34 +577,192 @@ public class VPX_AppMode extends JFrame {
 	}
 
 	private void loadUARTProperties() {
-	
-		getAvailableSerialPorts();
+
+		commModel.removeAllElements();
+
+		if (cmmPorts.size() > 0) {
+
+			for (Iterator<String> iterator = cmmPorts.iterator(); iterator.hasNext();) {
+
+				commModel.addElement(iterator.next());
+			}
+
+			cmbCOMM.setSelectedIndex(0);
+		}
+
 		txtSpeed.setText("115200");
+
 	}
 
 	private void loadETHProperties() {
 
+		nwIFModel.removeAllElements();
+
+		if (nwIFaces.size() > 0) {
+
+			for (Iterator<NWInterface> iterator = nwIFaces.iterator(); iterator.hasNext();) {
+
+				NWInterface nw = iterator.next();
+
+				nwIFModel.addElement(nw.getName());
+
+			}
+
+			cmbNWIface.setSelectedIndex(0);
+		}
 	}
-	
-	  public static HashSet<CommPortIdentifier> getAvailableSerialPorts() {
-	        HashSet<CommPortIdentifier> h = new HashSet<CommPortIdentifier>();
-	        Enumeration thePorts = CommPortIdentifier.getPortIdentifiers();
-	        while (thePorts.hasMoreElements()) {
-	            CommPortIdentifier com = (CommPortIdentifier) thePorts.nextElement();
-	            switch (com.getPortType()) {
-	            case CommPortIdentifier.PORT_SERIAL:
-	                try {
-	                    CommPort thePort = com.open("CommUtil", 50);
-	                    thePort.close();
-	                    h.add(com);
-	                } catch (PortInUseException e) {
-	                    System.out.println("Port, "  + com.getName() + ", is in use.");
-	                } catch (Exception e) {
-	                    System.err.println("Failed to open port " +  com.getName());
-	                    e.printStackTrace();
-	                }
-	            }
-	        }
-	        return h;
-	    }
+
+	private void populateETHValues(String name) {
+
+		for (Iterator<NWInterface> iterator = nwIFaces.iterator(); iterator.hasNext();) {
+
+			if (iterator.next().getName().equals(name)) {
+
+				nw = VPXUtilities.getEthernetPort(name);
+
+				txtIPAddress.setText(nw.getIpAddresses().get(0));
+
+				txtSubnet.setText(nw.getSubnet());
+
+				txtGateway.setText(nw.getGateWay());
+
+				if (nw.isConnected() && nw.isEnabled()) {
+
+					setEnabledETHs(true);
+
+				} else {
+
+					setEnabledETHs(false);
+
+					if (!nw.isEnabled()) {
+
+						String msg = name + " is disabled.Please enable and continue!";
+
+						JOptionPane.showMessageDialog(VPX_AppMode.this, msg);
+
+					} else {
+
+						if (!nw.isConnected()) {
+							String msg = name + " is not connected.Please connect and continue!";
+
+							JOptionPane.showMessageDialog(VPX_AppMode.this, msg);
+						}
+					}
+				}
+				break;
+			}
+
+		}
+	}
+
+	private void populateUARTValues(String name) {
+
+		setEnabledUARTs(true);
+	}
+
+	private void setEnabledETHs(boolean val) {
+
+		txtIPAddress.setEnabled(val);
+
+		txtSubnet.setEnabled(val);
+
+		txtGateway.setEnabled(val);
+
+		txtPeriodicity.setEnabled(val);
+
+		setLogProperties();
+
+		btnOpen.setEnabled(val);
+	}
+
+	private void setEnabledUARTs(boolean val) {
+
+		setLogProperties();
+
+		btnOpen.setEnabled(val);
+	}
+
+	private void setLogProperties() {
+
+		isLogEnabled = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_ENABLE));
+
+		chkLog.setSelected(isLogEnabled);
+
+		if (isLogEnabled) {
+			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO));
+		} else {
+			txtLogFileName.setEnabled(false);
+			btnBrowse.setEnabled(false);
+		}
+	}
+
+	private boolean updateLogSettings() {
+
+		boolean ret = false;
+
+		if (chkLog.isSelected()) {
+
+			if (txtLogFileName.getText().length() > 0) { // validation for valid
+															// filepath
+				VPXUtilities.setEnableLog(true);
+
+				VPXUtilities.updateProperties(VPXUtilities.LOG_SERIALNO, txtLogFileName.getText());
+				ret = true;
+			}
+		} else {
+			ret = true;
+		}
+
+		return ret;
+	}
+
+	private boolean isValueChanged() {
+
+		boolean retIP = false, retSub = false, retGW = false;
+
+		retIP = (nw.getIpAddresses().get(0).equals(txtIPAddress.getText().trim())) ? true : false;
+
+		retSub = (nw.getSubnet().equals(txtSubnet.getText().trim())) ? true : false;
+
+		retGW = (nw.getGateWay().equals(txtGateway.getText().trim())) ? true : false;
+
+		if (retIP && retSub && retGW)
+			return false;
+		else
+			return true;
+	}
+
+	private void openDebugWindow() {
+
+		if (updateLogSettings()) {
+
+			if (currentMode == ETHMODE) {
+
+				VPX_ETHWindow window = new VPX_ETHWindow();
+
+				if (isValueChanged()) {
+					VPXUtilities.setEthernetPort(cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
+							txtSubnet.getText(), txtGateway.getText());
+				}
+				window.setVisible(true);
+
+			} else {
+
+				updateLogSettings();
+
+				VPX_UARTWindow window = new VPX_UARTWindow();
+
+				window.setVisible(true);
+
+			}
+
+			VPX_AppMode.this.dispose();
+		} else {
+			JOptionPane.showMessageDialog(VPX_AppMode.this, "Please enter the valid log filename", "Error Log",
+					JOptionPane.ERROR_MESSAGE);
+
+			txtLogFileName.requestFocusInWindow();
+		}
+
+	}
 }

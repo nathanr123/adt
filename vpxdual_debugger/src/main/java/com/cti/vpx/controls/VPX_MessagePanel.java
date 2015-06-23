@@ -37,7 +37,7 @@ import javax.swing.text.StyledDocument;
 
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
@@ -47,7 +47,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JTextField txt_Msg_Send;
 
-	private VPX_Dual_ADT_RootWindow parent;
+	private VPX_ETHWindow parent;
 
 	private JButton btn_Msg_Send;
 
@@ -84,7 +84,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
 	 * Create the panel.
 	 */
-	public VPX_MessagePanel(VPX_Dual_ADT_RootWindow parent) {
+	public VPX_MessagePanel(VPX_ETHWindow parent) {
 		setBorder(new TitledBorder(null, "Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		this.parent = parent;

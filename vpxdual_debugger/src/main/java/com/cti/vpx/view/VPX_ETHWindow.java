@@ -46,7 +46,7 @@ import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.Pinger;
 import com.cti.vpx.util.VPXUtilities;
 
-public class VPX_Dual_ADT_RootWindow extends JFrame {
+public class VPX_ETHWindow extends JFrame {
 
 	/**
 	 * 
@@ -112,11 +112,11 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VPX_Dual_ADT_RootWindow() {
+	public VPX_ETHWindow() {
 
 		VPXUtilities.setParent(this);
 
-		promptLogFileName();
+	//	promptLogFileName();
 		
 		rBundle = VPXUtilities.getResourceBundle();
 
@@ -344,6 +344,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	private void loadSystemRootNode(VPXSystem system) {
 
+		/*
 		systemRootNode.removeAllChildren();
 
 		systemRootNode.setUserObject(system.getName());
@@ -361,7 +362,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 				systemRootNode.add(processorNode);
 			}
 		}
-
+	*/
 	}
 
 	private void updateProcessorTree(VPXSystem sys) {
@@ -381,7 +382,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		updateProcessorTree(system);
 
-		monitor.startMonitor();
+	//	monitor.startMonitor();
 
 		messagePanel.startRecieveMessage();
 
@@ -421,7 +422,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 	public void connectProcessor(Processor pro) {
 		vpx_Content_Tabbed_Pane_Right.addTab(String.format("%s(%s)", pro.getiP_Addresses(), pro.getName()),
-				new VPX_ConnectedProcessor(VPX_Dual_ADT_RootWindow.this));
+				new VPX_ConnectedProcessor(VPX_ETHWindow.this));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -451,7 +452,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			monitor.stopMonitor();
 
-			VPX_ScanWindow ir = new VPX_ScanWindow(VPX_Dual_ADT_RootWindow.this);
+			VPX_ScanWindow ir = new VPX_ScanWindow(VPX_ETHWindow.this);
 
 			ir.setVisible(true);
 
@@ -551,7 +552,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			VPX_Dual_ADT_RootWindow.this.dispose();
+			VPX_ETHWindow.this.dispose();
 
 		}
 	}
@@ -596,7 +597,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jb = new JFileChooser();
-				int i = jb.showOpenDialog(VPX_Dual_ADT_RootWindow.this);
+				int i = jb.showOpenDialog(VPX_ETHWindow.this);
 				if (i == JFileChooser.APPROVE_OPTION) {
 					String flnmae = jb.getSelectedFile().getPath();
 					if (!flnmae.endsWith(".log"))
@@ -715,6 +716,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 		@Override
 		public void run() {
+			/*
 			List<Processor> vpxSystemProcessors = VPXUtilities.getVPXSystem().getProcessors();
 
 			while (isStarted) {
@@ -733,7 +735,7 @@ public class VPX_Dual_ADT_RootWindow extends JFrame {
 
 				}
 			}
-
+			*/
 		}
 
 		public void startMonitor() {

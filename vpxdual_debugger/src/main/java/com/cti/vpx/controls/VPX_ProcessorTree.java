@@ -34,7 +34,7 @@ import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 /**
  * @author Abi_Achu
@@ -47,7 +47,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 */
 	private static final long serialVersionUID = 4220657730002684130L;
 
-	private VPX_Dual_ADT_RootWindow parent;
+	private VPX_ETHWindow parent;
 
 	private VPXSystem system;
 
@@ -91,7 +91,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	/**
 	 * @param root
 	 */
-	public VPX_ProcessorTree(VPX_Dual_ADT_RootWindow prnt, TreeNode root) {
+	public VPX_ProcessorTree(VPX_ETHWindow prnt, TreeNode root) {
 
 		super(root);
 

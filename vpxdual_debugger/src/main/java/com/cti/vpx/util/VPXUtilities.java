@@ -3,6 +3,8 @@
  */
 package com.cti.vpx.util;
 
+import gnu.io.CommPortIdentifier;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -22,13 +24,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -46,10 +51,11 @@ import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
+import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 /**
  * @author nathanr_kamal
@@ -61,7 +67,23 @@ public class VPXUtilities {
 
 	private static int scrHeight;
 
+	private final static String WIN_OSNAME = "Windows";
+
+	private final static String WIN_CMD_BASE = "netsh interface show interface";
+
 	private static final String MSG = "VPX_Dual_adt";
+
+	private static final String RUNASADMIN = "elevate ";
+
+	private static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+
+	private static final String NAME_PATTERN = "^[a-zA-Z\\d-_]+$";
+	
+	private static final Pattern ipPattern = Pattern.compile(IPADDRESS_PATTERN);
+	
+	private static final Pattern namePattern = Pattern.compile(NAME_PATTERN);
 
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(MSG);
 
@@ -87,7 +109,7 @@ public class VPXUtilities {
 
 	public static final String LOG_MAXFILESIZE = "log.maxfilesize";
 
-//	public static final String LOG_FILEPATH = "log.filepath";
+	// public static final String LOG_FILEPATH = "log.filepath";
 
 	public static final String LOG_FILEFORMAT = "log.fileformat";
 
@@ -109,7 +131,7 @@ public class VPXUtilities {
 
 	private static VPXSystem vpxSystem = new VPXSystem();
 
-	private static VPX_Dual_ADT_RootWindow parent;
+	private static VPX_ETHWindow parent;
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -185,16 +207,16 @@ public class VPXUtilities {
 		String str = "";
 
 		if (elapsedDays > 0) {
-			str += elapsedDays + "days";
+			str += elapsedDays + "days ";
 		}
 		if (elapsedHours > 0) {
-			str += elapsedHours + " hours";
+			str += elapsedHours + " hours ";
 		}
 		if (elapsedMinutes > 0) {
-			str += elapsedMinutes + " minutes";
+			str += elapsedMinutes + " minutes ";
 		}
 		if (elapsedSeconds > 0) {
-			str += elapsedSeconds + " seconds";
+			str += elapsedSeconds + " seconds ";
 		}
 		if (elapsedMilliSeconds > 0) {
 			str += elapsedMilliSeconds + "  milli seconds ";
@@ -203,7 +225,7 @@ public class VPXUtilities {
 		return str;
 	}
 
-	public static void setParent(VPX_Dual_ADT_RootWindow prnt) {
+	public static void setParent(VPX_ETHWindow prnt) {
 		parent = prnt;
 	}
 
@@ -331,18 +353,16 @@ public class VPXUtilities {
 	public static Processor getSelectedProcessor(String path) {
 
 		Processor pros = null;
-
-		List<Processor> ps = VPXUtilities.getVPXSystem().getProcessors();
-
-		for (Iterator<Processor> iterator = ps.iterator(); iterator.hasNext();) {
-			Processor processor = iterator.next();
-			if (path.startsWith(processor.getiP_Addresses())) {
-				pros = processor;
-				break;
-			}
-
-		}
-
+		/*
+		 * List<Processor> ps = VPXUtilities.getVPXSystem().getProcessors();
+		 * 
+		 * for (Iterator<Processor> iterator = ps.iterator();
+		 * iterator.hasNext();) { Processor processor = iterator.next(); if
+		 * (path.startsWith(processor.getiP_Addresses())) { pros = processor;
+		 * break; }
+		 * 
+		 * }
+		 */
 		return pros;
 	}
 
@@ -467,6 +487,16 @@ public class VPXUtilities {
 
 	public static boolean isLogEnabled() {
 		return isLogEnabled;
+	}
+
+	public static boolean isValidIP(String ip) {
+
+		return ipPattern.matcher(ip.trim()).matches();
+	}
+	
+	public static boolean isValidName(String name) {
+
+		return namePattern.matcher(name.trim()).matches();
 	}
 
 	public static void updateProperties(String key, String value) {
@@ -671,6 +701,285 @@ public class VPXUtilities {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static List<String> getSerialPorts() {
+
+		List<String> portList = new ArrayList<String>();
+
+		Enumeration<CommPortIdentifier> thePorts = CommPortIdentifier.getPortIdentifiers();
+
+		while (thePorts.hasMoreElements()) {
+
+			CommPortIdentifier com = (CommPortIdentifier) thePorts.nextElement();
+
+			switch (com.getPortType()) {
+
+			case CommPortIdentifier.PORT_SERIAL:
+
+				portList.add(com.getName());
+
+			}
+		}
+
+		return portList;
+	}
+
+	public static String getNetworkSettings(String lanName) {
+
+		String ipAddress = null;
+
+		String subnet = null;
+
+		String gateway = null;
+
+		String s = null;
+
+		boolean isAlreadyIPDone = false;
+
+		boolean isAlreadySubDone = false;
+
+		try {
+
+			String cmd = "netsh interface IP show addresses \"" + lanName + "\"";
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+
+				if (s.contains("IP Address:") && (!isAlreadyIPDone)) {
+
+					ipAddress = s.split(":")[1].trim();
+
+					isAlreadyIPDone = true;
+				}
+
+				if (s.contains("Subnet") && (!isAlreadySubDone)) {
+
+					subnet = (s.split(":")[1].trim());
+
+					String d = subnet.split(" ")[2].trim();
+
+					subnet = d.substring(0, d.length() - 1);
+
+					isAlreadyIPDone = true;
+				}
+				if (s.contains("Default")) {
+
+					gateway = s.split(":")[1].trim();
+
+				}
+
+			}
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		ipAddress = (ipAddress != null) ? ipAddress : " ";
+		subnet = (subnet != null) ? subnet : " ";
+		gateway = (gateway != null) ? gateway : " ";
+
+		return ipAddress + "," + subnet + "," + gateway;
+	}
+
+	public static List<NWInterface> getEthernetPorts() {
+
+		List<NWInterface> nwIfaces = new ArrayList<NWInterface>();
+		String s;
+		List<String> nwIface = new ArrayList<String>();
+
+		boolean isLeft = false;
+
+		int j = 0;
+
+		try {
+			String os = System.getProperty("os.name");
+
+			if (os.startsWith(WIN_OSNAME)) {
+
+				Process p = Runtime.getRuntime().exec(WIN_CMD_BASE);
+
+				BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+				// reading output stream of the command
+				while ((s = inputStream.readLine()) != null) {
+					if (isLeft) {
+						String[] ss = s.split("  ");
+						for (int i = 0; i < ss.length; i++) {
+							if (ss[i].trim().length() > 0) {
+								nwIface.add(ss[i].trim());
+							}
+						}
+					}
+					if (s.startsWith("----"))
+						isLeft = true;
+				}
+
+				s = null;
+
+				inputStream.close();
+
+				NWInterface ifs = null;
+
+				for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
+					String string = iterator.next();
+
+					switch (j) {
+					case 0:
+						ifs = null;
+						ifs = new NWInterface();
+						ifs.setEnabled(string.equals("Enabled"));
+						break;
+					case 1:
+						ifs.setConnected(string.equals("Connected"));
+						break;
+					case 2:
+						ifs.setDedicated(string.equals("Dedicated"));
+						break;
+					case 3:
+						ifs.setName(string);
+						// String[] sss = getNetworkSettings(string).split(",");
+						// ifs.addIPAddress(sss[0]);
+						// ifs.setSubnet(sss[1]);
+						// ifs.setGateWay(sss[2]);
+						nwIfaces.add(ifs);
+						j = -1;
+						break;
+					}
+
+					j++;
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return nwIfaces;
+	}
+
+	public static boolean setEthernetPort(String lan, String ip, String subnet, String gateway) {
+
+		try {
+
+			String cmd = RUNASADMIN + "netsh interface ip set address \"" + lan
+
+			+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
+
+			Process pp = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pp.getInputStream()));
+
+			String s = "";
+
+			while ((s = stdInput.readLine()) != null) {
+				System.out.println(s);
+			}
+
+			BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
+
+			while ((s = stderr.readLine()) != null) {
+				System.out.println(s);
+			}
+
+			return true;
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			return false;
+		}
+
+	}
+
+	public static NWInterface getEthernetPort(String name) {
+
+		String s;
+
+		List<String> nwIface = new ArrayList<String>();
+
+		NWInterface nw = null;
+
+		boolean isLeft = false;
+
+		int j = 0;
+
+		try {
+			String os = System.getProperty("os.name");
+
+			if (os.startsWith(WIN_OSNAME)) {
+
+				Process p = Runtime.getRuntime().exec(WIN_CMD_BASE);
+
+				BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+				// reading output stream of the command
+				while ((s = inputStream.readLine()) != null) {
+					if (isLeft) {
+						String[] ss = s.split("  ");
+						for (int i = 0; i < ss.length; i++) {
+							if (ss[i].trim().length() > 0) {
+								nwIface.add(ss[i].trim());
+							}
+						}
+					}
+					if (s.startsWith("----"))
+						isLeft = true;
+				}
+
+				s = null;
+
+				inputStream.close();
+
+				NWInterface ifs = null;
+
+				for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
+					String string = iterator.next();
+
+					switch (j) {
+					case 0:
+						ifs = null;
+						ifs = new NWInterface();
+						ifs.setEnabled(string.equals("Enabled"));
+						break;
+					case 1:
+						ifs.setConnected(string.equals("Connected"));
+						break;
+					case 2:
+						ifs.setDedicated(string.equals("Dedicated"));
+						break;
+					case 3:
+
+						if (string.equals(name)) {
+
+							ifs.setName(string);
+
+							String[] sss = getNetworkSettings(string).split(",");
+
+							ifs.addIPAddress(sss[0]);
+
+							ifs.setSubnet(sss[1]);
+
+							ifs.setGateWay(sss[2]);
+
+							nw = ifs;
+						}
+						j = -1;
+						break;
+					}
+
+					j++;
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return nw;
 	}
 
 }

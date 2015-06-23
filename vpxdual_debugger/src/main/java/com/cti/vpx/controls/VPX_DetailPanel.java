@@ -106,6 +106,7 @@ public class VPX_DetailPanel extends JDialog {
 
 	private void loadProperties(VPXSystem sys) {
 
+		/*
 		tbl_Property_Model.addRow(new String[] { "Name", sys.getName() });
 
 		List<Processor> processors = sys.getProcessors();
@@ -131,7 +132,7 @@ public class VPX_DetailPanel extends JDialog {
 
 			}
 		}
-
+	*/
 	}
 
 	private void loadProperties(Processor processor) {

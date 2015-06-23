@@ -34,7 +34,7 @@ import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXTCPConnector;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_ScanWindow extends JDialog {
 
@@ -49,12 +49,12 @@ public class VPX_ScanWindow extends JDialog {
 
 	private JTextField txt_To_IP;
 
-	private VPX_Dual_ADT_RootWindow parent;
+	private VPX_ETHWindow parent;
 
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_ScanWindow(VPX_Dual_ADT_RootWindow parent) {
+	public VPX_ScanWindow(VPX_ETHWindow parent) {
 
 		super(parent);
 
@@ -433,8 +433,7 @@ public class VPX_ScanWindow extends JDialog {
 
 			private void parseCMD(String ip, ATPCommand cmd) {
 
-				vpxSystem.addProcessor(new Processor(ip, VPXUtilities
-						.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
+				//vpxSystem.addProcessor(new Processor(ip, VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
 
 			}
 

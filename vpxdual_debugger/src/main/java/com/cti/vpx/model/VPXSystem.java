@@ -16,7 +16,7 @@ public class VPXSystem implements VPX {
 
 	private String name;
 
-	private List<Processor> processors;
+	private List<VPXSubSystem> subsystem;
 
 	public VPXSystem() {
 		this.name = this.getClass().getSimpleName();
@@ -31,20 +31,20 @@ public class VPXSystem implements VPX {
 		this.name = name;
 	}
 
-	public List<Processor> getProcessors() {
-		return processors;
+	/**
+	 * @return the subsystem
+	 */
+	public List<VPXSubSystem> getSubsystem() {
+		return subsystem;
 	}
 
+	/**
+	 * @param subsystem
+	 *            the subsystem to set
+	 */
 	@XmlElement
-	public void setProcessors(List<Processor> processors) {
-		this.processors = processors;
+	public void setSubsystem(List<VPXSubSystem> subsystem) {
+		this.subsystem = subsystem;
 	}
 
-	public void addProcessor(Processor porcessor) {
-		if (processors == null) {
-			processors = new ArrayList<Processor>();
-		}
-
-		processors.add(porcessor);
-	}
 }

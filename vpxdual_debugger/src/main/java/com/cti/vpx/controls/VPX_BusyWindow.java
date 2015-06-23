@@ -16,7 +16,7 @@ import net.miginfocom.swing.MigLayout;
 
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_BusyWindow extends JDialog {
 
@@ -33,7 +33,7 @@ public class VPX_BusyWindow extends JDialog {
 
 	private JLabel lbl_Detecting_Processor;
 
-	private VPX_Dual_ADT_RootWindow parent;
+	private VPX_ETHWindow parent;
 
 	private String title;
 	
@@ -42,7 +42,7 @@ public class VPX_BusyWindow extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_BusyWindow(VPX_Dual_ADT_RootWindow parent, String title, String msg) {
+	public VPX_BusyWindow(VPX_ETHWindow parent, String title, String msg) {
 
 		super(parent);
 

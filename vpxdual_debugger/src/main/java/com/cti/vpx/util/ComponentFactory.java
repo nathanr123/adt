@@ -32,7 +32,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.tree.TreeNode;
 
 import com.cti.vpx.controls.VPX_ProcessorTree;
-import com.cti.vpx.view.VPX_Dual_ADT_RootWindow;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 /**
  * @author nathanr_kamal
@@ -140,7 +140,7 @@ public class ComponentFactory {
 		return new JCheckBox(text);
 	}
 
-	public static VPX_ProcessorTree createProcessorTree(VPX_Dual_ADT_RootWindow parent, TreeNode root) {
+	public static VPX_ProcessorTree createProcessorTree(VPX_ETHWindow parent, TreeNode root) {
 		return new VPX_ProcessorTree(parent, root);
 	}
 
