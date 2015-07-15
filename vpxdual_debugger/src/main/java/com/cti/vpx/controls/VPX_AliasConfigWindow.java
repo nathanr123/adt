@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +31,10 @@ import javax.swing.event.ListSelectionListener;
 
 import com.cti.vpx.model.AliasTableModel;
 import com.cti.vpx.model.VPXSubSystem;
+import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_AliasConfigWindow extends JFrame {
 
@@ -63,6 +67,8 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 	private AliasTableModel aliasTableModel = new AliasTableModel();
 
+	private VPX_ETHWindow parent;
+
 	private VPXSubSystem currentSubSystem = null;
 
 	/**
@@ -72,6 +78,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					VPX_AliasConfigWindow frame = new VPX_AliasConfigWindow();
 					frame.setVisible(true);
@@ -91,6 +98,24 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		loadComponents();
 
+		centerFrame();
+
+		loadAliasFile();
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public VPX_AliasConfigWindow(VPX_ETHWindow prnt) {
+
+		this.parent = prnt;
+
+		init();
+
+		loadComponents();
+
+		centerFrame();
+
 		loadAliasFile();
 	}
 
@@ -102,7 +127,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setBounds(100, 100, 600, 475);
+		setBounds(100, 100, 600, 523);
 
 		contentPane = new JPanel();
 
@@ -119,7 +144,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		detailPanel.setBorder(new TitledBorder(null, "Detail", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		detailPanel.setPreferredSize(new Dimension(10, 175));
+		detailPanel.setPreferredSize(new Dimension(10, 210));
 
 		contentPane.add(detailPanel, BorderLayout.SOUTH);
 
@@ -135,13 +160,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		JLabel lblName = new JLabel("Alias Name");
 
-		lblName.setBounds(15, 19, 108, 20);
+		lblName.setBounds(15, 21, 108, 20);
 
 		dataPanel.add(lblName);
 
 		txtAliasName = new JTextField();
 
-		txtAliasName.setBounds(133, 19, 286, 20);
+		txtAliasName.setBounds(133, 21, 286, 20);
 
 		dataPanel.add(txtAliasName);
 
@@ -149,13 +174,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		JLabel lblP2020 = new JLabel("P2020 IP");
 
-		lblP2020.setBounds(15, 52, 108, 20);
+		lblP2020.setBounds(15, 62, 108, 20);
 
 		dataPanel.add(lblP2020);
 
 		txtP2020 = new JTextField();
 
-		txtP2020.setBounds(133, 52, 215, 20);
+		txtP2020.setBounds(133, 62, 215, 20);
 
 		dataPanel.add(txtP2020);
 
@@ -163,13 +188,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		JLabel lblDSP1 = new JLabel("DSP1 IP");
 
-		lblDSP1.setBounds(15, 85, 108, 20);
+		lblDSP1.setBounds(15, 103, 108, 20);
 
 		dataPanel.add(lblDSP1);
 
 		txtDSP1 = new JTextField();
 
-		txtDSP1.setBounds(133, 85, 215, 20);
+		txtDSP1.setBounds(133, 103, 215, 20);
 
 		txtDSP1.setColumns(10);
 
@@ -177,13 +202,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		JLabel lblDSP2 = new JLabel("DSP2 IP");
 
-		lblDSP2.setBounds(15, 118, 108, 20);
+		lblDSP2.setBounds(15, 144, 108, 20);
 
 		dataPanel.add(lblDSP2);
 
 		txtDSP2 = new JTextField();
 
-		txtDSP2.setBounds(133, 118, 215, 20);
+		txtDSP2.setBounds(133, 144, 215, 20);
 
 		txtDSP2.setColumns(10);
 
@@ -215,15 +240,21 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		controlPanel.add(btnUpdate);
 
+		JButton btnClearAll = ComponentFactory.createJButton(new DeleteAliasFileAction("Clear All"));
+
+		btnClearAll.setBounds(10, 93, 116, 23);
+
+		controlPanel.add(btnClearAll);
+
 		JButton btnReset = ComponentFactory.createJButton(new ResetAliasAction("Reset"));
 
-		btnReset.setBounds(10, 93, 116, 23);
+		btnReset.setBounds(10, 122, 116, 23);
 
 		controlPanel.add(btnReset);
 
 		JButton btnSave = ComponentFactory.createJButton(new SaveAliasAction("Save"));
 
-		btnSave.setBounds(10, 122, 116, 23);
+		btnSave.setBounds(10, 154, 116, 23);
 
 		controlPanel.add(btnSave);
 
@@ -240,8 +271,11 @@ public class VPX_AliasConfigWindow extends JFrame {
 		aliasPanel.add(aliasTableScrollPanel, BorderLayout.CENTER);
 
 		alaisTable = new JTable();
+
 		alaisTable.setShowVerticalLines(false);
+
 		alaisTable.setShowHorizontalLines(false);
+
 		alaisTable.setShowGrid(false);
 
 		alaisTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -304,7 +338,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		aliasTableScrollPanel.getViewport().setBackground(Color.WHITE);
 
-		loadToolBar();
+		// loadToolBar();
 	}
 
 	private void loadToolBar() {
@@ -324,7 +358,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 	}
 
 	private void loadAliasFile() {
-		aliasTableModel.addSubSystem(VPXUtilities.readFromXMLFile().getSubsystem());
+
+		VPXSystem sub = VPXUtilities.readFromXMLFile();
+
+		if (sub != null) {
+
+			aliasTableModel.addSubSystem(sub.getSubsystem());
+		}
 	}
 
 	private void addorSaveSubSystem() {
@@ -357,7 +397,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 			currentSubSystem.setIpDSP2(txtDSP2.getText());
 
-			int val = isSubsystemAvailable(currentSubSystem);
+			int val = isSubsystemAvailable();
 
 			if (val < SUBSYSTEMAVAILBLE) {
 
@@ -394,13 +434,29 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 			} else {
 
-				if (ismodify)
+				if (ismodify) {
 
-					aliasTableModel.modifySubSystem(currentSubSystem);
+					if (aliasTableModel.modifySubSystem(currentSubSystem)) {
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
+								+ " updated successfully!");
+					} else {
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in modifying "
+								+ currentSubSystem.getSubSystem(), "Updating", JOptionPane.ERROR_MESSAGE);
+					}
+				}
 
 				else {
 
-					aliasTableModel.addSubSystem(currentSubSystem);
+					if (aliasTableModel.addSubSystem(currentSubSystem)) {
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
+								+ " added successfully!");
+					} else {
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
+								"Error in adding " + currentSubSystem.getSubSystem(), "Adding",
+								JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		} else {
@@ -442,7 +498,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 		txtDSP2.setText(currentSubSystem.getIpDSP2());
 	}
 
-	private int isSubsystemAvailable(VPXSubSystem sub) {
+	private int isSubsystemAvailable() {
 
 		int ret = SUBSYSTEMAVAILBLE;
 
@@ -452,31 +508,49 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 			VPXSubSystem vpxSubSystem = iterator.next();
 
-			if (currentSubSystem.getSubSystem().equals(vpxSubSystem.getSubSystem())) {
+			if (vpxSubSystem.getId() != currentSubSystem.getId()) {
 
-				ret = SUBNAMEAVAILBLE;
+				if (currentSubSystem.getSubSystem().equals(vpxSubSystem.getSubSystem())) {
 
-			} else if (currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpP2020())
-					|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP1())
-					|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP2())) {
+					ret = SUBNAMEAVAILBLE;
 
-				ret = P2020AVAILBLE;
+				} else if (currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpP2020())
+						|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP1())
+						|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP2())) {
 
-			} else if (currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpP2020())
-					|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP1())
-					|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP2())) {
+					ret = P2020AVAILBLE;
 
-				ret = DSP1AVAILBLE;
+				} else if (currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpP2020())
+						|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP1())
+						|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP2())) {
 
-			} else if (currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpP2020())
-					|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP1())
-					|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP2())) {
+					ret = DSP1AVAILBLE;
 
-				ret = DSP2AVAILBLE;
+				} else if (currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpP2020())
+						|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP1())
+						|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP2())) {
+
+					ret = DSP2AVAILBLE;
+				}
 			}
 		}
 
 		return ret;
+	}
+
+	private void centerFrame() {
+
+		Dimension windowSize = getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
 	}
 
 	public class AddAliasAction extends AbstractAction {
@@ -526,7 +600,25 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			aliasTableModel.deleteSubSystem(currentSubSystem.getId());
+
+			String sub = currentSubSystem.getSubSystem();
+
+			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want delete " + sub + " ?",
+					"Confirmation", JOptionPane.YES_NO_OPTION);
+
+			if (option == JOptionPane.YES_OPTION) {
+
+				if (currentSubSystem != null)
+
+					if (aliasTableModel.deleteSubSystem(currentSubSystem.getId())) {
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, sub + " deleted successfully!");
+					} else {
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting " + sub,
+								"Deletion", JOptionPane.ERROR_MESSAGE);
+					}
+			}
+
 		}
 	}
 
@@ -552,8 +644,18 @@ public class VPX_AliasConfigWindow extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			if (currentSubSystem != null)
-				addorSaveSubSystem();
+			String sub = currentSubSystem.getSubSystem();
+
+			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want update " + sub + " ?",
+					"Confirmation", JOptionPane.YES_NO_OPTION);
+
+			if (option == JOptionPane.YES_OPTION) {
+
+				if (currentSubSystem != null)
+
+					addorSaveSubSystem();
+
+			}
 		}
 	}
 
@@ -604,7 +706,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			
 			VPXUtilities.writeToXMLFile(aliasTableModel.getSubSystem());
+
+			parent.updateProcessorTree();
+
+			VPX_AliasConfigWindow.this.dispose();
+
 		}
 	}
 
@@ -654,7 +762,13 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			if (VPXUtilities.writetoXLSFile(aliasTableModel.getSubSystem())) {
 
+				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Exported successfully!");
+			} else {
+				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in Exporting ", "Export VPX System",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -679,8 +793,23 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want delete all ?",
+					"Confirmation", JOptionPane.YES_NO_OPTION);
 
+			if (option == JOptionPane.YES_OPTION) {
+
+				if (VPXUtilities.deleteXMLFile()) {
+
+					aliasTableModel.clearAllSubSystem();
+
+					JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Deleted successfully!");
+
+				} else {
+
+					JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting ", "Deletion",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
-
 }

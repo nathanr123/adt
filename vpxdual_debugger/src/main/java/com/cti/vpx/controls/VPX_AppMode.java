@@ -738,13 +738,12 @@ public class VPX_AppMode extends JFrame {
 
 			if (currentMode == ETHMODE) {
 
-				VPX_ETHWindow window = new VPX_ETHWindow();
-
 				if (isValueChanged()) {
 					VPXUtilities.setEthernetPort(cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
 							txtSubnet.getText(), txtGateway.getText());
+
+					VPX_ETHWindow window = new VPX_ETHWindow();
 				}
-				window.setVisible(true);
 
 			} else {
 

@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -47,6 +46,12 @@ import javax.xml.bind.Unmarshaller;
 
 import javolution.io.Struct.Enum32;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
@@ -54,6 +59,7 @@ import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
+import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -80,9 +86,9 @@ public class VPXUtilities {
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private static final String NAME_PATTERN = "^[a-zA-Z\\d-_]+$";
-	
+
 	private static final Pattern ipPattern = Pattern.compile(IPADDRESS_PATTERN);
-	
+
 	private static final Pattern namePattern = Pattern.compile(NAME_PATTERN);
 
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(MSG);
@@ -129,9 +135,15 @@ public class VPXUtilities {
 
 	private static boolean isLogEnabled = false;
 
-	private static VPXSystem vpxSystem = new VPXSystem();
+	private static VPXSystem vpxSystem = null;// new VPXSystem();
 
 	private static VPX_ETHWindow parent;
+
+	private static String currentProcessor = "";
+
+	private static String currentSubSystem = "";
+
+	private static String currentProcType = "";
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -320,6 +332,9 @@ public class VPXUtilities {
 	}
 
 	public static VPXSystem getVPXSystem() {
+
+		vpxSystem = readFromXMLFile();
+
 		return vpxSystem;
 	}
 
@@ -413,6 +428,59 @@ public class VPXUtilities {
 
 	}
 
+	public static boolean writetoXLSFile(VPXSystem system) {
+
+		File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
+
+		if (!folder.exists()) {
+
+			folder.mkdir();
+		}
+
+		String FILE_PATH = resourceBundle.getString("Scan.processor.data.path") + "\\" + system.getName() + ".xls";
+
+		Workbook workbook = new XSSFWorkbook();
+
+		Sheet subsystemSheet = workbook.createSheet(system.getName());
+
+		List<VPXSubSystem> subSystems = system.getSubsystem();
+
+		int rowIndex = 0;
+
+		for (VPXSubSystem subsystem : subSystems) {
+
+			Row row = subsystemSheet.createRow(rowIndex++);
+
+			int cellIndex = 0;
+
+			row.createCell(cellIndex++).setCellValue(subsystem.getId());
+
+			row.createCell(cellIndex++).setCellValue(subsystem.getSubSystem());
+
+			row.createCell(cellIndex++).setCellValue(subsystem.getIpP2020());
+
+			row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP1());
+
+			row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP2());
+
+		}
+
+		try {
+
+			FileOutputStream fos = new FileOutputStream(FILE_PATH);
+
+			workbook.write(fos);
+
+			fos.close();
+
+			return true;
+
+		} catch (Exception e) {
+			return false;
+		}
+
+	}
+
 	public static void writeProperties() {
 		OutputStream output = null;
 		try {
@@ -493,7 +561,7 @@ public class VPXUtilities {
 
 		return ipPattern.matcher(ip.trim()).matches();
 	}
-	
+
 	public static boolean isValidName(String name) {
 
 		return namePattern.matcher(name.trim()).matches();
@@ -542,6 +610,27 @@ public class VPXUtilities {
 		return properties;
 	}
 
+	public static boolean deleteXMLFile() {
+
+		try {
+
+			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+					+ resourceBundle.getString("Scan.processor.data.xml"));
+
+			if (file.exists()) {
+
+				file.delete();
+			}
+
+			return true;
+
+		} catch (Exception e) {
+
+			return false;
+		}
+
+	}
+
 	public static VPXSystem readFromXMLFile() {
 
 		VPXSystem cag = null;
@@ -557,13 +646,101 @@ public class VPXUtilities {
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
 				cag = (VPXSystem) jaxbUnmarshaller.unmarshal(file);
-			}
+			} else
+				cag = new VPXSystem();
 
 		} catch (JAXBException e) {
+
 			e.printStackTrace();
 		}
 
 		return cag;
+	}
+
+	public static VPXSystem readFromXLSFile() {
+
+		String FILE_PATH = "data\\VPXSystem.xls";
+
+		VPXSystem vpx = new VPXSystem();
+
+		List<VPXSubSystem> subsystems = new ArrayList<VPXSubSystem>();
+
+		FileInputStream fis = null;
+
+		try {
+			fis = new FileInputStream(FILE_PATH);
+
+			Workbook workbook = new XSSFWorkbook(fis);
+
+			int numberOfSheets = workbook.getNumberOfSheets();
+
+			for (int i = 0; i < numberOfSheets; i++) {
+
+				Sheet sheet = workbook.getSheetAt(i);
+
+				Iterator<Row> rowIterator = sheet.iterator();
+
+				while (rowIterator.hasNext()) {
+
+					VPXSubSystem subsystem = new VPXSubSystem();
+
+					Row row = rowIterator.next();
+
+					Iterator<Cell> cellIterator = row.cellIterator();
+
+					while (cellIterator.hasNext()) {
+
+						Cell cell = cellIterator.next();
+
+						switch (cell.getColumnIndex()) {
+						case 0:
+
+							subsystem.setId((int) cell.getNumericCellValue());
+
+							break;
+
+						case 1:
+
+							subsystem.setSubSystem(cell.getStringCellValue());
+
+							break;
+
+						case 2:
+
+							subsystem.setIpP2020(cell.getStringCellValue());
+
+							break;
+
+						case 3:
+
+							subsystem.setIpDSP1(cell.getStringCellValue());
+
+							break;
+
+						case 4:
+
+							subsystem.setIpDSP2(cell.getStringCellValue());
+
+							break;
+						}
+
+					}
+
+					subsystems.add(subsystem);
+				}
+
+			}
+
+			fis.close();
+
+			vpx.setSubsystem(subsystems);
+
+			return vpx;
+
+		} catch (Exception e) {
+			return null;
+		}
+
 	}
 
 	public static String[] parseBuffertoString(byte[] buffer) {
@@ -980,6 +1157,57 @@ public class VPXUtilities {
 		}
 
 		return nw;
+	}
+
+	/**
+	 * @return the currentProcessor
+	 */
+	public static String getCurrentProcessor() {
+		return currentProcessor;
+	}
+
+	/**
+	 * @return the currentSubSystem
+	 */
+	public static String getCurrentSubSystem() {
+		return currentSubSystem;
+	}
+
+	/**
+	 * @param currentSubSystem
+	 *            the currentSubSystem to set
+	 */
+	public static void setCurrentSubSystem(String currentSubSystem) {
+		VPXUtilities.currentSubSystem = currentSubSystem;
+	}
+
+	/**
+	 * @return the currentProcType
+	 */
+	public static String getCurrentProcType() {
+		return currentProcType;
+	}
+
+	/**
+	 * @param currentProcType
+	 *            the currentProcType to set
+	 */
+	public static void setCurrentProcType(String currentProcType) {
+		VPXUtilities.currentProcType = currentProcType;
+	}
+
+	/**
+	 * @param currentProcessor
+	 *            the currentProcessor to set
+	 */
+	public static void setCurrentProcessor(String sub, String procType, String currentProcessor) {
+
+		VPXUtilities.currentSubSystem = sub;
+
+		VPXUtilities.currentProcessor = currentProcessor;
+
+		VPXUtilities.currentProcType = procType;
+
 	}
 
 }

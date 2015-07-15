@@ -16,7 +16,7 @@ public class VPXSystem implements VPX {
 
 	private String name;
 
-	private List<VPXSubSystem> subsystem;
+	private List<VPXSubSystem> subsystem = new ArrayList<VPXSubSystem>();
 
 	public VPXSystem() {
 		this.name = this.getClass().getSimpleName();

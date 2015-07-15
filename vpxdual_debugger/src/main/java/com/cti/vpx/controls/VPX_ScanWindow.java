@@ -17,7 +17,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
@@ -29,7 +28,6 @@ import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 
 import com.cti.vpx.command.ATPCommand;
-import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXTCPConnector;
@@ -255,7 +253,7 @@ public class VPX_ScanWindow extends JDialog {
 							try {
 								VPXSystem vpx = (VPXSystem) scan.get();
 
-								parent.reloadProcessorTree(vpx);
+								//parent.reloadProcessorTree(vpx);
 
 								parent.updateLog("Scanning Completed.");
 

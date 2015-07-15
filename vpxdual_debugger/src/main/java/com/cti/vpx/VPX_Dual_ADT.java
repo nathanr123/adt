@@ -27,12 +27,11 @@ public class VPX_Dual_ADT {
 						new VPX_SplashWindow();
 						
 					} else {
+						//VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
 
-						//VPX_Dual_ADT_RootWindow window = new VPX_Dual_ADT_RootWindow();
+						VPX_ETHWindow window = new VPX_ETHWindow();
 						
-						VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
-
-						window.setVisible(true);
+						//window.setVisible(true);
 					}
 
 				} catch (Exception e) {

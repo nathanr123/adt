@@ -8,12 +8,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.EventObject;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -22,6 +28,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
@@ -32,6 +39,8 @@ import javax.swing.tree.TreeNode;
 
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATPCommand;
+import com.cti.vpx.model.VPX;
+import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -49,7 +58,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private VPX_ETHWindow parent;
 
-	private VPXSystem system;
+	private VPXSystem system = new VPXSystem();
+
+	private static DefaultMutableTreeNode systemRootNode = new DefaultMutableTreeNode();
+
+	private ProcessorMonitorThread monitor = new ProcessorMonitorThread();
+
+	private ProcessorAdvertisementReceiver advRecvr = new ProcessorAdvertisementReceiver();
 
 	/**
 	 * 
@@ -101,6 +116,22 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	/**
+	 * @param prnt
+	 */
+	public VPX_ProcessorTree(VPX_ETHWindow prnt) {
+
+		super(systemRootNode);
+
+		this.parent = prnt;
+
+		initTree();
+
+		loadSystemRootNode();
+
+		startRecieveMessage();
+	}
+
+	/**
 	 * @param newModel
 	 */
 	public VPX_ProcessorTree(TreeModel newModel) {
@@ -123,6 +154,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void initTree() {
 
+		system = VPXUtilities.getVPXSystem();
+
 		addMouseListener(this);
 
 		setCellRenderer(new VPX_ProcessorTreeCellRenderer());
@@ -135,6 +168,232 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	public void setVPXSystem(VPXSystem sys) {
 		this.system = sys;
+
+		loadSystemRootNode();
+
+		for (int i = 0; i < getRowCount(); i++) {
+			expandRow(i);
+		}
+	}
+
+	public void updateVPXSystemTree() {
+		this.system = VPXUtilities.getVPXSystem();
+
+		loadSystemRootNode();
+
+		for (int i = 0; i < getRowCount(); i++) {
+			expandRow(i);
+		}
+	}
+
+	public boolean isSubSystemsAvailable() {
+
+		return (system.getSubsystem().size() > 0);
+	}
+
+	private String getNodeUserObject(String name, boolean isAlive, boolean isWaterfall, boolean isAmplitude) {
+
+		String sub = "<html>";
+		if (isAlive) {
+			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
+			if (isWaterfall) {
+				sub = sub + "<font face='Tahoma' size='2' color='green'>W</font>" + "&nbsp;&nbsp;";
+			} else {
+				sub = sub + "<font face='Tahoma' size='2' color='red'>W</font>" + "&nbsp;&nbsp;";
+			}
+			if (isAmplitude) {
+				sub = sub + "<font face='Tahoma' size='2' color='green'>A</font>" + "&nbsp;&nbsp;";
+			} else {
+				sub = sub + "<font face='Tahoma' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
+			}
+		} else {
+
+			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + name + "</font>" + "&nbsp;&nbsp;";
+
+			sub = sub + "<font face='Tahoma' size='2' color='red'>W</font>" + "&nbsp;&nbsp;";
+
+			sub = sub + "<font face='Tahoma' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
+		}
+
+		sub = sub + "</html>";
+
+		return sub;
+	}
+
+	private void updateProcessorResponse(String ip, String res) {
+		System.out.println(res);
+	}
+
+	private String getNodeUserObject(String name, boolean isAlive) {
+
+		String sub = "<html>";
+		if (isAlive) {
+			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
+
+		} else {
+			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + name + "</font>" + "&nbsp;&nbsp;";
+		}
+
+		sub = sub + "</html>";
+
+		return sub;
+	}
+
+	private void loadSystemRootNode() {
+
+		systemRootNode.removeAllChildren();
+
+		systemRootNode.setUserObject(system.getName());
+
+		List<VPXSubSystem> subSystems = system.getSubsystem();
+
+		if (subSystems != null) {
+			for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem subSystem = iterator.next();
+
+				DefaultMutableTreeNode subSystemNode = new DefaultMutableTreeNode(subSystem.getSubSystem());
+
+				DefaultMutableTreeNode ipNode1 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getP2020Name(),
+						true));
+
+				DefaultMutableTreeNode ipNode2 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP1Name(),
+						true, false, true));
+				DefaultMutableTreeNode ipNode3 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP2Name(),
+						true, true, false));
+
+				subSystemNode.add(ipNode1);
+
+				subSystemNode.add(ipNode2);
+
+				subSystemNode.add(ipNode3);
+
+				systemRootNode.add(subSystemNode);
+			}
+		}
+
+		for (int i = 0; i < getRowCount(); i++) {
+			expandRow(i);
+		}
+
+		updateUI();
+
+	}
+
+	class ProcessorAdvertisementReceiver extends SwingWorker<Void, String> {
+
+		DatagramSocket serverSocket;
+
+		byte[] receiveData = new byte[1024];
+
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+		public ProcessorAdvertisementReceiver() {
+			try {
+				serverSocket = new DatagramSocket(VPX.ADV_PORTNO);
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			while (true) {
+				serverSocket.receive(receivePacket);
+
+				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
+
+				updateProcessorResponse(receivePacket.getAddress().getHostAddress(), sentence);
+
+				Thread.sleep(500);
+			}
+		}
+
+		@Override
+		protected void process(List<String> chunks) {
+			// TODO Auto-generated method stub
+			super.process(chunks);
+		}
+
+	}
+
+	class ProcessorMonitorThread implements Runnable {
+
+		Thread th;
+
+		private boolean isStarted = true;
+
+		public ProcessorMonitorThread() {
+
+		}
+
+		@Override
+		public void run() {
+			/*
+			 * List<Processor> vpxSystemProcessors =
+			 * VPXUtilities.getVPXSystem().getProcessors();
+			 * 
+			 * while (isStarted) { try {
+			 * 
+			 * Thread.sleep(10000);
+			 * 
+			 * for (Iterator<Processor> iterator =
+			 * vpxSystemProcessors.iterator(); iterator.hasNext();) {
+			 * 
+			 * Processor processor = iterator.next();
+			 * 
+			 * refreshProcessorTree(processor,
+			 * !Pinger.ping(processor.getiP_Addresses()));
+			 * 
+			 * } } catch (Exception e) {
+			 * 
+			 * } }
+			 */
+		}
+
+		public void startMonitor() {
+			isStarted = true;
+			if (th == null)
+				th = new Thread(this, "Test");
+			th.start();
+		}
+
+		public void stopMonitor() {
+			isStarted = false;
+
+			th = null;
+		}
+
+	}
+
+	public class ScanAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public ScanAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		public ScanAction(ImageIcon icon) {
+
+			super("", icon);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			monitor.stopMonitor();
+
+			VPX_ScanWindow ir = new VPX_ScanWindow(parent);
+
+			ir.setVisible(true);
+
+		}
 	}
 
 	private class VPX_ProcessorTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -146,6 +405,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		ImageIcon systemIcon = VPXUtilities.getImageIcon("images\\System.jpg", 18, 18);
 
 		ImageIcon processorIcon = VPXUtilities.getImageIcon("images\\Processor4.jpg", 14, 14);
+
+		ImageIcon subSystemIcon = VPXUtilities.getImageIcon("images\\Slot.jpg", 14, 14);
 
 		public VPX_ProcessorTreeCellRenderer() {
 
@@ -159,18 +420,25 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			String nodo = "";
 
-			if (((DefaultMutableTreeNode) value).getUserObject() != null)
+			DefaultMutableTreeNode dNode = ((DefaultMutableTreeNode) value);
+
+			if (dNode.getUserObject() != null)
 				nodo = ((DefaultMutableTreeNode) value).getUserObject().toString();
 
 			if (nodo.startsWith(VPXSystem.class.getSimpleName())) {
 
 				setIcon(systemIcon);
 
-			} else {
+			} else if (dNode.isLeaf()) {
 
 				setIcon(processorIcon);
 
+			} else {
+
+				setIcon(subSystemIcon);
+
 			}
+
 			return this;
 		}
 	}
@@ -188,7 +456,25 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 
-		if (e.getButton() == 3) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) getLastSelectedPathComponent();
+
+		if (e.getButton() == 1) {
+
+			if (node.isLeaf()) {
+
+				String s = node.getUserObject().toString();
+
+				String ss = s.substring(s.indexOf("'>") + 2, s.indexOf("</")).trim();
+
+				VPXUtilities.setCurrentProcessor(
+						((DefaultMutableTreeNode) node.getParent()).getUserObject().toString(),
+						ss.substring(0, ss.indexOf(")") + 1), ss.substring(ss.indexOf(")") + 1));
+			}
+			else{
+				VPXUtilities.setCurrentProcessor("","","");
+			}
+
+		} else if (e.getButton() == 3) {
 
 			int row = getRowForLocation(e.getX(), e.getY());
 
@@ -199,9 +485,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			setSelectionRow(row);
 
-			showConextMenu(e.getX(), e.getY(), ((DefaultMutableTreeNode) getLastSelectedPathComponent())
-					.getUserObject().toString());
+			showConextMenu(e.getX(), e.getY(), node.getUserObject().toString());
 		}
+
 	}
 
 	@Override
@@ -214,6 +500,14 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void startBIST() {
 
+	}
+
+	private void startRecieveMessage() {
+		advRecvr.execute();
+	}
+
+	private void stopRecieveMessage() {
+		advRecvr.cancel(true);
 	}
 
 	private void reNameSelectedProcessorNode() {
@@ -266,13 +560,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				}
 			});
 
-			JMenuItem itemRefresh = new JMenuItem("Refresh");
+			JMenuItem itemRefresh = new JMenuItem("Configure");
 
 			itemRefresh.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-
+					new VPX_AliasConfigWindow(parent).setVisible(true);
 				}
 			});
 
@@ -363,7 +657,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 						} catch (Exception e2) {
 							e2.printStackTrace();
 						}
-						
+
 						client.close();
 					} catch (Exception e3) {
 						e3.printStackTrace();

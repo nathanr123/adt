@@ -85,49 +85,86 @@ public class AliasTableModel extends AbstractTableModel {
 	}
 
 	public void addSubSystem(List<VPXSubSystem> subs) {
-		
-		subSystems.clear();
-	
-		subSystems = subs;
-		
-		fireTableDataChanged();
-	}
-	
-	public void addSubSystem(VPXSubSystem sub) {
 
-		sub.setId(subSystems.size() + 1);
+		if (subs != null) {
+			subSystems.clear();
 
-		subSystems.add(sub);
+			subSystems = subs;
 
-		int i = subSystems.size() - 1;
-
-		fireTableRowsInserted(i, i);
+			fireTableDataChanged();
+		}
 	}
 
-	public void modifySubSystem(VPXSubSystem sub) {
+	public boolean addSubSystem(VPXSubSystem sub) {
 
-		int i = 0;
+		try {
+			sub.setId(subSystems.size() + 1);
 
-		for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
+			subSystems.add(sub);
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+			int i = subSystems.size() - 1;
 
-			if (vpxSubSystem.getId() == sub.getId()) {
+			fireTableRowsInserted(i, i);
 
-				subSystems.set(i, sub);
+			return true;
 
-				break;
-			}
+		} catch (Exception e) {
 
-			i++;
+			return false;
+		}
+	}
+
+	public boolean clearAllSubSystem() {
+
+		try {
+
+			subSystems.clear();
+
+			fireTableDataChanged();
+
+			return true;
+
+		} catch (Exception e) {
+
+			return false;
 		}
 
-		fireTableDataChanged();
 	}
 
-	public void deleteSubSystem(int id) {
+	public boolean modifySubSystem(VPXSubSystem sub) {
 
-		int i = 0;
+		try {
+			int i = 0;
+
+			for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				if (vpxSubSystem.getId() == sub.getId()) {
+
+					subSystems.set(i, sub);
+
+					break;
+				}
+
+				i++;
+			}
+
+			fireTableDataChanged();
+
+			return true;
+
+		} catch (Exception e) {
+
+			return false;
+		}
+	}
+
+	public boolean deleteSubSystem(int id) {
+
+		boolean ret = false;
+
+		int i = -1;
 
 		for (int j = 0; j < subSystems.size(); j++) {
 
@@ -139,20 +176,27 @@ public class AliasTableModel extends AbstractTableModel {
 			}
 		}
 
-		subSystems.remove(i);
+		if (i > 0) {
+			subSystems.remove(i);
 
-		Collections.sort(subSystems);
+			Collections.sort(subSystems);
 
-		i = 0;
+			i = 0;
 
-		for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
+			for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
 
-			iterator.next().setId(i + 1);
+				iterator.next().setId(i + 1);
 
-			i++;
+				i++;
+			}
+
+			fireTableDataChanged();
+
+			ret = true;
 		}
 
-		fireTableDataChanged();
+		return ret;
+
 	}
 
 	public VPXSystem getSubSystem() {

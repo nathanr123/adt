@@ -4,16 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -22,28 +16,22 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.miginfocom.swing.MigLayout;
-
-import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.controls.VPX_About_Dialog;
+import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
+import com.cti.vpx.controls.VPX_ConsolePanel;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MAD;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_Preference;
 import com.cti.vpx.controls.VPX_ProcessorTree;
-import com.cti.vpx.controls.VPX_ScanWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
-import com.cti.vpx.util.Pinger;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_ETHWindow extends JFrame {
@@ -91,11 +79,9 @@ public class VPX_ETHWindow extends JFrame {
 
 	private VPX_TabbedPane vpx_Content_Tabbed_Pane_Right;
 
-	private VPXSystem system;
-
-	private DefaultMutableTreeNode systemRootNode;
-
 	private VPX_LoggerPanel logger;
+
+	private VPX_ConsolePanel console;
 
 	private VPX_ProcessorTree vpx_Processor_Tree;
 
@@ -104,8 +90,6 @@ public class VPX_ETHWindow extends JFrame {
 	private VPX_StatusBar statusBar;
 
 	private VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
-
-	private ProcessorMonitorThread monitor = new ProcessorMonitorThread();
 
 	private VPX_MessagePanel messagePanel;
 
@@ -116,12 +100,11 @@ public class VPX_ETHWindow extends JFrame {
 
 		VPXUtilities.setParent(this);
 
-	//	promptLogFileName();
-		
 		rBundle = VPXUtilities.getResourceBundle();
 
 		initializeRootWindow();
 
+		promptAliasConfigFileName();
 	}
 
 	private void initializeRootWindow() {
@@ -139,6 +122,8 @@ public class VPX_ETHWindow extends JFrame {
 		loadComponents();
 
 		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
+
+		setVisible(true);
 
 		toFront();
 	}
@@ -168,7 +153,7 @@ public class VPX_ETHWindow extends JFrame {
 
 		vpx_MenuBar.add(vpx_Menu_File);
 
-		vpx_Menu_File_Scan = ComponentFactory.createJMenuItem(new ScanAction(rBundle.getString("Menu.File.Scan")));
+		vpx_Menu_File_Scan = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Scan"));
 
 		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(new ExitAction(rBundle.getString("Menu.File.Exit")));
 
@@ -238,8 +223,8 @@ public class VPX_ETHWindow extends JFrame {
 
 		vpx_ToolBar.setFloatable(false);
 
-		vpx_ToolBar.add(ComponentFactory.createJToolBarButton(new ScanAction(VPXUtilities.getImageIcon(
-				"images\\scan.png", 14, 14))), null);
+		vpx_ToolBar
+				.add(ComponentFactory.createJButton("", VPXUtilities.getImageIcon("images\\scan.png", 14, 14), null));
 
 		getContentPane().add(vpx_ToolBar, BorderLayout.NORTH);
 	}
@@ -296,7 +281,11 @@ public class VPX_ETHWindow extends JFrame {
 
 		logger = new VPX_LoggerPanel();
 
+		console = new VPX_ConsolePanel();
+
 		vpx_Content_Tabbed_Pane_Message.addTab("Logger", logger);
+
+		vpx_Content_Tabbed_Pane_Message.addTab("Console", console);
 
 		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
@@ -310,13 +299,7 @@ public class VPX_ETHWindow extends JFrame {
 
 	private JScrollPane getSystemTree() {
 
-		systemRootNode = new DefaultMutableTreeNode();
-
-		createVPXObject();
-
-		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this, systemRootNode);
-
-		vpx_Processor_Tree.setVPXSystem(system);
+		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this);
 
 		JScrollPane vpx_Processor_Tree_ScrollPane = new JScrollPane(vpx_Processor_Tree);
 
@@ -325,82 +308,11 @@ public class VPX_ETHWindow extends JFrame {
 		}
 
 		return vpx_Processor_Tree_ScrollPane;
-	}
-
-	private void createVPXObject() {
-
-		if (system == null) {
-
-			system = VPXUtilities.getVPXSystem();
-
-			systemRootNode.setUserObject(system.getName());
-		}
-
-		VPXUtilities.setVPXSystem(system);
-
-		loadSystemRootNode(system);
 
 	}
 
-	private void loadSystemRootNode(VPXSystem system) {
-
-		/*
-		systemRootNode.removeAllChildren();
-
-		systemRootNode.setUserObject(system.getName());
-
-		List<Processor> processorList = system.getProcessors();
-
-		if (processorList != null) {
-			for (Iterator<Processor> iterator = processorList.iterator(); iterator.hasNext();) {
-
-				Processor processor = iterator.next();
-
-				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(String.format("%s(%s)",
-						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
-
-				systemRootNode.add(processorNode);
-			}
-		}
-	*/
-	}
-
-	private void updateProcessorTree(VPXSystem sys) {
-		vpx_Processor_Tree.updateUI();
-
-		for (int i = 0; i < vpx_Processor_Tree.getRowCount(); i++) {
-			vpx_Processor_Tree.expandRow(i);
-		}
-
-		VPXUtilities.setVPXSystem(sys);
-
-	}
-
-	private void reloadVPXSystemTree(VPXSystem system) {
-
-		loadSystemRootNode(system);
-
-		updateProcessorTree(system);
-
-	//	monitor.startMonitor();
-
-		messagePanel.startRecieveMessage();
-
-	}
-
-	public void reloadProcessorTree(VPXSystem vpx) {
-
-		if (vpx == null) {
-			updateLog(VPX_LoggerPanel.ERROR, "VPX not created");
-		} else {
-			updateLog("VPX Object Created");
-		}
-
-		reloadVPXSystemTree(vpx);
-
-		updateLog("VPX System Tree Refreshed");
-
-		updateStatus("VPX System Tree Refreshed");
+	public void updateProcessorTree() {
+		vpx_Processor_Tree.updateVPXSystemTree();
 	}
 
 	public void updateStatus(String stats) {
@@ -427,36 +339,6 @@ public class VPX_ETHWindow extends JFrame {
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
 		pro.connect();
-	}
-
-	public class ScanAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public ScanAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		public ScanAction(ImageIcon icon) {
-
-			super("", icon);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			monitor.stopMonitor();
-
-			VPX_ScanWindow ir = new VPX_ScanWindow(VPX_ETHWindow.this);
-
-			ir.setVisible(true);
-
-		}
 	}
 
 	public class MemoryAction extends AbstractAction {
@@ -557,200 +439,17 @@ public class VPX_ETHWindow extends JFrame {
 		}
 	}
 
-	private void promptLogFileName() {
+	private void promptAliasConfigFileName() {
 
-		VPXUtilities.setEnableLog(false);
+		if (!vpx_Processor_Tree.isSubSystemsAvailable()) {
+			int option = JOptionPane.showConfirmDialog(VPX_ETHWindow.this,
+					"Alias config file not found.\nDo you want to config now?", "Confirmation",
+					JOptionPane.YES_NO_OPTION);
 
-		Boolean isLogEnabled = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_ENABLE));
-
-		Boolean isSerialPrompt = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_PROMPT));
-
-		if (isLogEnabled && isSerialPrompt) {
-			String new_Name = selectFile(VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO));
-
-			if (new_Name != null) {
-
-				VPXUtilities.setEnableLog(true);
-
-				VPXUtilities.updateProperties(VPXUtilities.LOG_SERIALNO, new_Name);
+			if (option == JOptionPane.YES_OPTION) {
+				new VPX_AliasConfigWindow(this).setVisible(true);
 			}
-		}
-	}
-
-	private String selectFile(String oldName) {
-		String[] options = { "Apply" };
-		JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout("", "[349.00,grow]", "[][][]"));
-
-		JLabel lblNewLabel = new JLabel("Select Log file");
-		panel.add(lblNewLabel, "cell 0 0");
-
-		JTextField textField = new JTextField(oldName);
-		panel.add(textField, "cell 0 1,growx");
-		textField.setColumns(10);
-
-		JButton btnNewButton = new JButton("Browse");
-		panel.add(btnNewButton, "cell 0 2,alignx right");
-
-		btnNewButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser jb = new JFileChooser();
-				int i = jb.showOpenDialog(VPX_ETHWindow.this);
-				if (i == JFileChooser.APPROVE_OPTION) {
-					String flnmae = jb.getSelectedFile().getPath();
-					if (!flnmae.endsWith(".log"))
-						flnmae += ".log";
-					textField.setText(flnmae);
-				}
-			}
-		});
-
-		int selectedOption = JOptionPane.showOptionDialog(null, panel, "Log Name", JOptionPane.NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-		if (selectedOption == 0) {
-			String flnmae = textField.getText();
-			if (!flnmae.endsWith(".log"))
-				flnmae += ".log";
-			return flnmae;
-		}
-
-		return "";
-	}
-
-	private void refreshProcessorTree(Processor processor, boolean isRemove) {
-
-		int size = systemRootNode.getChildCount();
-
-		String ip = processor.getiP_Addresses();
-
-		int foundAt = -1;
-
-		for (int i = 0; i < size; i++) {
-
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode) systemRootNode.getChildAt(i);
-
-			if (child.getUserObject().toString().startsWith(ip)) {
-
-				foundAt = i;
-
-				break;
-			}
-
-		}
-
-		if (isRemove) {
-			if (foundAt > -1) {
-				systemRootNode.remove(foundAt);
-
-				updateLog(ip + " Lost");
-			}
-		} else {
-			if (foundAt == -1) {
-
-				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(String.format("%s(%s)",
-						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
-
-				systemRootNode.add(processorNode);
-
-				updateLog(processor.getiP_Addresses() + " Found");
-			}
-		}
-
-		vpx_Processor_Tree.updateUI();
-	}
-
-	private void refreshProcessorTree(ATPCommand cmd, String ip, boolean isRemove) {
-
-		int size = systemRootNode.getChildCount();
-
-		int foundAt = -1;
-
-		for (int i = 0; i < size; i++) {
-
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode) systemRootNode.getChildAt(i);
-
-			if (child.getUserObject().toString().startsWith(ip)) {
-
-				foundAt = i;
-
-				break;
-			}
-
-		}
-
-		if (isRemove) {
-			if (foundAt > -1) {
-				systemRootNode.remove(foundAt);
-
-				updateLog(ip + " Lost");
-			}
-		} else {
-			if (foundAt == -1) {
-				Processor processor = new Processor(ip,
-						VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE));
-
-				DefaultMutableTreeNode processorNode = new DefaultMutableTreeNode(String.format("%s(%s)",
-						processor.getiP_Addresses(), processor.getName(), processor.getPortno()));
-
-				systemRootNode.add(processorNode);
-
-				updateLog(processor.getiP_Addresses() + " Found");
-			}
-		}
-
-		vpx_Processor_Tree.updateUI();
-	}
-
-	class ProcessorMonitorThread implements Runnable {
-
-		Thread th;
-
-		private boolean isStarted = true;
-
-		public ProcessorMonitorThread() {
-
-		}
-
-		@Override
-		public void run() {
-			/*
-			List<Processor> vpxSystemProcessors = VPXUtilities.getVPXSystem().getProcessors();
-
-			while (isStarted) {
-				try {
-
-					Thread.sleep(10000);
-
-					for (Iterator<Processor> iterator = vpxSystemProcessors.iterator(); iterator.hasNext();) {
-
-						Processor processor = iterator.next();
-
-						refreshProcessorTree(processor, !Pinger.ping(processor.getiP_Addresses()));
-
-					}
-				} catch (Exception e) {
-
-				}
-			}
-			*/
-		}
-
-		public void startMonitor() {
-			isStarted = true;
-			if (th == null)
-				th = new Thread(this, "Test");
-			th.start();
-		}
-
-		public void stopMonitor() {
-			isStarted = false;
-
-			th = null;
 		}
 
 	}
-
 }

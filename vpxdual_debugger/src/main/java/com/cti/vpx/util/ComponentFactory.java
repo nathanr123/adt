@@ -143,6 +143,10 @@ public class ComponentFactory {
 	public static VPX_ProcessorTree createProcessorTree(VPX_ETHWindow parent, TreeNode root) {
 		return new VPX_ProcessorTree(parent, root);
 	}
+	
+	public static VPX_ProcessorTree createProcessorTree(VPX_ETHWindow parent) {
+		return new VPX_ProcessorTree(parent);
+	}
 
 	public static JComboBox<String> createJComboBox() {
 		return new JComboBox<String>();

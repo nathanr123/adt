@@ -35,6 +35,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import com.cti.vpx.model.VPX;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -59,15 +60,23 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JButton btn_Msg_Clear;
 
-	private JScrollPane scrl_Msg_Pane;
+	private JScrollPane scrl_Proc_Msg_Pane;
 
-	private JTextPane txtP_Msg_Display;
+	private JTextPane txtP_Proc_Msg_Display;
+
+	private JTextPane txtP_User_Msg_Display;
 
 	private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-	private final StyleContext txtP_Msg_Display_Context = new StyleContext();
+	private final StyleContext txtP_Proc_Msg_Display_Context = new StyleContext();
 
-	private final StyledDocument txtP_Msg_Display_Document = new DefaultStyledDocument(txtP_Msg_Display_Context);
+	private final StyledDocument txtP_Proc_Msg_Display_Document = new DefaultStyledDocument(
+			txtP_Proc_Msg_Display_Context);
+
+	private final StyleContext txtP_User_Msg_Display_Context = new StyleContext();
+
+	private final StyledDocument txtP_User_Msg_Display_Document = new DefaultStyledDocument(
+			txtP_User_Msg_Display_Context);
 
 	private Style proc_Msg_Style, proc_From_Style, proc_To_Style, proc_Time_Style;
 
@@ -77,9 +86,15 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JPanel panel;
 
-	private JPanel panel_2;
+	private JPanel controlsPanel;
 
 	private MsgReceiver msgRecvr = new MsgReceiver();
+
+	private JPanel ProcMSGPanel;
+
+	private JPanel UserMSGPanel;
+
+	private JScrollPane scrl_User_Msg_Pane;
 
 	/**
 	 * Create the panel.
@@ -92,6 +107,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		init();
 
 		loadComponents();
+
+		startRecieveMessage();
 	}
 
 	private void init() {
@@ -133,85 +150,119 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		message_Panel.setLayout(new BorderLayout());
 
-		scrl_Msg_Pane = ComponentFactory.createJScrollPane();
-
-		message_Panel.add(scrl_Msg_Pane, BorderLayout.CENTER);
-
-		txtP_Msg_Display = ComponentFactory.createJTextPane(txtP_Msg_Display_Document);
-
-		txtP_Msg_Display.setPreferredSize(new Dimension(350, 35));
-		txtP_Msg_Display.setEditable(false);
-
-		scrl_Msg_Pane.setViewportView(txtP_Msg_Display);
-
-		panel_2 = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) panel_2.getLayout();
-		flowLayout.setAlignOnBaseline(true);
-		flowLayout.setVgap(0);
-		flowLayout.setHgap(0);
-		flowLayout.setAlignment(FlowLayout.RIGHT);
-		message_Panel.add(panel_2, BorderLayout.NORTH);
+		controlsPanel = new JPanel();
+		FlowLayout fl_controlsPanel = (FlowLayout) controlsPanel.getLayout();
+		fl_controlsPanel.setAlignOnBaseline(true);
+		fl_controlsPanel.setVgap(0);
+		fl_controlsPanel.setHgap(0);
+		fl_controlsPanel.setAlignment(FlowLayout.RIGHT);
+		message_Panel.add(controlsPanel, BorderLayout.NORTH);
 
 		btn_Msg_Reset = ComponentFactory.createJButton(new ResetAction("Reset"));
 		btn_Msg_Reset.setPreferredSize(new Dimension(20, 16));
 		btn_Msg_Reset.setBorderPainted(false);
-		panel_2.add(btn_Msg_Reset);
+		controlsPanel.add(btn_Msg_Reset);
 
 		btn_Msg_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
 		btn_Msg_Copy.setPreferredSize(new Dimension(20, 16));
 		btn_Msg_Copy.setBorderPainted(false);
-		panel_2.add(btn_Msg_Copy);
+		controlsPanel.add(btn_Msg_Copy);
 
 		btn_Msg_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
 		btn_Msg_Clear.setPreferredSize(new Dimension(20, 16));
 		btn_Msg_Clear.setBorderPainted(false);
-		panel_2.add(btn_Msg_Clear);
+		controlsPanel.add(btn_Msg_Clear);
 
 		btn_Msg_Save = ComponentFactory.createJButton(new SaveAction("Save"));
 		btn_Msg_Save.setPreferredSize(new Dimension(20, 16));
 		btn_Msg_Save.setBorderPainted(false);
-		panel_2.add(btn_Msg_Save);
+		controlsPanel.add(btn_Msg_Save);
+
+		ProcMSGPanel = new JPanel();
+		ProcMSGPanel.setBorder(new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP,
+				null, null));
+
+		ProcMSGPanel.setPreferredSize(new Dimension(10, 200));
+
+		message_Panel.add(ProcMSGPanel, BorderLayout.CENTER);
+
+		ProcMSGPanel.setLayout(new BorderLayout(0, 0));
+
+		scrl_Proc_Msg_Pane = ComponentFactory.createJScrollPane();
+
+		ProcMSGPanel.add(scrl_Proc_Msg_Pane);
+
+		txtP_Proc_Msg_Display = ComponentFactory.createJTextPane(txtP_Proc_Msg_Display_Document);
+
+		// txtP_Proc_Msg_Display.setPreferredSize(new Dimension(200, 35));
+
+		txtP_Proc_Msg_Display.setEditable(false);
+
+		scrl_Proc_Msg_Pane.setViewportView(txtP_Proc_Msg_Display);
+
+		UserMSGPanel = new JPanel();
+
+		UserMSGPanel.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null,
+				null));
+
+		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
+
+		message_Panel.add(UserMSGPanel, BorderLayout.SOUTH);
+
+		UserMSGPanel.setLayout(new BorderLayout(0, 0));
+
+		scrl_User_Msg_Pane = ComponentFactory.createJScrollPane();
+
+		UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
+
+		txtP_User_Msg_Display = ComponentFactory.createJTextPane(txtP_User_Msg_Display_Document);
+
+		// txtP_Proc_Msg_Display.setPreferredSize(new Dimension(200, 35));
+
+		txtP_User_Msg_Display.setEditable(false);
+
+		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
 	}
 
 	private void loadMessageStyles() {
 
-		default_Style = txtP_Msg_Display_Context.getStyle(StyleContext.DEFAULT_STYLE);
+		default_Style = txtP_Proc_Msg_Display_Context.getStyle(StyleContext.DEFAULT_STYLE);
 
-		proc_Msg_Style = txtP_Msg_Display_Context.addStyle("Processor_Message", default_Style);
+		proc_Msg_Style = txtP_Proc_Msg_Display_Context.addStyle("Processor_Message", default_Style);
 
 		StyleConstants.setFontSize(proc_Msg_Style, StyleConstants.getFontSize(default_Style) + 2);
 
-		proc_From_Style = txtP_Msg_Display_Context.addStyle("Processor_Message_From", default_Style);
+		proc_From_Style = txtP_Proc_Msg_Display_Context.addStyle("Processor_Message_From", default_Style);
 
 		StyleConstants.setBold(proc_From_Style, true);
 
-		proc_To_Style = txtP_Msg_Display_Context.addStyle("Processor_Message_To", default_Style);
+		proc_To_Style = txtP_Proc_Msg_Display_Context.addStyle("Processor_Message_To", default_Style);
 
 		StyleConstants.setItalic(proc_To_Style, true);
 
-		proc_Time_Style = txtP_Msg_Display_Context.addStyle("Processor_Message_Time", default_Style);
+		proc_Time_Style = txtP_Proc_Msg_Display_Context.addStyle("Processor_Message_Time", default_Style);
 
 		StyleConstants.setUnderline(proc_Time_Style, true);
 
-		user_Msg_Style = txtP_Msg_Display_Context.addStyle("User_Message", default_Style);
+		user_Msg_Style = txtP_Proc_Msg_Display_Context.addStyle("User_Message", default_Style);
 
 		StyleConstants.setFontSize(user_Msg_Style, StyleConstants.getFontSize(default_Style) + 2);
 
 		StyleConstants.setAlignment(user_Msg_Style, StyleConstants.ALIGN_RIGHT);
 
-		user_From_Style = txtP_Msg_Display_Context.addStyle("User_Message_From", default_Style);
+		user_From_Style = txtP_Proc_Msg_Display_Context.addStyle("User_Message_From", default_Style);
 
 		StyleConstants.setItalic(user_From_Style, true);
 
 		StyleConstants.setAlignment(user_From_Style, StyleConstants.ALIGN_RIGHT);
 
-		user_To_Style = txtP_Msg_Display_Context.addStyle("User_Message_To", default_Style);
+		user_To_Style = txtP_Proc_Msg_Display_Context.addStyle("User_Message_To", default_Style);
 
 		StyleConstants.setBold(user_To_Style, true);
 
 		StyleConstants.setAlignment(user_To_Style, StyleConstants.ALIGN_RIGHT);
 
-		user_Time_Style = txtP_Msg_Display_Context.addStyle("User_Message_Time", default_Style);
+		user_Time_Style = txtP_Proc_Msg_Display_Context.addStyle("User_Message_Time", default_Style);
 
 		StyleConstants.setUnderline(user_Time_Style, true);
 
@@ -222,48 +273,68 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	public void updateProcessorMessage(String msg) {
 
 		try {
-			int eo = txtP_Msg_Display_Document.getLength();
+			int eo = txtP_Proc_Msg_Display_Document.getLength();
 
-			txtP_Msg_Display_Document.insertString(eo, msg, null);
+			txtP_Proc_Msg_Display_Document.insertString(eo, msg, null);
 
-			txtP_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), proc_Msg_Style, false);
+			txtP_Proc_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), proc_Msg_Style, false);
 
-			txtP_Msg_Display_Document.setLogicalStyle(eo, proc_Msg_Style);
+			txtP_Proc_Msg_Display_Document.setLogicalStyle(eo, proc_Msg_Style);
 
 		} catch (BadLocationException e) {
 
 			e.printStackTrace();
 		}
+	}
+
+	public void updateProcessorMessage(String ip, String msg) {
+
+		if (ip.equals(VPXUtilities.getCurrentProcessor())) {
+
+			updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
+					+ " : \n", proc_From_Style);
+
+			updateProcessorMessage("  " + msg + "\n", proc_Msg_Style);
+		}
+
 	}
 
 	public void updateProcessorMessage(String msg, Style style) {
 
 		try {
-			int eo = txtP_Msg_Display_Document.getLength();
+			int eo = txtP_Proc_Msg_Display_Document.getLength();
 
-			txtP_Msg_Display_Document.insertString(eo, msg, null);
+			txtP_Proc_Msg_Display_Document.insertString(eo, msg, null);
 
-			txtP_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), style, false);
+			txtP_Proc_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), style, false);
 
-			txtP_Msg_Display_Document.setLogicalStyle(eo, style);
-			
-			txtP_Msg_Display.setCaretPosition(txtP_Msg_Display_Document.getLength());
-				
+			txtP_Proc_Msg_Display_Document.setLogicalStyle(eo, style);
+
+			txtP_Proc_Msg_Display.setCaretPosition(txtP_Proc_Msg_Display_Document.getLength());
+
 		} catch (BadLocationException e) {
 
 			e.printStackTrace();
 		}
 	}
 
+	private void updateUserMessage(String msg) {
+
+		updateUserMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType() + " : \n",
+				proc_From_Style);
+
+		updateUserMessage("  " + msg + "\n\n", proc_Msg_Style);
+	}
+
 	private void updateUserMessage(String msg, Style style) {
 		try {
-			int eo = txtP_Msg_Display_Document.getLength();
+			int eo = txtP_User_Msg_Display_Document.getLength();
 
-			txtP_Msg_Display_Document.insertString(eo, msg, null);
+			txtP_User_Msg_Display_Document.insertString(eo, msg, null);
 
-			txtP_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), style, false);
+			txtP_User_Msg_Display_Document.setCharacterAttributes(eo, eo + msg.length(), style, false);
 
-			txtP_Msg_Display_Document.setLogicalStyle(eo, style);
+			txtP_User_Msg_Display_Document.setLogicalStyle(eo, style);
 
 		} catch (BadLocationException e) {
 
@@ -273,14 +344,14 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private void clearContents() {
 
-		txtP_Msg_Display.setText("");
+		txtP_Proc_Msg_Display.setText("");
 	}
 
-	public void startRecieveMessage() {
+	private void startRecieveMessage() {
 		msgRecvr.execute();
 	}
 
-	public void stopRecieveMessage() {
+	private void stopRecieveMessage() {
 		msgRecvr.cancel(true);
 	}
 
@@ -301,23 +372,9 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			FileWriter fw = new FileWriter(new File(path), true);
 
-			txtP_Msg_Display.write(fw);
+			txtP_Proc_Msg_Display.write(fw);
 
 			fw.close();
-
-			/*
-			 * RTFEditorKit kit = new RTFEditorKit();
-			 * 
-			 * BufferedOutputStream out;
-			 * 
-			 * out = new BufferedOutputStream(new FileOutputStream(path));
-			 * 
-			 * kit.write(out, txtP_Msg_Display_Document,
-			 * txtP_Msg_Display_Document.getStartPosition().getOffset(),
-			 * txtP_Msg_Display_Document.getLength());
-			 * 
-			 * out.close();
-			 */
 
 			VPXUtilities.showPopup("File Saved at " + path);
 
@@ -352,16 +409,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			updateProcessorMessage("Slot : 0 :: DSP - 1: \n", proc_From_Style);
-
-			// updateProcessorMessage("to User: \n", proc_To_Style);
-
-			updateProcessorMessage("Processor Message Comes Here\n", proc_Msg_Style);
-
-			// updateProcessorMessage("at " + getCurrentTime() + "\n\n",
-			// proc_Time_Style);
-
-			// txt_Msg_Send.setText("");
 		}
 
 	}
@@ -379,16 +426,9 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			parent.updateLog("Message Sent.");
 
-			// updateUserMessage("User : \n", user_From_Style);
+			updateUserMessage(txt_Msg_Send.getText());
 
-			updateUserMessage("to Slot: 0::DSP - 1 \n", user_To_Style);
-
-			updateUserMessage(txt_Msg_Send.getText() + "\n", user_Msg_Style);
-
-			// updateUserMessage("at " + getCurrentTime() + "\n\n",
-			// user_Time_Style);
 		}
 
 	}
@@ -447,7 +487,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			setClipboardContents(txtP_Msg_Display.getText());
+			setClipboardContents(txtP_Proc_Msg_Display.getText());
 
 			VPXUtilities.showPopup("Contents copied to clipboard");
 		}
@@ -463,7 +503,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		public MsgReceiver() {
 			try {
-				serverSocket = new DatagramSocket(12346);
+				serverSocket = new DatagramSocket(VPX.MSG_PORTNO);
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
@@ -475,10 +515,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 				serverSocket.receive(receivePacket);
 
 				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
-				
-				updateProcessorMessage("Slot : 0 :: DSP - 1: \n", proc_From_Style);
 
-				updateProcessorMessage(sentence+"\n", proc_Msg_Style);
+				updateProcessorMessage(receivePacket.getAddress().getHostAddress(), sentence);
 
 				Thread.sleep(500);
 			}
