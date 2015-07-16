@@ -11,13 +11,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
@@ -35,10 +30,11 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-import com.cti.vpx.model.VPX;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+
+import javax.swing.JComboBox;
 
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
@@ -88,13 +84,12 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JPanel controlsPanel;
 
-	private MsgReceiver msgRecvr = new MsgReceiver();
-
 	private JPanel ProcMSGPanel;
 
 	private JPanel UserMSGPanel;
 
 	private JScrollPane scrl_User_Msg_Pane;
+	private JComboBox<String> cmbCores;
 
 	/**
 	 * Create the panel.
@@ -108,7 +103,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		loadComponents();
 
-		startRecieveMessage();
+		loadCoresFilter();
 	}
 
 	private void init() {
@@ -157,6 +152,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		fl_controlsPanel.setHgap(0);
 		fl_controlsPanel.setAlignment(FlowLayout.RIGHT);
 		message_Panel.add(controlsPanel, BorderLayout.NORTH);
+
+		cmbCores = new JComboBox();
+		cmbCores.setPreferredSize(new Dimension(140, 22));
+		controlsPanel.add(cmbCores);
 
 		btn_Msg_Reset = ComponentFactory.createJButton(new ResetAction("Reset"));
 		btn_Msg_Reset.setPreferredSize(new Dimension(20, 16));
@@ -290,13 +289,18 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	public void updateProcessorMessage(String ip, String msg) {
 
 		if (ip.equals(VPXUtilities.getCurrentProcessor())) {
+			if (cmbCores.getSelectedIndex() == 0) {
+				updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
+						+ " : \n", proc_From_Style);
 
-			updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
-					+ " : \n", proc_From_Style);
+				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
+			} else if (msg.startsWith((cmbCores.getSelectedIndex() - 1) + ":")) {
+				updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
+						+ " : \n", proc_From_Style);
 
-			updateProcessorMessage("  " + msg + "\n", proc_Msg_Style);
+				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
+			}
 		}
-
 	}
 
 	public void updateProcessorMessage(String msg, Style style) {
@@ -347,12 +351,15 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		txtP_Proc_Msg_Display.setText("");
 	}
 
-	private void startRecieveMessage() {
-		msgRecvr.execute();
-	}
+	private void loadCoresFilter() {
 
-	private void stopRecieveMessage() {
-		msgRecvr.cancel(true);
+		cmbCores.addItem("All Cores");
+
+		for (int i = 0; i < 8; i++) {
+			cmbCores.addItem(String.format("Core %s", i));
+		}
+		
+		cmbCores.setSelectedIndex(0);
 	}
 
 	private void setClipboardContents(String aString) {
@@ -491,42 +498,5 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			VPXUtilities.showPopup("Contents copied to clipboard");
 		}
-	}
-
-	class MsgReceiver extends SwingWorker<Void, String> {
-
-		DatagramSocket serverSocket;
-
-		byte[] receiveData = new byte[1024];
-
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-
-		public MsgReceiver() {
-			try {
-				serverSocket = new DatagramSocket(VPX.MSG_PORTNO);
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-			while (true) {
-				serverSocket.receive(receivePacket);
-
-				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
-
-				updateProcessorMessage(receivePacket.getAddress().getHostAddress(), sentence);
-
-				Thread.sleep(500);
-			}
-		}
-
-		@Override
-		protected void process(List<String> chunks) {
-			// TODO Auto-generated method stub
-			super.process(chunks);
-		}
-
 	}
 }

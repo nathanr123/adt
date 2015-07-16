@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -123,13 +125,45 @@ public class VPXUtilities {
 
 	public static final String LOG_OVERWRITE = "log.overwrite";
 
-	public static final String PYTHON_VERSION = "python.version";
+	public static final String PATH_PYTHON = "path.python";
 
-	public static final String PYTHON_INTERPRETERPATH = "python.intrptrpath";
+	public static final String PATH_MAP = "path.map";
 
-	public static final String PYTHON_USEDUMMY = "python.usedummy";
+	public static final String PATH_PRELINKER = "path.prelinker";
 
-	public static final String PYTHON_DUMMYFILE = "python.dummyfile";
+	public static final String PATH_STRIPER = "path.striper";
+
+	public static final String PATH_OFD = "path.ofd";
+
+	public static final String PATH_MAL = "path.mal";
+
+	public static final String PATH_NML = "path.nml";
+
+	public static final String PATH_DUMMY = "path.dummy";
+
+	public static final String DUMMY_CHK = "dummy.chk";
+
+	public static final String PATH_CORE0 = "path.core0";
+
+	public static final String PATH_CORE1 = "path.core1";
+
+	public static final String PATH_CORE2 = "path.core2";
+
+	public static final String PATH_CORE3 = "path.core3";
+
+	public static final String PATH_CORE4 = "path.core4";
+
+	public static final String PATH_CORE5 = "path.core5";
+
+	public static final String PATH_CORE6 = "path.core6";
+
+	public static final String PATH_CORE7 = "path.core7";
+
+	public static final String PATH_OUT = "path.out";
+
+	public static final String DEPLOYMENTFILE = "deploymnet_C678.json";
+
+	public static final String DEPLOYMENTCONFIGFILE = "maptoolCfg_C678.json";
 
 	private static Properties props;
 
@@ -144,6 +178,14 @@ public class VPXUtilities {
 	private static String currentSubSystem = "";
 
 	private static String currentProcType = "";
+
+	private static String currentdploy = "";
+
+	private static String currentdployCfg = "";
+
+	private static String currMapPath;
+
+	private static String folderPath;
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -504,11 +546,24 @@ public class VPXUtilities {
 			prop.setProperty(LOG_APPENDCURTIME, String.valueOf(true));
 			prop.setProperty(LOG_OVERWRITE, String.valueOf(false));
 
-			// Python Tab Settings
-			prop.setProperty(PYTHON_INTERPRETERPATH, getPythonInterpreterPath());
-			prop.setProperty(PYTHON_USEDUMMY, String.valueOf(false));
-			prop.setProperty(PYTHON_DUMMYFILE, "");
-			prop.setProperty(PYTHON_VERSION, findPyVersion());
+			prop.setProperty(PATH_PYTHON, "");
+			prop.setProperty(PATH_MAP, "");
+			prop.setProperty(PATH_PRELINKER, "");
+			prop.setProperty(PATH_STRIPER, "");
+			prop.setProperty(PATH_OFD, "");
+			prop.setProperty(PATH_MAL, "");
+			prop.setProperty(PATH_NML, "");
+			prop.setProperty(PATH_DUMMY, "");
+			prop.setProperty(DUMMY_CHK, "false");
+			prop.setProperty(PATH_CORE0, "");
+			prop.setProperty(PATH_CORE1, "");
+			prop.setProperty(PATH_CORE2, "");
+			prop.setProperty(PATH_CORE3, "");
+			prop.setProperty(PATH_CORE4, "");
+			prop.setProperty(PATH_CORE5, "");
+			prop.setProperty(PATH_CORE6, "");
+			prop.setProperty(PATH_CORE7, "");
+			prop.setProperty(PATH_OUT, "");
 
 			// save properties to project root folder
 			prop.store(output, null);
@@ -1208,6 +1263,169 @@ public class VPXUtilities {
 
 		VPXUtilities.currentProcType = procType;
 
+	}
+
+	public static void updateConfigFile(String pythonPath, String mapTool, String prelinker, String ofd, String strip,
+			String mal, String nml, boolean isUseDummy, String dummy) {
+
+		Properties p = readProperties();
+
+		p.setProperty(PATH_PYTHON, pythonPath);
+
+		p.setProperty(PATH_MAP, mapTool);
+
+		p.setProperty(PATH_PRELINKER, prelinker);
+
+		p.setProperty(PATH_OFD, ofd);
+
+		p.setProperty(PATH_STRIPER, strip);
+
+		p.setProperty(PATH_MAL, mal);
+
+		p.setProperty(PATH_NML, nml);
+
+		p.setProperty(DUMMY_CHK, isUseDummy ? "true" : "false");
+
+		p.setProperty(PATH_DUMMY, dummy);
+
+		updateProperties(p);
+
+		currMapPath = mapTool;
+
+		currentdployCfg = readFile("deploy\\config.data");
+
+		currentdployCfg = currentdployCfg.replace("prelinkpath", prelinker);
+
+		currentdployCfg = currentdployCfg.replace("ofdpath", ofd);
+
+		currentdployCfg = currentdployCfg.replace("strippath", strip);
+
+		currentdployCfg = currentdployCfg.replace("malpath", mal);
+
+		currentdployCfg = currentdployCfg.replace("nampath", nml);
+	}
+
+	private static String readFile(String filename) {
+		try {
+			final String CHARSET = "UTF-8";
+
+			final String DELIMITER = "==end==";
+
+			File file = new File(filename);
+
+			Scanner scanner = new Scanner(file, CHARSET).useDelimiter(DELIMITER);
+
+			String content = null;
+
+			if (scanner.hasNext())
+				content = scanner.next();
+
+			return content;
+
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static void writeFile(String filename, String content) {
+		try {
+
+			File newTextFile = new File(filename);
+
+			FileWriter fw = new FileWriter(newTextFile);
+
+			content = content.replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\"));
+
+			fw.write(content);
+
+			fw.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+	}
+
+	public static void createDeploymentFile(String outfilename, String out1Path, String out2Path, String out3Path,
+			String out4Path, String out5Path, String out6Path, String out7Path, String out8Path) {
+
+		String str = readFile("deploy/deployment.data");
+
+		str = str.replace("out1", out1Path);
+		str = str.replace("out2", out2Path);
+		str = str.replace("out3", out3Path);
+		str = str.replace("out4", out4Path);
+		str = str.replace("out5", out5Path);
+		str = str.replace("out6", out6Path);
+		str = str.replace("out7", out7Path);
+		str = str.replace("out8", out8Path);
+
+		Properties p = readProperties();
+
+		p.setProperty(PATH_CORE0, out1Path);
+
+		p.setProperty(PATH_CORE1, out2Path);
+
+		p.setProperty(PATH_CORE2, out3Path);
+
+		p.setProperty(PATH_CORE3, out4Path);
+
+		p.setProperty(PATH_CORE4, out5Path);
+
+		p.setProperty(PATH_CORE5, out6Path);
+
+		p.setProperty(PATH_CORE6, out7Path);
+
+		p.setProperty(PATH_CORE7, out8Path);
+
+		p.setProperty(PATH_OUT, outfilename);
+
+		updateProperties(p);
+
+		folderPath = currMapPath.substring(0, currMapPath.lastIndexOf("\\"));
+
+		writeFile(folderPath + "\\" + DEPLOYMENTFILE, str);
+
+		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "\\" + DEPLOYMENTFILE);
+
+		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
+
+		writeFile(folderPath + "\\" + DEPLOYMENTCONFIGFILE, currentdployCfg);
+
+	}
+
+	public static boolean createOutFile() {
+
+		boolean ret = true;
+
+		Properties p = readProperties();
+
+		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(PATH_MAP), DEPLOYMENTCONFIGFILE);
+
+		System.out.println(cmd);
+
+		String s = null;
+
+		try {
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+
+				System.out.println(s);
+				if (s.contains("MAP tool executing in prelink bypass mode")) {
+					ret = true;					
+				}
+
+			}
+		} catch (Exception e) {
+			ret = false;
+			e.printStackTrace();
+		}
+
+		return ret;
 	}
 
 }

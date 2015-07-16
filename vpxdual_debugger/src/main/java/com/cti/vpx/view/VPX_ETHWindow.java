@@ -1,10 +1,15 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
@@ -18,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
@@ -32,10 +38,11 @@ import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPX;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 
-public class VPX_ETHWindow extends JFrame {
+public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	/**
 	 * 
@@ -94,6 +101,8 @@ public class VPX_ETHWindow extends JFrame {
 
 	private VPX_MessagePanel messagePanel;
 
+	private MsgReceiver msgReciever = new MsgReceiver();
+
 	/**
 	 * Create the frame.
 	 */
@@ -106,6 +115,8 @@ public class VPX_ETHWindow extends JFrame {
 		initializeRootWindow();
 
 		promptAliasConfigFileName();
+
+		startMessageReciever();
 	}
 
 	private void initializeRootWindow() {
@@ -333,6 +344,14 @@ public class VPX_ETHWindow extends JFrame {
 		updateStatus(logMsg);
 	}
 
+	private void startMessageReciever() {
+		msgReciever.execute();
+	}
+
+	private void stopMessageReciever() {
+		msgReciever.cancel(true);
+	}
+
 	public void addTab(String tabName, JScrollPane comp) {
 		vpx_Content_Tabbed_Pane_Right.addTab(tabName, comp);
 
@@ -457,6 +476,91 @@ public class VPX_ETHWindow extends JFrame {
 				new VPX_AliasConfigWindow(this).setVisible(true);
 			}
 		}
+
+	}
+
+	class MsgReceiver extends SwingWorker<Void, String> {
+
+		DatagramSocket serverSocket;
+
+		byte[] receiveData = new byte[1024];
+
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+		public MsgReceiver() {
+			try {
+				serverSocket = new DatagramSocket(VPX.CONSOLE_MSG_PORTNO);
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			while (true) {
+
+				serverSocket.receive(receivePacket);
+
+				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
+
+				if (sentence.startsWith("M:")) {
+					messagePanel.updateProcessorMessage(receivePacket.getAddress().getHostAddress(),
+							sentence.substring(2, sentence.length()));
+				} else if (sentence.startsWith("C:")) {
+					console.printConsoleMsg(receivePacket.getAddress().getHostAddress(),
+							sentence.substring(2, sentence.length()));
+				}
+
+				Thread.sleep(500);
+			}
+		}
+
+		@Override
+		protected void process(List<String> chunks) {
+			// TODO Auto-generated method stub
+			super.process(chunks);
+		}
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		stopMessageReciever();
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
 
 	}
 }

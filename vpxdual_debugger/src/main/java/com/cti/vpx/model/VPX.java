@@ -15,10 +15,8 @@ public interface VPX extends Serializable {
 
 	public int COMM_PORTNO = 12346;
 
-	public int CONSOLE_PORTNO = 12347;
+	public int CONSOLE_MSG_PORTNO = 12347;
 
-	public int MSG_PORTNO = 12348;
-	
 	public int CONNECTION_TIMEOUT = 300000;
 
 	public enum PROCESSOR_LIST {

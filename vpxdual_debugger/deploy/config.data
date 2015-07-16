@@ -1,0 +1,11 @@
+{
+	"deploymentCfgFile" : "jsonpath",
+	"LoadImageName"     : "imagenamepath",
+	"prelinkExe"        : "prelinkpath",
+	"ofdTool"           : "ofdpath",
+	"stripExe"          : "strippath",
+	"malApp"            : "malpath",
+	"nmlLoader"         : "nampath"
+}
+
+==end==

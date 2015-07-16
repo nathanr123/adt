@@ -9,23 +9,26 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
-import com.cti.vpx.model.VPX;
+import com.cti.vpx.model.VPXSubSystem;
+import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -40,7 +43,17 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private FileWriter fw;
 
-	private ConsoleMessageReceiver consoleMsgReceiver = new ConsoleMessageReceiver();
+	private JComboBox<String> cmbSubSystem;
+
+	private JComboBox<String> cmbProcessor;
+
+	private JComboBox<String> cmbCores;
+
+	private VPXSystem vpxSystem;
+
+	private VPXSubSystem curProcFilter;
+
+	private boolean isFilterApply = false;
 
 	/**
 	 * Create the panel.
@@ -51,7 +64,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		loadComponents();
 
-		startRecieveMessage();
+		loadFilters();
 	}
 
 	private void init() {
@@ -65,32 +78,133 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		JPanel console_Panel = ComponentFactory.createJPanel();
 
-		FlowLayout flowLayout = (FlowLayout) console_Panel.getLayout();
-
-		flowLayout.setAlignment(FlowLayout.RIGHT);
-
 		add(console_Panel, BorderLayout.NORTH);
 
+		console_Panel.setLayout(new BorderLayout(0, 0));
+
+		JPanel filterPanel = new JPanel();
+
+		FlowLayout fl_filterPanel = (FlowLayout) filterPanel.getLayout();
+
+		fl_filterPanel.setHgap(15);
+
+		fl_filterPanel.setAlignment(FlowLayout.LEFT);
+
+		console_Panel.add(filterPanel, BorderLayout.CENTER);
+
+		JLabel lblSubSystem = new JLabel("Sub System");
+
+		filterPanel.add(lblSubSystem);
+
+		cmbSubSystem = new JComboBox<String>();
+
+		cmbSubSystem.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbSubSystem)) {
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+						loadProcessorsFilter();
+					}
+				}
+			}
+		});
+
+		cmbSubSystem.setPreferredSize(new Dimension(120, 22));
+
+		filterPanel.add(cmbSubSystem);
+
+		JLabel lblProcessors = new JLabel("Processors");
+
+		filterPanel.add(lblProcessors);
+
+		cmbProcessor = new JComboBox<String>();
+
+		cmbProcessor.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbProcessor)) {
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+						loadCoresFilter();
+					}
+				}
+			}
+		});
+
+		cmbProcessor.setPreferredSize(new Dimension(120, 22));
+
+		filterPanel.add(cmbProcessor);
+
+		JLabel lblCore = new JLabel("Core");
+
+		filterPanel.add(lblCore);
+
+		cmbCores = new JComboBox<String>();
+
+		cmbCores.setPreferredSize(new Dimension(120, 22));
+
+		filterPanel.add(cmbCores);
+
+		JButton btnEnableFilter = new JButton("Filter");
+
+		btnEnableFilter.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				isFilterApply = true;
+
+			}
+		});
+		filterPanel.add(btnEnableFilter);
+
+		JButton btnClear = new JButton("Clear");
+		btnClear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				isFilterApply = false;
+
+			}
+		});
+
+		filterPanel.add(btnClear);
+
+		JPanel panel_1 = new JPanel();
+
+		console_Panel.add(panel_1, BorderLayout.EAST);
+
 		JButton btn_Console_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
+
+		panel_1.add(btn_Console_Clear);
+
 		btn_Console_Clear.setFocusPainted(false);
+
 		btn_Console_Clear.setBorderPainted(false);
+
 		btn_Console_Clear.setPreferredSize(new Dimension(20, 16));
 
-		console_Panel.add(btn_Console_Clear);
-
 		JButton btn_Console_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
+
+		panel_1.add(btn_Console_Copy);
+
 		btn_Console_Copy.setFocusPainted(false);
+
 		btn_Console_Copy.setBorderPainted(false);
+
 		btn_Console_Copy.setPreferredSize(new Dimension(20, 16));
 
-		console_Panel.add(btn_Console_Copy);
-
 		JButton btn_Console_Save = ComponentFactory.createJButton(new SaveAction("Save"));
-		btn_Console_Save.setFocusPainted(false);
-		btn_Console_Save.setBorderPainted(false);
-		btn_Console_Save.setPreferredSize(new Dimension(20, 16));
 
-		console_Panel.add(btn_Console_Save);
+		panel_1.add(btn_Console_Save);
+
+		btn_Console_Save.setFocusPainted(false);
+
+		btn_Console_Save.setBorderPainted(false);
+
+		btn_Console_Save.setPreferredSize(new Dimension(20, 16));
 
 		JScrollPane scrl_Console = ComponentFactory.createJScrollPane();
 
@@ -102,6 +216,66 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		txtA_Console.setEditable(false);
 
+	}
+
+	private void loadFilters() {
+
+		vpxSystem = VPXUtilities.getVPXSystem();
+
+		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			cmbSubSystem.addItem(vpxSubSystem.getSubSystem());
+		}
+	}
+
+	private void loadProcessorsFilter() {
+
+		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
+
+				curProcFilter = vpxSubSystem;
+
+				cmbProcessor.removeAllItems();
+
+				cmbProcessor.addItem(vpxSubSystem.getIpP2020());
+
+				cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
+
+				cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
+
+				break;
+			}
+
+		}
+	}
+
+	private void loadCoresFilter() {
+
+		cmbCores.removeAllItems();
+
+		if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {
+			cmbCores.setEnabled(false);
+		} else {
+
+			cmbCores.setEnabled(true);
+
+			cmbCores.addItem("All Cores");
+
+			for (int i = 0; i < 8; i++) {
+				cmbCores.addItem(String.format("Core %s", i));
+			}
+
+			cmbCores.setSelectedIndex(0);
+		}
 	}
 
 	public void printConsoleMsg(String msg) {
@@ -119,7 +293,13 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 	}
 
 	public void printConsoleMsg(String ip, String msg) {
-
+		
+		if(isFilterApply){
+			
+		}
+		else{
+			
+		}
 		if (ip.equals(VPXUtilities.getCurrentProcessor())) {
 
 			if (txtA_Console.getCaretPosition() > 0)
@@ -168,14 +348,6 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 			e.printStackTrace();
 		}
 
-	}
-
-	private void startRecieveMessage() {
-		consoleMsgReceiver.execute();
-	}
-
-	private void stopRecieveMessage() {
-		consoleMsgReceiver.cancel(true);
 	}
 
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
@@ -240,43 +412,6 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 			VPXUtilities.showPopup("Contents copied to clipboard");
 		}
-	}
-
-	class ConsoleMessageReceiver extends SwingWorker<Void, String> {
-
-		DatagramSocket serverSocket;
-
-		byte[] receiveData = new byte[1024];
-
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-
-		public ConsoleMessageReceiver() {
-			try {
-				serverSocket = new DatagramSocket(VPX.CONSOLE_PORTNO);
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-			while (true) {
-				serverSocket.receive(receivePacket);
-
-				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
-
-				printConsoleMsg(receivePacket.getAddress().getHostAddress(), sentence);
-
-				Thread.sleep(500);
-			}
-		}
-
-		@Override
-		protected void process(List<String> chunks) {
-			// TODO Auto-generated method stub
-			super.process(chunks);
-		}
-
 	}
 
 }

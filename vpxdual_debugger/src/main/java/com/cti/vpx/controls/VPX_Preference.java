@@ -138,8 +138,6 @@ public class VPX_Preference extends JDialog {
 
 		loadLogProperties(false);
 
-		loadPythonProperties(false);
-
 		loadJavaProperties();
 	}
 
@@ -151,9 +149,7 @@ public class VPX_Preference extends JDialog {
 		case 1:
 			loadLogProperties(isRestore);
 			break;
-		case 2:
-			loadPythonProperties(isRestore);
-			break;
+
 		case 3:
 			loadJavaProperties();
 			break;
@@ -242,49 +238,6 @@ public class VPX_Preference extends JDialog {
 
 	}
 
-	private void loadPythonProperties(boolean isRestore) {
-
-		Properties prop = new Properties();
-
-		if (isRestore) {
-
-			prop.setProperty(VPXUtilities.PYTHON_INTERPRETERPATH, VPXUtilities.getPythonInterpreterPath());
-
-			prop.setProperty(VPXUtilities.PYTHON_USEDUMMY, String.valueOf(false));
-
-			prop.setProperty(VPXUtilities.PYTHON_DUMMYFILE, "");
-
-			prop.setProperty(VPXUtilities.PYTHON_VERSION, VPXUtilities.findPyVersion());
-		} else {
-			prop = (Properties) preferenceProperties.clone();
-		}
-
-		txtInterpreterPath.setText(preferenceProperties.getProperty(VPXUtilities.PYTHON_INTERPRETERPATH));
-
-		boolean dummy = Boolean.valueOf(preferenceProperties.getProperty(VPXUtilities.PYTHON_USEDUMMY));
-
-		chkUseDummy.setSelected(!dummy);
-
-		txtDummyOut.setText(preferenceProperties.getProperty(VPXUtilities.PYTHON_DUMMYFILE));
-
-		lblPyVersion.setText(preferenceProperties.getProperty(VPXUtilities.PYTHON_VERSION));
-
-		chkUseDummy.setSelected(dummy);
-
-		if (txtInterpreterPath.getText().length() < 13) {
-			lblErrIntrprtrPath.setText("Python interpreter not configured");
-		} else {
-			lblErrIntrprtrPath.setText("");
-		}
-
-		if (txtDummyOut.getText().length() < 5) {
-			lblErrDummyFile.setText("No .out file selected");
-		} else {
-			lblErrDummyFile.setText("");
-		}
-
-	}
-
 	private void loadJavaProperties() {
 		// Java Settings Properties
 		lblJVersion.setText(System.getProperty("java.version"));
@@ -333,15 +286,6 @@ public class VPX_Preference extends JDialog {
 			preferenceProperties.setProperty(VPXUtilities.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
 
 			break;
-		case 2:// Python Tab Settings
-
-			preferenceProperties.setProperty(VPXUtilities.PYTHON_INTERPRETERPATH, txtInterpreterPath.getText());
-
-			preferenceProperties.setProperty(VPXUtilities.PYTHON_USEDUMMY, String.valueOf(chkUseDummy.isSelected()));
-
-			preferenceProperties.setProperty(VPXUtilities.PYTHON_DUMMYFILE, txtDummyOut.getText());
-
-			break;
 
 		}
 
@@ -373,14 +317,6 @@ public class VPX_Preference extends JDialog {
 				String.valueOf(chkAppndTimeLogFile.isSelected()));
 
 		preferenceProperties.setProperty(VPXUtilities.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
-
-		// Python Tab Settings
-
-		preferenceProperties.setProperty(VPXUtilities.PYTHON_INTERPRETERPATH, txtInterpreterPath.getText());
-
-		preferenceProperties.setProperty(VPXUtilities.PYTHON_USEDUMMY, String.valueOf(chkUseDummy.isSelected()));
-
-		preferenceProperties.setProperty(VPXUtilities.PYTHON_DUMMYFILE, txtDummyOut.getText());
 
 	}
 
