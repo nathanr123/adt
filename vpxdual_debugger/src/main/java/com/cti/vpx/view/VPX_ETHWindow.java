@@ -1,6 +1,7 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -330,6 +331,12 @@ public class VPX_ETHWindow extends JFrame {
 		logger.updateLog(level, logMsg);
 
 		updateStatus(logMsg);
+	}
+
+	public void addTab(String tabName, JScrollPane comp) {
+		vpx_Content_Tabbed_Pane_Right.addTab(tabName, comp);
+
+		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 	}
 
 	public void connectProcessor(Processor pro) {

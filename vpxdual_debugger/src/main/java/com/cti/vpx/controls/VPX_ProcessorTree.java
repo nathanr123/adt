@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -469,9 +470,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				VPXUtilities.setCurrentProcessor(
 						((DefaultMutableTreeNode) node.getParent()).getUserObject().toString(),
 						ss.substring(0, ss.indexOf(")") + 1), ss.substring(ss.indexOf(")") + 1));
-			}
-			else{
-				VPXUtilities.setCurrentProcessor("","","");
+			} else {
+				VPXUtilities.setCurrentProcessor("", "", "");
 			}
 
 		} else if (e.getButton() == 3) {
@@ -485,6 +485,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			setSelectionRow(row);
 
+			node = (DefaultMutableTreeNode) getLastSelectedPathComponent();
+			
 			showConextMenu(e.getX(), e.getY(), node.getUserObject().toString());
 		}
 
@@ -508,6 +510,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void stopRecieveMessage() {
 		advRecvr.cancel(true);
+	}
+
+	private void showExecuteWindow() {
+
+		parent.addTab("Execute", new JScrollPane(new VPX_ExecutionPanel()));
+
 	}
 
 	private void reNameSelectedProcessorNode() {
@@ -603,13 +611,25 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			popup.add(itemRename);
 
+			JMenuItem itemExecute = new JMenuItem("Execute");
+
+			itemExecute.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					showExecuteWindow();
+				}
+			});
+
+			popup.add(itemExecute);
+
 			JMenuItem itemBist = new JMenuItem("Built In Self Test");
 
 			itemBist.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("Bist");
 					try {
 						Socket client = new Socket();
 

@@ -1,15 +1,20 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.util.VPXUtilities;
 
@@ -19,6 +24,13 @@ public class VPX_ExecutionPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 5981154131918463867L;
+
+	final JFileChooser fileDialog = new JFileChooser();
+
+	final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+
+	final FileNameExtensionFilter filterXml = new FileNameExtensionFilter("XML Files", "xml");
+
 	private JTextField txtOutFile_0;
 	private JTextField txtMapFile_0;
 	private JTextField txtOutFile_1;
@@ -44,7 +56,7 @@ public class VPX_ExecutionPanel extends JPanel {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 			JFrame f = new JFrame();
-			
+
 			f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 			f.setBounds(50, 10, 792, 882);
@@ -65,12 +77,12 @@ public class VPX_ExecutionPanel extends JPanel {
 		init();
 
 		loadComponents();
-
+		
 	}
 
 	private void init() {
 		setLayout(new BorderLayout(0, 0));
-
+		setPreferredSize(new Dimension(790,863));
 	}
 
 	private void loadComponents() {
@@ -144,13 +156,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core0Panel.add(txtMapFile_0);
 
-		JButton btnOutBrowse_0 = new JButton("Browse");
+		JButton btnOutBrowse_0 = new JButton(new BrowseAction("Browse", txtOutFile_0));
 
 		btnOutBrowse_0.setBounds(586, 20, 70, 26);
 
 		core0Panel.add(btnOutBrowse_0);
 
-		JButton btnMapBrowse_0 = new JButton("Browse");
+		JButton btnMapBrowse_0 = new JButton(new BrowseAction("Browse", txtMapFile_0, true));
 
 		btnMapBrowse_0.setBounds(586, 54, 70, 26);
 
@@ -215,13 +227,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core1Panel.add(txtMapFile_1);
 
-		JButton btnOutBrowse_1 = new JButton("Browse");
+		JButton btnOutBrowse_1 = new JButton(new BrowseAction("Browse", txtOutFile_1));
 
 		btnOutBrowse_1.setBounds(586, 17, 70, 26);
 
 		core1Panel.add(btnOutBrowse_1);
 
-		JButton btnMapBrowse_1 = new JButton("Browse");
+		JButton btnMapBrowse_1 = new JButton(new BrowseAction("Browse", txtMapFile_1, true));
 
 		btnMapBrowse_1.setBounds(586, 51, 70, 26);
 
@@ -286,13 +298,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core2Panel.add(txtMapFile_2);
 
-		JButton btnOutBrowse_2 = new JButton("Browse");
+		JButton btnOutBrowse_2 = new JButton(new BrowseAction("Browse", txtOutFile_2));
 
 		btnOutBrowse_2.setBounds(586, 17, 70, 26);
 
 		core2Panel.add(btnOutBrowse_2);
 
-		JButton btnMapBrowse_2 = new JButton("Browse");
+		JButton btnMapBrowse_2 = new JButton(new BrowseAction("Browse", txtMapFile_2, true));
 
 		btnMapBrowse_2.setBounds(586, 51, 70, 26);
 
@@ -357,13 +369,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core3panel.add(txtMapFile_3);
 
-		JButton btnOutBrowse_3 = new JButton("Browse");
+		JButton btnOutBrowse_3 = new JButton(new BrowseAction("Browse", txtOutFile_3));
 
 		btnOutBrowse_3.setBounds(586, 17, 70, 26);
 
 		core3panel.add(btnOutBrowse_3);
 
-		JButton btnMapBrowse_3 = new JButton("Browse");
+		JButton btnMapBrowse_3 = new JButton(new BrowseAction("Browse", txtMapFile_3, true));
 
 		btnMapBrowse_3.setBounds(586, 51, 70, 26);
 
@@ -428,13 +440,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core4Panel.add(txtMapFile_4);
 
-		JButton btnOutBrowse_4 = new JButton("Browse");
+		JButton btnOutBrowse_4 = new JButton(new BrowseAction("Browse", txtOutFile_4));
 
 		btnOutBrowse_4.setBounds(586, 17, 70, 26);
 
 		core4Panel.add(btnOutBrowse_4);
 
-		JButton btnMapBrowse_4 = new JButton("Browse");
+		JButton btnMapBrowse_4 = new JButton(new BrowseAction("Browse", txtMapFile_4, true));
 
 		btnMapBrowse_4.setBounds(586, 51, 70, 26);
 
@@ -499,13 +511,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core5Panel.add(txtMapFile_5);
 
-		JButton btnOutBrowse_5 = new JButton("Browse");
+		JButton btnOutBrowse_5 = new JButton(new BrowseAction("Browse", txtOutFile_5));
 
 		btnOutBrowse_5.setBounds(586, 17, 70, 26);
 
 		core5Panel.add(btnOutBrowse_5);
 
-		JButton btnMapBrowse_5 = new JButton("Browse");
+		JButton btnMapBrowse_5 = new JButton(new BrowseAction("Browse", txtMapFile_5, true));
 
 		btnMapBrowse_5.setBounds(586, 51, 70, 26);
 
@@ -570,13 +582,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core6Panel.add(txtMapFile_6);
 
-		JButton btnOutBrowse_6 = new JButton("Browse");
+		JButton btnOutBrowse_6 = new JButton(new BrowseAction("Browse", txtOutFile_6));
 
 		btnOutBrowse_6.setBounds(586, 17, 70, 26);
 
 		core6Panel.add(btnOutBrowse_6);
 
-		JButton btnMapBrowse_6 = new JButton("Browse");
+		JButton btnMapBrowse_6 = new JButton(new BrowseAction("Browse", txtMapFile_6, true));
 
 		btnMapBrowse_6.setBounds(586, 51, 70, 26);
 
@@ -641,13 +653,13 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core7Panel.add(txtMapFile_7);
 
-		JButton btnOutBrowse_7 = new JButton("Browse");
+		JButton btnOutBrowse_7 = new JButton(new BrowseAction("Browse", txtOutFile_7));
 
 		btnOutBrowse_7.setBounds(586, 17, 70, 26);
 
 		core7Panel.add(btnOutBrowse_7);
 
-		JButton btnMapBrowse_7 = new JButton("Browse");
+		JButton btnMapBrowse_7 = new JButton(new BrowseAction("Browse", txtMapFile_7, true));
 
 		btnMapBrowse_7.setBounds(586, 51, 70, 26);
 
@@ -686,19 +698,77 @@ public class VPX_ExecutionPanel extends JPanel {
 		basePanel.add(batchControlPanel);
 
 		JButton btnBatchDL = new JButton("Batch Download");
+
 		btnBatchDL.setSize(111, 26);
 
 		batchControlPanel.add(btnBatchDL);
 
 		JButton btnBatchRun = new JButton("Batch Run");
+
 		btnBatchRun.setSize(83, 26);
 
 		batchControlPanel.add(btnBatchRun);
 
 		JButton btnBatchHalt = new JButton("Batch Halt");
+
 		btnBatchHalt.setSize(83, 26);
 
 		batchControlPanel.add(btnBatchHalt);
 	}
 
+	public class BrowseAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		JTextField jtf;
+
+		boolean isXMLFilter = false;
+
+		public BrowseAction(String name, JTextField txt) {
+
+			jtf = txt;
+
+			putValue(NAME, name);
+
+		}
+
+		public BrowseAction(String name, JTextField txt, boolean isXML) {
+			jtf = txt;
+
+			this.isXMLFilter = isXML;
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			if (isXMLFilter) {
+
+				fileDialog.removeChoosableFileFilter(filterOut);
+
+				fileDialog.addChoosableFileFilter(filterXml);
+			} else {
+
+				fileDialog.removeChoosableFileFilter(filterXml);
+
+				fileDialog.addChoosableFileFilter(filterOut);
+			}
+
+			fileDialog.setAcceptAllFileFilterUsed(false);
+
+			int returnVal = fileDialog.showOpenDialog(null);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+				java.io.File file = fileDialog.getSelectedFile();
+
+				jtf.setText(file.getPath());
+			}
+		}
+	}
 }
