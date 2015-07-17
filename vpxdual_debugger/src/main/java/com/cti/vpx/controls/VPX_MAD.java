@@ -143,6 +143,7 @@ public class VPX_MAD extends JPanel {
 		txtConfigPathPython = new JTextField();
 
 		txtConfigPathPython.setBounds(132, 26, 509, 26);
+
 		configPathPanel.add(txtConfigPathPython);
 
 		txtConfigPathPython.setColumns(10);
@@ -600,21 +601,42 @@ public class VPX_MAD extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				String error = checkPathsValid(COMPILATION);
-
-				if (error.length() == 0) {
-					VPXUtilities.createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
-							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
-							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
-							txtCompilePathCore5.getText(), txtCompilePathCore6.getText(), txtCompilePathCore7.getText());
-
-					VPXUtilities.createOutFile();
-
-					JOptionPane.showMessageDialog(null, "Out file created successfully");
-				} else {
-
-					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+				if (chkConfigDummyOut.isSelected()) {
+					fillDummyFiles();
 				}
+
+				Thread th = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						String error = checkPathsValid(COMPILATION);
+
+						if (error.length() == 0) {
+
+							VPXUtilities.createDeploymentFile(txtCompilePathFinalOut.getText(),
+									txtCompilePathCore0.getText(), txtCompilePathCore1.getText(),
+									txtCompilePathCore2.getText(), txtCompilePathCore3.getText(),
+									txtCompilePathCore4.getText(), txtCompilePathCore5.getText(),
+									txtCompilePathCore6.getText(), txtCompilePathCore7.getText());
+
+							VPXUtilities.createOutFile();
+
+							JOptionPane.showMessageDialog(null, "Out file created successfully");
+
+							btnCompileApply.setEnabled(true);
+						} else {
+
+							JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+
+							btnCompileApply.setEnabled(true);
+						}
+
+					}
+				});
+
+				th.start();
+
+				btnCompileApply.setEnabled(false);
 
 			}
 		});
@@ -633,6 +655,46 @@ public class VPX_MAD extends JPanel {
 		});
 
 		compileControlsPanel.add(btnCompileClear);
+	}
+
+	private void fillDummyFiles() {
+
+		Properties p = VPXUtilities.readProperties();
+
+		String dummy = p.getProperty(VPXUtilities.PATH_DUMMY);
+
+		if (txtCompilePathCore0.getText().trim().length() == 0) {
+			txtCompilePathCore0.setText(dummy);
+		}
+
+		if (txtCompilePathCore1.getText().trim().length() == 0) {
+			txtCompilePathCore1.setText(dummy);
+		}
+
+		if (txtCompilePathCore2.getText().trim().length() == 0) {
+			txtCompilePathCore2.setText(dummy);
+		}
+
+		if (txtCompilePathCore3.getText().trim().length() == 0) {
+			txtCompilePathCore3.setText(dummy);
+		}
+
+		if (txtCompilePathCore4.getText().trim().length() == 0) {
+			txtCompilePathCore4.setText(dummy);
+		}
+
+		if (txtCompilePathCore5.getText().trim().length() == 0) {
+			txtCompilePathCore5.setText(dummy);
+		}
+
+		if (txtCompilePathCore6.getText().trim().length() == 0) {
+			txtCompilePathCore6.setText(dummy);
+		}
+
+		if (txtCompilePathCore7.getText().trim().length() == 0) {
+			txtCompilePathCore7.setText(dummy);
+		}
+
 	}
 
 	private void loadPathsFromProperties() {

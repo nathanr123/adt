@@ -26,7 +26,6 @@
  */
 package com.cti.vpx.controls.hex;
 
-
 import java.io.*;
 
 public class ByteBuffer {
@@ -83,6 +82,21 @@ public class ByteBuffer {
 			baos.write(buffer, 0, count);
 		}
 		buffer = baos.toByteArray();
+	}
+
+	/**
+	 * Creates a buffer representing the contents read from an input stream.
+	 *
+	 * @param in
+	 *            The input stream to read from.
+	 * @throws IOException
+	 *             If an IO error occurs.
+	 */
+	public ByteBuffer(byte[] bytes) throws IOException {
+
+		buffer = new byte[bytes.length]; // Use as a temporary buffer.
+
+		System.arraycopy(bytes, 0, buffer, 0, bytes.length);
 	}
 
 	public byte getByte(int offset) {

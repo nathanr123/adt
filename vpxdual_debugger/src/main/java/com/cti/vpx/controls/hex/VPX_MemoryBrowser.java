@@ -3,6 +3,10 @@ package com.cti.vpx.controls.hex;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -11,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
+import com.cti.vpx.model.VPX;
 import com.cti.vpx.util.ComponentFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -31,10 +36,12 @@ public class VPX_MemoryBrowser extends JPanel {
 	private JLabel lbl_Addr_View;
 
 	private VPX_TabbedPane memoryBrowser;
-	
+
 	private JPanel panel;
-	
+
 	private JComboBox<String> comboBox;
+
+	private HexEditorPanel hexPanel;
 
 	/**
 	 * Create the panel.
@@ -58,7 +65,7 @@ public class VPX_MemoryBrowser extends JPanel {
 		setLayout(new BorderLayout());
 
 	}
-	
+
 	private JPanel createAddressPanel() {
 
 		JPanel base_Panel = ComponentFactory.createJPanel();
@@ -72,6 +79,35 @@ public class VPX_MemoryBrowser extends JPanel {
 		base_Panel.add(btn_Panel, BorderLayout.EAST);
 
 		btn_Addr_Go = ComponentFactory.createJButton("Go");
+		
+		btn_Addr_Go.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent paramActionEvent) {
+				try {
+				      String host = "172.17.1.170";
+				      
+				      int port = VPX.COMM_PORTNO;
+
+				      byte[] message = "Java Source and Support".getBytes();
+
+				      // Get the internet address of the specified host
+				      InetAddress address = InetAddress.getByName(host);
+
+				      // Initialize a datagram packet with data and address
+				      DatagramPacket packet = new DatagramPacket(message, message.length,
+				          address, port);
+
+				      // Create a datagram socket, send the packet through it, close it.
+				      DatagramSocket dsocket = new DatagramSocket();
+				      dsocket.send(packet);
+				      dsocket.close();
+				    } catch (Exception e) {
+				      System.err.println(e);
+				    }
+				
+			}
+		});
 
 		btn_Panel.add(btn_Addr_Go);
 
@@ -84,14 +120,12 @@ public class VPX_MemoryBrowser extends JPanel {
 		base_Panel.add(lbl_Addr_View, BorderLayout.WEST);
 
 		base_Panel.setPreferredSize(new Dimension(500, 35));
-		
+
 		panel = new JPanel();
 		base_Panel.add(panel, BorderLayout.CENTER);
-		panel.setLayout(new FormLayout(new ColumnSpec[] {
-				FormSpecs.GROWING_BUTTON_COLSPEC,},
-			new RowSpec[] {
-				RowSpec.decode("35px"),}));
-		
+		panel.setLayout(new FormLayout(new ColumnSpec[] { FormSpecs.GROWING_BUTTON_COLSPEC, }, new RowSpec[] { RowSpec
+				.decode("35px"), }));
+
 		comboBox = ComponentFactory.createJComboBox();
 		panel.add(comboBox, "1, 1, fill, center");
 
@@ -102,17 +136,27 @@ public class VPX_MemoryBrowser extends JPanel {
 
 		memoryBrowser = new VPX_TabbedPane(false, true);
 
-		memoryBrowser.add(createHexPanel(), "Address " + (memoryBrowser.getTabCount() + 1));
+		createHexPanel();
+
+		memoryBrowser.add(hexPanel, "Address " + (memoryBrowser.getTabCount() + 1));
 
 	}
 
 	private void addNewTab() {
 
-		memoryBrowser.add(createHexPanel(), "Address " + (memoryBrowser.getTabCount() + 1));
+		memoryBrowser.add(getHexPanel(), "Address " + (memoryBrowser.getTabCount() + 1));
 
 	}
 
-	private HexEditorPanel createHexPanel() {
+	public void updateMemory(byte[] b){
+		hexPanel.handleRecievedBuffer(b);
+	}
+	
+	private void createHexPanel() {
+		hexPanel = new HexEditorPanel();
+	}
+
+	private HexEditorPanel getHexPanel() {
 		return new HexEditorPanel();
 	}
 

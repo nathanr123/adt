@@ -397,6 +397,10 @@ public class HexEditor extends JScrollPane {
 		table.open(fileName);
 	}
 
+	public void open(byte[] bytes) throws IOException {
+		table.open(bytes);
+	}
+	
 	/**
 	 * Sets the contents in the hex editor to the contents of the specified
 	 * input stream.

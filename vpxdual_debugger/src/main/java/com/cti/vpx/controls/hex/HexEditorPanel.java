@@ -158,7 +158,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		editor = new HexEditor();
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
-		handleOpenFile("images\\copy.gif");
+		handleOpenFile("image\\copy.gif");
+
 		add(editor);
 
 	}
@@ -339,6 +340,25 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		return text;
 	}
 
+	public void handleRecievedBuffer(byte[] bytes) {
+
+		try {
+			if (bytes.length > 0) { // In a jar
+				editor.open(bytes);
+
+			} else { // In a jar
+				throw new IOException("byte array is not valid");
+			}
+
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+			String message = msg.getString("Error.Title");
+			String title = msg.getString("Error.Desc");
+			title = MessageFormat.format(title, new Object[] { ioe.toString() });
+			JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	/**
 	 * Opens a file. Displays an error dialog if the file cannot be opened.
 	 *
@@ -448,7 +468,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			String name = msg.getString(getNameKey());
 			putValue(Action.NAME, name);
 			putValue(Action.SHORT_DESCRIPTION, name);
-			ImageIcon icon = VPXUtilities.getImageIcon(("images\\" + getIconKey()), 16, 16);
+			ImageIcon icon = VPXUtilities.getImageIcon(("image\\" + getIconKey()), 16, 16);
 			putValue(Action.SMALL_ICON, icon);
 		}
 

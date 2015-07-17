@@ -78,7 +78,7 @@ public class VPX_About_Dialog extends JDialog {
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setBounds(10, 11, 50, 50);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setIcon(VPXUtilities.getImageIcon("C:\\debugger\\images\\cornet.png",50,50));
+		lblNewLabel.setIcon(VPXUtilities.getImageIcon("image\\cornet.png",50,50));
 		contentPanel.add(lblNewLabel);
 
 		JLabel lblNewLabel_1 = new JLabel("VPX Dual Application Debugger Tool");

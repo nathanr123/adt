@@ -210,7 +210,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		public SaveAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("images\\save.gif"), 14, 14));
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\save.gif"), 14, 14));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -229,7 +229,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		public ClearAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("images\\delete.gif"), 14, 14));
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\delete.gif"), 14, 14));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -248,7 +248,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		public CopyAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("images\\copy.gif"), 14, 14));
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\copy.gif"), 14, 14));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;

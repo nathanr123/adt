@@ -107,6 +107,8 @@ public class VPXUtilities {
 
 	public static final String GENERAL_MEMORY = "general.memorybar";
 
+	public static final String SECURITY_PWD = "security.pwd";
+
 	public static final String LOG_SERIALNO = "log.serialno";
 
 	public static final String LOG_ENABLE = "log.enable";
@@ -385,7 +387,7 @@ public class VPXUtilities {
 	}
 
 	public static Image getAppIcon() {
-		return getImageIcon("images\\cornet.png", 24, 24).getImage();
+		return getImageIcon(System.getProperty("user.dir") + "\\" + "image\\cornet.png", 24, 24).getImage();
 	}
 
 	public static ImageIcon getImageIcon(String path, int w, int h) {
@@ -397,7 +399,7 @@ public class VPXUtilities {
 
 		try {
 
-			return new ImageIcon(name).getImage();
+			return new ImageIcon(System.getProperty("user.dir") + "\\" + name).getImage();
 
 		} catch (Exception ioe) {
 
@@ -1403,10 +1405,13 @@ public class VPXUtilities {
 
 		try {
 
+			if (fileName.length() == 0)
+				return false;
+
 			if (isDirectory) {
 				fileName = fileName.substring(0, fileName.lastIndexOf("\\"));
 			}
-			
+
 			File f = new File(fileName);
 
 			return f.exists();
@@ -1423,9 +1428,8 @@ public class VPXUtilities {
 
 		Properties p = readProperties();
 
-		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(PATH_MAP), DEPLOYMENTCONFIGFILE);
-
-		System.out.println(cmd);
+		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(PATH_MAP), folderPath + "\\"
+				+ DEPLOYMENTCONFIGFILE);
 
 		String s = null;
 
@@ -1437,18 +1441,61 @@ public class VPXUtilities {
 
 			while ((s = stdInput.readLine()) != null) {
 
-				System.out.println(s);
-				if (s.contains("MAP tool executing in prelink bypass mode")) {
-					ret = true;
+				if (s.contains("Error")) {
+					ret = false;
 				}
 
 			}
+
+			deleteAllGeneratedFilesAndFlders(folderPath + "\\" + DEPLOYMENTFILE, folderPath + "\\"
+					+ DEPLOYMENTCONFIGFILE);
+
+			return ret;
 		} catch (Exception e) {
 			ret = false;
 			e.printStackTrace();
 		}
 
 		return ret;
+	}
+
+	private static void deleteAllGeneratedFilesAndFlders(String deployFile, String cfgFile) {
+
+		deleteDeploymentFiles(folderPath + "\\" + DEPLOYMENTFILE, folderPath + "\\" + DEPLOYMENTCONFIGFILE, false);
+
+		deleteDeploymentFiles("images", "", true);
+
+		deleteDeploymentFiles("tmp", "", true);
+	}
+
+	private static void deleteDeploymentFiles(String deployFile, String cfgFile, boolean isdirectory) {
+
+		Properties p = readProperties();
+
+		String cmd = "";
+
+		if (isdirectory) {
+			cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
+		} else {
+			cmd = String.format("cmd /c del /F %s %s", deployFile, cfgFile);
+		}
+
+		String s = null;
+
+		try {
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
 	}
 
 }

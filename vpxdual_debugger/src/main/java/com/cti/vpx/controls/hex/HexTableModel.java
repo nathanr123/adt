@@ -265,6 +265,13 @@ public class HexTableModel extends AbstractTableModel {
 
 	}
 
+	public void setBytes(byte[] bytes) throws IOException {
+		doc = new ByteBuffer(bytes);
+		undoManager.discardAllEdits();
+		fireTableDataChanged();
+		editor.fireHexEditorEvent(0, doc.getSize(), 0);
+	}
+
 	/**
 	 * Sets the bytes displayed to those in the given file.
 	 *

@@ -392,6 +392,10 @@ class HexTable extends JTable {
 	public void open(String fileName) throws IOException {
 		model.setBytes(fileName); // Fires tableDataChanged event
 	}
+	
+	public void open(byte[] bytes) throws IOException {
+		model.setBytes(bytes); // Fires tableDataChanged event
+	}
 
 	/**
 	 * Sets the contents in the hex editor to the contents of the specified

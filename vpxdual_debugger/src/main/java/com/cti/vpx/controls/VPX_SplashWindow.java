@@ -101,7 +101,7 @@ public class VPX_SplashWindow extends JWindow {
 
 		JLabel lblIcon = new JLabel();
 		lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
-		lblIcon.setIcon(VPXUtilities.getImageIcon("images\\cornet.png", 72, 72));
+		lblIcon.setIcon(VPXUtilities.getImageIcon("image\\cornet.png", 72, 72));
 		lblIcon.setBounds(29, 94, 72, 72);
 		panel.add(lblIcon);
 
@@ -113,7 +113,7 @@ public class VPX_SplashWindow extends JWindow {
 
 		JLabel lblBGImage = new JLabel("");
 		lblBGImage.setBounds(2, 2, 495, 290);
-		lblBGImage.setIcon(VPXUtilities.getImageIcon("images\\BG.jpg", 596, 596));
+		lblBGImage.setIcon(VPXUtilities.getImageIcon("image\\BG.jpg", 596, 596));
 		panel.add(lblBGImage);
 		progressBar.setPreferredSize(new Dimension(150, 8));
 

@@ -9,6 +9,7 @@ import java.awt.event.WindowListener;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -102,6 +103,14 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 	private VPX_MessagePanel messagePanel;
 
 	private MsgReceiver msgReciever = new MsgReceiver();
+
+	private VPXUDPReciever udpReciever = new VPXUDPReciever();
+
+	public VPX_MemoryBrowser vpxMemoryBrowser = null;
+
+	ByteBuffer bb = ByteBuffer.allocate(9216);
+
+	private int len;
 
 	/**
 	 * Create the frame.
@@ -235,8 +244,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 		vpx_ToolBar.setFloatable(false);
 
-		vpx_ToolBar
-				.add(ComponentFactory.createJButton("", VPXUtilities.getImageIcon("images\\scan.png", 14, 14), null));
+		vpx_ToolBar.add(ComponentFactory.createJButton("", VPXUtilities.getImageIcon("image\\scan.png", 14, 14), null));
 
 		getContentPane().add(vpx_ToolBar, BorderLayout.NORTH);
 	}
@@ -323,6 +331,19 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	}
 
+	public void updateMemory(byte[] b) {
+
+		if (len < 9216) {
+			bb.put(b);
+			len = len + b.length;
+		} else {
+			vpxMemoryBrowser.updateMemory(b);
+			len = 0;
+			bb.clear();
+		}
+
+	}
+
 	public void updateProcessorTree() {
 		vpx_Processor_Tree.updateVPXSystemTree();
 	}
@@ -346,6 +367,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	private void startMessageReciever() {
 		msgReciever.execute();
+
+		udpReciever.startUDPMonitor();
 	}
 
 	private void stopMessageReciever() {
@@ -383,7 +406,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", new VPX_MemoryBrowser());
+			vpxMemoryBrowser = new VPX_MemoryBrowser();
+
+			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", vpxMemoryBrowser);
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 		}
@@ -475,6 +500,56 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 			if (option == JOptionPane.YES_OPTION) {
 				new VPX_AliasConfigWindow(this).setVisible(true);
 			}
+		}
+
+	}
+
+	class VPXUDPReciever extends SwingWorker<Void, Void> {
+
+		DatagramSocket serverSocket = null;
+
+		byte[] receiveData = new byte[1024];
+
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+		public VPXUDPReciever() {
+			try {
+				serverSocket = new DatagramSocket(VPX.COMM_PORTNO);
+
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected Void doInBackground() {
+
+			// String sentence = new String(receivePacket.getData(), 0,
+			// receivePacket.getLength());
+
+			while (true) {
+
+				try {
+
+					serverSocket.receive(receivePacket);
+
+					updateMemory(receivePacket.getData());
+
+					Thread.sleep(500);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		}
+
+		public void startUDPMonitor() {
+			execute();
+		}
+
+		public void stopUDPMonitor() {
+			cancel(true);
 		}
 
 	}

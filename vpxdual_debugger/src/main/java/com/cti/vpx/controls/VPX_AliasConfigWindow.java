@@ -350,10 +350,10 @@ public class VPX_AliasConfigWindow extends JFrame {
 		contentPane.add(aliasToolbar, BorderLayout.NORTH);
 
 		aliasToolbar.add(ComponentFactory.createJToolBarButton(new ImportAliasFileAction("Import", VPXUtilities
-				.getImageIcon("images\\download.png", 12, 12))), null);
+				.getImageIcon("image\\download.png", 12, 12))), null);
 
 		aliasToolbar.add(ComponentFactory.createJToolBarButton(new ExportAliasFileAction("Export", VPXUtilities
-				.getImageIcon("images\\upload.png", 12, 12))), null);
+				.getImageIcon("image\\upload.png", 12, 12))), null);
 
 	}
 

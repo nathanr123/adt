@@ -3,11 +3,14 @@
  */
 package com.cti.vpx.controls;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -22,8 +25,11 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -222,7 +228,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	private void updateProcessorResponse(String ip, String res) {
-		System.out.println(res);
+		
 	}
 
 	private String getNodeUserObject(String name, boolean isAlive) {
@@ -403,11 +409,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		 */
 		private static final long serialVersionUID = 3402533538077987491L;
 
-		ImageIcon systemIcon = VPXUtilities.getImageIcon("images\\System.jpg", 18, 18);
+		ImageIcon systemIcon = VPXUtilities.getImageIcon("image\\System.jpg", 18, 18);
 
-		ImageIcon processorIcon = VPXUtilities.getImageIcon("images\\Processor4.jpg", 14, 14);
+		ImageIcon processorIcon = VPXUtilities.getImageIcon("image\\Processor4.jpg", 14, 14);
 
-		ImageIcon subSystemIcon = VPXUtilities.getImageIcon("images\\Slot.jpg", 14, 14);
+		ImageIcon subSystemIcon = VPXUtilities.getImageIcon("image\\Slot.jpg", 14, 14);
 
 		public VPX_ProcessorTreeCellRenderer() {
 
@@ -486,7 +492,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			setSelectionRow(row);
 
 			node = (DefaultMutableTreeNode) getLastSelectedPathComponent();
-			
+
 			showConextMenu(e.getX(), e.getY(), node.getUserObject().toString());
 		}
 
@@ -546,6 +552,40 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		} else {
 			parent.updateStatus("Rename processor " + old_name + " interrupted");
 		}
+	}
+
+	private void showVLAN() {
+
+		final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+
+		JPanel contentPane = new JPanel();
+		contentPane.setLayout(new BorderLayout());
+		contentPane.add(browserCanvas, BorderLayout.CENTER);
+
+		JDialog frame = new JDialog(parent, "VLAN Configuration");
+		frame.setBounds(100, 100, 1400, 500);
+		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		frame.setContentPane(contentPane);
+		frame.setResizable(false);
+		frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// Dispose of the native component cleanly
+				browserCanvas.dispose();
+			}
+		});
+
+		frame.setVisible(true);
+
+		// Initialise the native browser component, and if successful...
+		if (browserCanvas.initialise()) {
+			// ...navigate to the desired URL
+			browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+		} else {
+		}
+		frame.setSize(1401, 501);
+
 	}
 
 	private void showConextMenu(int x, int y, String node) {
@@ -610,6 +650,19 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			});
 
 			popup.add(itemRename);
+
+			JMenuItem itemVLAN = new JMenuItem("VLAN Configuration");
+
+			itemVLAN.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					showVLAN();
+				}
+			});
+
+			popup.add(itemVLAN);
 
 			JMenuItem itemExecute = new JMenuItem("Execute");
 

@@ -126,10 +126,10 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 
 		maxImgI = new BufferedImage(BUTTONSIZE, BUTTONSIZE, BufferedImage.TYPE_4BYTE_ABGR);
 
-		closeB = new JButton(VPXUtilities.getImageIcon("images\\close4.png", 10, 10));
+		closeB = new JButton(VPXUtilities.getImageIcon("image\\close4.png", 10, 10));
 		closeB.setSize(BUTTONSIZE, BUTTONSIZE);
 
-		maxB = new JButton(VPXUtilities.getImageIcon("images\\detach.png", 14,14));
+		maxB = new JButton(VPXUtilities.getImageIcon("image\\detach.png", 14,14));
 		maxB.setSize(BUTTONSIZE, BUTTONSIZE);
 
 		actionPopupMenu = new JPopupMenu();
