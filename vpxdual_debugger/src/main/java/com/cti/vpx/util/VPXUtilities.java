@@ -1394,6 +1394,29 @@ public class VPXUtilities {
 
 	}
 
+	public static boolean isFileValid(String fileName) {
+
+		return isFileValid(fileName, false);
+	}
+
+	public static boolean isFileValid(String fileName, boolean isDirectory) {
+
+		try {
+
+			if (isDirectory) {
+				fileName = fileName.substring(0, fileName.lastIndexOf("\\"));
+			}
+			
+			File f = new File(fileName);
+
+			return f.exists();
+
+		} catch (Exception e) {
+			return false;
+		}
+
+	}
+
 	public static boolean createOutFile() {
 
 		boolean ret = true;
@@ -1416,7 +1439,7 @@ public class VPXUtilities {
 
 				System.out.println(s);
 				if (s.contains("MAP tool executing in prelink bypass mode")) {
-					ret = true;					
+					ret = true;
 				}
 
 			}
