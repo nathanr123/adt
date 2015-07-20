@@ -3,19 +3,12 @@
  */
 package com.cti.vpx.controls;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -25,18 +18,13 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -44,9 +32,7 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
-import com.cti.vpx.command.ATP;
-import com.cti.vpx.command.ATPCommand;
-import com.cti.vpx.model.VPX;
+import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
@@ -71,7 +57,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private ProcessorMonitorThread monitor = new ProcessorMonitorThread();
 
-	private ProcessorAdvertisementReceiver advRecvr = new ProcessorAdvertisementReceiver();
+	private VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
 
 	/**
 	 * 
@@ -135,7 +121,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		loadSystemRootNode();
 
-		startRecieveMessage();
 	}
 
 	/**
@@ -169,8 +154,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		setRowHeight(20);
 
-		// DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)
-		// getCellRenderer();
 	}
 
 	public void setVPXSystem(VPXSystem sys) {
@@ -202,7 +185,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		String sub = "<html>";
 		if (isAlive) {
-			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahoma' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
 			if (isWaterfall) {
 				sub = sub + "<font face='Tahoma' size='2' color='green'>W</font>" + "&nbsp;&nbsp;";
 			} else {
@@ -227,13 +210,57 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		return sub;
 	}
 
-	private void updateProcessorResponse(String ip, String res) {
-		
+	public void updateProcessorResponse(String ip, String res) {
+
+		DefaultMutableTreeNode node = null;
+		Enumeration<DefaultMutableTreeNode> e = systemRootNode.depthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = e.nextElement();
+			if (node.isLeaf()) {
+				if (node.getUserObject().toString().contains(ip)) {
+
+					parseResponse(node, res);
+
+					break;
+				}
+
+			}
+		}
+
+	}
+
+	private void parseResponse(DefaultMutableTreeNode node, String msg) {
+
+		if (msg.length() == 4) {
+
+			String name = node.getUserObject().toString();
+
+			name = name.substring(name.indexOf(">(") + 1, name.indexOf("</"));
+
+			if (msg.startsWith("P2")) {
+
+				node.setUserObject(getNodeUserObject(name, true));
+
+			} else {
+
+				String w = msg.substring(2, 3);
+
+				String a = msg.substring(3, 4);
+
+				name = getNodeUserObject(name, true, w.equals("1"), a.equals("1"));
+
+				node.setUserObject(name);
+
+			}
+		}
+
+		VPX_ProcessorTree.this.repaint();
 	}
 
 	private String getNodeUserObject(String name, boolean isAlive) {
 
 		String sub = "<html>";
+
 		if (isAlive) {
 			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
 
@@ -262,7 +289,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				DefaultMutableTreeNode subSystemNode = new DefaultMutableTreeNode(subSystem.getSubSystem());
 
 				DefaultMutableTreeNode ipNode1 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getP2020Name(),
-						true));
+						false));
 
 				DefaultMutableTreeNode ipNode2 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP1Name(),
 						true, false, true));
@@ -284,43 +311,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		}
 
 		updateUI();
-
-	}
-
-	class ProcessorAdvertisementReceiver extends SwingWorker<Void, String> {
-
-		DatagramSocket serverSocket;
-
-		byte[] receiveData = new byte[1024];
-
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-
-		public ProcessorAdvertisementReceiver() {
-			try {
-				serverSocket = new DatagramSocket(VPX.ADV_PORTNO);
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-			while (true) {
-				serverSocket.receive(receivePacket);
-
-				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
-
-				updateProcessorResponse(receivePacket.getAddress().getHostAddress(), sentence);
-
-				Thread.sleep(500);
-			}
-		}
-
-		@Override
-		protected void process(List<String> chunks) {
-			// TODO Auto-generated method stub
-			super.process(chunks);
-		}
 
 	}
 
@@ -467,17 +457,14 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (e.getButton() == 1) {
 
-			if (node.isLeaf()) {
+			if (node != null) {
+				if (node.isLeaf()) {
 
-				String s = node.getUserObject().toString();
+					setSelectedProcessor(node);
 
-				String ss = s.substring(s.indexOf("'>") + 2, s.indexOf("</")).trim();
-
-				VPXUtilities.setCurrentProcessor(
-						((DefaultMutableTreeNode) node.getParent()).getUserObject().toString(),
-						ss.substring(0, ss.indexOf(")") + 1), ss.substring(ss.indexOf(")") + 1));
-			} else {
-				VPXUtilities.setCurrentProcessor("", "", "");
+				} else {
+					VPXUtilities.setCurrentProcessor("", "", "");
+				}
 			}
 
 		} else if (e.getButton() == 3) {
@@ -493,9 +480,34 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			node = (DefaultMutableTreeNode) getLastSelectedPathComponent();
 
-			showConextMenu(e.getX(), e.getY(), node.getUserObject().toString());
+			if (node != null) {
+				setSelectedProcessor(node);
+
+				showConextMenu(e.getX(), e.getY(), node.getUserObject().toString());
+			}
 		}
 
+	}
+
+	private void setSelectedProcessor(DefaultMutableTreeNode node) {
+
+		String s = node.getUserObject().toString();
+
+		String ss = s;
+
+		if (s.startsWith("<html>")) {
+			ss = s.substring(s.indexOf("'>") + 2, s.indexOf("</")).trim();
+		}
+
+		if (node.isRoot()) {
+
+			VPXUtilities.setCurrentProcessor("", "", "");
+
+		} else {
+
+			VPXUtilities.setCurrentProcessor(((DefaultMutableTreeNode) node.getParent()).getUserObject().toString(),
+					ss.substring(0, ss.indexOf(")") + 1), ss.substring(ss.indexOf(")") + 1));
+		}
 	}
 
 	@Override
@@ -508,14 +520,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void startBIST() {
 
-	}
+		new VPX_BISTResultWindow(new BIST()).setVisible(true);
 
-	private void startRecieveMessage() {
-		advRecvr.execute();
-	}
-
-	private void stopRecieveMessage() {
-		advRecvr.cancel(true);
 	}
 
 	private void showExecuteWindow() {
@@ -525,6 +531,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	private void reNameSelectedProcessorNode() {
+
 		DefaultMutableTreeNode f = (DefaultMutableTreeNode) VPX_ProcessorTree.this.getLastSelectedPathComponent();
 
 		String old_Value = f.getUserObject().toString();
@@ -537,8 +544,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (new_Name != null) {
 
-			VPXUtilities.getSelectedProcessor(VPX_ProcessorTree.this.getLastSelectedPathComponent().toString())
-					.setName(new_Name);
+			// VPXUtilities.getSelectedSubSystem(VPX_ProcessorTree.this.getLastSelectedPathComponent().toString()).setName(new_Name);
 
 			String de = old_Value.substring(0, old_Value.indexOf("(")) + "(" + new_Name + ")";
 
@@ -556,36 +562,44 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void showVLAN() {
 
-		final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+		paswordWindow.resetPassword();
 
-		JPanel contentPane = new JPanel();
-		contentPane.setLayout(new BorderLayout());
-		contentPane.add(browserCanvas, BorderLayout.CENTER);
+		paswordWindow.setVisible(true);
 
-		JDialog frame = new JDialog(parent, "VLAN Configuration");
-		frame.setBounds(100, 100, 1400, 500);
-		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		frame.setContentPane(contentPane);
-		frame.setResizable(false);
-		frame.addWindowListener(new WindowAdapter() {
+		if (VPXUtilities.getPropertyValue(VPXUtilities.SECURITY_PWD).equals(paswordWindow.getPasword())) {
 
-			@Override
-			public void windowClosing(WindowEvent e) {
-				// Dispose of the native component cleanly
-				browserCanvas.dispose();
-			}
-		});
-
-		frame.setVisible(true);
-
-		// Initialise the native browser component, and if successful...
-		if (browserCanvas.initialise()) {
-			// ...navigate to the desired URL
-			browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
-		} else {
+			parent.addTab("VLAN", new JScrollPane(new VPX_P2020ConfigurationPanel()));
 		}
-		frame.setSize(1401, 501);
+		else{
+			JOptionPane.showMessageDialog(VPX_ProcessorTree.this.parent, "Pasword invalid","Authentication",JOptionPane.ERROR_MESSAGE);
+			
+			paswordWindow.resetPassword();
 
+			paswordWindow.setVisible(true);
+		}
+
+		/*
+		 * final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+		 * 
+		 * JPanel contentPane = new JPanel(); contentPane.setLayout(new
+		 * BorderLayout()); contentPane.add(browserCanvas, BorderLayout.CENTER);
+		 * 
+		 * JDialog frame = new JDialog(parent, "VLAN Configuration");
+		 * frame.setBounds(100, 100, 1400, 500);
+		 * frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		 * frame.setContentPane(contentPane); frame.setResizable(false);
+		 * frame.addWindowListener(new WindowAdapter() {
+		 * 
+		 * @Override public void windowClosing(WindowEvent e) { // Dispose of
+		 * the native component cleanly browserCanvas.dispose(); } });
+		 * 
+		 * frame.setVisible(true);
+		 * 
+		 * // Initialise the native browser component, and if successful... if
+		 * (browserCanvas.initialise()) { // ...navigate to the desired URL
+		 * browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+		 * } else { } frame.setSize(1401, 501);
+		 */
 	}
 
 	private void showConextMenu(int x, int y, String node) {
@@ -594,19 +608,21 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (node.startsWith("VPXSystem")) {
 
-			JMenuItem itemScan = new JMenuItem("Scan");
-
-			itemScan.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-
-					VPX_ScanWindow ir = new VPX_ScanWindow(parent);
-
-					ir.setVisible(true);
-
-				}
-			});
+			/*
+			 * JMenuItem itemScan = new JMenuItem("Scan");
+			 * 
+			 * itemScan.addActionListener(new ActionListener() {
+			 * 
+			 * @Override public void actionPerformed(ActionEvent e) {
+			 * 
+			 * VPX_ScanWindow ir = new VPX_ScanWindow(parent);
+			 * 
+			 * ir.setVisible(true);
+			 * 
+			 * } });
+			 * 
+			 * popup.add(itemScan);
+			 */
 
 			JMenuItem itemRefresh = new JMenuItem("Configure");
 
@@ -617,8 +633,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 					new VPX_AliasConfigWindow(parent).setVisible(true);
 				}
 			});
-
-			popup.add(itemScan);
 
 			popup.add(itemRefresh);
 
@@ -631,8 +645,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					parent.connectProcessor(VPXUtilities.getSelectedProcessor(VPX_ProcessorTree.this
-							.getLastSelectedPathComponent().toString()));
+					/*
+					 * parent.connectProcessor(VPXUtilities.getSelectedSubSystem(
+					 * VPX_ProcessorTree.this
+					 * .getLastSelectedPathComponent().toString()));
+					 */
 				}
 			});
 
@@ -683,59 +700,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						Socket client = new Socket();
 
-						client.connect(new InetSocketAddress("172.17.1.28", 12345), 300000);
+					startBIST();
 
-						client.setSoTimeout(300000);
-
-						System.out.println("Just connected to " + client.getRemoteSocketAddress());
-
-						System.out.println("Hello from " + client.getLocalSocketAddress());
-
-						/*
-						 * DSPATPCommand cmd = VPXUtilities.createDSPCommand();
-						 * 
-						 * cmd.params.testType.set(ATP.TEST_DSP_FULL);
-						 */
-
-						ATPCommand cmd = VPXUtilities.createATPCommand();
-
-						cmd.params.testType.set(ATP.TEST_P2020_FULL);
-
-						cmd.msgType.set(ATPCommand.MSG_TYPE_TEST);
-
-						cmd.msgID.set(ATPCommand.MSG_ID_GET);
-
-						VPX_BusyWindow busyWindow = new VPX_BusyWindow(null, "Built in Self Test",
-								"Complete Testing on process....");
-
-						cmd.write(client.getOutputStream());
-
-						long start = System.currentTimeMillis();
-
-						ATPCommand msg = new ATPCommand();
-
-						msg.read(client.getInputStream());
-
-						long end = System.currentTimeMillis();
-
-						try {
-							busyWindow.dispose();
-
-							UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-							new VPX_FullTestResult(msg, "172.17.1.28", start, end);
-						} catch (Exception e2) {
-							e2.printStackTrace();
-						}
-
-						client.close();
-					} catch (Exception e3) {
-						e3.printStackTrace();
-					}
 				}
+
 			});
 
 			popup.add(itemBist);

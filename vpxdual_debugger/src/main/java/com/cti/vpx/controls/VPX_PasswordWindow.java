@@ -1,7 +1,12 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -31,6 +36,8 @@ public class VPX_PasswordWindow extends JDialog {
 		init();
 
 		loadComponents();
+		
+		centerFrame();
 
 	}
 
@@ -41,10 +48,16 @@ public class VPX_PasswordWindow extends JDialog {
 		setTitle("Authentication");
 
 		setBounds(100, 100, 350, 130);
+		
+		setModal(true);
 
 		getContentPane().setLayout(new BorderLayout());
 	}
 
+	public void resetPassword(){
+		pwdAdminPassword.setText("");
+	}
+	
 	private void loadComponents() {
 
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -70,6 +83,16 @@ public class VPX_PasswordWindow extends JDialog {
 		JButton btnOK = new JButton("OK");
 
 		btnOK.setActionCommand("OK");
+		
+		btnOK.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				VPX_PasswordWindow.this.dispose();
+				
+			}
+		});
 
 		buttonPane.add(btnOK);
 
@@ -78,8 +101,40 @@ public class VPX_PasswordWindow extends JDialog {
 		JButton btnCancel = new JButton("Cancel");
 
 		btnCancel.setActionCommand("Cancel");
+		
+		btnCancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				pwdAdminPassword.setText("");
+				
+				VPX_PasswordWindow.this.dispose();
+				
+			}
+		});
 
 		buttonPane.add(btnCancel);
 	}
+
+	public String getPasword() {
+		return new String(this.pwdAdminPassword.getPassword());
+	}
+	
+	private void centerFrame() {
+
+		Dimension windowSize = getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
+	}
+
 
 }

@@ -136,10 +136,9 @@ public class VPX_SplashWindow extends JWindow {
 	}
 
 	private void createAndShowADTWindow() {
-		//VPX_Dual_ADT_RootWindow window = new VPX_Dual_ADT_RootWindow();
 
 		VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
 
-		window.setVisible(true);
+		window.showWindow();
 	}
 }

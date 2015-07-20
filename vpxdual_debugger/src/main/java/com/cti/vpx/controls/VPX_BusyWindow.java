@@ -134,4 +134,8 @@ public class VPX_BusyWindow extends JDialog {
 
 		setLocation(dx, dy);
 	}
+	
+	public static void main(String[] args) {
+		new VPX_BusyWindow(null, "Tielw", "message").setVisible(true);
+	}
 }

@@ -97,6 +97,8 @@ public class VPXUtilities {
 
 	private static final DateFormat DATEFORMAT_FULL = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
+	private static final DateFormat DATEFORMAT_FILE = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+
 	private static final DateFormat DATEFORMAT_DATE = new SimpleDateFormat("dd-MM-yyyy");
 
 	private static final DateFormat DATEFORMAT_TIME = new SimpleDateFormat("HH:mm:ss");
@@ -119,7 +121,7 @@ public class VPXUtilities {
 
 	public static final String LOG_MAXFILESIZE = "log.maxfilesize";
 
-	// public static final String LOG_FILEPATH = "log.filepath";
+	public static final String LOG_FILEPATH = "log.filepath";
 
 	public static final String LOG_FILEFORMAT = "log.fileformat";
 
@@ -301,6 +303,8 @@ public class VPXUtilities {
 			ret = DATEFORMAT_DATE.format(Calendar.getInstance().getTime());
 		else if (format == 2)
 			ret = DATEFORMAT_TIME.format(Calendar.getInstance().getTime());
+		else if (format == 3)
+			ret = DATEFORMAT_FILE.format(Calendar.getInstance().getTime());
 		return ret;
 	}
 
@@ -383,11 +387,13 @@ public class VPXUtilities {
 	}
 
 	public static void setVPXSystem(VPXSystem sys) {
+
 		vpxSystem = sys;
 	}
 
 	public static Image getAppIcon() {
-		return getImageIcon(System.getProperty("user.dir") + "\\" + "image\\cornet.png", 24, 24).getImage();
+
+		return getImageIcon("image\\cornet.png", 24, 24).getImage();
 	}
 
 	public static ImageIcon getImageIcon(String path, int w, int h) {
@@ -409,20 +415,27 @@ public class VPXUtilities {
 		return null;
 	}
 
-	public static Processor getSelectedProcessor(String path) {
+	public static VPXSubSystem getSelectedSubSystem(String path) {
 
-		Processor pros = null;
-		/*
-		 * List<Processor> ps = VPXUtilities.getVPXSystem().getProcessors();
-		 * 
-		 * for (Iterator<Processor> iterator = ps.iterator();
-		 * iterator.hasNext();) { Processor processor = iterator.next(); if
-		 * (path.startsWith(processor.getiP_Addresses())) { pros = processor;
-		 * break; }
-		 * 
-		 * }
-		 */
-		return pros;
+		VPXSubSystem sub = null;
+
+		vpxSystem = readFromXMLFile();
+
+		List<VPXSubSystem> subs = vpxSystem.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			if (vpxSubSystem.getSubSystem().equals(path)) {
+
+				sub = vpxSubSystem;
+
+				break;
+			}
+
+		}
+		return sub;
 	}
 
 	public static PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
@@ -536,12 +549,12 @@ public class VPXUtilities {
 			// General Tab Settings
 			prop.setProperty(GENERAL_SPLASH, String.valueOf(true));
 			prop.setProperty(GENERAL_MEMORY, String.valueOf(true));
-
+			prop.setProperty(SECURITY_PWD, "cornet");
 			// Log Tab Settings
 			prop.setProperty(LOG_ENABLE, String.valueOf(true));
 			prop.setProperty(LOG_PROMPT, String.valueOf(true));
 			prop.setProperty(LOG_MAXFILE, String.valueOf(true));
-			prop.setProperty(LOG_SERIALNO, "");
+			prop.setProperty(LOG_FILEPATH, System.getProperty("user.home"));
 			prop.setProperty(LOG_MAXFILESIZE, "2");
 			prop.setProperty(LOG_SERIALNO, "");
 			prop.setProperty(LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
@@ -1267,47 +1280,7 @@ public class VPXUtilities {
 
 	}
 
-	public static void updateConfigFile(String pythonPath, String mapTool, String prelinker, String ofd, String strip,
-			String mal, String nml, boolean isUseDummy, String dummy) {
-
-		Properties p = readProperties();
-
-		p.setProperty(PATH_PYTHON, pythonPath);
-
-		p.setProperty(PATH_MAP, mapTool);
-
-		p.setProperty(PATH_PRELINKER, prelinker);
-
-		p.setProperty(PATH_OFD, ofd);
-
-		p.setProperty(PATH_STRIPER, strip);
-
-		p.setProperty(PATH_MAL, mal);
-
-		p.setProperty(PATH_NML, nml);
-
-		p.setProperty(DUMMY_CHK, isUseDummy ? "true" : "false");
-
-		p.setProperty(PATH_DUMMY, dummy);
-
-		updateProperties(p);
-
-		currMapPath = mapTool;
-
-		currentdployCfg = readFile("deploy\\config.data");
-
-		currentdployCfg = currentdployCfg.replace("prelinkpath", prelinker);
-
-		currentdployCfg = currentdployCfg.replace("ofdpath", ofd);
-
-		currentdployCfg = currentdployCfg.replace("strippath", strip);
-
-		currentdployCfg = currentdployCfg.replace("malpath", mal);
-
-		currentdployCfg = currentdployCfg.replace("nampath", nml);
-	}
-
-	private static String readFile(String filename) {
+	public static String readFile(String filename) {
 		try {
 			final String CHARSET = "UTF-8";
 
@@ -1329,7 +1302,7 @@ public class VPXUtilities {
 		}
 	}
 
-	private static void writeFile(String filename, String content) {
+	public static void writeFile(String filename, String content) {
 		try {
 
 			File newTextFile = new File(filename);
@@ -1346,54 +1319,6 @@ public class VPXUtilities {
 			e.printStackTrace();
 
 		}
-	}
-
-	public static void createDeploymentFile(String outfilename, String out1Path, String out2Path, String out3Path,
-			String out4Path, String out5Path, String out6Path, String out7Path, String out8Path) {
-
-		String str = readFile("deploy/deployment.data");
-
-		str = str.replace("out1", out1Path);
-		str = str.replace("out2", out2Path);
-		str = str.replace("out3", out3Path);
-		str = str.replace("out4", out4Path);
-		str = str.replace("out5", out5Path);
-		str = str.replace("out6", out6Path);
-		str = str.replace("out7", out7Path);
-		str = str.replace("out8", out8Path);
-
-		Properties p = readProperties();
-
-		p.setProperty(PATH_CORE0, out1Path);
-
-		p.setProperty(PATH_CORE1, out2Path);
-
-		p.setProperty(PATH_CORE2, out3Path);
-
-		p.setProperty(PATH_CORE3, out4Path);
-
-		p.setProperty(PATH_CORE4, out5Path);
-
-		p.setProperty(PATH_CORE5, out6Path);
-
-		p.setProperty(PATH_CORE6, out7Path);
-
-		p.setProperty(PATH_CORE7, out8Path);
-
-		p.setProperty(PATH_OUT, outfilename);
-
-		updateProperties(p);
-
-		folderPath = currMapPath.substring(0, currMapPath.lastIndexOf("\\"));
-
-		writeFile(folderPath + "\\" + DEPLOYMENTFILE, str);
-
-		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "\\" + DEPLOYMENTFILE);
-
-		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
-
-		writeFile(folderPath + "\\" + DEPLOYMENTCONFIGFILE, currentdployCfg);
-
 	}
 
 	public static boolean isFileValid(String fileName) {
@@ -1422,44 +1347,32 @@ public class VPXUtilities {
 
 	}
 
-	public static boolean createOutFile() {
+	public static VPXSubSystem getSubSystem(String name) {
 
-		boolean ret = true;
+		VPXSubSystem sub = null;
 
-		Properties p = readProperties();
+		if (vpxSystem != null) {
 
-		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(PATH_MAP), folderPath + "\\"
-				+ DEPLOYMENTCONFIGFILE);
+			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
 
-		String s = null;
+			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
 
-		try {
+				VPXSubSystem vpxSubSystem = iterator.next();
 
-			Process proc = Runtime.getRuntime().exec(cmd);
+				if (vpxSubSystem.getSubSystem().equals(name)) {
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+					sub = vpxSubSystem;
 
-			while ((s = stdInput.readLine()) != null) {
-
-				if (s.contains("Error")) {
-					ret = false;
+					break;
 				}
 
 			}
-
-			deleteAllGeneratedFilesAndFlders(folderPath + "\\" + DEPLOYMENTFILE, folderPath + "\\"
-					+ DEPLOYMENTCONFIGFILE);
-
-			return ret;
-		} catch (Exception e) {
-			ret = false;
-			e.printStackTrace();
 		}
+		return sub;
 
-		return ret;
 	}
 
-	private static void deleteAllGeneratedFilesAndFlders(String deployFile, String cfgFile) {
+	public static void deleteAllGeneratedFilesAndFlders(String deployFile, String cfgFile) {
 
 		deleteDeploymentFiles(folderPath + "\\" + DEPLOYMENTFILE, folderPath + "\\" + DEPLOYMENTCONFIGFILE, false);
 

@@ -17,7 +17,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -36,16 +38,20 @@ public class VPX_DetailPanel extends JDialog {
 	 */
 
 	public VPX_DetailPanel(String path) {
+
 		init();
 
 		loadComponents();
 
 		loadProperties(path);
 
+		pack();
+
 		centerFrame();
 	}
 
 	private void init() {
+
 		setSize(343, 551);
 
 		setAlwaysOnTop(true);
@@ -73,6 +79,7 @@ public class VPX_DetailPanel extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				VPX_DetailPanel.this.dispose();
 			}
 		});
@@ -87,6 +94,8 @@ public class VPX_DetailPanel extends JDialog {
 
 		tbl_Property = new JTable();
 
+		tbl_Property.setRowHeight(20);
+
 		tbl_Property_Model = new DefaultTableModel(new String[] { "Property", "Value" }, 0);
 
 		tbl_Property.setModel(tbl_Property_Model);
@@ -96,63 +105,178 @@ public class VPX_DetailPanel extends JDialog {
 
 	private void loadProperties(String path) {
 
-		if (path.startsWith(VPXSystem.class.getSimpleName())) {		
+		if (path.startsWith(VPXSystem.class.getSimpleName())) {
+
 			loadProperties(VPXUtilities.getVPXSystem());
+
+		} else if (path.startsWith("<html>")) {
+
+			loadProperties(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentProcType());
+
 		} else {
-			loadProperties(VPXUtilities.getSelectedProcessor(path));		
+
+			loadProperties(VPXUtilities.getSelectedSubSystem(path));
 		}
 
 	}
 
 	private void loadProperties(VPXSystem sys) {
 
-		/*
-		tbl_Property_Model.addRow(new String[] { "Name", sys.getName() });
+		tbl_Property_Model.addRow(new String[] { "System Name", sys.getName() });
 
-		List<Processor> processors = sys.getProcessors();
+		List<VPXSubSystem> subSystems = sys.getSubsystem();
 
-		if (processors != null) {
-			tbl_Property_Model.addRow(new String[] { "Total No of Processors", ("" + processors.size()) });
+		tbl_Property_Model.addRow(new String[] { "Total no of Subsystems", String.format("%d", subSystems.size()) });
 
-			for (Iterator<Processor> iterator = processors.iterator(); iterator.hasNext();) {
+		tbl_Property_Model.addRow(new String[] { "", "" });
 
-				Processor processor = (Processor) iterator.next();
+		tbl_Property_Model.addRow(new String[] { "Subsystems Detail", "" });
 
-				tbl_Property_Model.addRow(new String[] { "", "" });
+		for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
 
-				tbl_Property_Model.addRow(new String[] { "Processor Name", processor.getName() });
+			VPXSubSystem vpxSubSystem = iterator.next();
 
-				tbl_Property_Model.addRow(new String[] { "Processor ID", ("" + processor.getID()) });
+			tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
 
-				tbl_Property_Model.addRow(new String[] { "IP Address", processor.getiP_Addresses() });
+			tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
 
-				tbl_Property_Model.addRow(new String[] { "Port", ("" + processor.getPortno()) });
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-				tbl_Property_Model.addRow(new String[] { "Processor Type", processor.getProcessorType().toString() });
+			tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
 
+			tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+			tbl_Property_Model.addRow(new String[] { "", "" });
+
+			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
+
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+			tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+			tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+			tbl_Property_Model.addRow(new String[] { "", "" });
+
+			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
+
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+			tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+			tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+			tbl_Property_Model.addRow(new String[] { "", "" });
+
+		}
+
+	}
+
+	private void loadProperties(VPXSubSystem vpxSubSystem) {
+
+		tbl_Property_Model.addRow(new String[] { "System Name", VPXSystem.class.getSimpleName() });
+
+		tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
+
+		tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
+
+		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+		tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+		tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
+
+		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+		tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+		tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
+
+		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+		tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+		tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+	}
+
+	private void loadProperties(String ip, String procType) {
+
+		PROCESSOR_TYPE pType = null;
+
+		VPXSubSystem vpxSubSystem = null;
+
+		if (procType.contains("P2020")) {
+
+			pType = PROCESSOR_TYPE.PROCESSOR_P2020;
+
+		} else if (procType.contains("DSP1")) {
+
+			pType = PROCESSOR_TYPE.PROCESSOR_DSP1;
+
+		} else if (procType.contains("DSP2")) {
+
+			pType = PROCESSOR_TYPE.PROCESSOR_DSP2;
+
+		}
+
+		List<VPXSubSystem> subs = VPXUtilities.getVPXSystem().getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem subSystem = iterator.next();
+
+			if (subSystem.getIpP2020().equals(ip) || subSystem.getIpDSP1().equals(ip)
+					|| subSystem.getIpDSP2().equals(ip)) {
+
+				vpxSubSystem = subSystem;
+
+				break;
 			}
 		}
-	*/
-	}
 
-	private void loadProperties(Processor processor) {
+		if (vpxSubSystem != null) {
 
-		if (processor != null) {
+			tbl_Property_Model.addRow(new String[] { "System Name", VPXSystem.class.getSimpleName() });
 
-			tbl_Property_Model.addRow(new String[] { "Processor Name", processor.getName() });
+			tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
 
-			tbl_Property_Model.addRow(new String[] { "Processor ID", ("" + processor.getID()) });
+			if (pType == PROCESSOR_TYPE.PROCESSOR_P2020) {
 
-			tbl_Property_Model.addRow(new String[] { "IP Address", processor.getiP_Addresses() });
+				tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
 
-			tbl_Property_Model.addRow(new String[] { "Port", ("" + processor.getPortno()) });
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-			tbl_Property_Model.addRow(new String[] { "Processor Type", processor.getProcessorType().toString() });
+				tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
 
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP1) {
+
+				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
+
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+				tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+
+			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP2) {
+
+				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
+
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+
+				tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+			}
 		}
 	}
-
-	
 
 	private void centerFrame() {
 

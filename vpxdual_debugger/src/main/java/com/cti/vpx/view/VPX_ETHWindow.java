@@ -1,20 +1,18 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -24,31 +22,43 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
-import javax.swing.SwingWorker;
+import javax.swing.SwingConstants;
 
+import com.cti.vpx.Listener.AdvertisementListener;
+import com.cti.vpx.Listener.CommunicationListener;
+import com.cti.vpx.Listener.MessageListener;
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_ConsolePanel;
 import com.cti.vpx.controls.VPX_LoggerPanel;
-import com.cti.vpx.controls.VPX_MAD;
+import com.cti.vpx.controls.VPX_MADPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_Preference;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_StatusBar;
+import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
+import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
+import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.VPX;
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXUDPMonitor;
 import com.cti.vpx.util.VPXUtilities;
 
-public class VPX_ETHWindow extends JFrame implements WindowListener {
+public class VPX_ETHWindow extends JFrame implements WindowListener, AdvertisementListener, MessageListener,
+		CommunicationListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2505823813174035752L;
+
+	private static final int MAX_MEMORY_BROWSER = 4;
+
+	private static final int MAX_MEMORY_PLOT = 3;
 
 	private ResourceBundle rBundle;
 
@@ -62,8 +72,6 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	private JMenu vpx_Menu_Help;
 
-	private JMenuItem vpx_Menu_File_Scan;
-
 	private JMenuItem vpx_Menu_File_Exit;
 
 	private JMenuItem vpx_Menu_Run_Run;
@@ -75,6 +83,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 	private JMenuItem vpx_Menu_Help_About;
 
 	private JMenuItem vpx_Menu_Window_MemoryBrowser;
+
+	private JMenuItem vpx_Menu_Window_MemoryPlot;
 
 	private JMenuItem vpx_Menu_Window_Flash;
 
@@ -102,15 +112,23 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	private VPX_MessagePanel messagePanel;
 
-	private MsgReceiver msgReciever = new MsgReceiver();
-
-	private VPXUDPReciever udpReciever = new VPXUDPReciever();
+	private VPXUDPMonitor udpMonitor = new VPXUDPMonitor();
 
 	public VPX_MemoryBrowser vpxMemoryBrowser = null;
+
+	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
+
+	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
 	ByteBuffer bb = ByteBuffer.allocate(9216);
 
 	private int len;
+
+	private JPanel baseTreePanel;
+
+	private static int currentNoofMemoryView;
+
+	private static int currentNoofMemoryPlot;
 
 	/**
 	 * Create the frame.
@@ -121,20 +139,19 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 		rBundle = VPXUtilities.getResourceBundle();
 
-		initializeRootWindow();
+		init();
 
 		promptAliasConfigFileName();
 
-		startMessageReciever();
+		udpMonitor.startMonitor();
+
 	}
 
-	private void initializeRootWindow() {
+	private void init() {
 
 		setTitle(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version"));
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		// setAlwaysOnTop(true);
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -145,6 +162,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
 
 		setVisible(true);
+
+		udpMonitor.addUDPListener(this);
 
 		toFront();
 	}
@@ -158,6 +177,140 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		loadContentPane();
 
 		loadStatusPane();
+
+		createMemoryBrowsers();
+
+		createMemoryPlots();
+	}
+
+	public void createMemoryBrowsers() {
+
+		memoryBrowserWindow = new VPX_MemoryBrowserWindow[MAX_MEMORY_BROWSER];
+
+		for (int i = 0; i < MAX_MEMORY_BROWSER; i++) {
+
+			memoryBrowserWindow[i] = new VPX_MemoryBrowserWindow(i);
+
+			memoryBrowserWindow[i].setParent(this);
+		}
+	}
+
+	public void openMemoryBrowser(MemoryViewFilter filter) {
+
+		currentNoofMemoryView++;
+
+		if (currentNoofMemoryView > MAX_MEMORY_BROWSER) {
+
+			JOptionPane.showMessageDialog(this, "Maximum 4 memory Browsers are allowed.You are exceeding the limit",
+					"Maximum Reached", JOptionPane.ERROR_MESSAGE);
+
+			currentNoofMemoryView = MAX_MEMORY_BROWSER;
+		}
+
+		for (int i = 0; i < MAX_MEMORY_BROWSER; i++) {
+
+			if (!memoryBrowserWindow[i].isVisible()) {
+
+				memoryBrowserWindow[i].setMemoryFilter(filter);
+
+				memoryBrowserWindow[i].showMemoryBrowser();
+
+				break;
+			}
+		}
+
+		if (currentNoofMemoryView == MAX_MEMORY_BROWSER) {
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
+		}
+
+		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+				+ (MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
+	}
+
+	public void reindexMemoryBrowserIndex() {
+
+		currentNoofMemoryView--;
+
+		if (currentNoofMemoryView == MAX_MEMORY_BROWSER) {
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
+		}
+
+		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+				+ (MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
+	}
+
+	public void createMemoryPlots() {
+
+		memoryPlotWindow = new VPX_MemoryPlotWindow[MAX_MEMORY_PLOT];
+
+		for (int i = 0; i < MAX_MEMORY_PLOT; i++) {
+
+			memoryPlotWindow[i] = new VPX_MemoryPlotWindow(i);
+
+			memoryPlotWindow[i].setParent(this);
+		}
+	}
+
+	public void openMemoryPlot() {
+
+		currentNoofMemoryPlot++;
+
+		if (currentNoofMemoryPlot > MAX_MEMORY_PLOT) {
+
+			JOptionPane.showMessageDialog(this, "Maximum 4 memory plots are allowed.You are exceeding the limit",
+					"Maximum Reached", JOptionPane.ERROR_MESSAGE);
+
+			currentNoofMemoryPlot = MAX_MEMORY_PLOT;
+		}
+
+		for (int i = 0; i < MAX_MEMORY_PLOT; i++) {
+
+			if (!memoryPlotWindow[i].isVisible()) {
+
+				memoryPlotWindow[i].showMemoryPlot();
+
+				break;
+			}
+		}
+
+		if (currentNoofMemoryPlot == MAX_MEMORY_PLOT) {
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(true);
+		}
+
+		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
+				+ (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+	}
+
+	public void reindexMemoryPlotIndex() {
+
+		currentNoofMemoryPlot--;
+
+		if (currentNoofMemoryPlot == MAX_MEMORY_PLOT) {
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(true);
+		}
+
+		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
+				+ (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
 	}
 
 	private void loadMenuBar() {
@@ -174,11 +327,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 		vpx_MenuBar.add(vpx_Menu_File);
 
-		vpx_Menu_File_Scan = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Scan"));
-
 		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(new ExitAction(rBundle.getString("Menu.File.Exit")));
-
-		vpx_Menu_File.add(vpx_Menu_File_Scan);
 
 		vpx_Menu_File.add(ComponentFactory.createJSeparator());
 
@@ -198,10 +347,16 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 		vpx_MenuBar.add(vpx_Menu_Window);
 
-		vpx_Menu_Window_MemoryBrowser = ComponentFactory.createJMenuItem(new MemoryAction(rBundle
-				.getString("Menu.Window.MemoryBrowser")));
+		vpx_Menu_Window_MemoryBrowser = ComponentFactory
+				.createJMenuItem(new MemoryAction(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+						+ (MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) "));
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
+
+		vpx_Menu_Window_MemoryPlot = ComponentFactory.createJMenuItem(new PlotAction(rBundle
+				.getString("Menu.Window.MemoryPlot") + " ( " + (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) "));
+
+		vpx_Menu_Window.add(vpx_Menu_Window_MemoryPlot);
 
 		vpx_Menu_Window_Flash = ComponentFactory.createJMenuItem(new FlashAction(rBundle
 				.getString("Menu.Window.FlashProcessor")));
@@ -255,7 +410,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 		JTabbedPane tb = new JTabbedPane();
 
-		tb.addTab("Processor Explorer", getSystemTree());
+		createSystemTree();
+
+		tb.addTab("Processor Explorer", baseTreePanel);
 
 		vpx_SplitPane.setLeftComponent(tb);
 
@@ -317,7 +474,13 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		return vpx_Right_SplitPane;
 	}
 
-	private JScrollPane getSystemTree() {
+	private void createSystemTree() {
+
+		baseTreePanel = new JPanel();
+
+		baseTreePanel.setLayout(new BorderLayout());
+
+		createLegendPanel();
 
 		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this);
 
@@ -327,8 +490,89 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 			vpx_Processor_Tree.expandRow(i);
 		}
 
-		return vpx_Processor_Tree_ScrollPane;
+		baseTreePanel.add(vpx_Processor_Tree_ScrollPane, BorderLayout.CENTER);
 
+	}
+
+	public void createLegendPanel() {
+
+		JPanel treeLegendPanel = new JPanel();
+
+		treeLegendPanel.setPreferredSize(new Dimension(300, 120));
+
+		treeLegendPanel.setLayout(null);
+
+		JLabel lblNewLabel = new JLabel("");
+
+		lblNewLabel.setOpaque(true);
+
+		lblNewLabel.setBackground(new Color(0, 128, 0));
+
+		lblNewLabel.setSize(new Dimension(32, 24));
+
+		lblNewLabel.setPreferredSize(new Dimension(32, 14));
+
+		lblNewLabel.setBounds(22, 64, 46, 14);
+
+		treeLegendPanel.add(lblNewLabel);
+
+		JLabel lblNewLabel_1 = new JLabel("");
+
+		lblNewLabel_1.setBackground(new Color(255, 0, 0));
+
+		lblNewLabel_1.setOpaque(true);
+
+		lblNewLabel_1.setSize(new Dimension(32, 24));
+
+		lblNewLabel_1.setBounds(22, 90, 46, 14);
+
+		treeLegendPanel.add(lblNewLabel_1);
+
+		JLabel lblNewLabel_2 = new JLabel("W");
+
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
+
+		lblNewLabel_2.setSize(new Dimension(32, 24));
+
+		lblNewLabel_2.setBounds(22, 12, 46, 14);
+
+		treeLegendPanel.add(lblNewLabel_2);
+
+		JLabel lblNewLabel_3 = new JLabel("A");
+
+		lblNewLabel_3.setHorizontalAlignment(SwingConstants.CENTER);
+
+		lblNewLabel_3.setSize(new Dimension(32, 24));
+
+		lblNewLabel_3.setBounds(22, 38, 46, 14);
+
+		treeLegendPanel.add(lblNewLabel_3);
+
+		JLabel lblNewLabel_4 = new JLabel("Waterfall Graph");
+
+		lblNewLabel_4.setBounds(93, 12, 148, 14);
+
+		treeLegendPanel.add(lblNewLabel_4);
+
+		JLabel lblAmplitudeGraph = new JLabel("Amplitude Graph");
+
+		lblAmplitudeGraph.setBounds(93, 38, 148, 14);
+
+		treeLegendPanel.add(lblAmplitudeGraph);
+
+		JLabel lblAvailable = new JLabel("Available");
+
+		lblAvailable.setBounds(93, 64, 148, 14);
+
+		treeLegendPanel.add(lblAvailable);
+
+		JLabel lblUnavailable = new JLabel("Unavailable");
+
+		lblUnavailable.setBounds(93, 90, 148, 14);
+
+		treeLegendPanel.add(lblUnavailable);
+
+		baseTreePanel.add(treeLegendPanel, BorderLayout.SOUTH);
 	}
 
 	public void updateMemory(byte[] b) {
@@ -365,17 +609,13 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		updateStatus(logMsg);
 	}
 
-	private void startMessageReciever() {
-		msgReciever.execute();
-
-		udpReciever.startUDPMonitor();
-	}
-
-	private void stopMessageReciever() {
-		msgReciever.cancel(true);
-	}
-
 	public void addTab(String tabName, JScrollPane comp) {
+		vpx_Content_Tabbed_Pane_Right.addTab(tabName, comp);
+
+		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+	}
+
+	public void addTab(String tabName, JPanel comp) {
 		vpx_Content_Tabbed_Pane_Right.addTab(tabName, comp);
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
@@ -406,11 +646,53 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			vpxMemoryBrowser = new VPX_MemoryBrowser();
+			MemoryViewFilter m = new MemoryViewFilter();
 
-			vpx_Content_Tabbed_Pane_Right.addTab("Memory Browser", vpxMemoryBrowser);
+			m.setSubsystem("Sub1");
 
-			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+			m.setProcessor("192.168.0.102");
+
+			m.setCore("Core 3");
+
+			m.setAutoRefresh(true);
+
+			m.setTimeinterval(10);
+
+			m.setUseMapFile(false);
+
+			m.setMapPath("C:\\temp.map");
+
+			m.setMemoryName("memory X");
+
+			m.setMemoryLength(10 + "");
+
+			m.setMemoryStride(10 + "");
+
+			m.setDirectMemory(true);
+
+			m.setMemoryAddress("0XFF00000");
+
+			openMemoryBrowser(m);
+		}
+	}
+
+	public class PlotAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 477649130981302914L;
+
+		public PlotAction(String name) {
+
+			putValue(NAME, name);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			openMemoryPlot();
 		}
 	}
 
@@ -431,7 +713,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 		public void actionPerformed(ActionEvent e) {
 			int i = isAlreadyExist();
 			if (isAlreadyExist() == -1) {
-				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_MAD()));
+				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_MADPanel(VPX_ETHWindow.this)));
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 			} else
@@ -504,100 +786,6 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	}
 
-	class VPXUDPReciever extends SwingWorker<Void, Void> {
-
-		DatagramSocket serverSocket = null;
-
-		byte[] receiveData = new byte[1024];
-
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-
-		public VPXUDPReciever() {
-			try {
-				serverSocket = new DatagramSocket(VPX.COMM_PORTNO);
-
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected Void doInBackground() {
-
-			// String sentence = new String(receivePacket.getData(), 0,
-			// receivePacket.getLength());
-
-			while (true) {
-
-				try {
-
-					serverSocket.receive(receivePacket);
-
-					updateMemory(receivePacket.getData());
-
-					Thread.sleep(500);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-		}
-
-		public void startUDPMonitor() {
-			execute();
-		}
-
-		public void stopUDPMonitor() {
-			cancel(true);
-		}
-
-	}
-
-	class MsgReceiver extends SwingWorker<Void, String> {
-
-		DatagramSocket serverSocket;
-
-		byte[] receiveData = new byte[1024];
-
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-
-		public MsgReceiver() {
-			try {
-				serverSocket = new DatagramSocket(VPX.CONSOLE_MSG_PORTNO);
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception {
-			while (true) {
-
-				serverSocket.receive(receivePacket);
-
-				String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
-
-				if (sentence.startsWith("M:")) {
-					messagePanel.updateProcessorMessage(receivePacket.getAddress().getHostAddress(),
-							sentence.substring(2, sentence.length()));
-				} else if (sentence.startsWith("C:")) {
-					console.printConsoleMsg(receivePacket.getAddress().getHostAddress(),
-							sentence.substring(2, sentence.length()));
-				}
-
-				Thread.sleep(500);
-			}
-		}
-
-		@Override
-		protected void process(List<String> chunks) {
-			// TODO Auto-generated method stub
-			super.process(chunks);
-		}
-
-	}
-
 	@Override
 	public void windowActivated(WindowEvent arg0) {
 		// TODO Auto-generated method stub
@@ -612,7 +800,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		stopMessageReciever();
+		udpMonitor.stopMonitor();
 	}
 
 	@Override
@@ -636,6 +824,47 @@ public class VPX_ETHWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowOpened(WindowEvent arg0) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void updateCommand(ATP command) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void sendCommand(ATP command) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void updateMessage(String ip, String msg) {
+
+		messagePanel.updateProcessorMessage(ip, msg);
+
+	}
+
+	@Override
+	public void sendMessage(String ip, String msg) {
+		System.out.println("Message : " + msg + " to IP : " + ip);
+
+	}
+
+	@Override
+	public void printConsoleMessage(String ip, String msg) {
+
+		System.out.println(msg);
+
+		console.printConsoleMsg(ip, msg);
+
+	}
+
+	@Override
+	public void updateProcessorStatus(String ip, String msg) {
+
+		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
 
 	}
 }

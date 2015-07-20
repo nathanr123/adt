@@ -45,8 +45,6 @@ public class VPX_StatusBar extends JPanel {
 
 		add(statusLbl, BorderLayout.LINE_START);
 		
-		System.out.println(Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.GENERAL_MEMORY)));
-
 		if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.GENERAL_MEMORY))) {
 			memBar = getMemoryPanel();
 

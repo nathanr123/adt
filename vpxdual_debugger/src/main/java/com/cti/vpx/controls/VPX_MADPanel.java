@@ -2,28 +2,40 @@ package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_MAD extends JPanel {
+public class VPX_MADPanel extends JPanel {
 
 	/**
 	 * 
@@ -74,18 +86,34 @@ public class VPX_MAD extends JPanel {
 
 	private JTextField txtCompilePathCore7;
 
-	final JFileChooser fileDialog = new JFileChooser();
+	private final JFileChooser fileDialog = new JFileChooser();
 
-	final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
 
-	Properties p = VPXUtilities.readProperties();
+	private Properties p = VPXUtilities.readProperties();
 
 	private JCheckBox chkConfigDummyOut;
+
+	private static MADProcessWindow madProcessWindow;
+
+	private static String currMapPath;
+
+	private static String currentdployCfg = "";
+
+	private static String folderPath;
+
+	private VPX_ETHWindow parent;
+
+	private JButton btnCompileApply;
+
+	private JButton btnCompileClear;
 
 	/**
 	 * Create the panel.
 	 */
-	public VPX_MAD() {
+	public VPX_MADPanel(VPX_ETHWindow prent) {
+
+		this.parent = prent;
 
 		init();
 
@@ -98,6 +126,7 @@ public class VPX_MAD extends JPanel {
 	private void init() {
 
 		setLayout(new BorderLayout(0, 0));
+
 	}
 
 	private void loadComponents() {
@@ -342,7 +371,7 @@ public class VPX_MAD extends JPanel {
 
 				if (error.length() == 0) {
 
-					VPXUtilities.updateConfigFile(txtConfigPathPython.getText(), txtConfigPathMAP.getText(),
+					updateConfigFile(txtConfigPathPython.getText(), txtConfigPathMAP.getText(),
 							txtConfigPathPrelinker.getText(), txtConfigPathOFD.getText(),
 							txtConfigPathStriper.getText(), txtConfigPathMAL.getText(), txtConfigPathNML.getText(),
 							chkConfigDummyOut.isSelected(), txtConfigPathDummyOut.getText());
@@ -594,7 +623,7 @@ public class VPX_MAD extends JPanel {
 
 		compileOutFilePanel.add(compileControlsPanel, BorderLayout.SOUTH);
 
-		JButton btnCompileApply = new JButton("Compile");
+		btnCompileApply = new JButton("Compile");
 
 		btnCompileApply.addActionListener(new ActionListener() {
 
@@ -605,45 +634,35 @@ public class VPX_MAD extends JPanel {
 					fillDummyFiles();
 				}
 
-				Thread th = new Thread(new Runnable() {
+				String error = checkPathsValid(COMPILATION);
 
-					@Override
-					public void run() {
-						String error = checkPathsValid(COMPILATION);
+				if (error.length() == 0) {
 
-						if (error.length() == 0) {
+					createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
+							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
+							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
+							txtCompilePathCore5.getText(), txtCompilePathCore6.getText(), txtCompilePathCore7.getText());
 
-							VPXUtilities.createDeploymentFile(txtCompilePathFinalOut.getText(),
-									txtCompilePathCore0.getText(), txtCompilePathCore1.getText(),
-									txtCompilePathCore2.getText(), txtCompilePathCore3.getText(),
-									txtCompilePathCore4.getText(), txtCompilePathCore5.getText(),
-									txtCompilePathCore6.getText(), txtCompilePathCore7.getText());
+					madProcessWindow = new MADProcessWindow(txtCompilePathFinalOut.getText().trim());
 
-							VPXUtilities.createOutFile();
+					madProcessWindow.doCompile();
 
-							JOptionPane.showMessageDialog(null, "Out file created successfully");
+					madProcessWindow.setVisible(true);
 
-							btnCompileApply.setEnabled(true);
-						} else {
+					btnCompileApply.setEnabled(true);
+				} else {
 
-							JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 
-							btnCompileApply.setEnabled(true);
-						}
-
-					}
-				});
-
-				th.start();
-
-				btnCompileApply.setEnabled(false);
+					btnCompileApply.setEnabled(true);
+				}
 
 			}
 		});
 
 		compileControlsPanel.add(btnCompileApply);
 
-		JButton btnCompileClear = new JButton("Clear");
+		btnCompileClear = new JButton("Clear");
 
 		btnCompileClear.addActionListener(new ActionListener() {
 
@@ -929,6 +948,143 @@ public class VPX_MAD extends JPanel {
 		return paths.toString();
 	}
 
+	public void updateConfigFile(String pythonPath, String mapTool, String prelinker, String ofd, String strip,
+			String mal, String nml, boolean isUseDummy, String dummy) {
+
+		Properties p = VPXUtilities.readProperties();
+
+		p.setProperty(VPXUtilities.PATH_PYTHON, pythonPath);
+
+		p.setProperty(VPXUtilities.PATH_MAP, mapTool);
+
+		p.setProperty(VPXUtilities.PATH_PRELINKER, prelinker);
+
+		p.setProperty(VPXUtilities.PATH_OFD, ofd);
+
+		p.setProperty(VPXUtilities.PATH_STRIPER, strip);
+
+		p.setProperty(VPXUtilities.PATH_MAL, mal);
+
+		p.setProperty(VPXUtilities.PATH_NML, nml);
+
+		p.setProperty(VPXUtilities.DUMMY_CHK, isUseDummy ? "true" : "false");
+
+		p.setProperty(VPXUtilities.PATH_DUMMY, dummy);
+
+		VPXUtilities.updateProperties(p);
+
+		currMapPath = mapTool;
+
+		currentdployCfg = VPXUtilities.readFile("deploy\\config.data");
+
+		currentdployCfg = currentdployCfg.replace("prelinkpath", prelinker);
+
+		currentdployCfg = currentdployCfg.replace("ofdpath", ofd);
+
+		currentdployCfg = currentdployCfg.replace("strippath", strip);
+
+		currentdployCfg = currentdployCfg.replace("malpath", mal);
+
+		currentdployCfg = currentdployCfg.replace("nampath", nml);
+	}
+
+	public void createDeploymentFile(String outfilename, String out1Path, String out2Path, String out3Path,
+			String out4Path, String out5Path, String out6Path, String out7Path, String out8Path) {
+
+		String str = VPXUtilities.readFile("deploy/deployment.data");
+
+		str = str.replace("out1", out1Path);
+		str = str.replace("out2", out2Path);
+		str = str.replace("out3", out3Path);
+		str = str.replace("out4", out4Path);
+		str = str.replace("out5", out5Path);
+		str = str.replace("out6", out6Path);
+		str = str.replace("out7", out7Path);
+		str = str.replace("out8", out8Path);
+
+		Properties p = VPXUtilities.readProperties();
+
+		p.setProperty(VPXUtilities.PATH_CORE0, out1Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE1, out2Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE2, out3Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE3, out4Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE4, out5Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE5, out6Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE6, out7Path);
+
+		p.setProperty(VPXUtilities.PATH_CORE7, out8Path);
+
+		p.setProperty(VPXUtilities.PATH_OUT, outfilename);
+
+		VPXUtilities.updateProperties(p);
+
+		folderPath = currMapPath.substring(0, currMapPath.lastIndexOf("\\"));
+
+		VPXUtilities.writeFile(folderPath + "\\" + VPXUtilities.DEPLOYMENTFILE, str);
+
+		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "\\" + VPXUtilities.DEPLOYMENTFILE);
+
+		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
+
+		VPXUtilities.writeFile(folderPath + "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE, currentdployCfg);
+
+	}
+
+	public boolean createOutFile() {
+
+		boolean ret = true;
+
+		Properties p = VPXUtilities.readProperties();
+
+		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(VPXUtilities.PATH_MAP), folderPath
+				+ "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE);
+		// String cmd = String.format("cmd /c ping 192.168.0.102");
+
+		try {
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			String s = null;
+			while ((s = stdInput.readLine()) != null) {
+
+				madProcessWindow.updateGeneratingMessage(s);
+
+				if (s.contains("Error")) {
+					ret = false;
+				}
+
+			}
+
+			if (ret) {
+				madProcessWindow.setSuccess();
+			} else
+
+			{
+				madProcessWindow.setFailure();
+
+				JOptionPane.showMessageDialog(madProcessWindow, "Error in generating out file");
+			}
+
+			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath + "\\" + VPXUtilities.DEPLOYMENTFILE, folderPath
+					+ "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE);
+
+			return ret;
+		} catch (Exception e) {
+			ret = false;
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+
 	public class BrowseAction extends AbstractAction {
 
 		/**
@@ -972,6 +1128,223 @@ public class VPX_MAD extends JPanel {
 
 				jtf.setText(file.getPath());
 			}
+		}
+	}
+
+	public class MADProcessWindow extends JDialog {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3411706910706113431L;
+
+		private final JPanel contentPanel = new JPanel();
+
+		private JButton btnOpen;
+
+		private JButton btnCancel;
+
+		private String path = null;
+
+		private JLabel lblOpenFolder;
+
+		private JTextArea txtAResult;
+
+		private JScrollPane scrResult;
+
+		/**
+		 * Create the dialog.
+		 */
+		public MADProcessWindow(String pathToOPen) {
+
+			this.path = pathToOPen;
+
+			init();
+
+			loadComponents();
+
+			centerFrame();
+
+		}
+
+		public JPanel getContentPanel() {
+			return contentPanel;
+		}
+
+		public void doCompile() {
+
+			Thread th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					createOutFile();
+
+				}
+			});
+
+			th.start();
+
+		}
+
+		private void init() {
+
+			setTitle("MAD Generation Process");
+
+			setModal(true);
+
+			setUndecorated(true);
+
+			setAlwaysOnTop(true);
+
+			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+			setSize(800, 350);
+
+			getContentPane().setLayout(new BorderLayout());
+
+		}
+
+		private void loadComponents() {
+
+			JPanel basePanel = new JPanel();
+
+			basePanel.setLayout(new BorderLayout());
+
+			basePanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+
+			getContentPane().add(basePanel, BorderLayout.CENTER);
+
+			basePanel.add(contentPanel, BorderLayout.CENTER);
+
+			contentPanel.setLayout(new BorderLayout(0, 0));
+
+			JPanel descriptionPanel = new JPanel();
+
+			descriptionPanel.setPreferredSize(new Dimension(10, 50));
+
+			contentPanel.add(descriptionPanel, BorderLayout.NORTH);
+
+			descriptionPanel.setLayout(new BorderLayout(0, 0));
+
+			JLabel lblDescription = new JLabel("Generating out file started.Detail are showing below");
+
+			descriptionPanel.add(lblDescription, BorderLayout.CENTER);
+
+			scrResult = new JScrollPane();
+
+			contentPanel.add(scrResult, BorderLayout.CENTER);
+
+			txtAResult = new JTextArea();
+
+			txtAResult.setEditable(false);
+
+			scrResult.setViewportView(txtAResult);
+
+			lblOpenFolder = new JLabel("Click open button to open generated out file folder");
+
+			lblOpenFolder.setEnabled(false);
+
+			lblOpenFolder.setPreferredSize(new Dimension(243, 20));
+
+			contentPanel.add(lblOpenFolder, BorderLayout.SOUTH);
+
+			contentPanel.add(new JLabel("   "), BorderLayout.EAST);
+
+			contentPanel.add(new JLabel("   "), BorderLayout.WEST);
+
+			JPanel buttonPane = new JPanel();
+
+			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+			basePanel.add(buttonPane, BorderLayout.SOUTH);
+
+			btnOpen = new JButton("Open");
+
+			btnOpen.setActionCommand("OK");
+
+			btnOpen.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					openFolder();
+
+				}
+			});
+
+			btnOpen.setEnabled(false);
+
+			buttonPane.add(btnOpen);
+
+			getRootPane().setDefaultButton(btnOpen);
+
+			btnCancel = new JButton("Close");
+
+			btnCancel.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					MADProcessWindow.this.dispose();
+
+				}
+			});
+
+			btnCancel.setEnabled(false);
+
+			btnCancel.setActionCommand("Cancel");
+
+			buttonPane.add(btnCancel);
+		}
+
+		private void centerFrame() {
+
+			Dimension windowSize = getSize();
+
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+			Point centerPoint = ge.getCenterPoint();
+
+			int dx = centerPoint.x - windowSize.width / 2;
+
+			int dy = centerPoint.y - windowSize.height / 2;
+
+			setLocation(dx, dy);
+		}
+
+		private void openFolder() {
+
+			try {
+
+				Desktop.getDesktop().open(new File(path.substring(0, path.lastIndexOf("\\"))));
+
+				this.dispose();
+
+			} catch (IOException e) {
+
+			}
+		}
+
+		public void updateGeneratingMessage(String msg) {
+			txtAResult.append(msg + "\n");
+		}
+
+		public void setSuccess() {
+
+			btnOpen.setEnabled(true);
+
+			btnCancel.setEnabled(true);
+
+			lblOpenFolder.setEnabled(true);
+		}
+
+		public void setFailure() {
+
+			btnOpen.setEnabled(false);
+
+			btnCancel.setEnabled(true);
+
+			lblOpenFolder.setEnabled(false);
 		}
 	}
 }

@@ -14,6 +14,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,6 +56,10 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private boolean isFilterApply = false;
 
+	List<String> ips = new ArrayList<String>();
+
+	private int coreindex;
+
 	/**
 	 * Create the panel.
 	 */
@@ -68,6 +73,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void init() {
+
 		setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 
 		setLayout(new BorderLayout(0, 0));
@@ -154,6 +160,11 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+
+				coreindex = 0;
+
+				ips.clear();
+
 				isFilterApply = true;
 
 			}
@@ -161,11 +172,23 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 		filterPanel.add(btnEnableFilter);
 
 		JButton btnClear = new JButton("Clear");
+		
 		btnClear.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+
+				coreindex = 0;
+
 				isFilterApply = false;
+
+				ips.clear();
+				
+				cmbSubSystem.setSelectedIndex(0);
+				
+				cmbProcessor.setSelectedIndex(0);
+				
+				cmbCores.setSelectedIndex(0);
 
 			}
 		});
@@ -184,7 +207,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		btn_Console_Clear.setBorderPainted(false);
 
-		btn_Console_Clear.setPreferredSize(new Dimension(20, 16));
+		btn_Console_Clear.setPreferredSize(new Dimension(22, 22));
 
 		JButton btn_Console_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
 
@@ -194,7 +217,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		btn_Console_Copy.setBorderPainted(false);
 
-		btn_Console_Copy.setPreferredSize(new Dimension(20, 16));
+		btn_Console_Copy.setPreferredSize(new Dimension(22, 22));
 
 		JButton btn_Console_Save = ComponentFactory.createJButton(new SaveAction("Save"));
 
@@ -204,7 +227,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		btn_Console_Save.setBorderPainted(false);
 
-		btn_Console_Save.setPreferredSize(new Dimension(20, 16));
+		btn_Console_Save.setPreferredSize(new Dimension(22, 22));
 
 		JScrollPane scrl_Console = ComponentFactory.createJScrollPane();
 
@@ -222,6 +245,10 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		vpxSystem = VPXUtilities.getVPXSystem();
 
+		cmbSubSystem.removeAllItems();
+
+		cmbSubSystem.addItem("All Susb Systems");
+
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 
 		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
@@ -234,6 +261,10 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private void loadProcessorsFilter() {
 
+		cmbProcessor.removeAllItems();
+
+		cmbProcessor.addItem("All Processors");
+
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 
 		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
@@ -243,8 +274,6 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 			if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
 
 				curProcFilter = vpxSubSystem;
-
-				cmbProcessor.removeAllItems();
 
 				cmbProcessor.addItem(vpxSubSystem.getIpP2020());
 
@@ -262,19 +291,24 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		cmbCores.removeAllItems();
 
-		if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {
-			cmbCores.setEnabled(false);
-		} else {
+		if (curProcFilter != null) {
 
-			cmbCores.setEnabled(true);
+			if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {
 
-			cmbCores.addItem("All Cores");
+				cmbCores.setEnabled(false);
 
-			for (int i = 0; i < 8; i++) {
-				cmbCores.addItem(String.format("Core %s", i));
+			} else {
+
+				cmbCores.setEnabled(true);
+
+				cmbCores.addItem("All Cores");
+
+				for (int i = 0; i < 8; i++) {
+					cmbCores.addItem(String.format("Core %s", i));
+				}
+
+				cmbCores.setSelectedIndex(0);
 			}
-
-			cmbCores.setSelectedIndex(0);
 		}
 	}
 
@@ -293,24 +327,55 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 	}
 
 	public void printConsoleMsg(String ip, String msg) {
-		
-		if(isFilterApply){
-			
-		}
-		else{
-			
-		}
-		if (ip.equals(VPXUtilities.getCurrentProcessor())) {
 
-			if (txtA_Console.getCaretPosition() > 0)
+		if (isFilterApply) {
 
-				txtA_Console.append("\n");
+			if (ips.size() == 0) {
 
-			String[] strs = msg.split(":");
+				ips.clear();
 
-			txtA_Console.append(String.format("Core %s : %s", strs[0], strs[1]));
+				if (cmbSubSystem.getSelectedIndex() > 0) {
 
-			txtA_Console.setCaretPosition(txtA_Console.getText().length());
+					VPXSubSystem sub = VPXUtilities.getSubSystem(cmbSubSystem.getSelectedItem().toString());
+
+					ips.add(sub.getIpP2020());
+
+					ips.add(sub.getIpDSP1());
+
+					ips.add(sub.getIpDSP2());
+				}
+
+				if (cmbProcessor.getSelectedIndex() > 0) {
+
+					ips.clear();
+
+					ips.add(cmbProcessor.getSelectedItem().toString());
+
+				}
+
+				coreindex = cmbCores.getSelectedIndex();
+			}
+
+			if (ips.contains(ip)) {
+
+				if (coreindex == 0) {
+
+					printConsoleMsg(msg);
+
+				} else {
+
+					if (msg.startsWith(String.valueOf((coreindex - 1)))) {
+
+						printConsoleMsg(msg);
+					}
+				}
+
+			}
+
+		} else {
+
+			printConsoleMsg(msg);
+
 		}
 	}
 
@@ -362,7 +427,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public SaveAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\save.gif"), 14, 14));
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\save.gif"), 20, 20));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -381,7 +446,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public ClearAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\delete.gif"), 14, 14));
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\clear2.png"), 20, 20));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -400,7 +465,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public CopyAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\copy.gif"), 14, 14));
+			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\copy.gif"), 20, 20));
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;

@@ -109,8 +109,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private Action redoAction;
 	private Action settingsAction;
 
-	public JComboBox<String> processorMem;
-
 	private ConfigPanel settingsPanel;
 
 	private DumpAction dumpAction;
@@ -220,12 +218,16 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private JToolBar createToolBar() {
 
 		JToolBar toolbar = new JToolBar();
-		processorMem = new JComboBox<String>(new DefaultComboBoxModel<String>(new String[] { "Select Processor",
-				"DSP - 1", "DSP - 2", "P2020" }));
 
-		processorMem.setMaximumSize(new Dimension(200, 25));
-		toolbar.add(processorMem);
+		toolbar.setFloatable(false);
 
+		formatBytes = new JComboBox<String>(new DefaultComboBoxModel<String>(new String[] { "8 Bit Integer",
+				"16 Bit Integer", "32 Bit Integer", "64 Bit Integer", "32 Bit Float", "64 Bit Float", "String",
+				"Decimal", "Binary" }));
+
+		formatBytes.setMaximumSize(new Dimension(200, 25));
+
+		toolbar.add(formatBytes);
 		toolbar.addSeparator();
 
 		toolbar.add(createToolBarButton(openAction));
@@ -240,16 +242,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		toolbar.add(createToolBarButton(undoAction));
 		toolbar.add(createToolBarButton(redoAction));
-
-		toolbar.addSeparator();
-
-		formatBytes = new JComboBox<String>(new DefaultComboBoxModel<String>(new String[] { "8 Bit Integer",
-				"16 Bit Integer", "32 Bit Integer", "64 Bit Integer", "32 Bit Float", "64 Bit Float", "String",
-				"Decimal", "Binary" }));
-
-		formatBytes.setMaximumSize(new Dimension(200, 25));
-
-		toolbar.add(formatBytes);
 
 		toolbar.addSeparator();
 
@@ -713,7 +705,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			try {
 				result = (String) contents.getTransferData(DataFlavor.stringFlavor);
 			} catch (UnsupportedFlavorException | IOException ex) {
-				System.out.println(ex);
 				ex.printStackTrace();
 			}
 		}

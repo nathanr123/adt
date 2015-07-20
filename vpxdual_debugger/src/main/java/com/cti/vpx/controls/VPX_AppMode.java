@@ -126,14 +126,19 @@ public class VPX_AppMode extends JFrame {
 
 		loadComponents();
 
+		setLogProperties();
+
 		centerFrame();
 
 	}
 
 	public VPX_AppMode() {
+
 		init();
 
 		loadComponents();
+
+		setLogProperties();
 
 		centerFrame();
 	}
@@ -377,9 +382,12 @@ public class VPX_AppMode extends JFrame {
 
 			loadUARTProperties();
 
-			cmbCOMM.setSelectedIndex(0);
+			if (cmbCOMM.getItemCount() > 0) {
 
-			populateUARTValues(cmbCOMM.getSelectedItem().toString());
+				cmbCOMM.setSelectedIndex(0);
+
+				populateUARTValues(cmbCOMM.getSelectedItem().toString());
+			}
 
 		} else if (mode == ETHMODE) {
 			centerPanel.removeAll();
@@ -689,7 +697,7 @@ public class VPX_AppMode extends JFrame {
 		chkLog.setSelected(isLogEnabled);
 
 		if (isLogEnabled) {
-			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXUtilities.LOG_SERIALNO));
+			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXUtilities.LOG_FILEPATH));
 		} else {
 			txtLogFileName.setEnabled(false);
 			btnBrowse.setEnabled(false);
@@ -742,8 +750,8 @@ public class VPX_AppMode extends JFrame {
 					VPXUtilities.setEthernetPort(cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
 							txtSubnet.getText(), txtGateway.getText());
 
-					VPX_ETHWindow window = new VPX_ETHWindow();
 				}
+				VPX_ETHWindow window = new VPX_ETHWindow();
 
 			} else {
 
@@ -763,5 +771,10 @@ public class VPX_AppMode extends JFrame {
 			txtLogFileName.requestFocusInWindow();
 		}
 
+	}
+
+	public void showWindow() {
+
+		this.setVisible(true);
 	}
 }
