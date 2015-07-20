@@ -1053,6 +1053,7 @@ public class VPX_MADPanel extends JPanel {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			String s = null;
+
 			while ((s = stdInput.readLine()) != null) {
 
 				madProcessWindow.updateGeneratingMessage(s);
@@ -1064,17 +1065,18 @@ public class VPX_MADPanel extends JPanel {
 			}
 
 			if (ret) {
-				madProcessWindow.setSuccess();
-			} else
 
-			{
+				madProcessWindow.setSuccess();
+
+			} else {
+
 				madProcessWindow.setFailure();
 
 				JOptionPane.showMessageDialog(madProcessWindow, "Error in generating out file");
 			}
 
-			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath + "\\" + VPXUtilities.DEPLOYMENTFILE, folderPath
-					+ "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE);
+			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXUtilities.DEPLOYMENTFILE,
+					VPXUtilities.DEPLOYMENTCONFIGFILE);
 
 			return ret;
 		} catch (Exception e) {
@@ -1116,9 +1118,9 @@ public class VPX_MADPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			fileDialog.addChoosableFileFilter(filterOut);
+			// fileDialog.addChoosableFileFilter(filterOut);
 
-			fileDialog.setAcceptAllFileFilterUsed(false);
+			// fileDialog.setAcceptAllFileFilterUsed(false);
 
 			int returnVal = fileDialog.showOpenDialog(null);
 

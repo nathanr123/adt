@@ -2,8 +2,11 @@ package com.cti.vpx.util;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+
 import javax.swing.SwingWorker;
+
 import com.cti.vpx.Listener.AdvertisementListener;
 import com.cti.vpx.Listener.CommunicationListener;
 import com.cti.vpx.Listener.MessageListener;
@@ -67,6 +70,27 @@ public class VPXUDPMonitor {
 	}
 
 	public void sendMessageToProcessor(String ip, String msg) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			byte[] buffer = msg.getBytes();
+
+			InetAddress receiverAddress = InetAddress.getByName(ip);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, receiverAddress,
+					UDPListener.CONSOLE_MSG_PORTNO);
+
+			datagramSocket.send(packet);
+
+			// System.out.println("Message : " + msg + " to IP : " + ip);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
 
 	}
 

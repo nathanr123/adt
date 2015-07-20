@@ -1,14 +1,23 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
+
+import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -27,14 +36,20 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 	private JPasswordField pwdConfirmPWD;
 
+	private VPX_ETHWindow parent;
+
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_ChangePasswordWindow() {
+	public VPX_ChangePasswordWindow(VPX_ETHWindow prnt) {
+
+		this.parent = prnt;
 
 		init();
 
 		loadComponents();
+
+		centerFrame();
 	}
 
 	private void init() {
@@ -88,7 +103,15 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 		JButton btnChangePWD = new JButton("Change");
 
-		btnChangePWD.setActionCommand("OK");
+		btnChangePWD.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				changePassword();
+
+			}
+		});
 
 		buttonPane.add(btnChangePWD);
 
@@ -102,4 +125,48 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 	}
 
+	private void centerFrame() {
+
+		Dimension windowSize = getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
+	}
+
+	private void changePassword() {
+
+		String pwd = VPXUtilities.getPropertyValue(VPXUtilities.SECURITY_PWD);
+
+		if (pwd.equals(new String(pwdOldPWD.getPassword()))) {
+
+			String pwd1 = new String(pwdNewPWD.getPassword());
+
+			String pwd2 = new String(pwdConfirmPWD.getPassword());
+
+			if (pwd1.equals(pwd2)) {
+
+				VPXUtilities.updateProperties(VPXUtilities.SECURITY_PWD, pwd1);
+
+				JOptionPane.showMessageDialog(parent, "Password Changed Succesfully", "Authentication",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(parent, "New password and Confirm password does not match",
+						"Authentication", JOptionPane.ERROR_MESSAGE);
+
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(parent, "Old passwrod does not match", "Authentication",
+					JOptionPane.ERROR_MESSAGE);
+
+		}
+		this.dispose();
+	}
 }

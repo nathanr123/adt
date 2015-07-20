@@ -5,12 +5,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ResourceBundle;
 
-import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -27,23 +34,32 @@ import javax.swing.SwingConstants;
 import com.cti.vpx.Listener.AdvertisementListener;
 import com.cti.vpx.Listener.CommunicationListener;
 import com.cti.vpx.Listener.MessageListener;
+import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
+import com.cti.vpx.controls.VPX_BISTResultWindow;
+import com.cti.vpx.controls.VPX_ChangePasswordWindow;
 import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_ConsolePanel;
+import com.cti.vpx.controls.VPX_DetailPanel;
+import com.cti.vpx.controls.VPX_EthernetFlashPanel;
+import com.cti.vpx.controls.VPX_ExecutionPanel;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MADPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
+import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_Preference;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_StatusBar;
+import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUDPMonitor;
 import com.cti.vpx.util.VPXUtilities;
@@ -56,9 +72,13 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	 */
 	private static final long serialVersionUID = 2505823813174035752L;
 
-	private static final int MAX_MEMORY_BROWSER = 4;
+	public static final int MAX_MEMORY_BROWSER = 4;
 
-	private static final int MAX_MEMORY_PLOT = 3;
+	public static final int MAX_MEMORY_PLOT = 3;
+
+	private static final VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
+
+	private static VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
 
 	private ResourceBundle rBundle;
 
@@ -66,29 +86,53 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	private JMenu vpx_Menu_File;
 
-	private JMenu vpx_Menu_Run;
-
 	private JMenu vpx_Menu_Window;
+
+	private JMenu vpx_Menu_Tool;
 
 	private JMenu vpx_Menu_Help;
 
+	// File Menu Items
+	private JMenuItem vpx_Menu_File_AliasConfig;
+
+	private JMenuItem vpx_Menu_File_Detail;
+
 	private JMenuItem vpx_Menu_File_Exit;
 
-	private JMenuItem vpx_Menu_Run_Run;
-
-	private JMenuItem vpx_Menu_Run_Pause;
-
-	private JMenuItem vpx_Menu_Help_Help;
-
-	private JMenuItem vpx_Menu_Help_About;
-
+	// Window Menu Items
 	private JMenuItem vpx_Menu_Window_MemoryBrowser;
 
 	private JMenuItem vpx_Menu_Window_MemoryPlot;
 
-	private JMenuItem vpx_Menu_Window_Flash;
+	private JMenuItem vpx_Menu_Window_EthFlash;
 
-	private JMenuItem vpx_Menu_Preference;
+	private JMenuItem vpx_Menu_Window_Amplitude;
+
+	private JMenuItem vpx_Menu_Window_Waterfall;
+
+	private JMenuItem vpx_Menu_Window_MAD;
+
+	private JMenuItem vpx_Menu_Window_BIST;
+
+	private JMenuItem vpx_Menu_Window_Execution;
+
+	private JMenuItem vpx_Menu_Window_P2020Config;
+
+	private JMenuItem vpx_Menu_Window_ChangeIP;
+
+	// Tools Menu Items
+	private JMenuItem vpx_Menu_Tools_ChangePWD;
+
+	private JMenuItem vpx_Menu_Tools_Prefrences;
+
+	private JMenuItem vpx_Menu_Tools_Console;
+
+	private JMenuItem vpx_Menu_Tools_Log;
+
+	// Help Menu Items
+	private JMenuItem vpx_Menu_Help_Help;
+
+	private JMenuItem vpx_Menu_Help_About;
 
 	private JToolBar vpx_ToolBar;
 
@@ -108,8 +152,6 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	private VPX_StatusBar statusBar;
 
-	private VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
-
 	private VPX_MessagePanel messagePanel;
 
 	private VPXUDPMonitor udpMonitor = new VPXUDPMonitor();
@@ -126,9 +168,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	private JPanel baseTreePanel;
 
-	private static int currentNoofMemoryView;
+	public static int currentNoofMemoryView;
 
-	private static int currentNoofMemoryPlot;
+	public static int currentNoofMemoryPlot;
 
 	/**
 	 * Create the frame.
@@ -170,9 +212,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	private void loadComponents() {
 
-		loadMenuBar();
+		createMenuBar();
 
-		loadToolBar();
+		createToolBar();
 
 		loadContentPane();
 
@@ -313,66 +355,242 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 				+ (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
 	}
 
-	private void loadMenuBar() {
+	private void createMenuBar() {
 
+		// Creating MenuBar
 		vpx_MenuBar = ComponentFactory.createJMenuBar();// new JMenuBar();
 
+		// Creating Menus
 		vpx_Menu_File = ComponentFactory.createJMenu(rBundle.getString("Menu.File"));
-
-		vpx_Menu_Run = ComponentFactory.createJMenu(rBundle.getString("Menu.Run"));
 
 		vpx_Menu_Window = ComponentFactory.createJMenu(rBundle.getString("Menu.Window"));
 
+		vpx_Menu_Tool = ComponentFactory.createJMenu(rBundle.getString("Menu.Tools"));
+
 		vpx_Menu_Help = ComponentFactory.createJMenu(rBundle.getString("Menu.Help"));
 
-		vpx_MenuBar.add(vpx_Menu_File);
+		// Creating MenuItems
 
-		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(new ExitAction(rBundle.getString("Menu.File.Exit")));
+		// File Menus
+		vpx_Menu_File_AliasConfig = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Config"));
 
-		vpx_Menu_File.add(ComponentFactory.createJSeparator());
+		vpx_Menu_File_AliasConfig.addActionListener(new ActionListener() {
 
-		vpx_Menu_File.add(vpx_Menu_File_Exit);
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
 
-		vpx_MenuBar.add(vpx_Menu_Run);
+				showAliasConfig();
 
-		vpx_Menu_Run_Run = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Run.Run"));
+			}
+		});
 
-		vpx_Menu_Run_Pause = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Run.Pause"));
+		vpx_Menu_File_Detail = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Detail"));
 
-		vpx_Menu_Run.add(vpx_Menu_Run_Run);
+		vpx_Menu_File_Detail.addActionListener(new ActionListener() {
 
-		vpx_Menu_Run.add(ComponentFactory.createJSeparator());
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-		vpx_Menu_Run.add(vpx_Menu_Run_Pause);
+				showDetail();
 
-		vpx_MenuBar.add(vpx_Menu_Window);
+			}
+		});
 
+		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Exit"));
+
+		vpx_Menu_File_Exit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				exitApplication();
+
+			}
+		});
+
+		// Window Menus
 		vpx_Menu_Window_MemoryBrowser = ComponentFactory
-				.createJMenuItem(new MemoryAction(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
-						+ (MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) "));
 
-		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
+		.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+				+ (MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
 
-		vpx_Menu_Window_MemoryPlot = ComponentFactory.createJMenuItem(new PlotAction(rBundle
-				.getString("Menu.Window.MemoryPlot") + " ( " + (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) "));
+		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
 
-		vpx_Menu_Window.add(vpx_Menu_Window_MemoryPlot);
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-		vpx_Menu_Window_Flash = ComponentFactory.createJMenuItem(new FlashAction(rBundle
-				.getString("Menu.Window.FlashProcessor")));
+				showMemoryBrowser();
 
-		vpx_Menu_Window.add(vpx_Menu_Window_Flash);
+			}
+		});
 
-		vpx_Menu_Window.add(ComponentFactory.createJSeparator());
+		vpx_Menu_Window_MemoryPlot = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MemoryPlot")
+				+ " ( " + (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
 
-		vpx_Menu_Preference = ComponentFactory.createJMenuItem(new PreferenceAction(rBundle
-				.getString("Menu.Window.Preferences")));
+		vpx_Menu_Window_MemoryPlot.addActionListener(new ActionListener() {
 
-		vpx_Menu_Window.add(vpx_Menu_Preference);
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-		vpx_MenuBar.add(vpx_Menu_Help);
+				showMemoryPlot();
 
+			}
+		});
+
+		vpx_Menu_Window_EthFlash = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.EthFlash"));
+
+		vpx_Menu_Window_EthFlash.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showEthFlash();
+			}
+		});
+
+		vpx_Menu_Window_Amplitude = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude"));
+
+		vpx_Menu_Window_Amplitude.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showAmplitude();
+
+			}
+		});
+		vpx_Menu_Window_Waterfall = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall"));
+
+		vpx_Menu_Window_Waterfall.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showWaterfall();
+
+			}
+		});
+
+		vpx_Menu_Window_MAD = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"));
+
+		vpx_Menu_Window_MAD.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showMAD();
+
+			}
+		});
+
+		vpx_Menu_Window_BIST = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"));
+
+		vpx_Menu_Window_BIST.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showBIST();
+
+			}
+		});
+
+		vpx_Menu_Window_Execution = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Execute"));
+
+		vpx_Menu_Window_Execution.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showExecution();
+
+			}
+		});
+
+		vpx_Menu_Window_P2020Config = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.P2020Config"));
+
+		vpx_Menu_Window_P2020Config.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showVLAN(0);
+
+			}
+		});
+
+		vpx_Menu_Window_ChangeIP = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.ChangeIP"));
+
+		vpx_Menu_Window_ChangeIP.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showVLAN(1);
+
+			}
+		});
+		// Tools Menus
+
+		vpx_Menu_Tools_ChangePWD = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.ChangePWD"));
+
+		vpx_Menu_Tools_ChangePWD.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showChangePassword();
+
+			}
+		});
+
+		vpx_Menu_Tools_Prefrences = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Preferences"));
+
+		vpx_Menu_Tools_Prefrences.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showPrefrences();
+			}
+		});
+
+		vpx_Menu_Tools_Console = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Console"));
+
+		vpx_Menu_Tools_Console.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showConsole();
+
+			}
+		});
+
+		vpx_Menu_Tools_Log = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Log"));
+
+		vpx_Menu_Tools_Log.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showLog();
+
+			}
+		});
+
+		// Help Menus
 		vpx_Menu_Help_Help = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Help"));
+
+		vpx_Menu_Help_Help.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showHelp();
+
+			}
+		});
 
 		vpx_Menu_Help_About = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.About"));
 
@@ -380,10 +598,72 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				aboutDialog.showDialog();
+
+				showAbout();
+
 			}
 		});
+		// Adding
 
+		// Adding Menus
+		vpx_MenuBar.add(vpx_Menu_File);
+
+		vpx_MenuBar.add(vpx_Menu_Window);
+
+		vpx_MenuBar.add(vpx_Menu_Tool);
+
+		vpx_MenuBar.add(vpx_Menu_Help);
+
+		// Adding Menu Items
+
+		// File Menu Items
+		vpx_Menu_File.add(vpx_Menu_File_AliasConfig);
+
+		vpx_Menu_File.add(vpx_Menu_File_Detail);
+
+		vpx_Menu_File.add(ComponentFactory.createJSeparator());
+
+		vpx_Menu_File.add(vpx_Menu_File_Exit);
+
+		// Window Menu Items
+		vpx_Menu_Window.add(vpx_Menu_Window_Execution);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_EthFlash);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_MAD);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_BIST);
+
+		vpx_Menu_Window.add(ComponentFactory.createJSeparator());
+
+		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_MemoryPlot);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_Amplitude);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_Waterfall);
+
+		vpx_Menu_Window.add(ComponentFactory.createJSeparator());
+
+		vpx_Menu_Window.add(vpx_Menu_Window_P2020Config);
+
+		vpx_Menu_Window.add(vpx_Menu_Window_ChangeIP);
+
+		// Tool Menu Items
+		vpx_Menu_Tool.add(vpx_Menu_Tools_ChangePWD);
+
+		vpx_Menu_Tool.add(ComponentFactory.createJSeparator());
+
+		vpx_Menu_Tool.add(vpx_Menu_Tools_Console);
+
+		vpx_Menu_Tool.add(vpx_Menu_Tools_Log);
+
+		vpx_Menu_Tool.add(ComponentFactory.createJSeparator());
+
+		vpx_Menu_Tool.add(vpx_Menu_Tools_Prefrences);
+
+		// Help Menu Items
 		vpx_Menu_Help.add(vpx_Menu_Help_Help);
 
 		vpx_Menu_Help.add(ComponentFactory.createJSeparator());
@@ -393,13 +673,152 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 		setJMenuBar(vpx_MenuBar);
 	}
 
-	private void loadToolBar() {
+	private void createToolBar() {
 
 		vpx_ToolBar = ComponentFactory.createJToolBar();
 
 		vpx_ToolBar.setFloatable(false);
 
-		vpx_ToolBar.add(ComponentFactory.createJButton("", VPXUtilities.getImageIcon("image\\scan.png", 14, 14), null));
+		JButton btnAliasConfig = ComponentFactory.createJButton("",
+				VPXUtilities.getImageIcon("image\\config.png", 14, 14), null);
+
+		btnAliasConfig.setToolTipText("Alias Configuration");
+
+		btnAliasConfig.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_File_AliasConfig.doClick();
+
+			}
+		});
+
+		vpx_ToolBar.add(btnAliasConfig);
+
+		JButton btnDetail = ComponentFactory.createJButton("", VPXUtilities.getImageIcon("image\\detail1.png", 14, 14),
+				null);
+
+		btnDetail.setToolTipText("VPX System Detail");
+
+		btnDetail.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_File_Detail.doClick();
+
+			}
+		});
+
+		JButton btnMemoryBrowser = ComponentFactory.createJButton("",
+				VPXUtilities.getImageIcon("image\\memory.png", 14, 14), null);
+
+		btnMemoryBrowser.setToolTipText("Memory Browser");
+
+		btnMemoryBrowser.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				vpx_Menu_Window_MemoryBrowser.doClick();
+
+			}
+		});
+
+		JButton btnMemoryPlot = ComponentFactory.createJButton("",
+				VPXUtilities.getImageIcon("image\\plot.png", 14, 14), null);
+
+		btnMemoryPlot.setToolTipText("Memory Plots");
+
+		btnMemoryPlot.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_Window_MemoryPlot.doClick();
+
+			}
+		});
+
+		JButton btnMAD = ComponentFactory.createJButton("", VPXUtilities.getImageIcon("image\\mad.png", 14, 14), null);
+
+		btnMAD.setToolTipText("MAD Utility");
+
+		btnMAD.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_Window_MAD.doClick();
+
+			}
+		});
+
+		JButton btnBIST = ComponentFactory
+				.createJButton("", VPXUtilities.getImageIcon("image\\BIST.png", 14, 14), null);
+
+		btnBIST.setToolTipText("Built In Self Test");
+
+		btnBIST.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_Window_BIST.doClick();
+
+			}
+		});
+
+		JButton btnFlash = ComponentFactory.createJButton("", VPXUtilities.getImageIcon("image\\memory1.png", 14, 14),
+				null);
+
+		btnFlash.setToolTipText("Ethernet Flash");
+
+		btnFlash.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_Window_EthFlash.doClick();
+
+			}
+		});
+
+		JButton btnExecute = ComponentFactory.createJButton("",
+				VPXUtilities.getImageIcon("image\\execution.png", 14, 14), null);
+
+		btnExecute.setToolTipText("Execution");
+
+		btnExecute.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_Window_Execution.doClick();
+
+			}
+		});
+
+		// Adding to Toolbar
+		vpx_ToolBar.add(btnDetail);
+
+		vpx_ToolBar.addSeparator();
+
+		vpx_ToolBar.add(btnMemoryBrowser);
+
+		vpx_ToolBar.add(btnMemoryPlot);
+
+		vpx_ToolBar.addSeparator();
+
+		vpx_ToolBar.add(btnMAD);
+
+		vpx_ToolBar.add(btnBIST);
+
+		vpx_ToolBar.add(btnFlash);
+
+		vpx_ToolBar.add(btnExecute);
+
+		vpx_ToolBar.addSeparator();
 
 		getContentPane().add(vpx_ToolBar, BorderLayout.NORTH);
 	}
@@ -497,6 +916,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	public void createLegendPanel() {
 
 		JPanel treeLegendPanel = new JPanel();
+
+		treeLegendPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 
 		treeLegendPanel.setPreferredSize(new Dimension(300, 120));
 
@@ -622,6 +1043,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	}
 
 	public void connectProcessor(Processor pro) {
+
 		vpx_Content_Tabbed_Pane_Right.addTab(String.format("%s(%s)", pro.getiP_Addresses(), pro.getName()),
 				new VPX_ConnectedProcessor(VPX_ETHWindow.this));
 
@@ -630,146 +1052,16 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 		pro.connect();
 	}
 
-	public class MemoryAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public MemoryAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			MemoryViewFilter m = new MemoryViewFilter();
-
-			m.setSubsystem("Sub1");
-
-			m.setProcessor("192.168.0.102");
-
-			m.setCore("Core 3");
-
-			m.setAutoRefresh(true);
-
-			m.setTimeinterval(10);
-
-			m.setUseMapFile(false);
-
-			m.setMapPath("C:\\temp.map");
-
-			m.setMemoryName("memory X");
-
-			m.setMemoryLength(10 + "");
-
-			m.setMemoryStride(10 + "");
-
-			m.setDirectMemory(true);
-
-			m.setMemoryAddress("0XFF00000");
-
-			openMemoryBrowser(m);
-		}
-	}
-
-	public class PlotAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public PlotAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			openMemoryPlot();
-		}
-	}
-
-	public class FlashAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public FlashAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			int i = isAlreadyExist();
-			if (isAlreadyExist() == -1) {
-				vpx_Content_Tabbed_Pane_Right.addTab("Flash", new JScrollPane(new VPX_MADPanel(VPX_ETHWindow.this)));
-
-				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
-			} else
-				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
-		}
-	}
-
-	private int isAlreadyExist() {
+	private int isAlreadyExist(String find) {
 		int ret = -1;
 
 		for (int i = 0; i < vpx_Content_Tabbed_Pane_Right.getTabCount(); i++) {
-			if (vpx_Content_Tabbed_Pane_Right.getTitleAt(i).equals("Flash")) {
+			if (vpx_Content_Tabbed_Pane_Right.getTitleAt(i).equals(find)) {
 				ret = i;
 				break;
 			}
 		}
 		return ret;
-	}
-
-	public class PreferenceAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public PreferenceAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			new VPX_Preference().showPreferenceWindow();
-		}
-	}
-
-	public class ExitAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public ExitAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			VPX_ETHWindow.this.dispose();
-
-		}
 	}
 
 	private void promptAliasConfigFileName() {
@@ -784,6 +1076,199 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 			}
 		}
 
+	}
+
+	public void showAliasConfig() {
+
+		new VPX_AliasConfigWindow(VPX_ETHWindow.this).setVisible(true);
+
+	}
+
+	public void showDetail() {
+
+		VPX_DetailPanel detail = new VPX_DetailPanel(VPXSystem.class.getSimpleName());
+
+		detail.setVisible(true);
+
+	}
+
+	public void exitApplication() {
+
+		VPX_ETHWindow.this.dispose();
+
+		System.exit(0);
+
+	}
+
+	public void showMemoryBrowser() {
+
+		MemoryViewFilter m = new MemoryViewFilter();
+
+		m.setSubsystem("Sub1");
+
+		m.setProcessor("192.168.0.102");
+
+		m.setCore("Core 3");
+
+		m.setAutoRefresh(true);
+
+		m.setTimeinterval(10);
+
+		m.setUseMapFile(false);
+
+		m.setMapPath("C:\\temp.map");
+
+		m.setMemoryName("memory X");
+
+		m.setMemoryLength(10 + "");
+
+		m.setMemoryStride(10 + "");
+
+		m.setDirectMemory(true);
+
+		m.setMemoryAddress("0XFF00000");
+
+		openMemoryBrowser(m);
+
+	}
+
+	public void showMemoryPlot() {
+
+		openMemoryPlot();
+
+	}
+
+	public void showEthFlash() {
+
+		vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility", new JScrollPane(new VPX_EthernetFlashPanel()));
+
+		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
+	}
+
+	public void showAmplitude() {
+	}
+
+	public void showWaterfall() {
+	}
+
+	public void showMAD() {
+
+		int i = isAlreadyExist("Mad Utility");
+
+		if (i == -1) {
+
+			vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility", new JScrollPane(new VPX_MADPanel(VPX_ETHWindow.this)));
+
+			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
+		} else
+
+			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
+
+	}
+
+	public void showBIST() {
+
+		new VPX_BISTResultWindow().setVisible(true);
+	}
+
+	public void showExecution() {
+
+		vpx_Content_Tabbed_Pane_Right.addTab("Execution", new JScrollPane(new VPX_ExecutionPanel()));
+
+		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
+	}
+
+	public void showVLAN(int tab) {
+
+		paswordWindow.resetPassword();
+
+		paswordWindow.setVisible(true);
+
+		if (VPXUtilities.getPropertyValue(VPXUtilities.SECURITY_PWD).equals(paswordWindow.getPasword())) {
+
+			// addTab("VLAN", new JScrollPane(new
+			// VPX_P2020ConfigurationPanel(tab)));
+
+			final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+
+			JPanel contentPane = new JPanel();
+
+			contentPane.setLayout(new BorderLayout());
+
+			contentPane.add(browserCanvas, BorderLayout.CENTER);
+
+			JDialog frame = new JDialog(this, "VLAN Configuration");
+
+			frame.setBounds(100, 100, 1400, 500);
+
+			frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+			frame.setContentPane(contentPane);
+
+			frame.setResizable(false);
+
+			frame.addWindowListener(new WindowAdapter() {
+
+				@Override
+				public void windowClosing(WindowEvent e) { // Dispose of the
+															// native
+															// component cleanly
+					browserCanvas.dispose();
+				}
+			});
+
+			frame.setVisible(true);
+
+			if (browserCanvas.initialise()) {
+
+				browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+			} else {
+			}
+
+			frame.setSize(1401, 501);
+
+		} else {
+
+			JOptionPane.showMessageDialog(this, "Pasword invalid", "Authentication", JOptionPane.ERROR_MESSAGE);
+
+			paswordWindow.resetPassword();
+
+			paswordWindow.setVisible(true);
+		}
+
+	}
+
+	public void showChangePassword() {
+
+		new VPX_ChangePasswordWindow(VPX_ETHWindow.this).setVisible(true);
+
+	}
+
+	public void showPrefrences() {
+
+		new VPX_Preference().showPreferenceWindow();
+
+	}
+
+	public void showConsole() {
+
+		vpx_Content_Tabbed_Pane_Message.setSelectedIndex(1);
+	}
+
+	public void showLog() {
+
+		vpx_Content_Tabbed_Pane_Message.setSelectedIndex(0);
+	}
+
+	public void showHelp() {
+	}
+
+	public void showAbout() {
+
+		aboutDialog.setVisible(true);
 	}
 
 	@Override
@@ -848,14 +1333,12 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	@Override
 	public void sendMessage(String ip, String msg) {
-		System.out.println("Message : " + msg + " to IP : " + ip);
 
+		udpMonitor.sendMessageToProcessor(ip, msg);
 	}
 
 	@Override
 	public void printConsoleMessage(String ip, String msg) {
-
-		System.out.println(msg);
 
 		console.printConsoleMsg(ip, msg);
 

@@ -97,14 +97,20 @@ public class VPX_P2020ConfigurationPanel extends JPanel {
 
 	private JTextField txtIPETH3;
 
+	private int selTab = 0;
+
 	/**
 	 * Create the panel.
 	 */
-	public VPX_P2020ConfigurationPanel() {
+	public VPX_P2020ConfigurationPanel(int tab) {
+
+		selTab = tab;
 
 		init();
 
 		loadComponents();
+
+		tabbedPane.setSelectedIndex(selTab);
 
 	}
 
@@ -1128,11 +1134,11 @@ public class VPX_P2020ConfigurationPanel extends JPanel {
 		JButton btnClear = new JButton("Clear");
 
 		btnClear.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 		p2020IPConfigPanel.add(btnClear, "cell 3 7");

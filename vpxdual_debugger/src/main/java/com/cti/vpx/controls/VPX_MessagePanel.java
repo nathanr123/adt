@@ -18,6 +18,7 @@ import java.util.Calendar;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -469,9 +470,31 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			parent.sendMessage(VPXUtilities.getCurrentProcessor(), txt_Msg_Send.getText());
+			String str = txt_Msg_Send.getText();
 
-			updateUserMessage(txt_Msg_Send.getText());
+			if (str.length() > 0 && str.length() <= 16) {
+
+				String[] s = str.split(" ");
+
+				if (s.length != 5) {
+
+					JOptionPane
+							.showMessageDialog(parent, "Arguments are missing", "Message", JOptionPane.ERROR_MESSAGE);
+
+					txt_Msg_Send.requestFocus();
+
+				} else {
+					parent.sendMessage(VPXUtilities.getCurrentProcessor(), txt_Msg_Send.getText());
+
+					updateUserMessage(txt_Msg_Send.getText());
+				}
+
+			} else {
+				JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
+						JOptionPane.ERROR_MESSAGE);
+
+				txt_Msg_Send.requestFocus();
+			}
 
 		}
 

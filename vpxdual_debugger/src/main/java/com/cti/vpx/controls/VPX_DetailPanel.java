@@ -18,7 +18,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
-import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
@@ -53,6 +52,8 @@ public class VPX_DetailPanel extends JDialog {
 	private void init() {
 
 		setSize(343, 551);
+
+		setTitle("VPX System Details");
 
 		setAlwaysOnTop(true);
 
@@ -107,9 +108,13 @@ public class VPX_DetailPanel extends JDialog {
 
 		if (path.startsWith(VPXSystem.class.getSimpleName())) {
 
+			setTitle("VPX System Details");
+
 			loadProperties(VPXUtilities.getVPXSystem());
 
 		} else if (path.startsWith("<html>")) {
+
+			setTitle(VPXUtilities.getCurrentProcType() + " " + VPXUtilities.getCurrentProcessor() + " Details");
 
 			loadProperties(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentProcType());
 
@@ -121,6 +126,8 @@ public class VPX_DetailPanel extends JDialog {
 	}
 
 	private void loadProperties(VPXSystem sys) {
+
+		setTitle("VPX System Details");
 
 		tbl_Property_Model.addRow(new String[] { "System Name", sys.getName() });
 
@@ -173,6 +180,8 @@ public class VPX_DetailPanel extends JDialog {
 	}
 
 	private void loadProperties(VPXSubSystem vpxSubSystem) {
+
+		setTitle(vpxSubSystem.getSubSystem() + " Details");
 
 		tbl_Property_Model.addRow(new String[] { "System Name", VPXSystem.class.getSimpleName() });
 

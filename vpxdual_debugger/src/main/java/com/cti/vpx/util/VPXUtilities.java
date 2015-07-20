@@ -1372,9 +1372,9 @@ public class VPXUtilities {
 
 	}
 
-	public static void deleteAllGeneratedFilesAndFlders(String deployFile, String cfgFile) {
+	public static void deleteAllGeneratedFilesAndFlders(String path, String deployFile, String cfgFile) {
 
-		deleteDeploymentFiles(folderPath + "\\" + DEPLOYMENTFILE, folderPath + "\\" + DEPLOYMENTCONFIGFILE, false);
+		deleteDeploymentFiles(path + "\\" + DEPLOYMENTFILE, path + "\\" + DEPLOYMENTCONFIGFILE, false);
 
 		deleteDeploymentFiles("images", "", true);
 
@@ -1402,7 +1402,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-
+				System.out.println(s);
 			}
 
 		} catch (Exception e) {
