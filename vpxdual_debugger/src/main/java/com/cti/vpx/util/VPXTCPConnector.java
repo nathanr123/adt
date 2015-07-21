@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.Processor;
 
@@ -19,7 +20,7 @@ public class VPXTCPConnector {
 		try {
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(ipaddress, Processor.PORTNO), 100);
+			client.connect(new InetSocketAddress(ipaddress, UDPListener.COMM_PORTNO), 100);
 
 			client.setSoTimeout(1000);
 
@@ -59,7 +60,7 @@ public class VPXTCPConnector {
 
 			Socket client = new Socket();
 			
-			client.connect(new InetSocketAddress(ipaddress, Processor.PORTNO), 1000);
+			client.connect(new InetSocketAddress(ipaddress,UDPListener.COMM_PORTNO), 1000);
 
 			client.setSoTimeout(1000);
 

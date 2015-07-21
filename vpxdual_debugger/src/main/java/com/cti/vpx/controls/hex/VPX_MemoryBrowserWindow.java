@@ -69,8 +69,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private VPXSystem vpxSystem;
 
 	private VPXSubSystem curProcFilter;
+
 	private JLabel lblAddress;
+
 	private JLabel lblMapFile;
+
 	private JButton btnMapFileBrowse;
 
 	/**
@@ -468,6 +471,32 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		setVisible(true);
 	}
 
+	public void reloadSubsystems() {
+
+		int sub = cmbSubSystem.getSelectedIndex();
+
+		int proc = cmbProcessor.getSelectedIndex();
+
+		int core = 0;
+
+		if (cmbCores.getItemCount() > 0) {
+
+			core = cmbCores.getSelectedIndex();
+		}
+
+		loadFilters();
+
+		cmbSubSystem.setSelectedIndex(sub);
+
+		cmbProcessor.setSelectedIndex(proc);
+
+		if (cmbCores.getItemCount() > 0) {
+
+			cmbCores.setSelectedIndex(core);
+		}
+
+	}
+
 	private void enableMemoryFields() {
 
 		boolean isMap = radUseMap.isSelected();
@@ -593,7 +622,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private void loadCoresFilter() {
 
 		cmbCores.removeAllItems();
-		
+
 		if (curProcFilter != null) {
 
 			if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {

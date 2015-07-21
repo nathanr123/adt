@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
+import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
@@ -172,7 +173,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 		filterPanel.add(btnEnableFilter);
 
 		JButton btnClear = new JButton("Clear");
-		
+
 		btnClear.addActionListener(new ActionListener() {
 
 			@Override
@@ -183,11 +184,11 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 				isFilterApply = false;
 
 				ips.clear();
-				
+
 				cmbSubSystem.setSelectedIndex(0);
-				
+
 				cmbProcessor.setSelectedIndex(0);
-				
+
 				cmbCores.setSelectedIndex(0);
 
 			}
@@ -257,6 +258,13 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 			cmbSubSystem.addItem(vpxSubSystem.getSubSystem());
 		}
+
+		List<Processor> p = vpxSystem.getUnListed();
+
+		if (p.size() > 0) {
+
+			cmbSubSystem.addItem("Un listed");
+		}
 	}
 
 	private void loadProcessorsFilter() {
@@ -265,51 +273,104 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		cmbProcessor.addItem("All Processors");
 
-		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+		if ("Un listed".equals(cmbSubSystem.getSelectedItem().toString())) {
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+			List<Processor> p = vpxSystem.getUnListed();
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+			if (p.size() > 0) {
 
-			if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
+				for (Iterator iterator = p.iterator(); iterator.hasNext();) {
 
-				curProcFilter = vpxSubSystem;
+					Processor processor = (Processor) iterator.next();
 
-				cmbProcessor.addItem(vpxSubSystem.getIpP2020());
-
-				cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
-
-				cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
-
-				break;
+					cmbProcessor.addItem(processor.getiP_Addresses());
+				}
 			}
 
+		} else {
+
+			List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+
+			for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
+
+					curProcFilter = vpxSubSystem;
+
+					cmbProcessor.addItem(vpxSubSystem.getIpP2020());
+
+					cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
+
+					cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
+
+					break;
+				}
+
+			}
 		}
+
 	}
 
 	private void loadCoresFilter() {
 
 		cmbCores.removeAllItems();
 
-		if (curProcFilter != null) {
+		if ("Un listed".equals(cmbSubSystem.getSelectedItem().toString())) {
 
-			if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {
+			List<Processor> s = vpxSystem.getUnListed();
 
-				cmbCores.setEnabled(false);
+			for (Iterator iterator = s.iterator(); iterator.hasNext();) {
 
-			} else {
+				Processor processor = (Processor) iterator.next();
 
-				cmbCores.setEnabled(true);
+				if (processor.getiP_Addresses().equals(cmbProcessor.getSelectedItem().toString())) {
 
-				cmbCores.addItem("All Cores");
+					if (processor.getName().contains("P2020")) {
 
-				for (int i = 0; i < 8; i++) {
-					cmbCores.addItem(String.format("Core %s", i));
+						cmbCores.setEnabled(false);
+
+					} else {
+
+						cmbCores.setEnabled(true);
+
+						cmbCores.addItem("All Cores");
+
+						for (int i = 0; i < 8; i++) {
+
+							cmbCores.addItem(String.format("Core %s", i));
+						}
+
+						cmbCores.setSelectedIndex(0);
+					}
 				}
-
-				cmbCores.setSelectedIndex(0);
 			}
+
+		} else {
+
+			if (curProcFilter != null) {
+
+				if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {
+
+					cmbCores.setEnabled(false);
+
+				} else {
+
+					cmbCores.setEnabled(true);
+
+					cmbCores.addItem("All Cores");
+
+					for (int i = 0; i < 8; i++) {
+						cmbCores.addItem(String.format("Core %s", i));
+					}
+
+					cmbCores.setSelectedIndex(0);
+				}
+			}
+
 		}
+
 	}
 
 	public void printConsoleMsg(String msg) {
@@ -376,6 +437,31 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 			printConsoleMsg(msg);
 
+		}
+	}
+
+	public void reloadSubsystems() {
+
+		int sub = cmbSubSystem.getSelectedIndex();
+
+		int proc = cmbProcessor.getSelectedIndex();
+
+		int core = 0;
+
+		if (cmbCores.getItemCount() > 0) {
+
+			core = cmbCores.getSelectedIndex();
+		}
+
+		loadFilters();
+
+		cmbSubSystem.setSelectedIndex(sub);
+
+		cmbProcessor.setSelectedIndex(proc);
+
+		if (cmbCores.getItemCount() > 0) {
+
+			cmbCores.setSelectedIndex(core);
 		}
 	}
 

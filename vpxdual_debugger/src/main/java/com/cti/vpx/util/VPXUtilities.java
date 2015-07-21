@@ -381,7 +381,8 @@ public class VPXUtilities {
 
 	public static VPXSystem getVPXSystem() {
 
-		vpxSystem = readFromXMLFile();
+		if (vpxSystem == null)
+			vpxSystem = readFromXMLFile();
 
 		return vpxSystem;
 	}

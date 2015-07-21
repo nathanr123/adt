@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 public class VPXSystem implements VPX {
@@ -17,6 +18,8 @@ public class VPXSystem implements VPX {
 	private String name;
 
 	private List<VPXSubSystem> subsystem = new ArrayList<VPXSubSystem>();
+
+	private List<Processor> unListed = new ArrayList<Processor>();
 
 	public VPXSystem() {
 		this.name = this.getClass().getSimpleName();
@@ -47,4 +50,17 @@ public class VPXSystem implements VPX {
 		this.subsystem = subsystem;
 	}
 
+	public List<Processor> getUnListed() {
+		return unListed;
+	}
+
+	@XmlTransient
+	public void setUnListed(List<Processor> unListed) {
+		this.unListed = unListed;
+	}
+
+	public void addInUnListed(String ip, long duration, String msg) {
+
+		unListed.add(new Processor(ip, duration, msg));
+	}
 }

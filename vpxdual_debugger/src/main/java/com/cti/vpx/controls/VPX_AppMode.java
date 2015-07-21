@@ -235,13 +235,39 @@ public class VPX_AppMode extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				JFileChooser jb = new JFileChooser();
+
 				int i = jb.showOpenDialog(VPX_AppMode.this);
+
 				if (i == JFileChooser.APPROVE_OPTION) {
+
 					String flnmae = jb.getSelectedFile().getPath();
-					if (!flnmae.endsWith(".log"))
-						flnmae += ".log";
+
+					if (!flnmae.endsWith(".log")) {
+
+						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_APPENDCURTIME))) {
+
+							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
+						} else {
+							flnmae += ".log";
+						}
+
+					} else {
+						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_APPENDCURTIME))) {
+
+							flnmae = flnmae.substring(0, flnmae.length() - 4);
+
+							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
+						}
+
+					}
+
 					txtLogFileName.setText(flnmae);
+
+					VPXUtilities.setEnableLog(true);
+
+					VPXUtilities.updateProperties(VPXUtilities.LOG_FILEPATH, txtLogFileName.getText());
 				}
 			}
 		});
@@ -702,6 +728,7 @@ public class VPX_AppMode extends JFrame {
 			txtLogFileName.setEnabled(false);
 			btnBrowse.setEnabled(false);
 		}
+
 	}
 
 	private boolean updateLogSettings() {
@@ -714,7 +741,7 @@ public class VPX_AppMode extends JFrame {
 															// filepath
 				VPXUtilities.setEnableLog(true);
 
-				VPXUtilities.updateProperties(VPXUtilities.LOG_SERIALNO, txtLogFileName.getText());
+				VPXUtilities.updateProperties(VPXUtilities.LOG_FILEPATH, txtLogFileName.getText());
 				ret = true;
 			}
 		} else {

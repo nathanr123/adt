@@ -1,5 +1,10 @@
 package com.cti.vpx.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlTransient;
+
 public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 
 	/**
@@ -151,6 +156,7 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	 * @param p2020ResponseTime
 	 *            the p2020ResponseTime to set
 	 */
+	@XmlTransient
 	public void setP2020ResponseTime(long p2020ResponseTime) {
 		this.p2020ResponseTime = p2020ResponseTime;
 	}
@@ -166,6 +172,7 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	 * @param dsp1ResponseTime
 	 *            the dsp1ResponseTime to set
 	 */
+	@XmlTransient
 	public void setDsp1ResponseTime(long dsp1ResponseTime) {
 		this.dsp1ResponseTime = dsp1ResponseTime;
 	}
@@ -181,6 +188,7 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	 * @param dsp2ResponseTime
 	 *            the dsp2ResponseTime to set
 	 */
+	@XmlTransient
 	public void setDsp2ResponseTime(long dsp2ResponseTime) {
 		this.dsp2ResponseTime = dsp2ResponseTime;
 	}

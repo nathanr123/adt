@@ -8,10 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ResourceBundle;
 
@@ -34,13 +30,11 @@ import javax.swing.SwingConstants;
 import com.cti.vpx.Listener.AdvertisementListener;
 import com.cti.vpx.Listener.CommunicationListener;
 import com.cti.vpx.Listener.MessageListener;
-import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
-import com.cti.vpx.controls.VPX_ConnectedProcessor;
 import com.cti.vpx.controls.VPX_ConsolePanel;
 import com.cti.vpx.controls.VPX_DetailPanel;
 import com.cti.vpx.controls.VPX_EthernetFlashPanel;
@@ -58,7 +52,6 @@ import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
-import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUDPMonitor;
@@ -272,6 +265,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
+
+		updateLog("Memory Browser opened");
 	}
 
 	public void reindexMemoryBrowserIndex() {
@@ -336,6 +331,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 				+ (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+
+		updateLog("Memory Plot opened");
 	}
 
 	public void reindexMemoryPlotIndex() {
@@ -353,6 +350,20 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 				+ (MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+	}
+
+	public void reloadVPXSystem() {
+
+		console.reloadSubsystems();
+
+		for (int i = 0; i < MAX_MEMORY_BROWSER; i++) {
+			memoryBrowserWindow[i].reloadSubsystems();
+		}
+
+		for (int i = 0; i < MAX_MEMORY_PLOT; i++) {
+
+			memoryPlotWindow[i].reloadAllSubsystems();
+		}
 	}
 
 	private void createMenuBar() {
@@ -1042,16 +1053,6 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 	}
 
-	public void connectProcessor(Processor pro) {
-
-		vpx_Content_Tabbed_Pane_Right.addTab(String.format("%s(%s)", pro.getiP_Addresses(), pro.getName()),
-				new VPX_ConnectedProcessor(VPX_ETHWindow.this));
-
-		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
-
-		pro.connect();
-	}
-
 	private int isAlreadyExist(String find) {
 		int ret = -1;
 
@@ -1086,7 +1087,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	public void showDetail() {
 
-		VPX_DetailPanel detail = new VPX_DetailPanel(VPXSystem.class.getSimpleName());
+		VPX_DetailPanel detail = new VPX_DetailPanel(VPX_ETHWindow.this, VPXSystem.class.getSimpleName());
 
 		detail.setVisible(true);
 
@@ -1144,12 +1145,16 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
+		updateLog("Ethernet Flash opened");
 	}
 
 	public void showAmplitude() {
+		
+		updateLog("Showing Amplitude Graph");
 	}
 
 	public void showWaterfall() {
+		updateLog("Showing Waterfall Graph");
 	}
 
 	public void showMAD() {
@@ -1161,20 +1166,30 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 			vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility", new JScrollPane(new VPX_MADPanel(VPX_ETHWindow.this)));
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+			
+			updateLog("MAD utility opened");
 
-		} else
+		} else{
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
-
+			
+			updateLog("MAD utility already opened");
+		}
 	}
 
 	public void showBIST() {
 
+		updateLog("Starting Built in Self Test");
+		
 		new VPX_BISTResultWindow().setVisible(true);
+		
+		updateLog("Built in Self Test Completed");
 	}
 
 	public void showExecution() {
 
+		updateLog("Showing Execution Window");
+		
 		vpx_Content_Tabbed_Pane_Right.addTab("Execution", new JScrollPane(new VPX_ExecutionPanel()));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
@@ -1187,6 +1202,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		paswordWindow.setVisible(true);
 
+		updateLog("Asking Super user password for VLAN Configuration");
+		
 		if (VPXUtilities.getPropertyValue(VPXUtilities.SECURITY_PWD).equals(paswordWindow.getPasword())) {
 
 			// addTab("VLAN", new JScrollPane(new
@@ -1208,7 +1225,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 			frame.setContentPane(contentPane);
 
-			frame.setResizable(false);
+			frame.setResizable(true);
 
 			frame.addWindowListener(new WindowAdapter() {
 
@@ -1237,18 +1254,24 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 			paswordWindow.resetPassword();
 
 			paswordWindow.setVisible(true);
+			
+			updateLog("Invalid Password");
 		}
 
 	}
 
 	public void showChangePassword() {
 
+		updateLog("Showing change password");
+		
 		new VPX_ChangePasswordWindow(VPX_ETHWindow.this).setVisible(true);
 
 	}
 
 	public void showPrefrences() {
 
+		updateLog("Showing Preference window");
+		
 		new VPX_Preference().showPreferenceWindow();
 
 	}
@@ -1345,7 +1368,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	}
 
 	@Override
-	public void updateProcessorStatus(String ip, String msg) {
+	public void updateProcessorStatus(String ip, String msg) {		
+		
 
 		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
 

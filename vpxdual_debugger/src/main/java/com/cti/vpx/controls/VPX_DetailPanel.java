@@ -21,6 +21,7 @@ import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_DetailPanel extends JDialog {
 	/**
@@ -32,11 +33,15 @@ public class VPX_DetailPanel extends JDialog {
 
 	private DefaultTableModel tbl_Property_Model;
 
+	private VPX_ETHWindow parent;
+
 	/**
 	 * Create the dialog.
 	 */
 
-	public VPX_DetailPanel(String path) {
+	public VPX_DetailPanel(VPX_ETHWindow parnt, String path) {
+
+		this.parent = parnt;
 
 		init();
 
@@ -112,6 +117,8 @@ public class VPX_DetailPanel extends JDialog {
 
 			loadProperties(VPXUtilities.getVPXSystem());
 
+			parent.updateLog("Showing VPXSystem DEtails");
+
 		} else if (path.startsWith("<html>")) {
 
 			setTitle(VPXUtilities.getCurrentProcType() + " " + VPXUtilities.getCurrentProcessor() + " Details");
@@ -183,6 +190,8 @@ public class VPX_DetailPanel extends JDialog {
 
 		setTitle(vpxSubSystem.getSubSystem() + " Details");
 
+		parent.updateLog("Showing " + vpxSubSystem.getSubSystem() + " Details");
+
 		tbl_Property_Model.addRow(new String[] { "System Name", VPXSystem.class.getSimpleName() });
 
 		tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
@@ -222,6 +231,8 @@ public class VPX_DetailPanel extends JDialog {
 		if (procType.contains("P2020")) {
 
 			pType = PROCESSOR_TYPE.PROCESSOR_P2020;
+
+			parent.updateLog("Showing " + procType + " " + ip + " Details");
 
 		} else if (procType.contains("DSP1")) {
 

@@ -7,6 +7,8 @@ import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,7 +38,7 @@ import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_AliasConfigWindow extends JFrame {
+public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 
 	/**
 	 * 
@@ -440,6 +442,8 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
 								+ " updated successfully!");
+						
+						parent.updateLog("Alias Configuration modified");
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in modifying "
 								+ currentSubSystem.getSubSystem(), "Updating", JOptionPane.ERROR_MESSAGE);
@@ -452,6 +456,8 @@ public class VPX_AliasConfigWindow extends JFrame {
 
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
 								+ " added successfully!");
+						
+						parent.updateLog("Alias Configuration Subsystem added");
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
 								"Error in adding " + currentSubSystem.getSubSystem(), "Adding",
@@ -496,6 +502,7 @@ public class VPX_AliasConfigWindow extends JFrame {
 		txtDSP1.setText(currentSubSystem.getIpDSP1());
 
 		txtDSP2.setText(currentSubSystem.getIpDSP2());
+		
 	}
 
 	private int isSubsystemAvailable() {
@@ -811,5 +818,48 @@ public class VPX_AliasConfigWindow extends JFrame {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		
+		parent.reloadVPXSystem();
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

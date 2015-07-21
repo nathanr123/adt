@@ -1,17 +1,6 @@
 package com.cti.vpx.model;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.cti.vpx.command.ATP;
-import com.cti.vpx.command.ATPCommand;
-import com.cti.vpx.command.DSPATPCommand;
-import com.cti.vpx.command.P2020ATPCommand;
-import com.cti.vpx.util.VPXUtilities;
 
 @XmlRootElement
 public class Processor implements VPX {
@@ -21,194 +10,74 @@ public class Processor implements VPX {
 	 */
 	private static final long serialVersionUID = 6214146807961201313L;
 
-	private int ID;
+	private String iP_Addresses;
 
 	private String name;
 
-	private String iP_Addresses;
+	private String msg;
 
-	public static final int PORTNO = 12345;
-
-	public static final int UDP_PORTNO = 12346;
-
-	public static final int CONNECTION_TIMEOUT = 300000;
-
-	private PROCESSOR_LIST processorType;
-
-	private Socket socket = null;
-
-	private ATPCommand cmd;
-
-	private Thread recieverThread = null;
+	private long responseTime;
 
 	public Processor() {
 
 	}
 
-	public Processor(String ipAddress, PROCESSOR_LIST pType) {
-		this.iP_Addresses = ipAddress;
+	public Processor(String iP_Addresses, long responsedTime, String msg) {
 
-		this.processorType = pType;
+		super();
 
-		setName(pType);
-	}
+		this.iP_Addresses = iP_Addresses;
 
-	public Processor(PROCESSOR_LIST pType) {
+		this.responseTime = responsedTime;
 
-		this.processorType = pType;
+		if (msg.startsWith("P2")) {
 
-		setName(pType);
-	}
+			name = "(P2020)" + iP_Addresses;
 
-	public int getID() {
-		return ID;
-	}
+		} else if (msg.startsWith("D1")) {
 
-	@XmlElement
-	public void setID(int iD) {
-		ID = iD;
-	}
+			name = "(DSP1)" + iP_Addresses;
 
-	public PROCESSOR_LIST getProcessorType() {
-		return processorType;
-	}
+		} else if (msg.startsWith("D2")) {
 
-	@XmlElement
-	public void setProcessorType(PROCESSOR_LIST processorType) {
-		this.processorType = processorType;
-		setName(processorType);
-	}
+			name = "(DSP2)" + iP_Addresses;
 
-	public int getPortno() {
-		return PORTNO;
-	}
+		}
 
-	public static int getUdpPortno() {
-		return UDP_PORTNO;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	@XmlElement
-	public void setName(String name) {
-		this.name = name;
+		this.msg = msg;
 	}
 
 	public String getiP_Addresses() {
 		return iP_Addresses;
 	}
 
-	@XmlElement
 	public void setiP_Addresses(String iP_Addresses) {
 		this.iP_Addresses = iP_Addresses;
 	}
 
-	public boolean connect() {
-		try {
-
-			if (socket == null) {
-				socket = new Socket();
-			}
-
-			socket.connect(new InetSocketAddress(iP_Addresses, PORTNO), CONNECTION_TIMEOUT);
-
-			socket.setSoTimeout(CONNECTION_TIMEOUT);
-
-			VPXUtilities.updateLog(String.format("%s Connected", iP_Addresses));
-
-			startReciever();
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
+	public long getResponseTime() {
+		return responseTime;
 	}
 
-	public void disConnect() {
-		try {
-			if (socket != null) {
-
-				socket.close();
-
-				recieverThread = null;
-			}
-		} catch (Exception e) {
-		}
+	public void setResponseTime(long responseTime) {
+			
+		this.responseTime = responseTime;
 	}
 
-	public boolean isConnected() {
-		if (socket == null)
-			return false;
-
-		return socket.isConnected();
+	public String getName() {
+		return name;
 	}
 
-	public void send(ATP atpCommand) {
-
-		synchronized (this) {
-			try {
-				if (processorType == PROCESSOR_LIST.PROCESSOR_P2020) {
-					cmd = (P2020ATPCommand) atpCommand;
-				} else {
-					cmd = (DSPATPCommand) atpCommand;
-				}
-
-				cmd.write(socket.getOutputStream());
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void receive() {
-		try {
-
-			if (isConnected()) {
-
-				cmd.getByteBuffer().clear();
-
-				cmd.read(socket.getInputStream());
-			}
-		} catch (Exception e) {
-		}
+	public String getMsg() {
+		return msg;
 	}
 
-	private void startReciever() {
-
-		if (recieverThread == null) {
-			recieverThread = new Thread(new ReceiverThread());
-		}
-
-		recieverThread.start();
-
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 
-	public void setName(PROCESSOR_LIST pType) {
-		if (pType == PROCESSOR_LIST.PROCESSOR_DSP1) {
-			this.name = "DSP - 1";
-			this.ID = 0;
-		} else if (pType == PROCESSOR_LIST.PROCESSOR_DSP2) {
-			this.name = "DSP - 2";
-			this.ID = 1;
-		} else if (pType == PROCESSOR_LIST.PROCESSOR_P2020) {
-			this.name = "P2020";
-			this.ID = 2;
-		}
-	}
-
-	private class ReceiverThread implements Runnable {
-
-		@Override
-		public void run() {
-			while (isConnected()) {
-				receive();
-			}
-		}
-
-	}
 }

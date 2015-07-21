@@ -381,9 +381,15 @@ public class VPX_MADPanel extends JPanel {
 					madTab.setEnabledAt(1, true);
 
 					madTab.setSelectedIndex(1);
+					
+					parent.updateLog("Configured Susccessfully");
 				} else {
 
 					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+					
+					parent.updateLog("Configuration error");
+					
+					parent.updateLog(error);
 				}
 			}
 		});
@@ -638,6 +644,8 @@ public class VPX_MADPanel extends JPanel {
 
 				if (error.length() == 0) {
 
+					parent.updateLog("MAD Compilation started");
+					
 					createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
 							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
 							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
@@ -649,12 +657,18 @@ public class VPX_MADPanel extends JPanel {
 
 					madProcessWindow.setVisible(true);
 
+					parent.updateLog("MAD Compilation Completed");
+					
 					btnCompileApply.setEnabled(true);
 				} else {
 
 					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 
 					btnCompileApply.setEnabled(true);
+					
+					parent.updateLog("MAD out files error");
+					
+					parent.updateLog(error);
 				}
 
 			}
@@ -1046,6 +1060,10 @@ public class VPX_MADPanel extends JPanel {
 				+ "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE);
 		// String cmd = String.format("cmd /c ping 192.168.0.102");
 
+		parent.updateLog("Creating deployment files");
+		
+		parent.updateLog("Creating deployment configuration files");
+		
 		try {
 
 			Process proc = Runtime.getRuntime().exec(cmd);
@@ -1058,6 +1076,8 @@ public class VPX_MADPanel extends JPanel {
 
 				madProcessWindow.updateGeneratingMessage(s);
 
+				parent.updateLog(s);
+				
 				if (s.contains("Error")) {
 					ret = false;
 				}
@@ -1073,6 +1093,8 @@ public class VPX_MADPanel extends JPanel {
 				madProcessWindow.setFailure();
 
 				JOptionPane.showMessageDialog(madProcessWindow, "Error in generating out file");
+				
+				parent.updateLog("Error in generating out file");
 			}
 
 			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXUtilities.DEPLOYMENTFILE,

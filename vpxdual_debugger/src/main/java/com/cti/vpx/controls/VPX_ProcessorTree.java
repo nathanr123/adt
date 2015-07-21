@@ -9,9 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Hashtable;
@@ -37,8 +34,7 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
-import com.cti.vpx.Listener.MessageListener;
-import com.cti.vpx.Listener.UDPListener;
+import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
@@ -55,6 +51,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 4220657730002684130L;
+
+	private static final int MAXRESPONSETIMEOUT = 10;
 
 	private static JPopupMenu vpx_contextMenu = new JPopupMenu();
 
@@ -239,11 +237,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	public void updateVPXSystemTree() {
+
 		this.system = VPXUtilities.getVPXSystem();
 
 		loadSystemRootNode();
 
 		for (int i = 0; i < getRowCount(); i++) {
+
 			expandRow(i);
 		}
 	}
@@ -321,16 +321,147 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (!isNotFound) {
 
-			systemRootNode.add(getProcessorNode(ip, res));
+			system.addInUnListed(ip, System.currentTimeMillis(), res);
 
-			((DefaultTreeModel) getModel()).reload();
+			System.out.println(ip + " " + res);
 
-			for (int i = 0; i < getRowCount(); i++) {
+			VPXUtilities.setVPXSystem(system);
 
-				expandRow(i);
-			}
+			loadSystemRootNode();
+			/*
+			 * systemRootNode.add(getProcessorNode(ip, res));
+			 * 
+			 * ((DefaultTreeModel) getModel()).reload();
+			 * 
+			 * for (int i = 0; i < getRowCount(); i++) {
+			 * 
+			 * expandRow(i); }
+			 */
+			// System.out.println(system.getUnListed().size());
+
+			parent.reloadVPXSystem();
 		}
 
+		setRespondTimetoVPXSystem(ip);
+
+	}
+
+	private void setRespondTimetoVPXSystem(String ip) {
+
+		long time = System.currentTimeMillis();
+
+		boolean isFound = false;
+
+		List<VPXSubSystem> s = system.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			if (vpxSubSystem.getIpP2020().equals(ip)) {
+
+				vpxSubSystem.setP2020ResponseTime(time);
+
+				isFound = true;
+
+				break;
+
+			} else if (vpxSubSystem.getIpDSP1().equals(ip)) {
+
+				vpxSubSystem.setDsp1ResponseTime(time);
+
+				isFound = true;
+
+				break;
+
+			} else if (vpxSubSystem.getIpDSP2().equals(ip)) {
+
+				vpxSubSystem.setDsp2ResponseTime(time);
+
+				isFound = true;
+
+				break;
+			}
+
+		}
+
+		if (!isFound) {
+
+			List<Processor> p = system.getUnListed();
+
+			for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				if (processor.getiP_Addresses().equals(ip)) {
+
+					processor.setResponseTime(time);
+
+					break;
+				}
+			}
+
+		}
+	}
+
+	private long getRespondTimeFromVPXSystem(String ip) {
+
+		long time = 0;// System.currentTimeMillis();
+
+		boolean isFound = false;
+
+		List<VPXSubSystem> s = system.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			if (ip.contains(vpxSubSystem.getIpP2020())) {
+
+				time = vpxSubSystem.getP2020ResponseTime();
+
+				isFound = true;
+
+				break;
+
+			} else if (ip.contains(vpxSubSystem.getIpDSP1())) {
+
+				time = vpxSubSystem.getDsp1ResponseTime();
+
+				isFound = true;
+
+				break;
+
+			} else if (ip.contains(vpxSubSystem.getIpDSP2())) {
+
+				time = vpxSubSystem.getDsp2ResponseTime();
+
+				isFound = true;
+
+				break;
+			}
+
+		}
+
+		if (!isFound) {
+
+			List<Processor> p = system.getUnListed();
+
+			for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				if (ip.contains(processor.getiP_Addresses())) {
+
+					time = processor.getResponseTime();
+
+					break;
+				}
+			}
+
+		}
+
+		return time;
 	}
 
 	private DefaultMutableTreeNode getProcessorNode(String ip, String msg) {
@@ -422,10 +553,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 						false));
 
 				DefaultMutableTreeNode ipNode2 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP1Name(),
-						true, false, true));
+						false, false, false));
 
 				DefaultMutableTreeNode ipNode3 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP2Name(),
-						true, true, false));
+						false, false, false));
 
 				subSystemNode.add(ipNode1);
 
@@ -437,12 +568,30 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		}
 
+		List<Processor> unlisted = system.getUnListed();
+
+		if (unlisted.size() > 0) {
+
+			DefaultMutableTreeNode unlist = new DefaultMutableTreeNode("Un Listed");
+
+			systemRootNode.add(unlist);
+
+			for (Iterator<Processor> iterator = unlisted.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				unlist.add(new DefaultMutableTreeNode(getProcessorNode(processor.getiP_Addresses(), processor.getMsg())));
+			}
+		}
+
+		((DefaultTreeModel) getModel()).reload();
+
 		for (int i = 0; i < getRowCount(); i++) {
 
 			expandRow(i);
 		}
 
-		updateUI();
+		// updateUI();
 
 	}
 
@@ -943,6 +1092,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	class ProcessorMonitor extends SwingWorker<Void, Void> {
 
+		String ip;
+
+		long response;
+
+		long difference;
+
 		public ProcessorMonitor() {
 
 		}
@@ -962,10 +1117,28 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 					if (node.isLeaf()) {
 
-						System.out.println(node.getUserObject().toString());
+						ip = node.getUserObject().toString();
+
+						ip = ip.substring(ip.indexOf(">(") + 1, ip.indexOf("</"));
+
+						response = getRespondTimeFromVPXSystem(ip);
+
+						difference = (System.currentTimeMillis() - response) / 1000;
+
+						if (difference > MAXRESPONSETIMEOUT) {
+
+							if (ip.contains("(P2020)")) {
+
+								node.setUserObject(getNodeUserObject(ip, false));
+							} else {
+								node.setUserObject(getNodeUserObject(ip, false, false, false));
+							}
+						}
 
 					}
 				}
+
+				repaint();
 
 				Thread.sleep(5000);
 			}
