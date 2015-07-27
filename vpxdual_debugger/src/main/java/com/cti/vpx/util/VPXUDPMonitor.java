@@ -18,11 +18,15 @@ public class VPXUDPMonitor {
 
 	UDPListener listener;
 
+	private static SubnetFilter subnet = null;
+
 	private VPXCommunicationMonitor communicationMonitor = new VPXCommunicationMonitor();
 
 	private VPXMessageMonitor messageMonitor = new VPXMessageMonitor();
 
 	private VPXAdvertisementMonitor advertisementMonitor = new VPXAdvertisementMonitor();
+
+	private boolean isipinRange = true;
 
 	public VPXUDPMonitor() {
 
@@ -49,6 +53,16 @@ public class VPXUDPMonitor {
 			stop();
 		}
 
+	}
+
+	public void applyFilterbySubnet(String subnetmask) {
+
+		subnet = SubnetFilter.createInstance(VPXUtilities.getCurrentIP() + "/" + subnetmask);
+	}
+
+	public void clearFilterbySubnet() {
+
+		subnet = null;
 	}
 
 	private void start() {
@@ -206,8 +220,11 @@ public class VPXUDPMonitor {
 		DatagramPacket advertisementPacket = new DatagramPacket(advertisementData, advertisementData.length);
 
 		public VPXAdvertisementMonitor() {
+
 			try {
+
 				advertisementSocket = new DatagramSocket(UDPListener.ADV_PORTNO);
+
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
@@ -216,12 +233,24 @@ public class VPXUDPMonitor {
 		@Override
 		protected Void doInBackground() throws Exception {
 			while (true) {
+
+				isipinRange = true;
+
 				advertisementSocket.receive(advertisementPacket);
 
-				String sentence = new String(advertisementPacket.getData(), 0, advertisementPacket.getLength());
+				if (subnet != null) {
 
-				((AdvertisementListener) listener).updateProcessorStatus(advertisementPacket.getAddress()
-						.getHostAddress(), sentence);
+					isipinRange = subnet.isInNet(advertisementPacket.getAddress().getHostAddress());
+
+				}
+
+				if (isipinRange) {
+
+					String sentence = new String(advertisementPacket.getData(), 0, advertisementPacket.getLength());
+
+					((AdvertisementListener) listener).updateProcessorStatus(advertisementPacket.getAddress()
+							.getHostAddress(), sentence);
+				}
 
 				Thread.sleep(500);
 			}

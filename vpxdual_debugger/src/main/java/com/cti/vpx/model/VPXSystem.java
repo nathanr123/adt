@@ -59,6 +59,11 @@ public class VPXSystem implements VPX {
 		this.unListed = unListed;
 	}
 
+	public void clearUnlisted() {
+
+		this.unListed.clear();
+	}
+
 	public void addInUnListed(String ip, long duration, String msg) {
 
 		unListed.add(new Processor(ip, duration, msg));

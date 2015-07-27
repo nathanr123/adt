@@ -23,17 +23,17 @@ public class VPX_Dual_ADT {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 					if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.GENERAL_SPLASH))) {
-						
+
 						new VPX_SplashWindow();
-						
+
 					} else {
-						VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
-						
-						//VPX_ETHWindow window = new VPX_ETHWindow();
-						
-						window.showWindow();
-						
-						//window.setVisible(true);
+						//VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
+
+						 VPX_ETHWindow window = new VPX_ETHWindow();
+
+						//window.showWindow();
+
+						// window.setVisible(true);
 					}
 
 				} catch (Exception e) {

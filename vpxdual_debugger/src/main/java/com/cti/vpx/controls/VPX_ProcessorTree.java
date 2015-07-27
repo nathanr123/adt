@@ -5,6 +5,7 @@ package com.cti.vpx.controls;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -52,7 +53,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	 */
 	private static final long serialVersionUID = 4220657730002684130L;
 
-	private static final int MAXRESPONSETIMEOUT = 10;
+	public static final int MAXRESPONSETIMEOUT = 10;
 
 	private static JPopupMenu vpx_contextMenu = new JPopupMenu();
 
@@ -60,6 +61,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	private JMenuItem vpx_Menu_File_AliasConfig;
 
 	private JMenuItem vpx_Menu_File_Detail;
+
+	private JMenuItem vpx_Menu_File_Refresh;
 
 	// Window Menu Items
 	private JMenuItem vpx_Menu_Window_MemoryBrowser;
@@ -323,8 +326,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			system.addInUnListed(ip, System.currentTimeMillis(), res);
 
-			System.out.println(ip + " " + res);
-
 			VPXUtilities.setVPXSystem(system);
 
 			loadSystemRootNode();
@@ -584,15 +585,95 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		}
 
-		((DefaultTreeModel) getModel()).reload();
-
-		for (int i = 0; i < getRowCount(); i++) {
-
-			expandRow(i);
-		}
+		refresh();
 
 		// updateUI();
 
+	}
+
+	private void loadSystemRootNodeWithoutUnListed() {
+
+		systemRootNode.removeAllChildren();
+
+		systemRootNode.setUserObject(system.getName());
+
+		List<VPXSubSystem> subSystems = system.getSubsystem();
+
+		system.clearUnlisted();
+
+		if (subSystems != null) {
+
+			for (Iterator<VPXSubSystem> iterator = subSystems.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem subSystem = iterator.next();
+
+				DefaultMutableTreeNode subSystemNode = new DefaultMutableTreeNode(subSystem.getSubSystem());
+
+				DefaultMutableTreeNode ipNode1 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getP2020Name(),
+						false));
+
+				DefaultMutableTreeNode ipNode2 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP1Name(),
+						false, false, false));
+
+				DefaultMutableTreeNode ipNode3 = new DefaultMutableTreeNode(getNodeUserObject(subSystem.getDSP2Name(),
+						false, false, false));
+
+				subSystemNode.add(ipNode1);
+
+				subSystemNode.add(ipNode2);
+
+				subSystemNode.add(ipNode3);
+
+				systemRootNode.add(subSystemNode);
+			}
+		}
+
+		updateUI();
+
+		refresh();
+
+		// updateUI();
+
+	}
+
+	public void refreshProcessorsStatus() {
+
+		String ip = null;
+
+		long response = 0, difference = 0;
+
+		DefaultMutableTreeNode node = null;
+
+		Enumeration<DefaultMutableTreeNode> e = systemRootNode.depthFirstEnumeration();
+
+		while (e.hasMoreElements()) {
+
+			node = e.nextElement();
+
+			if (node.isLeaf()) {
+
+				ip = node.getUserObject().toString();
+
+				ip = ip.substring(ip.indexOf(">(") + 1, ip.indexOf("</"));
+
+				response = getRespondTimeFromVPXSystem(ip);
+
+				difference = (System.currentTimeMillis() - response) / 1000;
+
+				if (difference > MAXRESPONSETIMEOUT) {
+
+					if (ip.contains("(P2020)")) {
+
+						node.setUserObject(getNodeUserObject(ip, false));
+					} else {
+						node.setUserObject(getNodeUserObject(ip, false, false, false));
+					}
+				}
+
+			}
+		}
+
+		repaint();
 	}
 
 	public class ScanAction extends AbstractAction {
@@ -791,7 +872,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		// Creating MenuItems
 
 		// File Menus
-		vpx_Menu_File_AliasConfig = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Config"));
+		vpx_Menu_File_AliasConfig = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Config"),
+				VPXUtilities.getImageIcon("image\\config.png", 14, 14));
 
 		vpx_Menu_File_AliasConfig.addActionListener(new ActionListener() {
 
@@ -803,7 +885,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Menu_File_Detail = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Detail"));
+		vpx_Menu_File_Detail = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Detail"),
+				VPXUtilities.getImageIcon("image\\detail1.png", 14, 14));
 
 		vpx_Menu_File_Detail.addActionListener(new ActionListener() {
 
@@ -815,11 +898,25 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
+		vpx_Menu_File_Refresh = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Refresh"),
+				VPXUtilities.getImageIcon("image\\refresh.png", 14, 14));
+
+		vpx_Menu_File_Refresh.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				refreshProcessorsStatus();
+
+			}
+		});
+
 		// Window Menus
 		vpx_Menu_Window_MemoryBrowser = ComponentFactory
 
 		.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
-				+ (VPX_ETHWindow.MAX_MEMORY_BROWSER - VPX_ETHWindow.currentNoofMemoryView) + " ) ");
+				+ (VPX_ETHWindow.MAX_MEMORY_BROWSER - VPX_ETHWindow.currentNoofMemoryView) + " ) ",
+				VPXUtilities.getImageIcon("image\\memory.png", 14, 14));
 
 		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
 
@@ -832,7 +929,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		});
 
 		vpx_Menu_Window_MemoryPlot = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MemoryPlot")
-				+ " ( " + (VPX_ETHWindow.MAX_MEMORY_PLOT - VPX_ETHWindow.currentNoofMemoryPlot) + " ) ");
+				+ " ( " + (VPX_ETHWindow.MAX_MEMORY_PLOT - VPX_ETHWindow.currentNoofMemoryPlot) + " ) ",
+				VPXUtilities.getImageIcon("image\\plot.png", 14, 14));
 
 		vpx_Menu_Window_MemoryPlot.addActionListener(new ActionListener() {
 
@@ -844,7 +942,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Menu_Window_EthFlash = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.EthFlash"));
+		vpx_Menu_Window_EthFlash = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.EthFlash"),
+				VPXUtilities.getImageIcon("image\\memory1.png", 14, 14));
 
 		vpx_Menu_Window_EthFlash.addActionListener(new ActionListener() {
 
@@ -879,7 +978,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Menu_Window_MAD = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"));
+		vpx_Menu_Window_MAD = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"),
+				VPXUtilities.getImageIcon("image\\mad.png", 14, 14));
 
 		vpx_Menu_Window_MAD.addActionListener(new ActionListener() {
 
@@ -891,7 +991,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Menu_Window_BIST = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"));
+		vpx_Menu_Window_BIST = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"),
+				VPXUtilities.getImageIcon("image\\BIST.png", 14, 14));
 
 		vpx_Menu_Window_BIST.addActionListener(new ActionListener() {
 
@@ -903,7 +1004,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Menu_Window_Execution = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Execute"));
+		vpx_Menu_Window_Execution = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Execute"),
+				VPXUtilities.getImageIcon("image\\execution.png", 14, 14));
 
 		vpx_Menu_Window_Execution.addActionListener(new ActionListener() {
 
@@ -954,6 +1056,17 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	}
 
+	private void refresh() {
+
+		((DefaultTreeModel) getModel()).reload();
+
+		for (int i = 0; i < getRowCount(); i++) {
+
+			expandRow(i);
+		}
+
+	}
+
 	private void showConextMenu(int x, int y, DefaultMutableTreeNode node) {
 
 		int i = node.getLevel();
@@ -988,6 +1101,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		}
 
 		getPopupMenu(i).show(this, x, y);
+	}
+
+	public void refreshProcessorTree() {
+
+		loadSystemRootNodeWithoutUnListed();
+
 	}
 
 	public JPopupMenu getPopupMenu(int nodeLevel) {
@@ -1032,6 +1151,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			// Tools Menu Items
 			vpx_contextMenu.add(vpx_Menu_Tools_ChangePWD);
 
+			vpx_contextMenu.add(vpx_Menu_File_Refresh);
+
 			vpx_contextMenu.add(vpx_Menu_File_Detail);
 
 		} else if (nodeLevel == 1) {
@@ -1047,6 +1168,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			vpx_contextMenu.add(vpx_Menu_Window_BIST);
 
 			vpx_contextMenu.add(ComponentFactory.createJSeparator());
+
+			vpx_contextMenu.add(vpx_Menu_File_Refresh);
 
 			vpx_contextMenu.add(vpx_Menu_File_Detail);
 
@@ -1074,6 +1197,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_contextMenu.add(ComponentFactory.createJSeparator());
 
+			vpx_contextMenu.add(vpx_Menu_File_Refresh);
+
 			vpx_contextMenu.add(vpx_Menu_File_Detail);
 
 		} else if (nodeLevel == 3) {
@@ -1084,8 +1209,18 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_contextMenu.add(ComponentFactory.createJSeparator());
 
+			vpx_contextMenu.add(vpx_Menu_File_Refresh);
+
 			vpx_contextMenu.add(vpx_Menu_File_Detail);
 		}
+
+		Dimension d = vpx_contextMenu.getPreferredSize();
+
+		d.width = 250;
+
+		d.height = d.height + 5;
+
+		vpx_contextMenu.setPreferredSize(d);
 
 		return vpx_contextMenu;
 	}

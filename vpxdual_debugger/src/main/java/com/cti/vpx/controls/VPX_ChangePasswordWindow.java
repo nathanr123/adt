@@ -119,6 +119,16 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 		JButton btnCancel = new JButton("Cancel");
 
+		btnCancel.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				VPX_ChangePasswordWindow.this.dispose();
+
+			}
+		});
+
 		btnCancel.setActionCommand("Cancel");
 
 		buttonPane.add(btnCancel);

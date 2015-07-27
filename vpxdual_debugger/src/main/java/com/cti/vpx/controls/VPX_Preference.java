@@ -189,7 +189,7 @@ public class VPX_Preference extends JDialog {
 
 			prop.setProperty(VPXUtilities.LOG_MAXFILESIZE, "2");
 
-			prop.setProperty(VPXUtilities.LOG_SERIALNO, "");
+			prop.setProperty(VPXUtilities.LOG_FILEPATH, "");
 
 			prop.setProperty(VPXUtilities.LOG_FILEFORMAT, "$(FileName)_$(CurrentTime)");
 
@@ -214,7 +214,7 @@ public class VPX_Preference extends JDialog {
 
 		spinMaxFileSize.setValue(Integer.valueOf(prop.getProperty(VPXUtilities.LOG_MAXFILESIZE)));
 
-		txtLogFilePath.setText(prop.getProperty(VPXUtilities.LOG_SERIALNO));
+		txtLogFilePath.setText(prop.getProperty(VPXUtilities.LOG_FILEPATH));
 
 		txtLogFileFormat.setText(prop.getProperty(VPXUtilities.LOG_FILEFORMAT));
 
@@ -274,7 +274,7 @@ public class VPX_Preference extends JDialog {
 
 			preferenceProperties.setProperty(VPXUtilities.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_SERIALNO, txtLogFilePath.getText());
+			preferenceProperties.setProperty(VPXUtilities.LOG_FILEPATH, txtLogFilePath.getText());
 
 			preferenceProperties.setProperty(VPXUtilities.LOG_FILEFORMAT, txtLogFileFormat.getText());
 
@@ -307,7 +307,7 @@ public class VPX_Preference extends JDialog {
 
 		preferenceProperties.setProperty(VPXUtilities.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_SERIALNO, txtLogFilePath.getText());
+		preferenceProperties.setProperty(VPXUtilities.LOG_FILEPATH, txtLogFilePath.getText());
 
 		preferenceProperties.setProperty(VPXUtilities.LOG_FILEFORMAT, txtLogFileFormat.getText());
 
@@ -592,6 +592,7 @@ public class VPX_Preference extends JDialog {
 			}
 		});
 	}
+
 	private void loadJavaPropertiesPanel() {
 
 		JPanel tabPanel_Java = new JPanel();

@@ -470,30 +470,38 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			String str = txt_Msg_Send.getText();
+			if (VPXUtilities.getCurrentProcessor().length() > 0) {
 
-			if (str.length() > 0 && str.length() <= 16) {
+				String str = txt_Msg_Send.getText();
 
-				String[] s = str.split(" ");
+				if (str.length() > 0 && str.length() <= 16) {
 
-				if (s.length != 5) {
+					String[] s = str.split(" ");
 
-					JOptionPane
-							.showMessageDialog(parent, "Arguments are missing", "Message", JOptionPane.ERROR_MESSAGE);
+					if (s.length != 5) {
 
-					txt_Msg_Send.requestFocus();
+						JOptionPane.showMessageDialog(parent, "Arguments are missing", "Message",
+								JOptionPane.ERROR_MESSAGE);
+
+						txt_Msg_Send.requestFocus();
+
+					} else {
+						parent.sendMessage(VPXUtilities.getCurrentProcessor(), txt_Msg_Send.getText());
+
+						updateUserMessage(txt_Msg_Send.getText());
+					}
 
 				} else {
-					parent.sendMessage(VPXUtilities.getCurrentProcessor(), txt_Msg_Send.getText());
+					JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
+							JOptionPane.ERROR_MESSAGE);
 
-					updateUserMessage(txt_Msg_Send.getText());
+					txt_Msg_Send.requestFocus();
 				}
-
 			} else {
-				JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
-						JOptionPane.ERROR_MESSAGE);
 
-				txt_Msg_Send.requestFocus();
+				JOptionPane.showMessageDialog(parent, "No processor is selected.Please select any one processor",
+						"Processor Selection", JOptionPane.ERROR_MESSAGE);
+
 			}
 
 		}

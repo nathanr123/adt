@@ -773,12 +773,51 @@ public class VPX_AppMode extends JFrame {
 
 			if (currentMode == ETHMODE) {
 
-				if (isValueChanged()) {
-					VPXUtilities.setEthernetPort(cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
-							txtSubnet.getText(), txtGateway.getText());
+				boolean ip = VPXUtilities.isValidIP(txtIPAddress.getText());
 
+				boolean sub = VPXUtilities.isValidIP(txtSubnet.getText());
+
+				boolean gateway = VPXUtilities.isValidIP(txtGateway.getText());
+
+				if (ip && sub && gateway) {
+
+					if (isValueChanged()) {
+
+						VPXUtilities.setEthernetPort(cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
+								txtSubnet.getText(), txtGateway.getText());
+
+					}
+
+					VPXUtilities.setCurrentIP(txtIPAddress.getText());
+
+					VPX_ETHWindow window = new VPX_ETHWindow();
+
+				} else {
+
+					if (!ip) {
+
+						JOptionPane.showMessageDialog(VPX_AppMode.this, "Given IP is not a valid.Please check",
+								"Error IP", JOptionPane.ERROR_MESSAGE);
+
+						txtIPAddress.requestFocus();
+
+					}
+					if (!sub) {
+
+						JOptionPane
+								.showMessageDialog(VPX_AppMode.this, "Given Subnet Mask is not a valid.Please check",
+										"Error Log", JOptionPane.ERROR_MESSAGE);
+
+						txtSubnet.requestFocus();
+					}
+					if (!gateway) {
+
+						JOptionPane.showMessageDialog(VPX_AppMode.this, "Given Gateway is not a valid.Please check",
+								"Error Log", JOptionPane.ERROR_MESSAGE);
+
+						txtGateway.requestFocus();
+					}
 				}
-				VPX_ETHWindow window = new VPX_ETHWindow();
 
 			} else {
 

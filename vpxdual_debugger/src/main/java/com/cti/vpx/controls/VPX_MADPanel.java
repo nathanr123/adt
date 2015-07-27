@@ -223,7 +223,7 @@ public class VPX_MADPanel extends JPanel {
 
 		configPathPanel.add(btnConfigBrowsePrelinker);
 
-		JLabel lblConfigStriper = new JLabel("Striper Tool");
+		JLabel lblConfigStriper = new JLabel("Stripper Tool");
 
 		lblConfigStriper.setBounds(22, 182, 100, 26);
 
@@ -381,14 +381,14 @@ public class VPX_MADPanel extends JPanel {
 					madTab.setEnabledAt(1, true);
 
 					madTab.setSelectedIndex(1);
-					
+
 					parent.updateLog("Configured Susccessfully");
 				} else {
 
 					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
-					
+
 					parent.updateLog("Configuration error");
-					
+
 					parent.updateLog(error);
 				}
 			}
@@ -645,7 +645,7 @@ public class VPX_MADPanel extends JPanel {
 				if (error.length() == 0) {
 
 					parent.updateLog("MAD Compilation started");
-					
+
 					createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
 							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
 							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
@@ -658,16 +658,16 @@ public class VPX_MADPanel extends JPanel {
 					madProcessWindow.setVisible(true);
 
 					parent.updateLog("MAD Compilation Completed");
-					
+
 					btnCompileApply.setEnabled(true);
 				} else {
 
 					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 
 					btnCompileApply.setEnabled(true);
-					
+
 					parent.updateLog("MAD out files error");
-					
+
 					parent.updateLog(error);
 				}
 
@@ -697,34 +697,63 @@ public class VPX_MADPanel extends JPanel {
 		String dummy = p.getProperty(VPXUtilities.PATH_DUMMY);
 
 		if (txtCompilePathCore0.getText().trim().length() == 0) {
+
+			txtCompilePathCore0.setForeground(Color.BLUE);
+
 			txtCompilePathCore0.setText(dummy);
+
 		}
 
 		if (txtCompilePathCore1.getText().trim().length() == 0) {
+
+			txtCompilePathCore1.setForeground(Color.BLUE);
+
 			txtCompilePathCore1.setText(dummy);
+
 		}
 
 		if (txtCompilePathCore2.getText().trim().length() == 0) {
+
+			txtCompilePathCore2.setForeground(Color.BLUE);
+
 			txtCompilePathCore2.setText(dummy);
+
 		}
 
 		if (txtCompilePathCore3.getText().trim().length() == 0) {
+
+			txtCompilePathCore3.setForeground(Color.BLUE);
+
 			txtCompilePathCore3.setText(dummy);
+
 		}
 
 		if (txtCompilePathCore4.getText().trim().length() == 0) {
+
+			txtCompilePathCore4.setForeground(Color.BLUE);
+
 			txtCompilePathCore4.setText(dummy);
+
 		}
 
 		if (txtCompilePathCore5.getText().trim().length() == 0) {
+
+			txtCompilePathCore5.setForeground(Color.BLUE);
+
 			txtCompilePathCore5.setText(dummy);
 		}
 
 		if (txtCompilePathCore6.getText().trim().length() == 0) {
+
+			txtCompilePathCore6.setForeground(Color.BLUE);
+
 			txtCompilePathCore6.setText(dummy);
 		}
 
 		if (txtCompilePathCore7.getText().trim().length() == 0) {
+
+			txtCompilePathCore7.setForeground(Color.BLUE);
+
 			txtCompilePathCore7.setText(dummy);
 		}
 
@@ -1061,9 +1090,9 @@ public class VPX_MADPanel extends JPanel {
 		// String cmd = String.format("cmd /c ping 192.168.0.102");
 
 		parent.updateLog("Creating deployment files");
-		
+
 		parent.updateLog("Creating deployment configuration files");
-		
+
 		try {
 
 			Process proc = Runtime.getRuntime().exec(cmd);
@@ -1077,7 +1106,7 @@ public class VPX_MADPanel extends JPanel {
 				madProcessWindow.updateGeneratingMessage(s);
 
 				parent.updateLog(s);
-				
+
 				if (s.contains("Error")) {
 					ret = false;
 				}
@@ -1093,7 +1122,7 @@ public class VPX_MADPanel extends JPanel {
 				madProcessWindow.setFailure();
 
 				JOptionPane.showMessageDialog(madProcessWindow, "Error in generating out file");
-				
+
 				parent.updateLog("Error in generating out file");
 			}
 

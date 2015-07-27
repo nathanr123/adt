@@ -81,7 +81,9 @@ public class VPX_ExecutionPanel extends JPanel {
 	}
 
 	private void init() {
+		
 		setLayout(new BorderLayout(0, 0));
+		
 		setPreferredSize(new Dimension(790,863));
 	}
 

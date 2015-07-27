@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -58,8 +59,8 @@ import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
+import com.cti.vpx.controls.VPX_EmptyIcon;
 import com.cti.vpx.model.NWInterface;
-import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -111,7 +112,7 @@ public class VPXUtilities {
 
 	public static final String SECURITY_PWD = "security.pwd";
 
-	public static final String LOG_SERIALNO = "log.serialno";
+	public static final String FILTER_SUBNET = "filter.subnet";
 
 	public static final String LOG_ENABLE = "log.enable";
 
@@ -183,13 +184,7 @@ public class VPXUtilities {
 
 	private static String currentProcType = "";
 
-	private static String currentdploy = "";
-
-	private static String currentdployCfg = "";
-
-	private static String currMapPath;
-
-	private static String folderPath;
+	private static String currentSystemIP;
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -310,6 +305,10 @@ public class VPXUtilities {
 
 	public static String getCurrentTime(int format, long millis) {
 		String ret = null;
+
+		if (millis == 0)
+			return "";
+
 		if (format == 0)
 			ret = DATEFORMAT_FULL.format(millis);
 		else if (format == 1)
@@ -395,6 +394,11 @@ public class VPXUtilities {
 	public static Image getAppIcon() {
 
 		return getImageIcon("image\\cornet.png", 24, 24).getImage();
+	}
+
+	public static Icon getEmptyIcon(int w, int h) {
+
+		return new VPX_EmptyIcon(w, h);
 	}
 
 	public static ImageIcon getImageIcon(String path, int w, int h) {
@@ -555,13 +559,12 @@ public class VPXUtilities {
 			prop.setProperty(LOG_ENABLE, String.valueOf(true));
 			prop.setProperty(LOG_PROMPT, String.valueOf(true));
 			prop.setProperty(LOG_MAXFILE, String.valueOf(true));
-			prop.setProperty(LOG_FILEPATH, System.getProperty("user.home"));
+			prop.setProperty(LOG_FILEPATH, System.getProperty("user.dir") + "\\logger_" + getCurrentTime(3) + ".log");
 			prop.setProperty(LOG_MAXFILESIZE, "2");
-			prop.setProperty(LOG_SERIALNO, "");
 			prop.setProperty(LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
 			prop.setProperty(LOG_APPENDCURTIME, String.valueOf(true));
 			prop.setProperty(LOG_OVERWRITE, String.valueOf(false));
-
+			prop.setProperty(FILTER_SUBNET, "");
 			prop.setProperty(PATH_PYTHON, "");
 			prop.setProperty(PATH_MAP, "");
 			prop.setProperty(PATH_PRELINKER, "");
@@ -1129,8 +1132,10 @@ public class VPXUtilities {
 			BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
 
 			while ((s = stderr.readLine()) != null) {
-				System.out.println(s);
+
 			}
+
+			// setCurrentIP(ip);
 
 			return true;
 
@@ -1141,6 +1146,16 @@ public class VPXUtilities {
 			return false;
 		}
 
+	}
+
+	public static String getCurrentIP() {
+
+		return currentSystemIP;
+	}
+
+	public static void setCurrentIP(String ip) {
+
+		currentSystemIP = ip;
 	}
 
 	public static NWInterface getEthernetPort(String name) {

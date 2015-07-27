@@ -38,7 +38,7 @@ import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
+public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 	/**
 	 * 
@@ -72,6 +72,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 	private VPX_ETHWindow parent;
 
 	private VPXSubSystem currentSubSystem = null;
+
+	private VPXSystem sub;
 
 	/**
 	 * Launch the application.
@@ -361,7 +363,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 
 	private void loadAliasFile() {
 
-		VPXSystem sub = VPXUtilities.readFromXMLFile();
+		sub = VPXUtilities.readFromXMLFile();
 
 		if (sub != null) {
 
@@ -442,7 +444,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
 								+ " updated successfully!");
-						
+
 						parent.updateLog("Alias Configuration modified");
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in modifying "
@@ -456,7 +458,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
 								+ " added successfully!");
-						
+
 						parent.updateLog("Alias Configuration Subsystem added");
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
@@ -502,7 +504,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 		txtDSP1.setText(currentSubSystem.getIpDSP1());
 
 		txtDSP2.setText(currentSubSystem.getIpDSP2());
-		
+
 	}
 
 	private int isSubsystemAvailable() {
@@ -713,8 +715,10 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			VPXUtilities.writeToXMLFile(aliasTableModel.getSubSystem());
+
+			VPXUtilities.setVPXSystem(VPXUtilities.readFromXMLFile());
 
 			parent.updateProcessorTree();
 
@@ -823,43 +827,43 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener{
 	@Override
 	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		
+
 		parent.reloadVPXSystem();
-		
+
 	}
 
 	@Override
 	public void windowIconified(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowActivated(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

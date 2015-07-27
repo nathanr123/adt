@@ -3,6 +3,7 @@
  */
 package com.cti.vpx.util;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -57,17 +58,60 @@ public class ComponentFactory {
 
 	public static JMenuItem createJMenuItem(String name) {
 
-		return new JMenuItem(name);
+		JMenuItem item = new JMenuItem(name);
+
+		Dimension d = item.getPreferredSize();
+
+		d.width = 250;
+
+		d.height = d.height + 5;
+
+		item.setPreferredSize(d);
+
+		return item;
+	}
+
+	public static JMenuItem createJMenuItem(String name, Icon icon) {
+
+		JMenuItem item = new JMenuItem(name, icon);
+
+		Dimension d = item.getPreferredSize();
+
+		d.width = 250;
+
+		d.height = d.height + 5;
+
+		item.setPreferredSize(d);
+
+		return item;
 	}
 
 	public static JMenuItem createJMenuItem(Action action) {
 
-		return new JMenuItem(action);
+		JMenuItem item = new JMenuItem(action);
+
+		Dimension d = item.getPreferredSize();
+
+		d.width = 250;
+
+		d.height = d.height + 5;
+
+		item.setPreferredSize(d);
+
+		return item;
 	}
 
 	public static JMenuItem createJMenuItem(String name, ActionListener listener) {
 
 		JMenuItem i = new JMenuItem(name);
+
+		Dimension d = i.getPreferredSize();
+
+		d.width = 250;
+
+		d.height = d.height + 5;
+
+		i.setPreferredSize(d);
 
 		i.addActionListener(listener);
 
@@ -96,11 +140,11 @@ public class ComponentFactory {
 	public static JButton createJToolBarButton(Action action) {
 
 		JButton jb = new JButton(action);
-		
+
 		jb.setFocusable(false);
-		
+
 		jb.setBorderPainted(false);
-		
+
 		return jb;
 	}
 
@@ -143,7 +187,7 @@ public class ComponentFactory {
 	public static VPX_ProcessorTree createProcessorTree(VPX_ETHWindow parent, TreeNode root) {
 		return new VPX_ProcessorTree(parent, root);
 	}
-	
+
 	public static VPX_ProcessorTree createProcessorTree(VPX_ETHWindow parent) {
 		return new VPX_ProcessorTree(parent);
 	}
