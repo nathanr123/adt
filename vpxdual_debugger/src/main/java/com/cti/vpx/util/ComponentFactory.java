@@ -62,26 +62,12 @@ public class ComponentFactory {
 
 		Dimension d = item.getPreferredSize();
 
-		d.width = 250;
-
-		d.height = d.height + 5;
-
-		item.setPreferredSize(d);
-
 		return item;
 	}
 
 	public static JMenuItem createJMenuItem(String name, Icon icon) {
 
 		JMenuItem item = new JMenuItem(name, icon);
-
-		Dimension d = item.getPreferredSize();
-
-		d.width = 250;
-
-		d.height = d.height + 5;
-
-		item.setPreferredSize(d);
 
 		return item;
 	}
@@ -90,28 +76,12 @@ public class ComponentFactory {
 
 		JMenuItem item = new JMenuItem(action);
 
-		Dimension d = item.getPreferredSize();
-
-		d.width = 250;
-
-		d.height = d.height + 5;
-
-		item.setPreferredSize(d);
-
 		return item;
 	}
 
 	public static JMenuItem createJMenuItem(String name, ActionListener listener) {
 
 		JMenuItem i = new JMenuItem(name);
-
-		Dimension d = i.getPreferredSize();
-
-		d.width = 250;
-
-		d.height = d.height + 5;
-
-		i.setPreferredSize(d);
 
 		i.addActionListener(listener);
 

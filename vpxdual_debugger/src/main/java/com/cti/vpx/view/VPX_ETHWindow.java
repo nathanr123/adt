@@ -1038,7 +1038,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		messagePanel = new VPX_MessagePanel(this);
 
-		messagePanel.setPreferredSize(new Dimension(375, 300));
+		messagePanel.setPreferredSize(new Dimension(450, 300));
 
 		contentPanel.add(messagePanel, BorderLayout.EAST);
 

@@ -55,8 +55,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	public static final int MAXRESPONSETIMEOUT = 10;
 
-	private static JPopupMenu vpx_contextMenu = new JPopupMenu();
-
 	// File Menu Items
 	private JMenuItem vpx_Menu_File_AliasConfig;
 
@@ -1111,7 +1109,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	public JPopupMenu getPopupMenu(int nodeLevel) {
 
-		vpx_contextMenu.removeAll();
+		JPopupMenu vpx_contextMenu = new JPopupMenu();
 
 		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (VPX_ETHWindow.MAX_MEMORY_BROWSER - VPX_ETHWindow.currentNoofMemoryView) + " ) ");
@@ -1217,8 +1215,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		Dimension d = vpx_contextMenu.getPreferredSize();
 
 		d.width = 250;
-
-		d.height = d.height + 5;
 
 		vpx_contextMenu.setPreferredSize(d);
 
