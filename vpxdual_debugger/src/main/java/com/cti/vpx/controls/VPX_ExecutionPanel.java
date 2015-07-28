@@ -16,6 +16,7 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_ExecutionPanel extends JPanel {
@@ -25,28 +26,44 @@ public class VPX_ExecutionPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 5981154131918463867L;
 
-	final JFileChooser fileDialog = new JFileChooser();
+	private final JFileChooser fileDialog = new JFileChooser();
 
-	final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
 
-	final FileNameExtensionFilter filterXml = new FileNameExtensionFilter("XML Files", "xml");
+	private final FileNameExtensionFilter filterXml = new FileNameExtensionFilter("XML Files", "xml");
 
 	private JTextField txtOutFile_0;
+
 	private JTextField txtMapFile_0;
+
 	private JTextField txtOutFile_1;
+
 	private JTextField txtMapFile_1;
+
 	private JTextField txtOutFile_2;
+
 	private JTextField txtMapFile_2;
+
 	private JTextField txtOutFile_3;
+
 	private JTextField txtMapFile_3;
+
 	private JTextField txtOutFile_4;
+
 	private JTextField txtMapFile_4;
+
 	private JTextField txtOutFile_5;
+
 	private JTextField txtMapFile_5;
+
 	private JTextField txtOutFile_6;
+
 	private JTextField txtMapFile_6;
+
 	private JTextField txtOutFile_7;
+
 	private JTextField txtMapFile_7;
+
 	private JPanel basePanel;
 
 	public static void main(String[] args) {
@@ -77,14 +94,14 @@ public class VPX_ExecutionPanel extends JPanel {
 		init();
 
 		loadComponents();
-		
+
 	}
 
 	private void init() {
-		
+
 		setLayout(new BorderLayout(0, 0));
-		
-		setPreferredSize(new Dimension(790,863));
+
+		setPreferredSize(new Dimension(790, 863));
 	}
 
 	private void loadComponents() {
@@ -170,19 +187,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core0Panel.add(btnMapBrowse_0);
 
-		JButton btnRun_0 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_0 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_0.setBounds(665, 54, 26, 26);
 
 		core0Panel.add(btnRun_0);
 
-		JButton btnHalt_0 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_0 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_0.setBounds(698, 54, 26, 26);
 
 		core0Panel.add(btnHalt_0);
 
-		JButton btnDL_0 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_0 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_0.setBounds(731, 54, 26, 26);
 
@@ -241,19 +258,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core1Panel.add(btnMapBrowse_1);
 
-		JButton btnRun_1 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_1 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_1.setBounds(665, 51, 26, 26);
 
 		core1Panel.add(btnRun_1);
 
-		JButton btnHalt_1 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_1 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_1.setBounds(698, 51, 26, 26);
 
 		core1Panel.add(btnHalt_1);
 
-		JButton btnDL_1 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_1 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_1.setBounds(731, 51, 26, 26);
 
@@ -312,19 +329,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core2Panel.add(btnMapBrowse_2);
 
-		JButton btnRun_2 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_2 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_2.setBounds(665, 51, 26, 26);
 
 		core2Panel.add(btnRun_2);
 
-		JButton btnHalt_2 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_2 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_2.setBounds(698, 51, 26, 26);
 
 		core2Panel.add(btnHalt_2);
 
-		JButton btnDL_2 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_2 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_2.setBounds(731, 51, 26, 26);
 
@@ -383,19 +400,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core3panel.add(btnMapBrowse_3);
 
-		JButton btnRun_3 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_3 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_3.setBounds(665, 51, 26, 26);
 
 		core3panel.add(btnRun_3);
 
-		JButton btnHalt_3 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_3 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_3.setBounds(698, 51, 26, 26);
 
 		core3panel.add(btnHalt_3);
 
-		JButton btnDL_3 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_3 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_3.setBounds(731, 51, 26, 26);
 
@@ -454,19 +471,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core4Panel.add(btnMapBrowse_4);
 
-		JButton btnRun_4 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_4 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_4.setBounds(665, 51, 26, 26);
 
 		core4Panel.add(btnRun_4);
 
-		JButton btnHalt_4 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_4 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_4.setBounds(698, 51, 26, 26);
 
 		core4Panel.add(btnHalt_4);
 
-		JButton btnDL_4 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_4 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_4.setBounds(731, 51, 26, 26);
 
@@ -525,19 +542,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core5Panel.add(btnMapBrowse_5);
 
-		JButton btnRun_5 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_5 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_5.setBounds(665, 51, 26, 26);
 
 		core5Panel.add(btnRun_5);
 
-		JButton btnHalt_5 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_5 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_5.setBounds(698, 51, 26, 26);
 
 		core5Panel.add(btnHalt_5);
 
-		JButton btnDL_5 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_5 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_5.setBounds(731, 51, 26, 26);
 
@@ -596,19 +613,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core6Panel.add(btnMapBrowse_6);
 
-		JButton btnRun_6 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_6 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_6.setBounds(665, 51, 26, 26);
 
 		core6Panel.add(btnRun_6);
 
-		JButton btnHalt_6 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_6 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_6.setBounds(698, 51, 26, 26);
 
 		core6Panel.add(btnHalt_6);
 
-		JButton btnDL_6 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_6 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_6.setBounds(731, 51, 26, 26);
 
@@ -667,19 +684,19 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		core7Panel.add(btnMapBrowse_7);
 
-		JButton btnRun_7 = new JButton(VPXUtilities.getImageIcon("image\\play.png", 18, 18));
+		JButton btnRun_7 = new JButton(VPXConstants.Icons.ICON_RUN);
 
 		btnRun_7.setBounds(665, 51, 26, 26);
 
 		core7Panel.add(btnRun_7);
 
-		JButton btnHalt_7 = new JButton(VPXUtilities.getImageIcon("image\\pause.png", 18, 18));
+		JButton btnHalt_7 = new JButton(VPXConstants.Icons.ICON_PAUSE);
 
 		btnHalt_7.setBounds(698, 51, 26, 26);
 
 		core7Panel.add(btnHalt_7);
 
-		JButton btnDL_7 = new JButton(VPXUtilities.getImageIcon("image\\download1.png", 18, 18));
+		JButton btnDL_7 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDL_7.setBounds(731, 51, 26, 26);
 

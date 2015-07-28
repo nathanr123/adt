@@ -12,113 +12,113 @@ import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_StatusBar extends JPanel {
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7921801919677398732L;
+    private static final long serialVersionUID = 7921801919677398732L;
 
-	private boolean isAppRunning = true;
+    private boolean isAppRunning = true;
 
-	private JProgressBar progressBar;
+    private JProgressBar progressBar;
 
-	private Runtime jvm = Runtime.getRuntime();
+    private Runtime jvm = Runtime.getRuntime();
 
-	private long totalMemory = jvm.totalMemory();
+    private long totalMemory = jvm.totalMemory();
 
-	private long usedMemory;
+    private long usedMemory;
 
-	private int usedPct;
+    private int usedPct;
 
-	private JPanel memBar;
+    private JPanel memBar;
 
-	private JLabel statusLbl;
+    private JLabel statusLbl;
 
-	private static final int MB = 1024 * 1024;
+    public VPX_StatusBar() {
+	setLayout(new BorderLayout());
 
-	public VPX_StatusBar() {
-		setLayout(new BorderLayout());
+	statusLbl = ComponentFactory.createJLabel("");
 
-		statusLbl = ComponentFactory.createJLabel("");
+	add(statusLbl, BorderLayout.LINE_START);
 
-		add(statusLbl, BorderLayout.LINE_START);
-		
-		if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.GENERAL_MEMORY))) {
-			memBar = getMemoryPanel();
+	if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.GENERAL_MEMORY))) {
+	    memBar = getMemoryPanel();
 
-			add(memBar, BorderLayout.EAST);
-		}
-
-		setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-
-		setPreferredSize(new Dimension(VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight() / 35));
+	    add(memBar, BorderLayout.EAST);
 	}
 
-	private JPanel getMemoryPanel() {
+	setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
-		JPanel memPanel = ComponentFactory.createJPanel();
+	setPreferredSize(new Dimension(VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight() / 35));
+    }
 
-		memPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    private JPanel getMemoryPanel() {
 
-		progressBar = new JProgressBar();
+	JPanel memPanel = ComponentFactory.createJPanel();
 
-		progressBar.setPreferredSize(new Dimension(200, 25));
+	memPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		progressBar.setStringPainted(true);
+	progressBar = new JProgressBar();
 
-		memPanel.add(progressBar);
+	progressBar.setPreferredSize(new Dimension(200, 25));
 
-		MemoryMonitor memMonitor = new MemoryMonitor();
+	progressBar.setStringPainted(true);
 
-		memMonitor.execute();
+	memPanel.add(progressBar);
 
-		return memPanel;
+	MemoryMonitor memMonitor = new MemoryMonitor();
+
+	memMonitor.execute();
+
+	return memPanel;
+    }
+
+    private void updateMemory() {
+	usedMemory = totalMemory - jvm.freeMemory();
+
+	usedPct = (int) ((100 * usedMemory) / totalMemory);
+
+	progressBar.setValue((int) usedPct);
+
+	String ttText = String
+		.format("<html>Memory Usage : %d %%<br>Memory Using by Application : %d MB<br>Free Memory %d MB<br>Total Memory : %d MB<br>Memory Allocated : %d MB<br>Maximum Memory : %d MB</html>",
+			usedPct, usedMemory / VPXConstants.MB, jvm.freeMemory() / VPXConstants.MB,
+			totalMemory / VPXConstants.MB, totalMemory / VPXConstants.MB, jvm.maxMemory() / VPXConstants.MB);
+
+	progressBar.setToolTipText(ttText);
+
+	progressBar.setString(usedPct + " % " + usedMemory / VPXConstants.MB + "MB Out of " + totalMemory / VPXConstants.MB
+		+ "MB");
+
+    }
+
+    public void updateStatus(String status) {
+
+	statusLbl.setText(status);
+    }
+
+    public void stopMemoryMonitor() {
+
+	isAppRunning = false;
+    }
+
+    class MemoryMonitor extends SwingWorker<Void, Void> {
+
+	@Override
+	protected Void doInBackground() throws Exception {
+
+	    while (isAppRunning) {
+
+		updateMemory();
+
+		Thread.sleep(5000);
+	    }
+	    return null;
 	}
 
-	private void updateMemory() {
-		usedMemory = totalMemory - jvm.freeMemory();
-
-		usedPct = (int) ((100 * usedMemory) / totalMemory);
-
-		progressBar.setValue((int) usedPct);
-
-		String ttText = String
-				.format("<html>Memory Usage : %d %%<br>Memory Using by Application : %d MB<br>Free Memory %d MB<br>Total Memory : %d MB<br>Memory Allocated : %d MB<br>Maximum Memory : %d MB</html>",
-						usedPct, usedMemory / MB, jvm.freeMemory() / MB, totalMemory / MB, totalMemory / MB,
-						jvm.maxMemory() / MB);
-
-		progressBar.setToolTipText(ttText);
-
-		progressBar.setString(usedPct + " % " + usedMemory / MB + "MB Out of " + totalMemory / MB + "MB");
-
-	}
-
-	public void updateStatus(String status) {
-
-		statusLbl.setText(status);
-	}
-
-	public void stopMemoryMonitor() {
-
-		isAppRunning = false;
-	}
-
-	class MemoryMonitor extends SwingWorker<Void, Void> {
-
-		@Override
-		protected Void doInBackground() throws Exception {
-
-			while (isAppRunning) {
-
-				updateMemory();
-
-				Thread.sleep(5000);
-			}
-			return null;
-		}
-
-	}
+    }
 
 }

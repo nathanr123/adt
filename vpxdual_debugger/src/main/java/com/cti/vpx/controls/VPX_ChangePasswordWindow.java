@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -152,7 +153,7 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 	private void changePassword() {
 
-		String pwd = VPXUtilities.getPropertyValue(VPXUtilities.SECURITY_PWD);
+		String pwd = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD);
 
 		if (pwd.equals(new String(pwdOldPWD.getPassword()))) {
 
@@ -162,7 +163,7 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 			if (pwd1.equals(pwd2)) {
 
-				VPXUtilities.updateProperties(VPXUtilities.SECURITY_PWD, pwd1);
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.SECURITY_PWD, pwd1);
 
 				JOptionPane.showMessageDialog(parent, "Password Changed Succesfully", "Authentication",
 						JOptionPane.INFORMATION_MESSAGE);

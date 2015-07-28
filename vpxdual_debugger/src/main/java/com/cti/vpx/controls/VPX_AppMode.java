@@ -30,6 +30,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.model.NWInterface;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 import com.cti.vpx.view.VPX_UARTWindow;
@@ -40,10 +41,6 @@ public class VPX_AppMode extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = -3306489875227159785L;
-
-	private static int UARTMODE = 0;
-
-	private static int ETHMODE = 1;
 
 	private static String UARTNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UART Mode will be switched into minimal functionalities and windows.</left></body></html>";
 
@@ -180,7 +177,7 @@ public class VPX_AppMode extends JFrame {
 
 		loadBottomComponents();
 
-		reloadCenterComponents(UARTMODE);
+		reloadCenterComponents(VPXConstants.UARTMODE);
 
 	}
 
@@ -246,7 +243,7 @@ public class VPX_AppMode extends JFrame {
 
 					if (!flnmae.endsWith(".log")) {
 
-						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_APPENDCURTIME))) {
+						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
 							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
 						} else {
@@ -254,7 +251,7 @@ public class VPX_AppMode extends JFrame {
 						}
 
 					} else {
-						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_APPENDCURTIME))) {
+						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
 							flnmae = flnmae.substring(0, flnmae.length() - 4);
 
@@ -267,7 +264,7 @@ public class VPX_AppMode extends JFrame {
 
 					VPXUtilities.setEnableLog(true);
 
-					VPXUtilities.updateProperties(VPXUtilities.LOG_FILEPATH, txtLogFileName.getText());
+					VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
 				}
 			}
 		});
@@ -355,8 +352,8 @@ public class VPX_AppMode extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if (currentMode != UARTMODE)
-					reloadCenterComponents(UARTMODE);
+				if (currentMode != VPXConstants.UARTMODE)
+					reloadCenterComponents(VPXConstants.UARTMODE);
 
 			}
 		});
@@ -375,8 +372,8 @@ public class VPX_AppMode extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (currentMode != ETHMODE)
-					reloadCenterComponents(ETHMODE);
+				if (currentMode != VPXConstants.ETHMODE)
+					reloadCenterComponents(VPXConstants.ETHMODE);
 
 			}
 		});
@@ -394,7 +391,7 @@ public class VPX_AppMode extends JFrame {
 
 		currentMode = mode;
 
-		if (mode == UARTMODE) {
+		if (mode == VPXConstants.UARTMODE) {
 
 			centerPanel.removeAll();
 
@@ -415,7 +412,7 @@ public class VPX_AppMode extends JFrame {
 				populateUARTValues(cmbCOMM.getSelectedItem().toString());
 			}
 
-		} else if (mode == ETHMODE) {
+		} else if (mode == VPXConstants.ETHMODE) {
 			centerPanel.removeAll();
 
 			setSize(470, 570);
@@ -718,12 +715,12 @@ public class VPX_AppMode extends JFrame {
 
 	private void setLogProperties() {
 
-		isLogEnabled = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXUtilities.LOG_ENABLE));
+		isLogEnabled = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_ENABLE));
 
 		chkLog.setSelected(isLogEnabled);
 
 		if (isLogEnabled) {
-			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXUtilities.LOG_FILEPATH));
+			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
 		} else {
 			txtLogFileName.setEnabled(false);
 			btnBrowse.setEnabled(false);
@@ -741,7 +738,7 @@ public class VPX_AppMode extends JFrame {
 															// filepath
 				VPXUtilities.setEnableLog(true);
 
-				VPXUtilities.updateProperties(VPXUtilities.LOG_FILEPATH, txtLogFileName.getText());
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
 				ret = true;
 			}
 		} else {
@@ -771,7 +768,7 @@ public class VPX_AppMode extends JFrame {
 
 		if (updateLogSettings()) {
 
-			if (currentMode == ETHMODE) {
+			if (currentMode == VPXConstants.ETHMODE) {
 
 				boolean ip = VPXUtilities.isValidIP(txtIPAddress.getText());
 

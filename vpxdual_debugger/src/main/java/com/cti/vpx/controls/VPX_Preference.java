@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
@@ -30,11 +30,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
-
-import java.awt.Color;
 
 public class VPX_Preference extends JDialog {
 
@@ -42,34 +40,48 @@ public class VPX_Preference extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = -999389272992924693L;
+
 	private final JPanel basePanel = new JPanel();
+
 	private JTabbedPane preference_TabbedPane;
+
 	private JTextField txtLogFileFormat;
+
 	private JTextField txtLogFilePath;
-	private JTextField txtInterpreterPath;
-	private JTextField txtDummyOut;
 
 	private Properties preferenceProperties;
+
 	private final JFileChooser fileDialog = new JFileChooser();
+
 	private JCheckBox chkShowSplash;
+
 	private JCheckBox chkShowMemory;
+
 	private JCheckBox chkEnableLog;
+
 	private JCheckBox chkPromptSerialNo;
+
 	private JCheckBox chkOverwrite;
+
 	private JCheckBox chkAppndTimeLogFile;
+
 	private JCheckBox chkMaxLogFile;
-	private JCheckBox chkUseDummy;
+
 	private JSpinner spinMaxFileSize;
+
 	private JLabel lblJVersion;
+
 	private JLabel lblJName;
+
 	private JLabel lblJInstallPath;
+
 	private JLabel lbJInstallJRE;
+
 	private JLabel lblJVMName;
+
 	private JLabel lblJVMArch;
-	private JLabel lblPyVersion;
+
 	private JLabel lblErrLogPath;
-	private JLabel lblErrDummyFile;
-	private JLabel lblErrIntrprtrPath;
 
 	/**
 	 * Launch the application.
@@ -161,9 +173,9 @@ public class VPX_Preference extends JDialog {
 
 		if (!isRestore) {
 
-			splash = Boolean.valueOf(preferenceProperties.getProperty(VPXUtilities.GENERAL_SPLASH));
+			splash = Boolean.valueOf(preferenceProperties.getProperty(VPXConstants.ResourceFields.GENERAL_SPLASH));
 
-			memory = Boolean.valueOf(preferenceProperties.getProperty(VPXUtilities.GENERAL_MEMORY));
+			memory = Boolean.valueOf(preferenceProperties.getProperty(VPXConstants.ResourceFields.GENERAL_MEMORY));
 		}
 
 		chkShowSplash.setSelected(!splash);
@@ -181,46 +193,46 @@ public class VPX_Preference extends JDialog {
 
 		if (isRestore) {
 
-			prop.setProperty(VPXUtilities.LOG_ENABLE, String.valueOf(true));
+			prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
 
-			prop.setProperty(VPXUtilities.LOG_PROMPT, String.valueOf(true));
+			prop.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(true));
 
-			prop.setProperty(VPXUtilities.LOG_MAXFILE, String.valueOf(true));
+			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(true));
 
-			prop.setProperty(VPXUtilities.LOG_MAXFILESIZE, "2");
+			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, "2");
 
-			prop.setProperty(VPXUtilities.LOG_FILEPATH, "");
+			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, "");
 
-			prop.setProperty(VPXUtilities.LOG_FILEFORMAT, "$(FileName)_$(CurrentTime)");
+			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, "$(FileName)_$(CurrentTime)");
 
-			prop.setProperty(VPXUtilities.LOG_APPENDCURTIME, String.valueOf(true));
+			prop.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME, String.valueOf(true));
 
-			prop.setProperty(VPXUtilities.LOG_OVERWRITE, String.valueOf(false));
+			prop.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(false));
 		} else {
 			prop = (Properties) preferenceProperties.clone();
 		}
 
-		boolean enablelog = Boolean.valueOf(prop.getProperty(VPXUtilities.LOG_ENABLE));
+		boolean enablelog = Boolean.valueOf(prop.getProperty(VPXConstants.ResourceFields.LOG_ENABLE));
 
-		boolean maxLog = Boolean.valueOf(prop.getProperty(VPXUtilities.LOG_MAXFILE));
+		boolean maxLog = Boolean.valueOf(prop.getProperty(VPXConstants.ResourceFields.LOG_MAXFILE));
 
-		boolean appTime = Boolean.valueOf(prop.getProperty(VPXUtilities.LOG_APPENDCURTIME));
+		boolean appTime = Boolean.valueOf(prop.getProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME));
 
 		chkEnableLog.setSelected(!enablelog);
 
-		chkPromptSerialNo.setSelected(Boolean.valueOf(prop.getProperty(VPXUtilities.LOG_PROMPT)));
+		chkPromptSerialNo.setSelected(Boolean.valueOf(prop.getProperty(VPXConstants.ResourceFields.LOG_PROMPT)));
 
 		chkMaxLogFile.setSelected(!maxLog);
 
-		spinMaxFileSize.setValue(Integer.valueOf(prop.getProperty(VPXUtilities.LOG_MAXFILESIZE)));
+		spinMaxFileSize.setValue(Integer.valueOf(prop.getProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE)));
 
-		txtLogFilePath.setText(prop.getProperty(VPXUtilities.LOG_FILEPATH));
+		txtLogFilePath.setText(prop.getProperty(VPXConstants.ResourceFields.LOG_FILEPATH));
 
-		txtLogFileFormat.setText(prop.getProperty(VPXUtilities.LOG_FILEFORMAT));
+		txtLogFileFormat.setText(prop.getProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT));
 
 		chkAppndTimeLogFile.setSelected(!appTime);
 
-		chkOverwrite.setSelected(Boolean.valueOf(prop.getProperty(VPXUtilities.LOG_OVERWRITE)));
+		chkOverwrite.setSelected(Boolean.valueOf(prop.getProperty(VPXConstants.ResourceFields.LOG_OVERWRITE)));
 
 		chkEnableLog.setSelected(enablelog);
 
@@ -259,29 +271,32 @@ public class VPX_Preference extends JDialog {
 		switch (propId) {
 		case 0:// General Tab Settings
 
-			preferenceProperties.setProperty(VPXUtilities.GENERAL_SPLASH, String.valueOf(chkShowSplash.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH,
+					String.valueOf(chkShowSplash.isSelected()));
 
-			preferenceProperties.setProperty(VPXUtilities.GENERAL_MEMORY, String.valueOf(chkShowMemory.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY,
+					String.valueOf(chkShowMemory.isSelected()));
 
 			break;
 		case 1:// Log Tab Settings
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_ENABLE, String.valueOf(chkEnableLog.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(chkEnableLog.isSelected()));
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_PROMPT, String.valueOf(chkPromptSerialNo.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_PROMPT,
+					String.valueOf(chkPromptSerialNo.isSelected()));
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_MAXFILE, String.valueOf(chkMaxLogFile.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(chkMaxLogFile.isSelected()));
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_FILEPATH, txtLogFilePath.getText());
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFilePath.getText());
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_FILEFORMAT, txtLogFileFormat.getText());
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, txtLogFileFormat.getText());
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_APPENDCURTIME,
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME,
 					String.valueOf(chkAppndTimeLogFile.isSelected()));
 
-			preferenceProperties.setProperty(VPXUtilities.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
 
 			break;
 
@@ -293,28 +308,28 @@ public class VPX_Preference extends JDialog {
 
 		// General Tab Settings
 
-		preferenceProperties.setProperty(VPXUtilities.GENERAL_SPLASH, String.valueOf(chkShowSplash.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH, String.valueOf(chkShowSplash.isSelected()));
 
-		preferenceProperties.setProperty(VPXUtilities.GENERAL_MEMORY, String.valueOf(chkShowMemory.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY, String.valueOf(chkShowMemory.isSelected()));
 
 		// Log Tab Settings
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_ENABLE, String.valueOf(chkEnableLog.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(chkEnableLog.isSelected()));
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_PROMPT, String.valueOf(chkPromptSerialNo.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(chkPromptSerialNo.isSelected()));
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_MAXFILE, String.valueOf(chkMaxLogFile.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(chkMaxLogFile.isSelected()));
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_FILEPATH, txtLogFilePath.getText());
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFilePath.getText());
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_FILEFORMAT, txtLogFileFormat.getText());
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, txtLogFileFormat.getText());
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_APPENDCURTIME,
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME,
 				String.valueOf(chkAppndTimeLogFile.isSelected()));
 
-		preferenceProperties.setProperty(VPXUtilities.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
 
 	}
 

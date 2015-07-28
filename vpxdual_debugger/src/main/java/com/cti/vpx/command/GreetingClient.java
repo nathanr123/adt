@@ -1,143 +1,126 @@
 package com.cti.vpx.command;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 
-import javax.swing.UIManager;
-
-import com.cti.vpx.controls.VPX_BusyWindow;
-import com.cti.vpx.controls.VPX_FullTestResult;
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.Listener.UDPListener;
+import com.cti.vpx.command.ATP.MESSAGE_MODE;
 
 public class GreetingClient {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		// new GreetingClient().identify("172.17.10.21", 12345);
+	// new GreetingClient().identify("172.17.10.21", 12345);
 
-		new GreetingClient().bIST("172.17.1.28", 12345);
+	new GreetingClient();
+
+    }
+
+    public GreetingClient() {
+
+	//Thread th = new Thread(new MThreadMonitor());
+
+	//th.start();
+
+	send();
+    }
+
+    public void send() {
+
+	DatagramSocket datagramSocket;
+
+	try {
+	    datagramSocket = new DatagramSocket();
+
+	    MessageCommand msg = new MessageCommand();
+
+	    msg.mode.set(MESSAGE_MODE.MSG_MODE_MESSAGE);
+
+	    msg.core.set(11);
+
+	    ByteBuffer buffer1 = ByteBuffer.allocateDirect(10000);
+
+	    buffer1.flip();
+	    
+	    byte[] buffer = new byte[buffer1.remaining()];
+	    
+	    buffer1.get(buffer);
+
+	    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.1.28"),
+		    UDPListener.CONSOLE_MSG_PORTNO);
+
+	    datagramSocket.send(packet);
+
+	    // System.out.println("Message : " + msg + " to IP : " + ip);
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
 	}
 
-	public void bIST(String serverName, int port) {
+    }
 
+    class MThreadMonitor implements Runnable {
+	DatagramSocket messageReceiverSocket;
+
+	MessageCommand msgCommand = new MessageCommand();
+
+	byte[] messageData = new byte[msgCommand.size()];
+
+	DatagramPacket messagePacket = new DatagramPacket(messageData, messageData.length);
+
+	public MThreadMonitor() {
+	    try {
+		messageReceiverSocket = new DatagramSocket(UDPListener.CONSOLE_MSG_PORTNO);
+	    } catch (SocketException e) {
+		e.printStackTrace();
+	    }
+	}
+
+	@Override
+	public void run() {
+
+	    ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
+
+	    while (true) {
 		try {
-			System.out.println("Connecting to " + serverName + " on port " + port);
 
-			Socket client = new Socket();
+		    messageReceiverSocket.receive(messagePacket);
 
-			client.connect(new InetSocketAddress(serverName, port), 300000);
+		    bf.clear();
 
-			client.setSoTimeout(300000);
+		    bf.put(messageData);
 
-			System.out.println("Just connected to " + client.getRemoteSocketAddress());
+		    bf.flip();
 
-			System.out.println("Hello from " + client.getLocalSocketAddress());
+		    msgCommand.getByteBuffer().clear();
 
-			/*DSPATPCommand cmd = VPXUtilities.createDSPCommand();
+		    msgCommand.getByteBuffer().put(bf);
 
-			cmd.params.testType.set(ATP.TEST_DSP_FULL);*/
+		    System.out.println(msgCommand.core);
 
-			ATPCommand cmd = VPXUtilities.createATPCommand();
-			
-			cmd.params.testType.set(ATP.TEST_P2020_FULL);
-			
-			cmd.msgType.set(ATPCommand.MSG_TYPE_TEST);
+		    System.out.println(msgCommand.mode);
 
-			cmd.msgID.set(ATPCommand.MSG_ID_GET);
+		    System.out.println(msgCommand.command);
 
-			VPX_BusyWindow busyWindow = new VPX_BusyWindow(null, "Built in Self Test",
-					"Complete Testing on process....");
+		    System.out.println(msgCommand.argu1);
 
-			cmd.write(client.getOutputStream());
+		    System.out.println(msgCommand.argu2);
 
-			long start = System.currentTimeMillis();
-			
-			ATPCommand msg = new ATPCommand();
+		    System.out.println(msgCommand.argu3);
 
-			msg.read( client.getInputStream());
-			
-			long end = System.currentTimeMillis();
+		    System.out.println(msgCommand.argu4);
 
-			try {
-				busyWindow.dispose();
+		    Thread.sleep(500);
 
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-				new VPX_FullTestResult(msg, serverName, start, end);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		} catch (Exception e) {
-			e.printStackTrace();
+		    e.printStackTrace();
 		}
+	    }
 
 	}
 
-	public void identify(String serverName, int port) {
-
-		try {
-			System.out.println("Connecting to " + serverName + " on port " + port);
-
-			Socket client = new Socket();
-
-			client.connect(new InetSocketAddress(serverName, port), 500);
-
-			client.setSoTimeout(1000);
-
-			System.out.println("Just connected to " + client.getRemoteSocketAddress());
-
-			OutputStream outToServer = client.getOutputStream();
-
-			DataOutputStream out = new DataOutputStream(outToServer);
-
-			System.out.println("Hello from " + client.getLocalSocketAddress());
-
-			ATPCommand cmd = new ATPCommand();
-
-			cmd.msgType.set(ATPCommand.MSG_TYPE_QUERY);
-
-			cmd.msgID.set(ATPCommand.MSG_ID_GET);
-
-			cmd.write(out);
-
-			InputStream inFromServer = client.getInputStream();
-
-			DataInputStream in = new DataInputStream(inFromServer);
-
-			ATPCommand msg = new ATPCommand();
-
-			ByteBuffer bf = ByteBuffer.allocate(msg.size());
-
-			byte[] b = new byte[msg.size()];
-
-			bf.clear();
-
-			in.read(b);
-
-			bf.put(b);
-
-			bf.flip();
-
-			msg.getByteBuffer().put(bf);
-
-			System.out.println("Message Type : " + ("0x" + Long.toHexString(msg.msgType.get()).toUpperCase()));
-
-			System.out.println("Message ID : " + ("0x" + Long.toHexString(msg.msgID.get()).toUpperCase()));
-
-			System.out.println("Slot ID : " + msg.params.proccesorInfo.slotID.get());
-
-			System.out.println("Processor : " + msg.params.proccesorInfo.processorID.get());
-
-			System.out.println("Processor Type : " + msg.params.proccesorInfo.processorTYPE);
-
-			client.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
+    }
 }

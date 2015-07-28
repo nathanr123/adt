@@ -32,6 +32,7 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
@@ -513,7 +514,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public SaveAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\save.gif"), 20, 20));
+			putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_SAVE);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -532,7 +533,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public ClearAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\clear2.png"), 20, 20));
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_CLEAR);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -551,7 +552,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public CopyAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\copy.gif"), 20, 20));
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_COPY);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;

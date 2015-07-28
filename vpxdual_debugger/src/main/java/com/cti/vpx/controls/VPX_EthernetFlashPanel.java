@@ -27,9 +27,9 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private JTextField txtBinFilePath;
 
-	final JFileChooser fileDialog = new JFileChooser();
+	private final JFileChooser fileDialog = new JFileChooser();
 
-	final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
 
 	private JComboBox<String> cmbOffset;
 

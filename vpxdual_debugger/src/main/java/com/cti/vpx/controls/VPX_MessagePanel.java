@@ -11,13 +11,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -25,554 +24,543 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-import javax.swing.JComboBox;
-
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
+    /**
+	 * 
+	 */
+    private static final long serialVersionUID = -1739175553026398101L;
+
+    private JTextField txt_Msg_Send;
+
+    private VPX_ETHWindow parent;
+
+    private JButton btn_Msg_Send;
+
+    private JButton btn_Msg_Reset;
+
+    private JButton btn_Msg_Copy;
+
+    private JButton btn_Msg_Save;
+
+    private JButton btn_Msg_Clear;
+
+    private JScrollPane scrl_Proc_Msg_Pane;
+
+    private JTextPane txtP_Proc_Msg_Display;
+
+    private JTextPane txtP_User_Msg_Display;
+
+    private Style proc_Msg_Style, proc_From_Style, proc_To_Style, proc_Time_Style;
+
+    private Style user_Msg_Style, user_From_Style, user_To_Style, user_Time_Style;
+
+    private Style default_Style;
+
+    private JPanel panel;
+
+    private JPanel controlsPanel;
+
+    private JPanel ProcMSGPanel;
+
+    private JPanel UserMSGPanel;
+
+    private JScrollPane scrl_User_Msg_Pane;
+
+    private JComboBox<String> cmbCores;
+
+    /**
+     * Create the panel.
+     */
+    public VPX_MessagePanel(VPX_ETHWindow parent) {
+
+	setBorder(new TitledBorder(null, "Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+	this.parent = parent;
+
+	init();
+
+	loadComponents();
+
+	loadCoresFilter();
+    }
+
+    private void init() {
+
+	setLayout(new BorderLayout(5, 5));
+
+	loadMessageStyles();
+    }
+
+    private void loadComponents() {
+
+	JPanel base_Panel = ComponentFactory.createJPanel();
+
+	base_Panel.setPreferredSize(new Dimension(10, 55));
+
+	add(base_Panel, BorderLayout.SOUTH);
+
+	base_Panel.setLayout(new BorderLayout(0, 0));
+
+	JPanel btn_Panel = ComponentFactory.createJPanel();
+
+	base_Panel.add(btn_Panel, BorderLayout.SOUTH);
+
+	btn_Panel.setLayout(new BorderLayout(0, 0));
+
+	panel = new JPanel();
+
+	btn_Panel.add(panel);
+
+	panel.setLayout(new BorderLayout(0, 0));
+
+	btn_Msg_Send = ComponentFactory.createJButton(new SendMsgAction("Send Message"));
+
+	panel.add(btn_Msg_Send);
+
+	txt_Msg_Send = ComponentFactory.createJTextField();
+
+	base_Panel.add(txt_Msg_Send, BorderLayout.CENTER);
+
+	txt_Msg_Send.setColumns(10);
+
+	JPanel message_Panel = ComponentFactory.createJPanel();
+
+	add(message_Panel, BorderLayout.CENTER);
+
+	message_Panel.setLayout(new BorderLayout());
+
+	controlsPanel = new JPanel();
+
+	FlowLayout fl_controlsPanel = (FlowLayout) controlsPanel.getLayout();
+
+	fl_controlsPanel.setAlignOnBaseline(true);
+
+	fl_controlsPanel.setVgap(0);
+
+	fl_controlsPanel.setHgap(3);
+
+	fl_controlsPanel.setAlignment(FlowLayout.RIGHT);
+
+	message_Panel.add(controlsPanel, BorderLayout.NORTH);
+
+	cmbCores = new JComboBox<String>();
+
+	cmbCores.setPreferredSize(new Dimension(140, 22));
+
+	controlsPanel.add(cmbCores);
+
+	btn_Msg_Reset = ComponentFactory.createJButton(new ResetAction("Reset"));
+
+	btn_Msg_Reset.setPreferredSize(new Dimension(22, 22));
+
+	btn_Msg_Reset.setBorderPainted(false);
+
+	controlsPanel.add(btn_Msg_Reset);
+
+	btn_Msg_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
+
+	btn_Msg_Copy.setPreferredSize(new Dimension(22, 22));
+
+	btn_Msg_Copy.setBorderPainted(false);
+
+	controlsPanel.add(btn_Msg_Copy);
+
+	btn_Msg_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
+
+	btn_Msg_Clear.setPreferredSize(new Dimension(22, 22));
+
+	btn_Msg_Clear.setBorderPainted(false);
+
+	controlsPanel.add(btn_Msg_Clear);
+
+	btn_Msg_Save = ComponentFactory.createJButton(new SaveAction("Save"));
+
+	btn_Msg_Save.setPreferredSize(new Dimension(22, 22));
+
+	btn_Msg_Save.setBorderPainted(false);
+
+	controlsPanel.add(btn_Msg_Save);
+
+	ProcMSGPanel = new JPanel();
+
+	ProcMSGPanel.setBorder(new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP,
+		null, null));
+
+	ProcMSGPanel.setPreferredSize(new Dimension(10, 200));
+
+	message_Panel.add(ProcMSGPanel, BorderLayout.CENTER);
+
+	ProcMSGPanel.setLayout(new BorderLayout(0, 0));
+
+	scrl_Proc_Msg_Pane = ComponentFactory.createJScrollPane();
+
+	ProcMSGPanel.add(scrl_Proc_Msg_Pane);
+
+	txtP_Proc_Msg_Display = ComponentFactory.createJTextPane(VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT);
+
+	txtP_Proc_Msg_Display.setEditable(false);
+
+	scrl_Proc_Msg_Pane.setViewportView(txtP_Proc_Msg_Display);
+
+	UserMSGPanel = new JPanel();
+
+	UserMSGPanel.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null,
+		null));
+
+	UserMSGPanel.setPreferredSize(new Dimension(10, 250));
+
+	message_Panel.add(UserMSGPanel, BorderLayout.SOUTH);
+
+	UserMSGPanel.setLayout(new BorderLayout(0, 0));
+
+	scrl_User_Msg_Pane = ComponentFactory.createJScrollPane();
+
+	UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
+
+	txtP_User_Msg_Display = ComponentFactory.createJTextPane(VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT);
+
+	txtP_User_Msg_Display.setEditable(false);
+
+	scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
+    }
+
+    private void loadMessageStyles() {
+
+	default_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.getStyle(StyleContext.DEFAULT_STYLE);
+
+	proc_Msg_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message", default_Style);
+
+	StyleConstants.setFontSize(proc_Msg_Style, StyleConstants.getFontSize(default_Style) + 2);
+
+	proc_From_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message_From",
+		default_Style);
+
+	StyleConstants.setBold(proc_From_Style, true);
+
+	proc_To_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message_To", default_Style);
+
+	StyleConstants.setItalic(proc_To_Style, true);
+
+	proc_Time_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message_Time",
+		default_Style);
+
+	StyleConstants.setUnderline(proc_Time_Style, true);
+
+	user_Msg_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message", default_Style);
+
+	StyleConstants.setFontSize(user_Msg_Style, StyleConstants.getFontSize(default_Style) + 2);
+
+	StyleConstants.setAlignment(user_Msg_Style, StyleConstants.ALIGN_RIGHT);
+
+	user_From_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message_From", default_Style);
+
+	StyleConstants.setItalic(user_From_Style, true);
+
+	StyleConstants.setAlignment(user_From_Style, StyleConstants.ALIGN_RIGHT);
+
+	user_To_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message_To", default_Style);
+
+	StyleConstants.setBold(user_To_Style, true);
+
+	StyleConstants.setAlignment(user_To_Style, StyleConstants.ALIGN_RIGHT);
+
+	user_Time_Style = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message_Time", default_Style);
+
+	StyleConstants.setUnderline(user_Time_Style, true);
+
+	StyleConstants.setAlignment(user_Time_Style, StyleConstants.ALIGN_RIGHT);
+
+    }
+
+    public void updateProcessorMessage(String msg) {
+
+	try {
+
+	    int eo = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength();
+
+	    VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.insertString(eo, msg, null);
+
+	    VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setCharacterAttributes(eo, eo + msg.length(),
+		    proc_Msg_Style, false);
+
+	    VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, proc_Msg_Style);
+
+	} catch (BadLocationException e) {
+
+	    e.printStackTrace();
+	}
+    }
+
+    public void updateProcessorMessage(String ip, String msg) {
+
+	if (ip.equals(VPXUtilities.getCurrentProcessor())) {
+
+	    if (cmbCores.getSelectedIndex() == 0) {
+
+		updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
+			+ " : \n", proc_From_Style);
+
+		updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
+
+	    } else if (msg.startsWith((cmbCores.getSelectedIndex() - 1) + ":")) {
+
+		updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
+			+ " : \n", proc_From_Style);
+
+		updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
+	    }
+	}
+    }
+
+    public void updateProcessorMessage(String msg, Style style) {
+
+	try {
+
+	    int eo = VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength();
+
+	    VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.insertString(eo, msg, null);
+
+	    VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setCharacterAttributes(eo, eo + msg.length(), style, false);
+
+	    VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, style);
+
+	    txtP_Proc_Msg_Display.setCaretPosition(VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength());
+
+	} catch (BadLocationException e) {
+
+	    e.printStackTrace();
+	}
+    }
+
+    private void updateUserMessage(String msg) {
+
+	updateUserMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType() + " : \n",
+		proc_From_Style);
+
+	updateUserMessage("  " + msg + "\n\n", proc_Msg_Style);
+    }
+
+    private void updateUserMessage(String msg, Style style) {
+	try {
+
+	    int eo = VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT.getLength();
+
+	    VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT.insertString(eo, msg, null);
+
+	    VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT.setCharacterAttributes(eo, eo + msg.length(), style, false);
+
+	    VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, style);
+
+	} catch (BadLocationException e) {
+
+	    e.printStackTrace();
+	}
+    }
+
+    private void clearContents() {
+
+	txtP_Proc_Msg_Display.setText("");
+    }
+
+    private void loadCoresFilter() {
+
+	cmbCores.addItem("All Cores");
+
+	for (int i = 0; i < 8; i++) {
+	    cmbCores.addItem(String.format("Core %s", i));
+	}
+
+	cmbCores.setSelectedIndex(0);
+    }
+
+    private void setClipboardContents(String aString) {
+
+	StringSelection stringSelection = new StringSelection(aString);
+
+	Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+	clipboard.setContents(stringSelection, this);
+    }
+
+    private void saveLogtoFile() {
+
+	try {
+
+	    String path = System.getProperty("user.home") + "\\Messages."
+		    + getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".rtf";
+
+	    FileWriter fw = new FileWriter(new File(path), true);
+
+	    txtP_Proc_Msg_Display.write(fw);
+
+	    fw.close();
+
+	    VPXUtilities.showPopup("File Saved at " + path);
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+	}
+
+    }
+
+    private String getCurrentTime() {
+
+	return VPXConstants.DATEFORMAT_FULL.format(Calendar.getInstance().getTime());
+    }
+
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+
+    }
+
+    class ResetAction extends AbstractAction {
+
+	/**
+		 * 
+		 */
+	private static final long serialVersionUID = 1L;
+
+	public ResetAction(String name) {
+
+	    putValue(Action.SHORT_DESCRIPTION, name);
+
+	    putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_UNDO);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+	}
+
+    }
+
+    class SendMsgAction extends AbstractAction {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1739175553026398101L;
+	private static final long serialVersionUID = 1L;
 
-	private final StyleContext PROCESSOR_MESSAGE_DISPLAY_CONTEXT = new StyleContext();
+	public SendMsgAction(String name) {
 
-	private final StyledDocument PROCESSOR_MESSAGE_DISPLAY_DOCUMENT = new DefaultStyledDocument(
-			PROCESSOR_MESSAGE_DISPLAY_CONTEXT);
+	    putValue(Action.NAME, name);
+	}
 
-	private final StyleContext USER_MESSAGE_DISPLAY_CONTEXT = new StyleContext();
+	@Override
+	public void actionPerformed(ActionEvent e) {
 
-	private final StyledDocument USER_MESSAGE_DISPLAY_DOCUMENT = new DefaultStyledDocument(USER_MESSAGE_DISPLAY_CONTEXT);
+	    if (VPXUtilities.getCurrentProcessor().length() > 0) {
 
-	private final DateFormat MESSAGE_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		String str = txt_Msg_Send.getText();
 
-	private JTextField txt_Msg_Send;
+		if (str.length() > 0 && str.length() <= 16) {
 
-	private VPX_ETHWindow parent;
+		    String[] s = str.split(" ");
 
-	private JButton btn_Msg_Send;
+		    if (s.length != 5) {
 
-	private JButton btn_Msg_Reset;
+			JOptionPane.showMessageDialog(parent, "Arguments are missing", "Message",
+				JOptionPane.ERROR_MESSAGE);
 
-	private JButton btn_Msg_Copy;
+			txt_Msg_Send.requestFocus();
 
-	private JButton btn_Msg_Save;
+		    } else {
+			parent.sendMessage(VPXUtilities.getCurrentProcessor(), txt_Msg_Send.getText());
 
-	private JButton btn_Msg_Clear;
+			updateUserMessage(txt_Msg_Send.getText());
+		    }
 
-	private JScrollPane scrl_Proc_Msg_Pane;
+		} else {
+		    JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
+			    JOptionPane.ERROR_MESSAGE);
 
-	private JTextPane txtP_Proc_Msg_Display;
+		    txt_Msg_Send.requestFocus();
+		}
+	    } else {
 
-	private JTextPane txtP_User_Msg_Display;
+		JOptionPane.showMessageDialog(parent, "No processor is selected.Please select any one processor",
+			"Processor Selection", JOptionPane.ERROR_MESSAGE);
 
-	private Style proc_Msg_Style, proc_From_Style, proc_To_Style, proc_Time_Style;
+	    }
 
-	private Style user_Msg_Style, user_From_Style, user_To_Style, user_Time_Style;
+	}
 
-	private Style default_Style;
+    }
 
-	private JPanel panel;
-
-	private JPanel controlsPanel;
-
-	private JPanel ProcMSGPanel;
-
-	private JPanel UserMSGPanel;
-
-	private JScrollPane scrl_User_Msg_Pane;
-
-	private JComboBox<String> cmbCores;
+    class SaveAction extends AbstractAction {
 
 	/**
-	 * Create the panel.
-	 */
-	public VPX_MessagePanel(VPX_ETHWindow parent) {
-
-		setBorder(new TitledBorder(null, "Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-		this.parent = parent;
-
-		init();
-
-		loadComponents();
-
-		loadCoresFilter();
-	}
-
-	private void init() {
-
-		setLayout(new BorderLayout(5, 5));
-
-		loadMessageStyles();
-	}
-
-	private void loadComponents() {
-
-		JPanel base_Panel = ComponentFactory.createJPanel();
-
-		base_Panel.setPreferredSize(new Dimension(10, 55));
-
-		add(base_Panel, BorderLayout.SOUTH);
-
-		base_Panel.setLayout(new BorderLayout(0, 0));
-
-		JPanel btn_Panel = ComponentFactory.createJPanel();
-
-		base_Panel.add(btn_Panel, BorderLayout.SOUTH);
-
-		btn_Panel.setLayout(new BorderLayout(0, 0));
-
-		panel = new JPanel();
-
-		btn_Panel.add(panel);
-
-		panel.setLayout(new BorderLayout(0, 0));
-
-		btn_Msg_Send = ComponentFactory.createJButton(new SendMsgAction("Send Message"));
-
-		panel.add(btn_Msg_Send);
-
-		txt_Msg_Send = ComponentFactory.createJTextField();
-
-		base_Panel.add(txt_Msg_Send, BorderLayout.CENTER);
-
-		txt_Msg_Send.setColumns(10);
-
-		JPanel message_Panel = ComponentFactory.createJPanel();
-
-		add(message_Panel, BorderLayout.CENTER);
-
-		message_Panel.setLayout(new BorderLayout());
-
-		controlsPanel = new JPanel();
-
-		FlowLayout fl_controlsPanel = (FlowLayout) controlsPanel.getLayout();
-
-		fl_controlsPanel.setAlignOnBaseline(true);
-
-		fl_controlsPanel.setVgap(0);
-
-		fl_controlsPanel.setHgap(3);
-
-		fl_controlsPanel.setAlignment(FlowLayout.RIGHT);
-
-		message_Panel.add(controlsPanel, BorderLayout.NORTH);
-
-		cmbCores = new JComboBox<String>();
-
-		cmbCores.setPreferredSize(new Dimension(140, 22));
-
-		controlsPanel.add(cmbCores);
-
-		btn_Msg_Reset = ComponentFactory.createJButton(new ResetAction("Reset"));
-
-		btn_Msg_Reset.setPreferredSize(new Dimension(22, 22));
-
-		btn_Msg_Reset.setBorderPainted(false);
-
-		controlsPanel.add(btn_Msg_Reset);
-
-		btn_Msg_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
-
-		btn_Msg_Copy.setPreferredSize(new Dimension(22, 22));
-
-		btn_Msg_Copy.setBorderPainted(false);
-
-		controlsPanel.add(btn_Msg_Copy);
-
-		btn_Msg_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
-
-		btn_Msg_Clear.setPreferredSize(new Dimension(22, 22));
-
-		btn_Msg_Clear.setBorderPainted(false);
-
-		controlsPanel.add(btn_Msg_Clear);
-
-		btn_Msg_Save = ComponentFactory.createJButton(new SaveAction("Save"));
-
-		btn_Msg_Save.setPreferredSize(new Dimension(22, 22));
-
-		btn_Msg_Save.setBorderPainted(false);
-
-		controlsPanel.add(btn_Msg_Save);
-
-		ProcMSGPanel = new JPanel();
-
-		ProcMSGPanel.setBorder(new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
-
-		ProcMSGPanel.setPreferredSize(new Dimension(10, 200));
-
-		message_Panel.add(ProcMSGPanel, BorderLayout.CENTER);
-
-		ProcMSGPanel.setLayout(new BorderLayout(0, 0));
-
-		scrl_Proc_Msg_Pane = ComponentFactory.createJScrollPane();
-
-		ProcMSGPanel.add(scrl_Proc_Msg_Pane);
-
-		txtP_Proc_Msg_Display = ComponentFactory.createJTextPane(PROCESSOR_MESSAGE_DISPLAY_DOCUMENT);
-
-		txtP_Proc_Msg_Display.setEditable(false);
-
-		scrl_Proc_Msg_Pane.setViewportView(txtP_Proc_Msg_Display);
-
-		UserMSGPanel = new JPanel();
-
-		UserMSGPanel.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
-
-		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
-
-		message_Panel.add(UserMSGPanel, BorderLayout.SOUTH);
-
-		UserMSGPanel.setLayout(new BorderLayout(0, 0));
-
-		scrl_User_Msg_Pane = ComponentFactory.createJScrollPane();
-
-		UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
-
-		txtP_User_Msg_Display = ComponentFactory.createJTextPane(USER_MESSAGE_DISPLAY_DOCUMENT);
-
-		txtP_User_Msg_Display.setEditable(false);
-
-		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
-	}
-
-	private void loadMessageStyles() {
-
-		default_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.getStyle(StyleContext.DEFAULT_STYLE);
-
-		proc_Msg_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message", default_Style);
-
-		StyleConstants.setFontSize(proc_Msg_Style, StyleConstants.getFontSize(default_Style) + 2);
-
-		proc_From_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message_From", default_Style);
-
-		StyleConstants.setBold(proc_From_Style, true);
-
-		proc_To_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message_To", default_Style);
-
-		StyleConstants.setItalic(proc_To_Style, true);
-
-		proc_Time_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("Processor_Message_Time", default_Style);
-
-		StyleConstants.setUnderline(proc_Time_Style, true);
-
-		user_Msg_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message", default_Style);
-
-		StyleConstants.setFontSize(user_Msg_Style, StyleConstants.getFontSize(default_Style) + 2);
-
-		StyleConstants.setAlignment(user_Msg_Style, StyleConstants.ALIGN_RIGHT);
-
-		user_From_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message_From", default_Style);
-
-		StyleConstants.setItalic(user_From_Style, true);
-
-		StyleConstants.setAlignment(user_From_Style, StyleConstants.ALIGN_RIGHT);
-
-		user_To_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message_To", default_Style);
-
-		StyleConstants.setBold(user_To_Style, true);
-
-		StyleConstants.setAlignment(user_To_Style, StyleConstants.ALIGN_RIGHT);
-
-		user_Time_Style = PROCESSOR_MESSAGE_DISPLAY_CONTEXT.addStyle("User_Message_Time", default_Style);
-
-		StyleConstants.setUnderline(user_Time_Style, true);
-
-		StyleConstants.setAlignment(user_Time_Style, StyleConstants.ALIGN_RIGHT);
-
-	}
-
-	public void updateProcessorMessage(String msg) {
-
-		try {
-
-			int eo = PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength();
-
-			PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.insertString(eo, msg, null);
-
-			PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setCharacterAttributes(eo, eo + msg.length(), proc_Msg_Style, false);
-
-			PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, proc_Msg_Style);
-
-		} catch (BadLocationException e) {
-
-			e.printStackTrace();
-		}
-	}
-
-	public void updateProcessorMessage(String ip, String msg) {
-
-		if (ip.equals(VPXUtilities.getCurrentProcessor())) {
-
-			if (cmbCores.getSelectedIndex() == 0) {
-
-				updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
-						+ " : \n", proc_From_Style);
-
-				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
-
-			} else if (msg.startsWith((cmbCores.getSelectedIndex() - 1) + ":")) {
-
-				updateProcessorMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType()
-						+ " : \n", proc_From_Style);
-
-				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
-			}
-		}
-	}
-
-	public void updateProcessorMessage(String msg, Style style) {
-
-		try {
-
-			int eo = PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength();
-
-			PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.insertString(eo, msg, null);
-
-			PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setCharacterAttributes(eo, eo + msg.length(), style, false);
-
-			PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, style);
-
-			txtP_Proc_Msg_Display.setCaretPosition(PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength());
-
-		} catch (BadLocationException e) {
-
-			e.printStackTrace();
-		}
-	}
-
-	private void updateUserMessage(String msg) {
-
-		updateUserMessage(VPXUtilities.getCurrentSubSystem() + " " + VPXUtilities.getCurrentProcType() + " : \n",
-				proc_From_Style);
-
-		updateUserMessage("  " + msg + "\n\n", proc_Msg_Style);
-	}
-
-	private void updateUserMessage(String msg, Style style) {
-		try {
-
-			int eo = USER_MESSAGE_DISPLAY_DOCUMENT.getLength();
-
-			USER_MESSAGE_DISPLAY_DOCUMENT.insertString(eo, msg, null);
-
-			USER_MESSAGE_DISPLAY_DOCUMENT.setCharacterAttributes(eo, eo + msg.length(), style, false);
-
-			USER_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, style);
-
-		} catch (BadLocationException e) {
-
-			e.printStackTrace();
-		}
-	}
-
-	private void clearContents() {
-
-		txtP_Proc_Msg_Display.setText("");
-	}
-
-	private void loadCoresFilter() {
-
-		cmbCores.addItem("All Cores");
-
-		for (int i = 0; i < 8; i++) {
-			cmbCores.addItem(String.format("Core %s", i));
-		}
-
-		cmbCores.setSelectedIndex(0);
-	}
-
-	private void setClipboardContents(String aString) {
-
-		StringSelection stringSelection = new StringSelection(aString);
-
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-		clipboard.setContents(stringSelection, this);
-	}
-
-	private void saveLogtoFile() {
-
-		try {
-
-			String path = System.getProperty("user.home") + "\\Messages."
-					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".rtf";
-
-			FileWriter fw = new FileWriter(new File(path), true);
-
-			txtP_Proc_Msg_Display.write(fw);
-
-			fw.close();
-
-			VPXUtilities.showPopup("File Saved at " + path);
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
-
-	}
-
-	private String getCurrentTime() {
-
-		return MESSAGE_DATE_FORMAT.format(Calendar.getInstance().getTime());
-	}
-
-	public void lostOwnership(Clipboard clipboard, Transferable contents) {
-
-	}
-
-	class ResetAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public ResetAction(String name) {
-
-			putValue(Action.SHORT_DESCRIPTION, name);
-
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\undo.gif"), 20, 20));
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-		}
-
-	}
-
-	class SendMsgAction extends AbstractAction {
-
-		/**
-	 * 
-	 */
-		private static final long serialVersionUID = 1L;
-
-		public SendMsgAction(String name) {
-
-			putValue(Action.NAME, name);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			if (VPXUtilities.getCurrentProcessor().length() > 0) {
-
-				String str = txt_Msg_Send.getText();
-
-				if (str.length() > 0 && str.length() <= 16) {
-
-					String[] s = str.split(" ");
-
-					if (s.length != 5) {
-
-						JOptionPane.showMessageDialog(parent, "Arguments are missing", "Message",
-								JOptionPane.ERROR_MESSAGE);
-
-						txt_Msg_Send.requestFocus();
-
-					} else {
-						parent.sendMessage(VPXUtilities.getCurrentProcessor(), txt_Msg_Send.getText());
-
-						updateUserMessage(txt_Msg_Send.getText());
-					}
-
-				} else {
-					JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
-							JOptionPane.ERROR_MESSAGE);
-
-					txt_Msg_Send.requestFocus();
-				}
-			} else {
-
-				JOptionPane.showMessageDialog(parent, "No processor is selected.Please select any one processor",
-						"Processor Selection", JOptionPane.ERROR_MESSAGE);
-
-			}
-
-		}
-
-	}
-
-	class SaveAction extends AbstractAction {
-
-		/**
 		 * 
 		 */
 
-		public SaveAction(String name) {
+	public SaveAction(String name) {
 
-			putValue(Action.SHORT_DESCRIPTION, name);
+	    putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\save.gif"), 20, 20));
-		}
-
-		private static final long serialVersionUID = -780929428772240491L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			saveLogtoFile();
-		}
+	    putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_SAVE);
 	}
 
-	class ClearAction extends AbstractAction {
+	private static final long serialVersionUID = -780929428772240491L;
 
-		/**
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+	    saveLogtoFile();
+	}
+    }
+
+    class ClearAction extends AbstractAction {
+
+	/**
 		 * 
 		 */
 
-		public ClearAction(String name) {
+	public ClearAction(String name) {
 
-			putValue(Action.SHORT_DESCRIPTION, name);
+	    putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\clear2.png"), 20, 20));
-		}
-
-		private static final long serialVersionUID = -780929428772240491L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			clearContents();
-		}
+	    putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_CLEAR);
 	}
 
-	class CopyAction extends AbstractAction {
+	private static final long serialVersionUID = -780929428772240491L;
 
-		/**
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+	    clearContents();
+	}
+    }
+
+    class CopyAction extends AbstractAction {
+
+	/**
 		 * 
 		 */
 
-		public CopyAction(String name) {
+	public CopyAction(String name) {
 
-			putValue(Action.SHORT_DESCRIPTION, name);
+	    putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\copy.gif"), 20, 20));
-		}
-
-		private static final long serialVersionUID = -780929428772240491L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			setClipboardContents(txtP_Proc_Msg_Display.getText());
-
-			VPXUtilities.showPopup("Contents copied to clipboard");
-		}
+	    putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_COPY);
 	}
+
+	private static final long serialVersionUID = -780929428772240491L;
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+	    setClipboardContents(txtP_Proc_Msg_Display.getText());
+
+	    VPXUtilities.showPopup("Contents copied to clipboard");
+	}
+    }
 }

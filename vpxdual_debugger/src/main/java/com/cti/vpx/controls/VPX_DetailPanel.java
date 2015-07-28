@@ -21,6 +21,7 @@ import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -232,8 +233,8 @@ public class VPX_DetailPanel extends JDialog {
 		long cur = System.currentTimeMillis();
 
 		long dif = (cur - time) / 1000;
-		
-		if (dif > VPX_ProcessorTree.MAXRESPONSETIMEOUT) {
+
+		if (dif > VPXConstants.MAXRESPONSETIMEOUT) {
 
 			return "No Response";
 		} else {

@@ -30,8 +30,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -41,10 +41,6 @@ public class VPX_MADPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 4991577328261732341L;
-
-	private static final int CONFIGURATION = 0;
-
-	private static final int COMPILATION = 1;
 
 	private JTabbedPane madTab;
 
@@ -87,8 +83,6 @@ public class VPX_MADPanel extends JPanel {
 	private JTextField txtCompilePathCore7;
 
 	private final JFileChooser fileDialog = new JFileChooser();
-
-	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
 
 	private Properties p = VPXUtilities.readProperties();
 
@@ -367,7 +361,7 @@ public class VPX_MADPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				String error = checkPathsValid(CONFIGURATION);
+				String error = checkPathsValid(VPXConstants.CONFIGURATION);
 
 				if (error.length() == 0) {
 
@@ -640,7 +634,7 @@ public class VPX_MADPanel extends JPanel {
 					fillDummyFiles();
 				}
 
-				String error = checkPathsValid(COMPILATION);
+				String error = checkPathsValid(VPXConstants.COMPILATION);
 
 				if (error.length() == 0) {
 
@@ -694,7 +688,7 @@ public class VPX_MADPanel extends JPanel {
 
 		Properties p = VPXUtilities.readProperties();
 
-		String dummy = p.getProperty(VPXUtilities.PATH_DUMMY);
+		String dummy = p.getProperty(VPXConstants.ResourceFields.PATH_DUMMY);
 
 		if (txtCompilePathCore0.getText().trim().length() == 0) {
 
@@ -761,45 +755,45 @@ public class VPX_MADPanel extends JPanel {
 
 	private void loadPathsFromProperties() {
 
-		txtConfigPathPython.setText(p.getProperty(VPXUtilities.PATH_PYTHON));
+		txtConfigPathPython.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PYTHON));
 
-		txtConfigPathMAP.setText(p.getProperty(VPXUtilities.PATH_MAP));
+		txtConfigPathMAP.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAP));
 
-		txtConfigPathPrelinker.setText(p.getProperty(VPXUtilities.PATH_PRELINKER));
+		txtConfigPathPrelinker.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PRELINKER));
 
-		txtConfigPathStriper.setText(p.getProperty(VPXUtilities.PATH_STRIPER));
+		txtConfigPathStriper.setText(p.getProperty(VPXConstants.ResourceFields.PATH_STRIPER));
 
-		txtConfigPathOFD.setText(p.getProperty(VPXUtilities.PATH_OFD));
+		txtConfigPathOFD.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OFD));
 
-		txtConfigPathMAL.setText(p.getProperty(VPXUtilities.PATH_MAL));
+		txtConfigPathMAL.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAL));
 
-		txtConfigPathNML.setText(p.getProperty(VPXUtilities.PATH_NML));
+		txtConfigPathNML.setText(p.getProperty(VPXConstants.ResourceFields.PATH_NML));
 
-		txtConfigPathDummyOut.setText(p.getProperty(VPXUtilities.PATH_DUMMY));
+		txtConfigPathDummyOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_DUMMY));
 
-		boolean dummy = Boolean.valueOf(p.getProperty(VPXUtilities.DUMMY_CHK));
+		boolean dummy = Boolean.valueOf(p.getProperty(VPXConstants.ResourceFields.DUMMY_CHK));
 
 		chkConfigDummyOut.setSelected(dummy);
 
 		txtConfigPathDummyOut.setEnabled(dummy);
 
-		txtCompilePathCore0.setText(p.getProperty(VPXUtilities.PATH_CORE0));
+		txtCompilePathCore0.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE0));
 
-		txtCompilePathCore1.setText(p.getProperty(VPXUtilities.PATH_CORE1));
+		txtCompilePathCore1.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE1));
 
-		txtCompilePathCore2.setText(p.getProperty(VPXUtilities.PATH_CORE2));
+		txtCompilePathCore2.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE2));
 
-		txtCompilePathCore3.setText(p.getProperty(VPXUtilities.PATH_CORE3));
+		txtCompilePathCore3.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE3));
 
-		txtCompilePathCore4.setText(p.getProperty(VPXUtilities.PATH_CORE4));
+		txtCompilePathCore4.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE4));
 
-		txtCompilePathCore5.setText(p.getProperty(VPXUtilities.PATH_CORE5));
+		txtCompilePathCore5.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE5));
 
-		txtCompilePathCore6.setText(p.getProperty(VPXUtilities.PATH_CORE6));
+		txtCompilePathCore6.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE6));
 
-		txtCompilePathCore7.setText(p.getProperty(VPXUtilities.PATH_CORE7));
+		txtCompilePathCore7.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE7));
 
-		txtCompilePathFinalOut.setText(p.getProperty(VPXUtilities.PATH_OUT));
+		txtCompilePathFinalOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OUT));
 
 	}
 
@@ -853,7 +847,7 @@ public class VPX_MADPanel extends JPanel {
 
 		StringBuilder paths = new StringBuilder("");
 
-		if (option == CONFIGURATION) {
+		if (option == VPXConstants.CONFIGURATION) {
 
 			paths.append("Error occured while configuring paths.\n");
 
@@ -916,7 +910,7 @@ public class VPX_MADPanel extends JPanel {
 				}
 			}
 
-		} else if (option == COMPILATION) {
+		} else if (option == VPXConstants.COMPILATION) {
 
 			paths.append("Error occured while compiling out files.\n");
 
@@ -996,23 +990,23 @@ public class VPX_MADPanel extends JPanel {
 
 		Properties p = VPXUtilities.readProperties();
 
-		p.setProperty(VPXUtilities.PATH_PYTHON, pythonPath);
+		p.setProperty(VPXConstants.ResourceFields.PATH_PYTHON, pythonPath);
 
-		p.setProperty(VPXUtilities.PATH_MAP, mapTool);
+		p.setProperty(VPXConstants.ResourceFields.PATH_MAP, mapTool);
 
-		p.setProperty(VPXUtilities.PATH_PRELINKER, prelinker);
+		p.setProperty(VPXConstants.ResourceFields.PATH_PRELINKER, prelinker);
 
-		p.setProperty(VPXUtilities.PATH_OFD, ofd);
+		p.setProperty(VPXConstants.ResourceFields.PATH_OFD, ofd);
 
-		p.setProperty(VPXUtilities.PATH_STRIPER, strip);
+		p.setProperty(VPXConstants.ResourceFields.PATH_STRIPER, strip);
 
-		p.setProperty(VPXUtilities.PATH_MAL, mal);
+		p.setProperty(VPXConstants.ResourceFields.PATH_MAL, mal);
 
-		p.setProperty(VPXUtilities.PATH_NML, nml);
+		p.setProperty(VPXConstants.ResourceFields.PATH_NML, nml);
 
-		p.setProperty(VPXUtilities.DUMMY_CHK, isUseDummy ? "true" : "false");
+		p.setProperty(VPXConstants.ResourceFields.DUMMY_CHK, isUseDummy ? "true" : "false");
 
-		p.setProperty(VPXUtilities.PATH_DUMMY, dummy);
+		p.setProperty(VPXConstants.ResourceFields.PATH_DUMMY, dummy);
 
 		VPXUtilities.updateProperties(p);
 
@@ -1037,45 +1031,52 @@ public class VPX_MADPanel extends JPanel {
 		String str = VPXUtilities.readFile("deploy/deployment.data");
 
 		str = str.replace("out1", out1Path);
+
 		str = str.replace("out2", out2Path);
+
 		str = str.replace("out3", out3Path);
+
 		str = str.replace("out4", out4Path);
+
 		str = str.replace("out5", out5Path);
+
 		str = str.replace("out6", out6Path);
+
 		str = str.replace("out7", out7Path);
+
 		str = str.replace("out8", out8Path);
 
 		Properties p = VPXUtilities.readProperties();
 
-		p.setProperty(VPXUtilities.PATH_CORE0, out1Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE0, out1Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE1, out2Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE1, out2Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE2, out3Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE2, out3Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE3, out4Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE3, out4Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE4, out5Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE4, out5Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE5, out6Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE5, out6Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE6, out7Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE6, out7Path);
 
-		p.setProperty(VPXUtilities.PATH_CORE7, out8Path);
+		p.setProperty(VPXConstants.ResourceFields.PATH_CORE7, out8Path);
 
-		p.setProperty(VPXUtilities.PATH_OUT, outfilename);
+		p.setProperty(VPXConstants.ResourceFields.PATH_OUT, outfilename);
 
 		VPXUtilities.updateProperties(p);
 
 		folderPath = currMapPath.substring(0, currMapPath.lastIndexOf("\\"));
 
-		VPXUtilities.writeFile(folderPath + "\\" + VPXUtilities.DEPLOYMENTFILE, str);
+		VPXUtilities.writeFile(folderPath + "\\" + VPXConstants.ResourceFields.DEPLOYMENTFILE, str);
 
-		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "\\" + VPXUtilities.DEPLOYMENTFILE);
+		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "\\" + VPXConstants.ResourceFields.DEPLOYMENTFILE);
 
 		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
 
-		VPXUtilities.writeFile(folderPath + "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE, currentdployCfg);
+		VPXUtilities.writeFile(folderPath + "\\" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, currentdployCfg);
 
 	}
 
@@ -1085,8 +1086,8 @@ public class VPX_MADPanel extends JPanel {
 
 		Properties p = VPXUtilities.readProperties();
 
-		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(VPXUtilities.PATH_MAP), folderPath
-				+ "\\" + VPXUtilities.DEPLOYMENTCONFIGFILE);
+		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(VPXConstants.ResourceFields.PATH_MAP), folderPath
+				+ "\\" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
 		// String cmd = String.format("cmd /c ping 192.168.0.102");
 
 		parent.updateLog("Creating deployment files");
@@ -1126,8 +1127,8 @@ public class VPX_MADPanel extends JPanel {
 				parent.updateLog("Error in generating out file");
 			}
 
-			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXUtilities.DEPLOYMENTFILE,
-					VPXUtilities.DEPLOYMENTCONFIGFILE);
+			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXConstants.ResourceFields.DEPLOYMENTFILE,
+					VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
 
 			return ret;
 		} catch (Exception e) {

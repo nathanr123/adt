@@ -72,1359 +72,1298 @@ import com.cti.vpx.view.VPX_ETHWindow;
  */
 public class VPXUtilities {
 
-	private static int scrWidth;
+    private static int scrWidth;
 
-	private static int scrHeight;
+    private static int scrHeight;
 
-	private final static String WIN_OSNAME = "Windows";
+    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(VPXConstants.RESOURCENAME);
 
-	private final static String WIN_CMD_BASE = "netsh interface show interface";
+    private static Properties props;
 
-	private static final String MSG = "VPX_Dual_adt";
+    private static boolean isLogEnabled = false;
 
-	private static final String RUNASADMIN = "elevate ";
+    private static VPXSystem vpxSystem = null;
 
-	private static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+    private static VPX_ETHWindow parent;
 
-	private static final String NAME_PATTERN = "^[a-zA-Z\\d-_]+$";
+    private static String currentProcessor = "";
 
-	private static final Pattern ipPattern = Pattern.compile(IPADDRESS_PATTERN);
+    private static String currentSubSystem = "";
 
-	private static final Pattern namePattern = Pattern.compile(NAME_PATTERN);
+    private static String currentProcType = "";
 
-	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(MSG);
+    private static String currentSystemIP;
 
-	private static final DateFormat DATEFORMAT_FULL = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    public static ResourceBundle getResourceBundle() {
 
-	private static final DateFormat DATEFORMAT_FILE = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+	return resourceBundle;
+    }
 
-	private static final DateFormat DATEFORMAT_DATE = new SimpleDateFormat("dd-MM-yyyy");
+    public static Dimension getScreenResoultion() {
 
-	private static final DateFormat DATEFORMAT_TIME = new SimpleDateFormat("HH:mm:ss");
+	Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
-	private static final DateFormat DATEFORMAT_TIMEFULL = new SimpleDateFormat("HH:mm:ss.SSS");
+	scrWidth = (int) d.getWidth();
 
-	public static final String GENERAL_SPLASH = "general.splash";
+	scrHeight = (int) d.getHeight();
 
-	public static final String GENERAL_MEMORY = "general.memorybar";
+	return d;
 
-	public static final String SECURITY_PWD = "security.pwd";
+    }
 
-	public static final String FILTER_SUBNET = "filter.subnet";
+    public static int getScreenWidth() {
 
-	public static final String LOG_ENABLE = "log.enable";
+	if (scrWidth == 0)
 
-	public static final String LOG_PROMPT = "log.promptSno";
+	    getScreenResoultion();
 
-	public static final String LOG_MAXFILE = "log.maxfile";
+	return scrWidth;
+    }
 
-	public static final String LOG_MAXFILESIZE = "log.maxfilesize";
+    public static int getScreenHeight() {
 
-	public static final String LOG_FILEPATH = "log.filepath";
+	if (scrHeight == 0)
 
-	public static final String LOG_FILEFORMAT = "log.fileformat";
+	    getScreenResoultion();
 
-	public static final String LOG_APPENDCURTIME = "log.appendcurtime";
+	return scrHeight;
+    }
 
-	public static final String LOG_OVERWRITE = "log.overwrite";
+    public static String getCurrentTime() {
+	return getCurrentTime(0);
+    }
 
-	public static final String PATH_PYTHON = "path.python";
+    public static ATPCommand createATPCommand() {
+	return new ATPCommand();
+    }
 
-	public static final String PATH_MAP = "path.map";
+    public static P2020ATPCommand createP2020Command() {
+	return new P2020ATPCommand();
+    }
 
-	public static final String PATH_PRELINKER = "path.prelinker";
+    public static DSPATPCommand createDSPCommand() {
+	return new DSPATPCommand();
+    }
 
-	public static final String PATH_STRIPER = "path.striper";
+    public static String friendlyTimeDiff(long different) {
 
-	public static final String PATH_OFD = "path.ofd";
+	long secondsInMilli = 1000;
 
-	public static final String PATH_MAL = "path.mal";
+	long minutesInMilli = secondsInMilli * 60;
 
-	public static final String PATH_NML = "path.nml";
+	long hoursInMilli = minutesInMilli * 60;
 
-	public static final String PATH_DUMMY = "path.dummy";
+	long daysInMilli = hoursInMilli * 24;
 
-	public static final String DUMMY_CHK = "dummy.chk";
+	long elapsedDays = different / daysInMilli;
 
-	public static final String PATH_CORE0 = "path.core0";
+	different = different % daysInMilli;
 
-	public static final String PATH_CORE1 = "path.core1";
+	long elapsedHours = different / hoursInMilli;
 
-	public static final String PATH_CORE2 = "path.core2";
+	different = different % hoursInMilli;
 
-	public static final String PATH_CORE3 = "path.core3";
+	long elapsedMinutes = different / minutesInMilli;
 
-	public static final String PATH_CORE4 = "path.core4";
+	different = different % minutesInMilli;
 
-	public static final String PATH_CORE5 = "path.core5";
+	long elapsedSeconds = different / secondsInMilli;
 
-	public static final String PATH_CORE6 = "path.core6";
+	long elapsedMilliSeconds = different % secondsInMilli;
 
-	public static final String PATH_CORE7 = "path.core7";
+	String str = "";
 
-	public static final String PATH_OUT = "path.out";
+	if (elapsedDays > 0) {
 
-	public static final String DEPLOYMENTFILE = "deploymnet_C678.json";
+	    str += elapsedDays + "days ";
+	}
+	if (elapsedHours > 0) {
 
-	public static final String DEPLOYMENTCONFIGFILE = "maptoolCfg_C678.json";
+	    str += elapsedHours + " hours ";
+	}
+	if (elapsedMinutes > 0) {
 
-	private static Properties props;
+	    str += elapsedMinutes + " minutes ";
+	}
+	if (elapsedSeconds > 0) {
 
-	private static boolean isLogEnabled = false;
+	    str += elapsedSeconds + " seconds ";
+	}
+	if (elapsedMilliSeconds > 0) {
 
-	private static VPXSystem vpxSystem = null;// new VPXSystem();
-
-	private static VPX_ETHWindow parent;
-
-	private static String currentProcessor = "";
-
-	private static String currentSubSystem = "";
-
-	private static String currentProcType = "";
-
-	private static String currentSystemIP;
-
-	public static ResourceBundle getResourceBundle() {
-
-		return resourceBundle;
+	    str += elapsedMilliSeconds + "  milli seconds ";
 	}
 
-	public static Dimension getScreenResoultion() {
+	return str;
+    }
 
-		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    public static void setParent(VPX_ETHWindow prnt) {
+	parent = prnt;
+    }
 
-		scrWidth = (int) d.getWidth();
+    public static void updateLog(String log) {
+	parent.updateLog(log);
+    }
 
-		scrHeight = (int) d.getHeight();
+    public static void updateStatus(String status) {
+	parent.updateStatus(status);
+    }
 
-		return d;
+    public static String getCurrentTime(int format) {
 
-	}
+	String ret = null;
 
-	public static int getScreenWidth() {
+	if (format == 0)
 
-		if (scrWidth == 0)
+	    ret = VPXConstants.DATEFORMAT_FULL.format(Calendar.getInstance().getTime());
 
-			getScreenResoultion();
+	else if (format == 1)
 
-		return scrWidth;
-	}
+	    ret = VPXConstants.DATEFORMAT_DATE.format(Calendar.getInstance().getTime());
 
-	public static int getScreenHeight() {
+	else if (format == 2)
 
-		if (scrHeight == 0)
+	    ret = VPXConstants.DATEFORMAT_TIME.format(Calendar.getInstance().getTime());
 
-			getScreenResoultion();
+	else if (format == 3)
 
-		return scrHeight;
-	}
+	    ret = VPXConstants.DATEFORMAT_FILE.format(Calendar.getInstance().getTime());
 
-	public static String getCurrentTime() {
-		return getCurrentTime(0);
-	}
+	return ret;
+    }
 
-	public static ATPCommand createATPCommand() {
-		return new ATPCommand();
-	}
+    public static String getCurrentTime(int format, long millis) {
 
-	public static P2020ATPCommand createP2020Command() {
-		return new P2020ATPCommand();
-	}
+	String ret = null;
 
-	public static DSPATPCommand createDSPCommand() {
-		return new DSPATPCommand();
-	}
+	if (millis == 0)
 
-	public static String friendlyTimeDiff(long different) {
+	    return "";
 
-		long secondsInMilli = 1000;
-		long minutesInMilli = secondsInMilli * 60;
-		long hoursInMilli = minutesInMilli * 60;
-		long daysInMilli = hoursInMilli * 24;
+	if (format == 0)
 
-		long elapsedDays = different / daysInMilli;
-		different = different % daysInMilli;
+	    ret = VPXConstants.DATEFORMAT_FULL.format(millis);
 
-		long elapsedHours = different / hoursInMilli;
-		different = different % hoursInMilli;
+	else if (format == 1)
 
-		long elapsedMinutes = different / minutesInMilli;
-		different = different % minutesInMilli;
+	    ret = VPXConstants.DATEFORMAT_DATE.format(millis);
 
-		long elapsedSeconds = different / secondsInMilli;
+	else if (format == 2)
 
-		long elapsedMilliSeconds = different % secondsInMilli;
+	    ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
-		String str = "";
+	else if (format == 3)
 
-		if (elapsedDays > 0) {
-			str += elapsedDays + "days ";
-		}
-		if (elapsedHours > 0) {
-			str += elapsedHours + " hours ";
-		}
-		if (elapsedMinutes > 0) {
-			str += elapsedMinutes + " minutes ";
-		}
-		if (elapsedSeconds > 0) {
-			str += elapsedSeconds + " seconds ";
-		}
-		if (elapsedMilliSeconds > 0) {
-			str += elapsedMilliSeconds + "  milli seconds ";
-		}
+	    ret = VPXConstants.DATEFORMAT_TIMEFULL.format(millis);
 
-		return str;
-	}
+	return ret;
+    }
 
-	public static void setParent(VPX_ETHWindow prnt) {
-		parent = prnt;
-	}
+    public static long getLongFromIP(String ip) {
 
-	public static void updateLog(String log) {
-		parent.updateLog(log);
-	}
+	String[] split = ip.split("\\.");
 
-	public static void updateStatus(String status) {
-		parent.updateStatus(status);
-	}
+	return (Long.parseLong(split[0]) << 24 | Long.parseLong(split[1]) << 16 | Long.parseLong(split[2]) << 8 | Long
+		.parseLong(split[3]));
 
-	public static String getCurrentTime(int format) {
-		String ret = null;
-		if (format == 0)
-			ret = DATEFORMAT_FULL.format(Calendar.getInstance().getTime());
-		else if (format == 1)
-			ret = DATEFORMAT_DATE.format(Calendar.getInstance().getTime());
-		else if (format == 2)
-			ret = DATEFORMAT_TIME.format(Calendar.getInstance().getTime());
-		else if (format == 3)
-			ret = DATEFORMAT_FILE.format(Calendar.getInstance().getTime());
-		return ret;
-	}
+    }
 
-	public static String getCurrentTime(int format, long millis) {
-		String ret = null;
+    public static String getIPFromLong(final long ipaslong) {
 
-		if (millis == 0)
-			return "";
+	return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff,
+		(ipaslong >>> 8) & 0xff, (ipaslong) & 0xff);
+    }
 
-		if (format == 0)
-			ret = DATEFORMAT_FULL.format(millis);
-		else if (format == 1)
-			ret = DATEFORMAT_DATE.format(millis);
-		else if (format == 2)
-			ret = DATEFORMAT_TIME.format(millis);
-		else if (format == 3)
-			ret = DATEFORMAT_TIMEFULL.format(millis);
-		return ret;
-	}
+    public static void showPopup(String msg) {
+	final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE,
+		JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
 
-	public static long getLongFromIP(String ip) {
+	final JDialog dialog = new JDialog();
+	dialog.setTitle("Message");
+	dialog.setModal(true);
+	dialog.setUndecorated(true);
+	dialog.setContentPane(optionPane);
+	optionPane.setBorder(new LineBorder(Color.GRAY));
+	dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+	dialog.setAlwaysOnTop(true);
+	dialog.setSize(new Dimension(450, 100));
 
-		String[] split = ip.split("\\.");
-
-		return (Long.parseLong(split[0]) << 24 | Long.parseLong(split[1]) << 16 | Long.parseLong(split[2]) << 8 | Long
-				.parseLong(split[3]));
-
-	}
-
-	public static String getIPFromLong(final long ipaslong) {
-
-		return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff,
-				(ipaslong >>> 8) & 0xff, (ipaslong) & 0xff);
-	}
-
-	public static void showPopup(String msg) {
-		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE,
-				JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
-
-		final JDialog dialog = new JDialog();
-		dialog.setTitle("Message");
-		dialog.setModal(true);
-		dialog.setUndecorated(true);
-		dialog.setContentPane(optionPane);
-		optionPane.setBorder(new LineBorder(Color.GRAY));
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		dialog.setAlwaysOnTop(true);
-		dialog.setSize(new Dimension(450, 100));
-
-		// create timer to dispose of dialog after 5 seconds
-		Timer timer = new Timer(1000, new AbstractAction() {
-			/**
+	// create timer to dispose of dialog after 5 seconds
+	Timer timer = new Timer(1000, new AbstractAction() {
+	    /**
 			 * 
 			 */
-			private static final long serialVersionUID = -5640039573419174479L;
+	    private static final long serialVersionUID = -5640039573419174479L;
 
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				dialog.dispose();
-			}
-		});
-		timer.setRepeats(false);// the timer should only go off once
+	    @Override
+	    public void actionPerformed(ActionEvent ae) {
+		dialog.dispose();
+	    }
+	});
+	timer.setRepeats(false);// the timer should only go off once
 
-		// start timer to close JDialog as dialog modal we must start the timer
-		// before its visible
-		timer.start();
+	// start timer to close JDialog as dialog modal we must start the timer
+	// before its visible
+	timer.start();
 
-		Dimension windowSize = dialog.getSize();
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Point centerPoint = ge.getCenterPoint();
+	Dimension windowSize = dialog.getSize();
+	GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	Point centerPoint = ge.getCenterPoint();
 
-		int dx = centerPoint.x - windowSize.width / 2;
-		int dy = centerPoint.y - windowSize.height / 2;
-		dialog.setLocation(dx, dy);
+	int dx = centerPoint.x - windowSize.width / 2;
+	int dy = centerPoint.y - windowSize.height / 2;
+	dialog.setLocation(dx, dy);
 
-		dialog.setVisible(true);
+	dialog.setVisible(true);
+    }
+
+    public static VPXSystem getVPXSystem() {
+
+	if (vpxSystem == null)
+	    vpxSystem = readFromXMLFile();
+
+	return vpxSystem;
+    }
+
+    public static void setVPXSystem(VPXSystem sys) {
+
+	vpxSystem = sys;
+    }
+
+    public static Image getAppIcon() {
+
+	return getImageIcon(VPXConstants.Icons.ICON_CORNET_NAME, 24, 24).getImage();
+    }
+
+    public static Icon getEmptyIcon(int w, int h) {
+
+	return new VPX_EmptyIcon(w, h);
+    }
+
+    public static ImageIcon getImageIcon(String path, int w, int h) {
+
+	return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
+    }
+
+    private static Image getImage(String name) {
+
+	try {
+
+	    return new ImageIcon(System.getProperty("user.dir") + "\\image\\" + name).getImage();
+
+	} catch (Exception ioe) {
+
+	    ioe.printStackTrace();
 	}
 
-	public static VPXSystem getVPXSystem() {
+	return null;
+    }
 
-		if (vpxSystem == null)
-			vpxSystem = readFromXMLFile();
+    public static VPXSubSystem getSelectedSubSystem(String path) {
 
-		return vpxSystem;
+	VPXSubSystem sub = null;
+
+	vpxSystem = readFromXMLFile();
+
+	List<VPXSubSystem> subs = vpxSystem.getSubsystem();
+
+	for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
+
+	    VPXSubSystem vpxSubSystem = iterator.next();
+
+	    if (vpxSubSystem.getSubSystem().equals(path)) {
+
+		sub = vpxSubSystem;
+
+		break;
+	    }
+
+	}
+	return sub;
+    }
+
+    public static PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
+
+	if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
+
+	    return PROCESSOR_LIST.PROCESSOR_P2020;
+
+	} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP1.toString())) {
+
+	    return PROCESSOR_LIST.PROCESSOR_DSP1;
+
+	} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP2.toString())) {
+
+	    return PROCESSOR_LIST.PROCESSOR_DSP2;
 	}
 
-	public static void setVPXSystem(VPXSystem sys) {
+	return null;
 
-		vpxSystem = sys;
+    }
+
+    public static void writeToXMLFile(VPXSystem system) {
+	try {
+
+	    File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
+
+	    if (!folder.exists()) {
+
+		folder.mkdir();
+	    }
+
+	    File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+		    + resourceBundle.getString("Scan.processor.data.xml"));
+
+	    JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
+
+	    Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+	    // output pretty printed
+	    jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+	    jaxbMarshaller.marshal(system, file);
+
+	} catch (JAXBException e) {
+	    e.printStackTrace();
 	}
 
-	public static Image getAppIcon() {
+    }
 
-		return getImageIcon("image\\cornet.png", 24, 24).getImage();
+    public static boolean writetoXLSFile(VPXSystem system) {
+
+	File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
+
+	if (!folder.exists()) {
+
+	    folder.mkdir();
 	}
 
-	public static Icon getEmptyIcon(int w, int h) {
+	String FILE_PATH = resourceBundle.getString("Scan.processor.data.path") + "\\" + system.getName() + ".xls";
 
-		return new VPX_EmptyIcon(w, h);
+	Workbook workbook = new XSSFWorkbook();
+
+	Sheet subsystemSheet = workbook.createSheet(system.getName());
+
+	List<VPXSubSystem> subSystems = system.getSubsystem();
+
+	int rowIndex = 0;
+
+	for (VPXSubSystem subsystem : subSystems) {
+
+	    Row row = subsystemSheet.createRow(rowIndex++);
+
+	    int cellIndex = 0;
+
+	    row.createCell(cellIndex++).setCellValue(subsystem.getId());
+
+	    row.createCell(cellIndex++).setCellValue(subsystem.getSubSystem());
+
+	    row.createCell(cellIndex++).setCellValue(subsystem.getIpP2020());
+
+	    row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP1());
+
+	    row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP2());
+
 	}
 
-	public static ImageIcon getImageIcon(String path, int w, int h) {
+	try {
 
-		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
+	    FileOutputStream fos = new FileOutputStream(FILE_PATH);
+
+	    workbook.write(fos);
+
+	    fos.close();
+
+	    return true;
+
+	} catch (Exception e) {
+	    return false;
 	}
 
-	private static Image getImage(String name) {
+    }
 
+    public static void writeProperties() {
+	OutputStream output = null;
+	try {
+
+	    Properties prop = new Properties();
+
+	    output = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+
+	    // General Tab Settings
+	    prop.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH, String.valueOf(true));
+	    prop.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY, String.valueOf(true));
+	    prop.setProperty(VPXConstants.ResourceFields.SECURITY_PWD, "cornet");
+	    // Log Tab Settings
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(true));
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(true));
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, System.getProperty("user.dir") + "\\logger_"
+		    + getCurrentTime(3) + ".log");
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, "2");
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME, String.valueOf(true));
+	    prop.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(false));
+	    prop.setProperty(VPXConstants.ResourceFields.FILTER_SUBNET, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_PYTHON, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_MAP, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_PRELINKER, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_STRIPER, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_OFD, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_MAL, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_NML, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_DUMMY, "");
+	    prop.setProperty(VPXConstants.ResourceFields.DUMMY_CHK, "false");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE0, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE1, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE2, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE3, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE4, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE5, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE6, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_CORE7, "");
+	    prop.setProperty(VPXConstants.ResourceFields.PATH_OUT, "");
+
+	    // save properties to project root folder
+	    prop.store(output, null);
+
+	} catch (Exception e) {
+	    e.printStackTrace();
+
+	    if (output != null) {
 		try {
-
-			return new ImageIcon(System.getProperty("user.dir") + "\\" + name).getImage();
-
-		} catch (Exception ioe) {
-
-			ioe.printStackTrace();
+		    output.close();
+		} catch (IOException ea) {
+		    ea.printStackTrace();
 		}
-
-		return null;
+	    }
 	}
 
-	public static VPXSubSystem getSelectedSubSystem(String path) {
+    }
 
-		VPXSubSystem sub = null;
+    public static String getPropertyValue(String key) {
 
-		vpxSystem = readFromXMLFile();
+	if (props == null)
+	    readProperties();
+	return props.getProperty(key);
+    }
 
-		List<VPXSubSystem> subs = vpxSystem.getSubsystem();
+    public static void updateProperties(Properties prop) {
+	try {
+	    props = (Properties) prop.clone();
 
-		for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
+	    FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+	    prop.store(out, null);
 
-			if (vpxSubSystem.getSubSystem().equals(path)) {
-
-				sub = vpxSubSystem;
-
-				break;
-			}
-
-		}
-		return sub;
+	    out.close();
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
 
-	public static PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
+    }
 
-		if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
+    public static void setEnableLog(boolean val) {
+	isLogEnabled = val;
+    }
 
-			return PROCESSOR_LIST.PROCESSOR_P2020;
+    public static boolean isLogEnabled() {
+	return isLogEnabled;
+    }
 
-		} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP1.toString())) {
+    public static boolean isValidIP(String ip) {
 
-			return PROCESSOR_LIST.PROCESSOR_DSP1;
+	return VPXConstants.IPPattern.matcher(ip.trim()).matches();
+    }
 
-		} else if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_DSP2.toString())) {
+    public static boolean isValidName(String name) {
 
-			return PROCESSOR_LIST.PROCESSOR_DSP2;
-		}
+	return VPXConstants.NAMEPATTERN.matcher(name.trim()).matches();
+    }
 
-		return null;
+    public static void updateProperties(String key, String value) {
+	try {
+	    if (props == null)
+		readProperties();
 
+	    FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+
+	    props.setProperty(key, value);
+
+	    props.store(out, null);
+
+	    out.close();
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
 
-	public static void writeToXMLFile(VPXSystem system) {
-		try {
+    }
 
-			File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
+    public static Properties readProperties() {
 
-			if (!folder.exists()) {
+	Properties properties = new Properties();
 
-				folder.mkdir();
-			}
+	try {
 
-			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
-					+ resourceBundle.getString("Scan.processor.data.xml"));
+	    File f = new File(resourceBundle.getString("system.preference.property.name"));
 
-			JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
+	    if (!f.exists())
+		writeProperties();
 
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+	    InputStream in = new FileInputStream(resourceBundle.getString("system.preference.property.name"));
 
-			// output pretty printed
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+	    properties.load(in);
 
-			jaxbMarshaller.marshal(system, file);
-
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    properties = null;
 	}
 
-	public static boolean writetoXLSFile(VPXSystem system) {
+	props = (Properties) properties.clone();
 
-		File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
+	return properties;
+    }
 
-		if (!folder.exists()) {
+    public static boolean deleteXMLFile() {
 
-			folder.mkdir();
-		}
+	try {
 
-		String FILE_PATH = resourceBundle.getString("Scan.processor.data.path") + "\\" + system.getName() + ".xls";
+	    File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+		    + resourceBundle.getString("Scan.processor.data.xml"));
 
-		Workbook workbook = new XSSFWorkbook();
+	    if (file.exists()) {
 
-		Sheet subsystemSheet = workbook.createSheet(system.getName());
+		file.delete();
+	    }
 
-		List<VPXSubSystem> subSystems = system.getSubsystem();
+	    return true;
 
-		int rowIndex = 0;
+	} catch (Exception e) {
 
-		for (VPXSubSystem subsystem : subSystems) {
-
-			Row row = subsystemSheet.createRow(rowIndex++);
-
-			int cellIndex = 0;
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getId());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getSubSystem());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getIpP2020());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP1());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP2());
-
-		}
-
-		try {
-
-			FileOutputStream fos = new FileOutputStream(FILE_PATH);
-
-			workbook.write(fos);
-
-			fos.close();
-
-			return true;
-
-		} catch (Exception e) {
-			return false;
-		}
-
+	    return false;
 	}
 
-	public static void writeProperties() {
-		OutputStream output = null;
-		try {
+    }
 
-			Properties prop = new Properties();
+    public static VPXSystem readFromXMLFile() {
 
-			output = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+	VPXSystem cag = null;
 
-			// General Tab Settings
-			prop.setProperty(GENERAL_SPLASH, String.valueOf(true));
-			prop.setProperty(GENERAL_MEMORY, String.valueOf(true));
-			prop.setProperty(SECURITY_PWD, "cornet");
-			// Log Tab Settings
-			prop.setProperty(LOG_ENABLE, String.valueOf(true));
-			prop.setProperty(LOG_PROMPT, String.valueOf(true));
-			prop.setProperty(LOG_MAXFILE, String.valueOf(true));
-			prop.setProperty(LOG_FILEPATH, System.getProperty("user.dir") + "\\logger_" + getCurrentTime(3) + ".log");
-			prop.setProperty(LOG_MAXFILESIZE, "2");
-			prop.setProperty(LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
-			prop.setProperty(LOG_APPENDCURTIME, String.valueOf(true));
-			prop.setProperty(LOG_OVERWRITE, String.valueOf(false));
-			prop.setProperty(FILTER_SUBNET, "");
-			prop.setProperty(PATH_PYTHON, "");
-			prop.setProperty(PATH_MAP, "");
-			prop.setProperty(PATH_PRELINKER, "");
-			prop.setProperty(PATH_STRIPER, "");
-			prop.setProperty(PATH_OFD, "");
-			prop.setProperty(PATH_MAL, "");
-			prop.setProperty(PATH_NML, "");
-			prop.setProperty(PATH_DUMMY, "");
-			prop.setProperty(DUMMY_CHK, "false");
-			prop.setProperty(PATH_CORE0, "");
-			prop.setProperty(PATH_CORE1, "");
-			prop.setProperty(PATH_CORE2, "");
-			prop.setProperty(PATH_CORE3, "");
-			prop.setProperty(PATH_CORE4, "");
-			prop.setProperty(PATH_CORE5, "");
-			prop.setProperty(PATH_CORE6, "");
-			prop.setProperty(PATH_CORE7, "");
-			prop.setProperty(PATH_OUT, "");
+	try {
 
-			// save properties to project root folder
-			prop.store(output, null);
+	    File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+		    + resourceBundle.getString("Scan.processor.data.xml"));
 
-		} catch (Exception e) {
-			e.printStackTrace();
+	    if (file.exists()) {
+		JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
 
-			if (output != null) {
-				try {
-					output.close();
-				} catch (IOException ea) {
-					ea.printStackTrace();
-				}
-			}
-		}
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
+		cag = (VPXSystem) jaxbUnmarshaller.unmarshal(file);
+	    } else
+		cag = new VPXSystem();
+
+	} catch (JAXBException e) {
+
+	    e.printStackTrace();
 	}
 
-	public static String getPropertyValue(String key) {
+	return cag;
+    }
 
-		if (props == null)
-			readProperties();
-		return props.getProperty(key);
-	}
+    public static VPXSystem readFromXLSFile() {
 
-	public static void updateProperties(Properties prop) {
-		try {
-			props = (Properties) prop.clone();
+	String FILE_PATH = "data\\VPXSystem.xls";
 
-			FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+	VPXSystem vpx = new VPXSystem();
 
-			prop.store(out, null);
+	List<VPXSubSystem> subsystems = new ArrayList<VPXSubSystem>();
 
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	FileInputStream fis = null;
 
-	}
+	try {
+	    fis = new FileInputStream(FILE_PATH);
 
-	public static void setEnableLog(boolean val) {
-		isLogEnabled = val;
-	}
+	    Workbook workbook = new XSSFWorkbook(fis);
 
-	public static boolean isLogEnabled() {
-		return isLogEnabled;
-	}
+	    int numberOfSheets = workbook.getNumberOfSheets();
 
-	public static boolean isValidIP(String ip) {
+	    for (int i = 0; i < numberOfSheets; i++) {
 
-		return ipPattern.matcher(ip.trim()).matches();
-	}
+		Sheet sheet = workbook.getSheetAt(i);
 
-	public static boolean isValidName(String name) {
+		Iterator<Row> rowIterator = sheet.iterator();
 
-		return namePattern.matcher(name.trim()).matches();
-	}
+		while (rowIterator.hasNext()) {
 
-	public static void updateProperties(String key, String value) {
-		try {
-			if (props == null)
-				readProperties();
+		    VPXSubSystem subsystem = new VPXSubSystem();
 
-			FileOutputStream out = new FileOutputStream(resourceBundle.getString("system.preference.property.name"));
+		    Row row = rowIterator.next();
 
-			props.setProperty(key, value);
+		    Iterator<Cell> cellIterator = row.cellIterator();
 
-			props.store(out, null);
+		    while (cellIterator.hasNext()) {
 
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			Cell cell = cellIterator.next();
 
-	}
+			switch (cell.getColumnIndex()) {
+			case 0:
 
-	public static Properties readProperties() {
+			    subsystem.setId((int) cell.getNumericCellValue());
 
-		Properties properties = new Properties();
+			    break;
 
-		try {
+			case 1:
 
-			File f = new File(resourceBundle.getString("system.preference.property.name"));
+			    subsystem.setSubSystem(cell.getStringCellValue());
 
-			if (!f.exists())
-				writeProperties();
+			    break;
 
-			InputStream in = new FileInputStream(resourceBundle.getString("system.preference.property.name"));
+			case 2:
 
-			properties.load(in);
+			    subsystem.setIpP2020(cell.getStringCellValue());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			properties = null;
-		}
+			    break;
 
-		props = (Properties) properties.clone();
+			case 3:
 
-		return properties;
-	}
+			    subsystem.setIpDSP1(cell.getStringCellValue());
 
-	public static boolean deleteXMLFile() {
+			    break;
 
-		try {
+			case 4:
 
-			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
-					+ resourceBundle.getString("Scan.processor.data.xml"));
+			    subsystem.setIpDSP2(cell.getStringCellValue());
 
-			if (file.exists()) {
-
-				file.delete();
-			}
-
-			return true;
-
-		} catch (Exception e) {
-
-			return false;
-		}
-
-	}
-
-	public static VPXSystem readFromXMLFile() {
-
-		VPXSystem cag = null;
-
-		try {
-
-			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
-					+ resourceBundle.getString("Scan.processor.data.xml"));
-
-			if (file.exists()) {
-				JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
-
-				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-				cag = (VPXSystem) jaxbUnmarshaller.unmarshal(file);
-			} else
-				cag = new VPXSystem();
-
-		} catch (JAXBException e) {
-
-			e.printStackTrace();
-		}
-
-		return cag;
-	}
-
-	public static VPXSystem readFromXLSFile() {
-
-		String FILE_PATH = "data\\VPXSystem.xls";
-
-		VPXSystem vpx = new VPXSystem();
-
-		List<VPXSubSystem> subsystems = new ArrayList<VPXSubSystem>();
-
-		FileInputStream fis = null;
-
-		try {
-			fis = new FileInputStream(FILE_PATH);
-
-			Workbook workbook = new XSSFWorkbook(fis);
-
-			int numberOfSheets = workbook.getNumberOfSheets();
-
-			for (int i = 0; i < numberOfSheets; i++) {
-
-				Sheet sheet = workbook.getSheetAt(i);
-
-				Iterator<Row> rowIterator = sheet.iterator();
-
-				while (rowIterator.hasNext()) {
-
-					VPXSubSystem subsystem = new VPXSubSystem();
-
-					Row row = rowIterator.next();
-
-					Iterator<Cell> cellIterator = row.cellIterator();
-
-					while (cellIterator.hasNext()) {
-
-						Cell cell = cellIterator.next();
-
-						switch (cell.getColumnIndex()) {
-						case 0:
-
-							subsystem.setId((int) cell.getNumericCellValue());
-
-							break;
-
-						case 1:
-
-							subsystem.setSubSystem(cell.getStringCellValue());
-
-							break;
-
-						case 2:
-
-							subsystem.setIpP2020(cell.getStringCellValue());
-
-							break;
-
-						case 3:
-
-							subsystem.setIpDSP1(cell.getStringCellValue());
-
-							break;
-
-						case 4:
-
-							subsystem.setIpDSP2(cell.getStringCellValue());
-
-							break;
-						}
-
-					}
-
-					subsystems.add(subsystem);
-				}
-
+			    break;
 			}
 
-			fis.close();
+		    }
 
-			vpx.setSubsystem(subsystems);
-
-			return vpx;
-
-		} catch (Exception e) {
-			return null;
+		    subsystems.add(subsystem);
 		}
 
+	    }
+
+	    fis.close();
+
+	    vpx.setSubsystem(subsystems);
+
+	    return vpx;
+
+	} catch (Exception e) {
+	    return null;
 	}
 
-	public static String[] parseBuffertoString(byte[] buffer) {
-		String[] strArr = new String(buffer).trim().split(";;");
+    }
 
-		return strArr;
+    public static String[] parseBuffertoString(byte[] buffer) {
+	String[] strArr = new String(buffer).trim().split(";;");
+
+	return strArr;
+    }
+
+    public static String getPythonInterpreterPath() {
+	String ret = null;
+	String path = System.getenv().get("Path");
+	if (path != null) {
+
+	    String[] paths = path.split(";");
+
+	    for (int i = 0; i < paths.length; i++) {
+		int k = paths[i].indexOf("Python");
+		if (k > -1) {
+		    ret = paths[i].substring(0, (paths[i].indexOf("\\", k) + 1));
+		    break;
+		}
+	    }
+
+	    return ret + "python.exe";
+	} else
+	    return "";
+    }
+
+    public static String findPyVersion() {
+	String version = "", s;
+
+	String Command = "python -V";
+
+	try {
+	    Process p = Runtime.getRuntime().exec(Command);
+
+	    BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+	    // reading output stream of the command
+	    while ((s = inputStream.readLine()) != null) {
+		if (s.startsWith("Python ")) {
+		    version = s.split(" ")[1];
+		}
+	    }
+
+	    s = null;
+
+	    inputStream.close();
+
+	} catch (Exception e) {
+
 	}
 
-	public static String getPythonInterpreterPath() {
-		String ret = null;
-		String path = System.getenv().get("Path");
-		if (path != null) {
+	return version;
+    }
 
-			String[] paths = path.split(";");
+    /**
+     * Use Streams when you are dealing with raw data, binary data
+     * 
+     * @param data
+     */
+    public static void appendUsingOutputStream(String fileName, String data) {
+	OutputStream os = null;
+	try {
+	    // below true flag tells OutputStream to append
+	    os = new FileOutputStream(new File(fileName), true);
+	    os.write(data.getBytes(), 0, data.length());
+	} catch (IOException e) {
+	    e.printStackTrace();
+	} finally {
+	    try {
+		os.close();
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+    }
 
-			for (int i = 0; i < paths.length; i++) {
-				int k = paths[i].indexOf("Python");
-				if (k > -1) {
-					ret = paths[i].substring(0, (paths[i].indexOf("\\", k) + 1));
-					break;
-				}
+    /**
+     * Use BufferedWriter when number of write operations are more
+     * 
+     * @param filePath
+     * @param text
+     * @param noOfLines
+     */
+    public static void appendUsingBufferedWriter(String filePath, String text, int noOfLines) {
+	File file = new File(filePath);
+	FileWriter fr = null;
+	BufferedWriter br = null;
+	try {
+	    // to append to file, you need to initialize FileWriter using below
+	    // constructor
+	    fr = new FileWriter(file, true);
+	    br = new BufferedWriter(fr);
+	    for (int i = 0; i < noOfLines; i++) {
+		br.newLine();
+		// you can use write or append method
+		br.write(text);
+	    }
+
+	} catch (IOException e) {
+	    e.printStackTrace();
+	} finally {
+	    try {
+		br.close();
+		fr.close();
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+    }
+
+    /**
+     * Use FileWriter when number of write operations are less
+     * 
+     * @param filePath
+     * @param text
+     * @param noOfLines
+     */
+    public static void appendUsingFileWriter(String filePath, String text) {
+	File file = new File(filePath);
+	BufferedWriter fr = null;
+	try {
+	    // Below constructor argument decides whether to append or override
+	    fr = new BufferedWriter(new FileWriter(file, true));
+	    fr.write(text);
+	    fr.newLine();
+
+	} catch (IOException e) {
+	    e.printStackTrace();
+	} finally {
+	    try {
+		fr.close();
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+    }
+
+    public static List<String> getSerialPorts() {
+
+	List<String> portList = new ArrayList<String>();
+
+	Enumeration<CommPortIdentifier> thePorts = CommPortIdentifier.getPortIdentifiers();
+
+	while (thePorts.hasMoreElements()) {
+
+	    CommPortIdentifier com = (CommPortIdentifier) thePorts.nextElement();
+
+	    switch (com.getPortType()) {
+
+	    case CommPortIdentifier.PORT_SERIAL:
+
+		portList.add(com.getName());
+
+	    }
+	}
+
+	return portList;
+    }
+
+    public static String getNetworkSettings(String lanName) {
+
+	String ipAddress = null;
+
+	String subnet = null;
+
+	String gateway = null;
+
+	String s = null;
+
+	boolean isAlreadyIPDone = false;
+
+	boolean isAlreadySubDone = false;
+
+	try {
+
+	    String cmd = "netsh interface IP show addresses \"" + lanName + "\"";
+
+	    Process proc = Runtime.getRuntime().exec(cmd);
+
+	    BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+	    while ((s = stdInput.readLine()) != null) {
+
+		if (s.contains("IP Address:") && (!isAlreadyIPDone)) {
+
+		    ipAddress = s.split(":")[1].trim();
+
+		    isAlreadyIPDone = true;
+		}
+
+		if (s.contains("Subnet") && (!isAlreadySubDone)) {
+
+		    subnet = (s.split(":")[1].trim());
+
+		    String d = subnet.split(" ")[2].trim();
+
+		    subnet = d.substring(0, d.length() - 1);
+
+		    isAlreadyIPDone = true;
+		}
+		if (s.contains("Default")) {
+
+		    gateway = s.split(":")[1].trim();
+
+		}
+
+	    }
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+	}
+	ipAddress = (ipAddress != null) ? ipAddress : " ";
+	subnet = (subnet != null) ? subnet : " ";
+	gateway = (gateway != null) ? gateway : " ";
+
+	return ipAddress + "," + subnet + "," + gateway;
+    }
+
+    public static List<NWInterface> getEthernetPorts() {
+
+	List<NWInterface> nwIfaces = new ArrayList<NWInterface>();
+	String s;
+	List<String> nwIface = new ArrayList<String>();
+
+	boolean isLeft = false;
+
+	int j = 0;
+
+	try {
+	    String os = System.getProperty("os.name");
+
+	    if (os.startsWith(VPXConstants.WIN_OSNAME)) {
+
+		Process p = Runtime.getRuntime().exec(VPXConstants.WIN_CMD_BASE);
+
+		BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+		// reading output stream of the command
+		while ((s = inputStream.readLine()) != null) {
+		    if (isLeft) {
+			String[] ss = s.split("  ");
+			for (int i = 0; i < ss.length; i++) {
+			    if (ss[i].trim().length() > 0) {
+				nwIface.add(ss[i].trim());
+			    }
 			}
+		    }
+		    if (s.startsWith("----"))
+			isLeft = true;
+		}
 
-			return ret + "python.exe";
-		} else
-			return "";
+		s = null;
+
+		inputStream.close();
+
+		NWInterface ifs = null;
+
+		for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
+		    String string = iterator.next();
+
+		    switch (j) {
+		    case 0:
+			ifs = null;
+			ifs = new NWInterface();
+			ifs.setEnabled(string.equals("Enabled"));
+			break;
+		    case 1:
+			ifs.setConnected(string.equals("Connected"));
+			break;
+		    case 2:
+			ifs.setDedicated(string.equals("Dedicated"));
+			break;
+		    case 3:
+			ifs.setName(string);
+			// String[] sss = getNetworkSettings(string).split(",");
+			// ifs.addIPAddress(sss[0]);
+			// ifs.setSubnet(sss[1]);
+			// ifs.setGateWay(sss[2]);
+			nwIfaces.add(ifs);
+			j = -1;
+			break;
+		    }
+
+		    j++;
+		}
+
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
 
-	public static String findPyVersion() {
-		String version = "", s;
+	return nwIfaces;
+    }
 
-		String Command = "python -V";
+    public static boolean setEthernetPort(String lan, String ip, String subnet, String gateway) {
 
-		try {
-			Process p = Runtime.getRuntime().exec(Command);
+	try {
 
-			BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+	    String cmd = VPXConstants.RUNASADMIN + "netsh interface ip set address \"" + lan
 
-			// reading output stream of the command
-			while ((s = inputStream.readLine()) != null) {
-				if (s.startsWith("Python ")) {
-					version = s.split(" ")[1];
-				}
+	    + "\" static " + ip + " " + subnet + " " + gateway + " 1";
+
+	    Process pp = Runtime.getRuntime().exec(cmd);
+
+	    BufferedReader stdInput = new BufferedReader(new InputStreamReader(pp.getInputStream()));
+
+	    String s = "";
+
+	    while ((s = stdInput.readLine()) != null) {
+		System.out.println(s);
+	    }
+
+	    BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
+
+	    while ((s = stderr.readLine()) != null) {
+
+	    }
+
+	    // setCurrentIP(ip);
+
+	    return true;
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+
+	    return false;
+	}
+
+    }
+
+    public static String getCurrentIP() {
+
+	return currentSystemIP;
+    }
+
+    public static void setCurrentIP(String ip) {
+
+	currentSystemIP = ip;
+    }
+
+    public static NWInterface getEthernetPort(String name) {
+
+	String s;
+
+	List<String> nwIface = new ArrayList<String>();
+
+	NWInterface nw = null;
+
+	boolean isLeft = false;
+
+	int j = 0;
+
+	try {
+	    String os = System.getProperty("os.name");
+
+	    if (os.startsWith(VPXConstants.WIN_OSNAME)) {
+
+		Process p = Runtime.getRuntime().exec(VPXConstants.WIN_CMD_BASE);
+
+		BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+		// reading output stream of the command
+		while ((s = inputStream.readLine()) != null) {
+		    if (isLeft) {
+			String[] ss = s.split("  ");
+			for (int i = 0; i < ss.length; i++) {
+			    if (ss[i].trim().length() > 0) {
+				nwIface.add(ss[i].trim());
+			    }
 			}
-
-			s = null;
-
-			inputStream.close();
-
-		} catch (Exception e) {
-
+		    }
+		    if (s.startsWith("----"))
+			isLeft = true;
 		}
 
-		return version;
-	}
+		s = null;
 
-	/**
-	 * Use Streams when you are dealing with raw data, binary data
-	 * 
-	 * @param data
-	 */
-	public static void appendUsingOutputStream(String fileName, String data) {
-		OutputStream os = null;
-		try {
-			// below true flag tells OutputStream to append
-			os = new FileOutputStream(new File(fileName), true);
-			os.write(data.getBytes(), 0, data.length());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				os.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+		inputStream.close();
+
+		NWInterface ifs = null;
+
+		for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
+		    String string = iterator.next();
+
+		    switch (j) {
+		    case 0:
+			ifs = null;
+			ifs = new NWInterface();
+			ifs.setEnabled(string.equals("Enabled"));
+			break;
+		    case 1:
+			ifs.setConnected(string.equals("Connected"));
+			break;
+		    case 2:
+			ifs.setDedicated(string.equals("Dedicated"));
+			break;
+		    case 3:
+
+			if (string.equals(name)) {
+
+			    ifs.setName(string);
+
+			    String[] sss = getNetworkSettings(string).split(",");
+
+			    ifs.addIPAddress(sss[0]);
+
+			    ifs.setSubnet(sss[1]);
+
+			    ifs.setGateWay(sss[2]);
+
+			    nw = ifs;
 			}
-		}
-	}
+			j = -1;
+			break;
+		    }
 
-	/**
-	 * Use BufferedWriter when number of write operations are more
-	 * 
-	 * @param filePath
-	 * @param text
-	 * @param noOfLines
-	 */
-	public static void appendUsingBufferedWriter(String filePath, String text, int noOfLines) {
-		File file = new File(filePath);
-		FileWriter fr = null;
-		BufferedWriter br = null;
-		try {
-			// to append to file, you need to initialize FileWriter using below
-			// constructor
-			fr = new FileWriter(file, true);
-			br = new BufferedWriter(fr);
-			for (int i = 0; i < noOfLines; i++) {
-				br.newLine();
-				// you can use write or append method
-				br.write(text);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				br.close();
-				fr.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Use FileWriter when number of write operations are less
-	 * 
-	 * @param filePath
-	 * @param text
-	 * @param noOfLines
-	 */
-	public static void appendUsingFileWriter(String filePath, String text) {
-		File file = new File(filePath);
-		BufferedWriter fr = null;
-		try {
-			// Below constructor argument decides whether to append or override
-			fr = new BufferedWriter(new FileWriter(file, true));
-			fr.write(text);
-			fr.newLine();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				fr.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static List<String> getSerialPorts() {
-
-		List<String> portList = new ArrayList<String>();
-
-		Enumeration<CommPortIdentifier> thePorts = CommPortIdentifier.getPortIdentifiers();
-
-		while (thePorts.hasMoreElements()) {
-
-			CommPortIdentifier com = (CommPortIdentifier) thePorts.nextElement();
-
-			switch (com.getPortType()) {
-
-			case CommPortIdentifier.PORT_SERIAL:
-
-				portList.add(com.getName());
-
-			}
+		    j++;
 		}
 
-		return portList;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
 
-	public static String getNetworkSettings(String lanName) {
+	return nw;
+    }
 
-		String ipAddress = null;
+    /**
+     * @return the currentProcessor
+     */
+    public static String getCurrentProcessor() {
+	return currentProcessor;
+    }
 
-		String subnet = null;
+    /**
+     * @return the currentSubSystem
+     */
+    public static String getCurrentSubSystem() {
+	return currentSubSystem;
+    }
 
-		String gateway = null;
+    /**
+     * @param currentSubSystem
+     *            the currentSubSystem to set
+     */
+    public static void setCurrentSubSystem(String currentSubSystem) {
+	VPXUtilities.currentSubSystem = currentSubSystem;
+    }
 
-		String s = null;
+    /**
+     * @return the currentProcType
+     */
+    public static String getCurrentProcType() {
+	return currentProcType;
+    }
 
-		boolean isAlreadyIPDone = false;
+    /**
+     * @param currentProcType
+     *            the currentProcType to set
+     */
+    public static void setCurrentProcType(String currentProcType) {
+	VPXUtilities.currentProcType = currentProcType;
+    }
 
-		boolean isAlreadySubDone = false;
+    /**
+     * @param currentProcessor
+     *            the currentProcessor to set
+     */
+    public static void setCurrentProcessor(String sub, String procType, String currentProcessor) {
 
-		try {
+	VPXUtilities.currentSubSystem = sub;
 
-			String cmd = "netsh interface IP show addresses \"" + lanName + "\"";
+	VPXUtilities.currentProcessor = currentProcessor;
 
-			Process proc = Runtime.getRuntime().exec(cmd);
+	VPXUtilities.currentProcType = procType;
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+    }
 
-			while ((s = stdInput.readLine()) != null) {
+    public static String readFile(String filename) {
+	try {
+	    final String CHARSET = "UTF-8";
 
-				if (s.contains("IP Address:") && (!isAlreadyIPDone)) {
+	    final String DELIMITER = "==end==";
 
-					ipAddress = s.split(":")[1].trim();
+	    File file = new File(filename);
 
-					isAlreadyIPDone = true;
-				}
+	    Scanner scanner = new Scanner(file, CHARSET).useDelimiter(DELIMITER);
 
-				if (s.contains("Subnet") && (!isAlreadySubDone)) {
+	    String content = null;
 
-					subnet = (s.split(":")[1].trim());
+	    if (scanner.hasNext())
+		content = scanner.next();
 
-					String d = subnet.split(" ")[2].trim();
+	    return content;
 
-					subnet = d.substring(0, d.length() - 1);
+	} catch (Exception e) {
+	    return null;
+	}
+    }
 
-					isAlreadyIPDone = true;
-				}
-				if (s.contains("Default")) {
+    public static void writeFile(String filename, String content) {
+	try {
 
-					gateway = s.split(":")[1].trim();
+	    File newTextFile = new File(filename);
 
-				}
+	    FileWriter fw = new FileWriter(newTextFile);
 
-			}
-		} catch (Exception e) {
+	    content = content.replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\"));
 
-			e.printStackTrace();
-		}
-		ipAddress = (ipAddress != null) ? ipAddress : " ";
-		subnet = (subnet != null) ? subnet : " ";
-		gateway = (gateway != null) ? gateway : " ";
+	    fw.write(content);
 
-		return ipAddress + "," + subnet + "," + gateway;
+	    fw.close();
+
+	} catch (Exception e) {
+	    e.printStackTrace();
+
+	}
+    }
+
+    public static boolean isFileValid(String fileName) {
+
+	return isFileValid(fileName, false);
+    }
+
+    public static boolean isFileValid(String fileName, boolean isDirectory) {
+
+	try {
+
+	    if (fileName.length() == 0)
+		return false;
+
+	    if (isDirectory) {
+		fileName = fileName.substring(0, fileName.lastIndexOf("\\"));
+	    }
+
+	    File f = new File(fileName);
+
+	    return f.exists();
+
+	} catch (Exception e) {
+	    return false;
 	}
 
-	public static List<NWInterface> getEthernetPorts() {
+    }
 
-		List<NWInterface> nwIfaces = new ArrayList<NWInterface>();
-		String s;
-		List<String> nwIface = new ArrayList<String>();
+    public static VPXSubSystem getSubSystem(String name) {
 
-		boolean isLeft = false;
+	VPXSubSystem sub = null;
 
-		int j = 0;
+	if (vpxSystem != null) {
 
-		try {
-			String os = System.getProperty("os.name");
+	    List<VPXSubSystem> subs = vpxSystem.getSubsystem();
 
-			if (os.startsWith(WIN_OSNAME)) {
+	    for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
 
-				Process p = Runtime.getRuntime().exec(WIN_CMD_BASE);
+		VPXSubSystem vpxSubSystem = iterator.next();
 
-				BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		if (vpxSubSystem.getSubSystem().equals(name)) {
 
-				// reading output stream of the command
-				while ((s = inputStream.readLine()) != null) {
-					if (isLeft) {
-						String[] ss = s.split("  ");
-						for (int i = 0; i < ss.length; i++) {
-							if (ss[i].trim().length() > 0) {
-								nwIface.add(ss[i].trim());
-							}
-						}
-					}
-					if (s.startsWith("----"))
-						isLeft = true;
-				}
+		    sub = vpxSubSystem;
 
-				s = null;
-
-				inputStream.close();
-
-				NWInterface ifs = null;
-
-				for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
-					String string = iterator.next();
-
-					switch (j) {
-					case 0:
-						ifs = null;
-						ifs = new NWInterface();
-						ifs.setEnabled(string.equals("Enabled"));
-						break;
-					case 1:
-						ifs.setConnected(string.equals("Connected"));
-						break;
-					case 2:
-						ifs.setDedicated(string.equals("Dedicated"));
-						break;
-					case 3:
-						ifs.setName(string);
-						// String[] sss = getNetworkSettings(string).split(",");
-						// ifs.addIPAddress(sss[0]);
-						// ifs.setSubnet(sss[1]);
-						// ifs.setGateWay(sss[2]);
-						nwIfaces.add(ifs);
-						j = -1;
-						break;
-					}
-
-					j++;
-				}
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return nwIfaces;
-	}
-
-	public static boolean setEthernetPort(String lan, String ip, String subnet, String gateway) {
-
-		try {
-
-			String cmd = RUNASADMIN + "netsh interface ip set address \"" + lan
-
-			+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
-
-			Process pp = Runtime.getRuntime().exec(cmd);
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pp.getInputStream()));
-
-			String s = "";
-
-			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
-			}
-
-			BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
-
-			while ((s = stderr.readLine()) != null) {
-
-			}
-
-			// setCurrentIP(ip);
-
-			return true;
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-			return false;
+		    break;
 		}
 
+	    }
+	}
+	return sub;
+
+    }
+
+    public static void deleteAllGeneratedFilesAndFlders(String path, String deployFile, String cfgFile) {
+
+	deleteDeploymentFiles(path + "\\" + VPXConstants.ResourceFields.DEPLOYMENTFILE, path + "\\"
+		+ VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, false);
+
+	deleteDeploymentFiles("images", "", true);
+
+	deleteDeploymentFiles("tmp", "", true);
+    }
+
+    private static void deleteDeploymentFiles(String deployFile, String cfgFile, boolean isdirectory) {
+
+	String cmd = "";
+
+	if (isdirectory) {
+	    cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
+	} else {
+	    cmd = String.format("cmd /c del /F %s %s", deployFile, cfgFile);
 	}
 
-	public static String getCurrentIP() {
+	String s = null;
 
-		return currentSystemIP;
+	try {
+
+	    Process proc = Runtime.getRuntime().exec(cmd);
+
+	    BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+	    while ((s = stdInput.readLine()) != null) {
+		System.out.println(s);
+	    }
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
 	}
-
-	public static void setCurrentIP(String ip) {
-
-		currentSystemIP = ip;
-	}
-
-	public static NWInterface getEthernetPort(String name) {
-
-		String s;
-
-		List<String> nwIface = new ArrayList<String>();
-
-		NWInterface nw = null;
-
-		boolean isLeft = false;
-
-		int j = 0;
-
-		try {
-			String os = System.getProperty("os.name");
-
-			if (os.startsWith(WIN_OSNAME)) {
-
-				Process p = Runtime.getRuntime().exec(WIN_CMD_BASE);
-
-				BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-				// reading output stream of the command
-				while ((s = inputStream.readLine()) != null) {
-					if (isLeft) {
-						String[] ss = s.split("  ");
-						for (int i = 0; i < ss.length; i++) {
-							if (ss[i].trim().length() > 0) {
-								nwIface.add(ss[i].trim());
-							}
-						}
-					}
-					if (s.startsWith("----"))
-						isLeft = true;
-				}
-
-				s = null;
-
-				inputStream.close();
-
-				NWInterface ifs = null;
-
-				for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
-					String string = iterator.next();
-
-					switch (j) {
-					case 0:
-						ifs = null;
-						ifs = new NWInterface();
-						ifs.setEnabled(string.equals("Enabled"));
-						break;
-					case 1:
-						ifs.setConnected(string.equals("Connected"));
-						break;
-					case 2:
-						ifs.setDedicated(string.equals("Dedicated"));
-						break;
-					case 3:
-
-						if (string.equals(name)) {
-
-							ifs.setName(string);
-
-							String[] sss = getNetworkSettings(string).split(",");
-
-							ifs.addIPAddress(sss[0]);
-
-							ifs.setSubnet(sss[1]);
-
-							ifs.setGateWay(sss[2]);
-
-							nw = ifs;
-						}
-						j = -1;
-						break;
-					}
-
-					j++;
-				}
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return nw;
-	}
-
-	/**
-	 * @return the currentProcessor
-	 */
-	public static String getCurrentProcessor() {
-		return currentProcessor;
-	}
-
-	/**
-	 * @return the currentSubSystem
-	 */
-	public static String getCurrentSubSystem() {
-		return currentSubSystem;
-	}
-
-	/**
-	 * @param currentSubSystem
-	 *            the currentSubSystem to set
-	 */
-	public static void setCurrentSubSystem(String currentSubSystem) {
-		VPXUtilities.currentSubSystem = currentSubSystem;
-	}
-
-	/**
-	 * @return the currentProcType
-	 */
-	public static String getCurrentProcType() {
-		return currentProcType;
-	}
-
-	/**
-	 * @param currentProcType
-	 *            the currentProcType to set
-	 */
-	public static void setCurrentProcType(String currentProcType) {
-		VPXUtilities.currentProcType = currentProcType;
-	}
-
-	/**
-	 * @param currentProcessor
-	 *            the currentProcessor to set
-	 */
-	public static void setCurrentProcessor(String sub, String procType, String currentProcessor) {
-
-		VPXUtilities.currentSubSystem = sub;
-
-		VPXUtilities.currentProcessor = currentProcessor;
-
-		VPXUtilities.currentProcType = procType;
-
-	}
-
-	public static String readFile(String filename) {
-		try {
-			final String CHARSET = "UTF-8";
-
-			final String DELIMITER = "==end==";
-
-			File file = new File(filename);
-
-			Scanner scanner = new Scanner(file, CHARSET).useDelimiter(DELIMITER);
-
-			String content = null;
-
-			if (scanner.hasNext())
-				content = scanner.next();
-
-			return content;
-
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static void writeFile(String filename, String content) {
-		try {
-
-			File newTextFile = new File(filename);
-
-			FileWriter fw = new FileWriter(newTextFile);
-
-			content = content.replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\"));
-
-			fw.write(content);
-
-			fw.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
-	}
-
-	public static boolean isFileValid(String fileName) {
-
-		return isFileValid(fileName, false);
-	}
-
-	public static boolean isFileValid(String fileName, boolean isDirectory) {
-
-		try {
-
-			if (fileName.length() == 0)
-				return false;
-
-			if (isDirectory) {
-				fileName = fileName.substring(0, fileName.lastIndexOf("\\"));
-			}
-
-			File f = new File(fileName);
-
-			return f.exists();
-
-		} catch (Exception e) {
-			return false;
-		}
-
-	}
-
-	public static VPXSubSystem getSubSystem(String name) {
-
-		VPXSubSystem sub = null;
-
-		if (vpxSystem != null) {
-
-			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
-
-			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
-
-				VPXSubSystem vpxSubSystem = iterator.next();
-
-				if (vpxSubSystem.getSubSystem().equals(name)) {
-
-					sub = vpxSubSystem;
-
-					break;
-				}
-
-			}
-		}
-		return sub;
-
-	}
-
-	public static void deleteAllGeneratedFilesAndFlders(String path, String deployFile, String cfgFile) {
-
-		deleteDeploymentFiles(path + "\\" + DEPLOYMENTFILE, path + "\\" + DEPLOYMENTCONFIGFILE, false);
-
-		deleteDeploymentFiles("images", "", true);
-
-		deleteDeploymentFiles("tmp", "", true);
-	}
-
-	private static void deleteDeploymentFiles(String deployFile, String cfgFile, boolean isdirectory) {
-
-		Properties p = readProperties();
-
-		String cmd = "";
-
-		if (isdirectory) {
-			cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
-		} else {
-			cmd = String.format("cmd /c del /F %s %s", deployFile, cfgFile);
-		}
-
-		String s = null;
-
-		try {
-
-			Process proc = Runtime.getRuntime().exec(cmd);
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-
-			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
-			}
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
-	}
+    }
 
 }

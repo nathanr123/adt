@@ -21,6 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
 import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
@@ -31,14 +32,6 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 	private static final long serialVersionUID = -2395447790825321429L;
 
 	private JTextArea txtA_Log;
-
-	public static int INFO = 0;
-
-	public static int ERROR = 1;
-
-	public static int WARN = 2;
-
-	public static int FATAL = 3;
 
 	private FileWriter fw;
 
@@ -114,7 +107,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	public void updateLog(String log) {
 
-		updateLog(INFO, log);
+		updateLog(VPXConstants.INFO, log);
 	}
 
 	public void updateLog(int LEVEL, String log) {
@@ -138,7 +131,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			if (VPXUtilities.isLogEnabled()) {
 
-				String filePath = VPXUtilities.getPropertyValue(VPXUtilities.LOG_FILEPATH);
+				String filePath = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
 
 				VPXUtilities.appendUsingFileWriter(filePath, log);
 
@@ -154,19 +147,19 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		String lvl = "INFO: ";
 
-		if (level == INFO) {
+		if (level == VPXConstants.INFO) {
 
 			lvl = "INFO: ";
 
-		} else if (level == ERROR) {
+		} else if (level == VPXConstants.ERROR) {
 
 			lvl = "ERROR: ";
 
-		} else if (level == WARN) {
+		} else if (level == VPXConstants.WARN) {
 
 			lvl = "WARN: ";
 
-		} else if (level == FATAL) {
+		} else if (level == VPXConstants.FATAL) {
 
 			lvl = "FATAL: ";
 
@@ -224,7 +217,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\save.gif"), 20, 20));
+			putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_SAVE);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -246,7 +239,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\clear2.png"), 20, 20));
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_CLEAR);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -267,7 +260,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON, VPXUtilities.getImageIcon(("image\\copy.gif"), 20, 20));
+			putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_COPY);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
