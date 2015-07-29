@@ -11,25 +11,37 @@ public class MessageCommand extends Struct implements ATP, Serializable {
      * 
      */
 
-    
     private static final long serialVersionUID = -3422816712139640712L;
 
     public final Enum32<MESSAGE_MODE> mode = new Enum32<MESSAGE_MODE>(MESSAGE_MODE.values());
 
     public final Unsigned32 core = new Unsigned32();
 
-    public final UTF8String command = new UTF8String(16);
-
-    public final UTF8String argu1 = new UTF8String(16);
-
-    public final UTF8String argu2 = new UTF8String(16);
-   
-    public final UTF8String argu3 = new UTF8String(16);
-
-    public final UTF8String argu4 = new UTF8String(16);
+    public final UTF8String command_msg = new UTF8String(128);
 
     public MessageCommand() {
 
+    }
+
+    /**
+     * @return the mode
+     */
+    public Enum32<MESSAGE_MODE> getMode() {
+	return mode;
+    }
+
+    /**
+     * @return the core
+     */
+    public Unsigned32 getCore() {
+	return core;
+    }
+
+    /**
+     * @return the command_msg
+     */
+    public UTF8String getCommand_msg() {
+	return command_msg;
     }
 
     @Override

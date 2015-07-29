@@ -26,29 +26,18 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 	public class TestInfo extends Struct {
 
 		// P2020
+
 		public final Unsigned32 RESULT_P2020_PROCESSOR = new Unsigned32();
 
-		public final Unsigned32 RESULT_P2020_MEMORY = new Unsigned32();
+		public final Unsigned32 RESULT_P2020_DDR3 = new Unsigned32();
 
-		public final Unsigned32 RESULT_P2020_FLASH = new Unsigned32();
-
-		public final Unsigned32 RESULT_P2020_RTC = new Unsigned32();
-
-		public final Unsigned32 RESULT_P2020_USB = new Unsigned32();
-
-		public final Unsigned32 RESULT_P2020_TEMP = new Unsigned32();
+		public final Unsigned32 RESULT_P2020_NORFLASH = new Unsigned32();
 
 		public final Unsigned32 RESULT_P2020_ETHERNET = new Unsigned32();
 
-		public final Unsigned32 RESULT_P2020_LISTPCI = new Unsigned32();
+		public final Unsigned32 RESULT_P2020_SRIO = new Unsigned32();
 
-		public final Unsigned32 RESULT_P2020_SATATUS = new Unsigned32();
-
-		public final Unsigned32 RESULT_P2020_AUDIO = new Unsigned32();
-
-		public final Unsigned32 RESULT_P2020_PMCXMC = new Unsigned32();
-
-		public final Unsigned32 RESULT_P2020_SRIOLOOP = new Unsigned32();
+		public final Unsigned32 RESULT_P2020_PCIE = new Unsigned32();
 
 		public final Unsigned32 RESULT_P2020_TEMP1 = new Unsigned32();
 
@@ -56,28 +45,28 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 
 		public final Unsigned32 RESULT_P2020_TEMP3 = new Unsigned32();
 
-		// Full Test P2020
-		public final Unsigned32 RESULT_P2020_FULL = new Unsigned32();
+		public final Unsigned32 RESULT_P2020_VOLT1_3p3 = new Unsigned32();
+
+		public final Unsigned32 RESULT_P2020_VOLT2_2p5 = new Unsigned32();
+
+		public final Unsigned32 RESULT_P2020_VOLT3_1p8 = new Unsigned32();
+
+		public final Unsigned32 RESULT_P2020_VOLT4_1p5 = new Unsigned32();
+
+		public final Unsigned32 RESULT_P2020_VOLT5_1p2 = new Unsigned32();
+
+		public final Unsigned32 RESULT_P2020_VOLT6_1p0 = new Unsigned32();
+
+		public final Unsigned32 RESULT_P2020_VOLT7_1p05 = new Unsigned32();
 
 		// DSP
-		public final Unsigned32 RESULT_DSP_DDR = new Unsigned32();
+		public final Unsigned32 RESULT_DSP_PROCESSOR = new Unsigned32();
 
-		public final Unsigned32 RESULT_DSP_DMA = new Unsigned32();
+		public final Unsigned32 RESULT_DSP_DDR3 = new Unsigned32();
 
 		public final Unsigned32 RESULT_DSP_NAND = new Unsigned32();
 
 		public final Unsigned32 RESULT_DSP_NOR = new Unsigned32();
-
-		public final Unsigned32 RESULT_DSP_HYPLOOP = new Unsigned32();
-
-		public final Unsigned32 RESULT_DSP_ETHERNET = new Unsigned32();
-
-		public final Unsigned32 RESULT_DSP_PCIE = new Unsigned32();
-
-		public final Unsigned32 RESULT_DSP_SRIO = new Unsigned32();
-
-		// Full Test DSP
-		public final Unsigned32 RESULT_DSP_FULL = new Unsigned32();
 	}
 
 	public class FlashInfo extends Struct {
@@ -105,11 +94,31 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 
 	}
 
+	public class MemoryInfo extends Struct {
+
+		public final Unsigned32 address = new Unsigned32();
+
+		public final Unsigned32 length = new Unsigned32();
+
+		public final Unsigned32 stride = new Unsigned32();
+
+		public final Unsigned32 newvalue = new Unsigned32();
+
+		public final Unsigned32 buffer[] = array(new Unsigned32[1024]);
+
+	}
+
 	public class MSGParamaenters extends Union {
 
 		public final Unsigned32 testType = new Unsigned32();
 
+		public final Unsigned32 periodicity = new Unsigned32();
+
 		public final ProcessorInfo proccesorInfo = inner(new ProcessorInfo());
+
+		public final MemoryInfo memoryinfo = inner(new MemoryInfo());
+
+		public final FlashInfo flash_info = inner(new FlashInfo());
 
 		public TestInfo testinfo = inner(new TestInfo());
 

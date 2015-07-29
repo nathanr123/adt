@@ -11,7 +11,6 @@ import java.nio.ByteBuffer;
 
 import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATPCommand;
-import com.cti.vpx.model.Processor;
 
 public class VPXTCPConnector {
 
@@ -59,8 +58,8 @@ public class VPXTCPConnector {
 		try {
 
 			Socket client = new Socket();
-			
-			client.connect(new InetSocketAddress(ipaddress,UDPListener.COMM_PORTNO), 1000);
+
+			client.connect(new InetSocketAddress(ipaddress, UDPListener.COMM_PORTNO), 1000);
 
 			client.setSoTimeout(1000);
 
@@ -70,7 +69,7 @@ public class VPXTCPConnector {
 
 			ATPCommand cmd = new ATPCommand();
 
-			cmd.msgType.set(ATPCommand.MSG_TYPE_QUERY);
+			cmd.msgType.set(ATPCommand.MSG_TYPE_BIST);
 
 			cmd.msgID.set(ATPCommand.MSG_ID_GET);
 
@@ -95,7 +94,7 @@ public class VPXTCPConnector {
 			bf.flip();
 
 			msg.getByteBuffer().put(bf);
-			
+
 			client.close();
 
 			return msg;
