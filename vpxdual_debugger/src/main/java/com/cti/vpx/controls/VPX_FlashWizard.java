@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -27,22 +28,26 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_MADPanel extends JPanel {
+public class VPX_FlashWizard extends JDialog {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4991577328261732341L;
+	private static final long serialVersionUID = 6933734296966776392L;
 
-	private JTabbedPane madTab;
+	private static MADProcessPanel madProcessPanel;
+
+	private JPanel introPanel;
 
 	private JPanel configPanel;
 
@@ -88,8 +93,6 @@ public class VPX_MADPanel extends JPanel {
 
 	private JCheckBox chkConfigDummyOut;
 
-	private static MADProcessWindow madProcessWindow;
-
 	private static String currMapPath;
 
 	private static String currentdployCfg = "";
@@ -98,74 +101,154 @@ public class VPX_MADPanel extends JPanel {
 
 	private VPX_ETHWindow parent;
 
-	private JButton btnCompileApply;
+	private JTabbedPane madTab;
 
-	private JButton btnCompileClear;
+	private VPX_EthernetFlashPanel flashPanel;
+
+	private JButton btnBack;
+
+	private JButton btnNext;
+
+	private JButton btnClose;
+
+	private JButton btnOpenFolder;
+
+	private JButton btnClearFields;
 
 	/**
-	 * Create the panel.
+	 * Launch the application.
 	 */
-	public VPX_MADPanel(VPX_ETHWindow prent) {
+	public static void main(String[] args) {
 
-		this.parent = prent;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					VPX_FlashWizard dialog = new VPX_FlashWizard();
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public VPX_FlashWizard() {
+
+		// this.parent = parnt;
 
 		init();
 
 		loadComponents();
 
+		loadDefaultSettings();
+
+		pack();
+
+		centerFrame();
+
 		loadPathsFromProperties();
 
 	}
-	
-	public VPX_MADPanel() {
+
+	public VPX_FlashWizard(VPX_ETHWindow parnt) {
+
+		this.parent = parnt;
+
+		init();
+
+		loadComponents();
+
+		loadDefaultSettings();
+
+		pack();
+
+		centerFrame();
+
+		loadPathsFromProperties();
 
 	}
 
 	private void init() {
 
-		setLayout(new BorderLayout(0, 0));
+		setSize(800, 600);
+
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+		getContentPane().setLayout(new BorderLayout(0, 0));
 
 	}
 
 	private void loadComponents() {
 
+		JPanel wizardsContainerPanel = new JPanel();
+
+		getContentPane().add(wizardsContainerPanel, BorderLayout.CENTER);
+
+		wizardsContainerPanel.setLayout(new BorderLayout(0, 0));
+
 		madTab = new JTabbedPane(JTabbedPane.TOP);
 
-		add(madTab, BorderLayout.CENTER);
+		wizardsContainerPanel.add(madTab, BorderLayout.CENTER);
 
-		createCompilationTab();
+		createIntroPanel();
 
-		createConfigurationTab();
+		createConfigPanel();
+
+		createCompilePanel();
+
+		createGeneratePanel();
+
+		createFlashPanel();
+
+		madTab.addTab("Intro", null, new JScrollPane(introPanel), null);
 
 		madTab.addTab("Configuration", null, new JScrollPane(configPanel), null);
 
 		madTab.addTab("Compilation", null, new JScrollPane(compilePanel), null);
 
-		madTab.setEnabledAt(1, false);
+		madTab.addTab("Generate Out File", null, new JScrollPane(madProcessPanel), null);
+
+		madTab.addTab("Flash", null, new JScrollPane(flashPanel), null);
+
+		createControlsPanel();
 
 	}
 
-	public JPanel getConfigPanel() {
+	private void createIntroPanel() {
 
-		if (configPanel == null) {
+		String intro = "<html>" + "<body>" + "<p><h2>This wizard is combination of</h2> </p>" + "<ul>"
+				+ "<li><b>MAD Utility</b></li><br>" + "<li><b>Ethernet Flash</b></li>" + "</ul>" + "<ol>"
+				+ "<li><b>MAD Utility</b></li>" + "<ul type='disc'>"
+				+ "<li>User can select the paths of tools which are generating the out file</li><br>"
+				+ "<li>User have an option to use dummy file instead of empty out file</li><br>"
+				+ "<li>User can select the paths of core out files and generating out file</li><br>" + "</ul>" + "<br>"
+				+ "<li><b>Ethernet Flash</b></li>" + "<ul type='disc'>"
+				+ "<li>User can flash the generated out file into to memory</li><br>"
+				+ "<li>User have an option to select device NAND or NOR</li><br>"
+				+ "<li>User have an option to flash location</li><br>" + "</ul>" + "</ol>" + "</body>" + "</html>";
 
-			createConfigurationTab();
-		}
+		introPanel = new JPanel();
 
-		return configPanel;
+		introPanel
+				.setBorder(new TitledBorder(null, "Introduction", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		introPanel.setPreferredSize(new Dimension(800, 500));
+
+		introPanel.setLayout(new BorderLayout(0, 0));
+
+		JLabel lblIntro = new JLabel(intro);
+
+		lblIntro.setVerticalAlignment(SwingConstants.TOP);
+
+		introPanel.add(lblIntro, BorderLayout.CENTER);
+
 	}
 
-	public JPanel getCompilationPanel() {
-
-		if (compilePanel == null) {
-
-			createCompilationTab();
-		}
-
-		return compilePanel;
-	}
-
-	private void createConfigurationTab() {
+	private void createConfigPanel() {
 
 		configPanel = new JPanel();
 
@@ -374,62 +457,9 @@ public class VPX_MADPanel extends JPanel {
 
 		configDummyOutFilePanel.add(btnConfigBrowseDummyOut);
 
-		JPanel configControlPanel = new JPanel();
-
-		configDummyPanel.add(configControlPanel, BorderLayout.SOUTH);
-
-		JButton btnConfigApply = new JButton("Apply");
-
-		btnConfigApply.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-
-				String error = checkPathsValid(VPXConstants.CONFIGURATION);
-
-				if (error.length() == 0) {
-
-					updateConfigFile(txtConfigPathPython.getText(), txtConfigPathMAP.getText(),
-							txtConfigPathPrelinker.getText(), txtConfigPathOFD.getText(),
-							txtConfigPathStriper.getText(), txtConfigPathMAL.getText(), txtConfigPathNML.getText(),
-							chkConfigDummyOut.isSelected(), txtConfigPathDummyOut.getText());
-
-					JOptionPane.showMessageDialog(null, "Paths are configured successfully");
-
-					madTab.setEnabledAt(1, true);
-
-					madTab.setSelectedIndex(1);
-
-					parent.updateLog("Configured Susccessfully");
-				} else {
-
-					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
-
-					parent.updateLog("Configuration error");
-
-					parent.updateLog(error);
-				}
-			}
-		});
-
-		configControlPanel.add(btnConfigApply);
-
-		JButton btnConfigClear = new JButton("Clear");
-
-		btnConfigClear.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				clearConfigurationFields();
-
-			}
-		});
-
-		configControlPanel.add(btnConfigClear);
-
 	}
 
-	private void createCompilationTab() {
+	private void createCompilePanel() {
 
 		compilePanel = new JPanel();
 
@@ -643,69 +673,399 @@ public class VPX_MADPanel extends JPanel {
 
 		compileFinalOutFilePanel.add(btnCompileFinalOutFile);
 
-		JPanel compileControlsPanel = new JPanel();
+	}
 
-		compileOutFilePanel.add(compileControlsPanel, BorderLayout.SOUTH);
+	private void createGeneratePanel() {
 
-		btnCompileApply = new JButton("Compile");
+		madProcessPanel = new MADProcessPanel();
+	}
 
-		btnCompileApply.addActionListener(new ActionListener() {
+	private void createFlashPanel() {
+
+		flashPanel = new VPX_EthernetFlashPanel();
+	}
+
+	private void createControlsPanel() {
+
+		JPanel controlsPanel = new JPanel();
+
+		controlsPanel.setBorder(new LineBorder(Color.LIGHT_GRAY));
+
+		controlsPanel.setPreferredSize(new Dimension(10, 50));
+
+		getContentPane().add(controlsPanel, BorderLayout.SOUTH);
+
+		controlsPanel.setLayout(new BorderLayout(0, 0));
+
+		JPanel emptyPanel = new JPanel();
+
+		emptyPanel.setPreferredSize(new Dimension(150, 10));
+
+		controlsPanel.add(emptyPanel, BorderLayout.WEST);
+
+		JPanel navigationPanel = new JPanel();
+
+		FlowLayout fl_navigationPanel = (FlowLayout) navigationPanel.getLayout();
+
+		fl_navigationPanel.setVgap(12);
+
+		fl_navigationPanel.setAlignment(FlowLayout.LEFT);
+
+		controlsPanel.add(navigationPanel, BorderLayout.CENTER);
+
+		btnBack = new JButton("<  Back");
+
+		btnBack.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 
-				if (chkConfigDummyOut.isSelected()) {
-					fillDummyFiles();
+				if (madTab.getSelectedIndex() > 0) {
+
+					int idx = madTab.getSelectedIndex() - 1;
+
+					madTab.setSelectedIndex(idx);
+
+					disableAll(idx);
 				}
 
-				String error = checkPathsValid(VPXConstants.COMPILATION);
+				if (madTab.getSelectedIndex() == 0) {
 
-				if (error.length() == 0) {
-
-					parent.updateLog("MAD Compilation started");
-
-					createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
-							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
-							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
-							txtCompilePathCore5.getText(), txtCompilePathCore6.getText(), txtCompilePathCore7.getText());
-
-					madProcessWindow = new MADProcessWindow(txtCompilePathFinalOut.getText().trim());
-
-					madProcessWindow.doCompile();
-
-					madProcessWindow.setVisible(true);
-
-					parent.updateLog("MAD Compilation Completed");
-
-					btnCompileApply.setEnabled(true);
-				} else {
-
-					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
-
-					btnCompileApply.setEnabled(true);
-
-					parent.updateLog("MAD out files error");
-
-					parent.updateLog(error);
+					btnBack.setEnabled(false);
 				}
+
+				btnNext.setEnabled(true);
 
 			}
 		});
 
-		compileControlsPanel.add(btnCompileApply);
+		navigationPanel.add(btnBack);
 
-		btnCompileClear = new JButton("Clear");
+		btnNext = new JButton("Next  >");
 
-		btnCompileClear.addActionListener(new ActionListener() {
+		btnNext.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				clearCompilationFields();
+			public void actionPerformed(ActionEvent arg0) {
+
+				if (madTab.getSelectedIndex() < madTab.getTabCount()) {
+
+					doNext();
+				}
+
+				if (madTab.getSelectedIndex() == madTab.getTabCount() - 1) {
+
+					btnNext.setEnabled(false);
+				}
+
+				btnBack.setEnabled(true);
 
 			}
 		});
 
-		compileControlsPanel.add(btnCompileClear);
+		navigationPanel.add(btnNext);
+
+		btnClearFields = new JButton("Clear");
+
+		btnClearFields.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				doClear();
+
+			}
+		});
+
+		navigationPanel.add(btnClearFields);
+
+		btnOpenFolder = new JButton("Open Folder");
+
+		btnOpenFolder.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				madProcessPanel.openFolder();
+
+			}
+		});
+
+		navigationPanel.add(btnOpenFolder);
+
+		btnClose = new JButton("Close");
+
+		btnClose.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				VPX_FlashWizard.this.dispose();
+
+			}
+		});
+
+		navigationPanel.add(btnClose);
+
+	}
+
+	private void doClear() {
+
+		if (madTab.getSelectedIndex() == 1) {
+
+			clearConfigurationFields();
+
+		} else if (madTab.getSelectedIndex() == 2) {
+
+			clearCompilationFields();
+
+		} else if (madTab.getSelectedIndex() == 4) {
+
+			// clearFlashFields();
+		}
+
+	}
+
+	private void doNext() {
+
+		if (madTab.getSelectedIndex() == 0 || madTab.getSelectedIndex() == 3) {
+
+			int idx = madTab.getSelectedIndex() + 1;
+
+			madTab.setEnabledAt(idx, true);
+
+			madTab.setSelectedIndex(idx);
+
+			disableAll(idx);
+
+		} else if (madTab.getSelectedIndex() == 1) {
+
+			applyConfiguration();
+
+		} else if (madTab.getSelectedIndex() == 2) {
+
+			applyCompilation();
+		}
+
+	}
+
+	private void disableAll(int idx) {
+
+		for (int i = 0; i < madTab.getTabCount(); i++) {
+
+			madTab.setEnabledAt(i, false);
+		}
+
+		madTab.setEnabledAt(idx, true);
+
+		if (idx == 0 || idx == 3) {
+
+			btnClearFields.setEnabled(false);
+
+		} else {
+
+			btnClearFields.setEnabled(true);
+		}
+
+	}
+
+	private void loadDefaultSettings() {
+
+		madTab.setEnabledAt(0, true);
+
+		for (int i = 1; i < madTab.getTabCount(); i++) {
+
+			madTab.setEnabledAt(i, false);
+		}
+
+		btnNext.setEnabled(true);
+
+		btnClearFields.setEnabled(false);
+
+		btnOpenFolder.setEnabled(false);
+
+		btnBack.setEnabled(false);
+
+		btnClose.setEnabled(true);
+
+		madTab.setSelectedIndex(0);
+	}
+
+	private void centerFrame() {
+
+		Dimension windowSize = getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
+	}
+
+	private void loadPathsFromProperties() {
+
+		txtConfigPathPython.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PYTHON));
+
+		txtConfigPathMAP.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAP));
+
+		txtConfigPathPrelinker.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PRELINKER));
+
+		txtConfigPathStriper.setText(p.getProperty(VPXConstants.ResourceFields.PATH_STRIPER));
+
+		txtConfigPathOFD.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OFD));
+
+		txtConfigPathMAL.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAL));
+
+		txtConfigPathNML.setText(p.getProperty(VPXConstants.ResourceFields.PATH_NML));
+
+		txtConfigPathDummyOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_DUMMY));
+
+		boolean dummy = Boolean.valueOf(p.getProperty(VPXConstants.ResourceFields.DUMMY_CHK));
+
+		chkConfigDummyOut.setSelected(dummy);
+
+		txtConfigPathDummyOut.setEnabled(dummy);
+
+		txtCompilePathCore0.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE0));
+
+		txtCompilePathCore1.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE1));
+
+		txtCompilePathCore2.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE2));
+
+		txtCompilePathCore3.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE3));
+
+		txtCompilePathCore4.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE4));
+
+		txtCompilePathCore5.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE5));
+
+		txtCompilePathCore6.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE6));
+
+		txtCompilePathCore7.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE7));
+
+		txtCompilePathFinalOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OUT));
+
+	}
+
+	private void applyConfiguration() {
+
+		String error = checkPathsValid(VPXConstants.CONFIGURATION);
+
+		if (error.length() == 0) {
+
+			updateConfigFile(txtConfigPathPython.getText(), txtConfigPathMAP.getText(),
+					txtConfigPathPrelinker.getText(), txtConfigPathOFD.getText(), txtConfigPathStriper.getText(),
+					txtConfigPathMAL.getText(), txtConfigPathNML.getText(), chkConfigDummyOut.isSelected(),
+					txtConfigPathDummyOut.getText());
+
+			JOptionPane.showMessageDialog(null, "Paths are configured successfully");
+
+			parent.updateLog("Configured Successfully");
+
+			int idx = madTab.getSelectedIndex() + 1;
+
+			madTab.setEnabledAt(idx, true);
+
+			madTab.setSelectedIndex(idx);
+
+			disableAll(idx);
+		} else {
+
+			JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+
+			parent.updateLog("Configuration error");
+
+			parent.updateLog(error);
+		}
+	}
+
+	private void applyCompilation() {
+
+		if (chkConfigDummyOut.isSelected()) {
+			fillDummyFiles();
+		}
+
+		String error = checkPathsValid(VPXConstants.COMPILATION);
+
+		if (error.length() == 0) {
+
+			parent.updateLog("MAD Compilation started");
+
+			createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
+					txtCompilePathCore1.getText(), txtCompilePathCore2.getText(), txtCompilePathCore3.getText(),
+					txtCompilePathCore4.getText(), txtCompilePathCore5.getText(), txtCompilePathCore6.getText(),
+					txtCompilePathCore7.getText());
+
+			String path = txtCompilePathFinalOut.getText();
+
+			madProcessPanel.setPath(path.substring(0, path.lastIndexOf("\\")));
+
+			madProcessPanel.doCompile();
+
+			parent.updateLog("MAD Compilation Completed");
+
+			int idx = madTab.getSelectedIndex() + 1;
+
+			madTab.setEnabledAt(idx, true);
+
+			madTab.setSelectedIndex(idx);
+
+			disableAll(idx);
+		} else {
+
+			JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+
+			parent.updateLog("MAD out files error");
+
+			parent.updateLog(error);
+		}
+	}
+
+	private void clearCompilationFields() {
+
+		txtCompilePathCore0.setText("");
+
+		txtCompilePathCore1.setText("");
+
+		txtCompilePathCore2.setText("");
+
+		txtCompilePathCore3.setText("");
+
+		txtCompilePathCore4.setText("");
+
+		txtCompilePathCore5.setText("");
+
+		txtCompilePathCore6.setText("");
+
+		txtCompilePathCore7.setText("");
+
+		txtCompilePathFinalOut.setText("");
+	}
+
+	private void clearConfigurationFields() {
+
+		txtConfigPathPython.setText("");
+
+		txtConfigPathMAP.setText("");
+
+		txtConfigPathPrelinker.setText("");
+
+		txtConfigPathStriper.setText("");
+
+		txtConfigPathOFD.setText("");
+
+		txtConfigPathMAL.setText("");
+
+		txtConfigPathNML.setText("");
+
+		txtConfigPathDummyOut.setText("");
+
+		chkConfigDummyOut.setSelected(false);
+
+		txtConfigPathDummyOut.setEnabled(false);
 	}
 
 	private void fillDummyFiles() {
@@ -775,94 +1135,6 @@ public class VPX_MADPanel extends JPanel {
 			txtCompilePathCore7.setText(dummy);
 		}
 
-	}
-
-	private void loadPathsFromProperties() {
-
-		txtConfigPathPython.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PYTHON));
-
-		txtConfigPathMAP.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAP));
-
-		txtConfigPathPrelinker.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PRELINKER));
-
-		txtConfigPathStriper.setText(p.getProperty(VPXConstants.ResourceFields.PATH_STRIPER));
-
-		txtConfigPathOFD.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OFD));
-
-		txtConfigPathMAL.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAL));
-
-		txtConfigPathNML.setText(p.getProperty(VPXConstants.ResourceFields.PATH_NML));
-
-		txtConfigPathDummyOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_DUMMY));
-
-		boolean dummy = Boolean.valueOf(p.getProperty(VPXConstants.ResourceFields.DUMMY_CHK));
-
-		chkConfigDummyOut.setSelected(dummy);
-
-		txtConfigPathDummyOut.setEnabled(dummy);
-
-		txtCompilePathCore0.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE0));
-
-		txtCompilePathCore1.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE1));
-
-		txtCompilePathCore2.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE2));
-
-		txtCompilePathCore3.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE3));
-
-		txtCompilePathCore4.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE4));
-
-		txtCompilePathCore5.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE5));
-
-		txtCompilePathCore6.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE6));
-
-		txtCompilePathCore7.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE7));
-
-		txtCompilePathFinalOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OUT));
-
-	}
-
-	private void clearCompilationFields() {
-
-		txtCompilePathCore0.setText("");
-
-		txtCompilePathCore1.setText("");
-
-		txtCompilePathCore2.setText("");
-
-		txtCompilePathCore3.setText("");
-
-		txtCompilePathCore4.setText("");
-
-		txtCompilePathCore5.setText("");
-
-		txtCompilePathCore6.setText("");
-
-		txtCompilePathCore7.setText("");
-
-		txtCompilePathFinalOut.setText("");
-	}
-
-	private void clearConfigurationFields() {
-
-		txtConfigPathPython.setText("");
-
-		txtConfigPathMAP.setText("");
-
-		txtConfigPathPrelinker.setText("");
-
-		txtConfigPathStriper.setText("");
-
-		txtConfigPathOFD.setText("");
-
-		txtConfigPathMAL.setText("");
-
-		txtConfigPathNML.setText("");
-
-		txtConfigPathDummyOut.setText("");
-
-		chkConfigDummyOut.setSelected(false);
-
-		txtConfigPathDummyOut.setEnabled(false);
 	}
 
 	private String checkPathsValid(int option) {
@@ -1129,7 +1401,7 @@ public class VPX_MADPanel extends JPanel {
 
 			while ((s = stdInput.readLine()) != null) {
 
-				madProcessWindow.updateGeneratingMessage(s);
+				madProcessPanel.updateGeneratingMessage(s);
 
 				parent.updateLog(s);
 
@@ -1141,13 +1413,13 @@ public class VPX_MADPanel extends JPanel {
 
 			if (ret) {
 
-				madProcessWindow.setSuccess();
+				madProcessPanel.setSuccess();
 
 			} else {
 
-				madProcessWindow.setFailure();
+				madProcessPanel.setFailure();
 
-				JOptionPane.showMessageDialog(madProcessWindow, "Error in generating out file");
+				JOptionPane.showMessageDialog(madProcessPanel, "Error in generating out file");
 
 				parent.updateLog("Error in generating out file");
 			}
@@ -1210,7 +1482,7 @@ public class VPX_MADPanel extends JPanel {
 		}
 	}
 
-	public class MADProcessWindow extends JDialog {
+	public class MADProcessPanel extends JPanel {
 
 		/**
 		 * 
@@ -1221,7 +1493,7 @@ public class VPX_MADPanel extends JPanel {
 
 		private JButton btnOpen;
 
-		private JButton btnCancel;
+		// private JButton btnCancel;
 
 		private String path = null;
 
@@ -1234,7 +1506,7 @@ public class VPX_MADPanel extends JPanel {
 		/**
 		 * Create the dialog.
 		 */
-		public MADProcessWindow(String pathToOPen) {
+		public MADProcessPanel(String pathToOPen) {
 
 			this.path = pathToOPen;
 
@@ -1246,8 +1518,19 @@ public class VPX_MADPanel extends JPanel {
 
 		}
 
-		public JPanel getContentPanel() {
-			return contentPanel;
+		public MADProcessPanel() {
+
+			init();
+
+			loadComponents();
+
+			centerFrame();
+
+		}
+
+		public void setPath(String pathToOPen) {
+
+			this.path = pathToOPen;
 		}
 
 		public void doCompile() {
@@ -1267,19 +1550,9 @@ public class VPX_MADPanel extends JPanel {
 
 		private void init() {
 
-			setTitle("MAD Generation Process");
+			this.setPreferredSize(new Dimension(800, 350));
 
-			setModal(true);
-
-			setUndecorated(true);
-
-			setAlwaysOnTop(true);
-
-			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-			setSize(800, 350);
-
-			getContentPane().setLayout(new BorderLayout());
+			this.setLayout(new BorderLayout());
 
 		}
 
@@ -1291,7 +1564,7 @@ public class VPX_MADPanel extends JPanel {
 
 			basePanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
-			getContentPane().add(basePanel, BorderLayout.CENTER);
+			add(basePanel, BorderLayout.CENTER);
 
 			basePanel.add(contentPanel, BorderLayout.CENTER);
 
@@ -1335,7 +1608,7 @@ public class VPX_MADPanel extends JPanel {
 
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-			basePanel.add(buttonPane, BorderLayout.SOUTH);
+			// basePanel.add(buttonPane, BorderLayout.SOUTH);
 
 			btnOpen = new JButton("Open");
 
@@ -1355,49 +1628,13 @@ public class VPX_MADPanel extends JPanel {
 
 			buttonPane.add(btnOpen);
 
-			getRootPane().setDefaultButton(btnOpen);
-
-			btnCancel = new JButton("Close");
-
-			btnCancel.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-
-					MADProcessWindow.this.dispose();
-
-				}
-			});
-
-			btnCancel.setEnabled(false);
-
-			btnCancel.setActionCommand("Cancel");
-
-			buttonPane.add(btnCancel);
 		}
 
-		private void centerFrame() {
-
-			Dimension windowSize = getSize();
-
-			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
-			Point centerPoint = ge.getCenterPoint();
-
-			int dx = centerPoint.x - windowSize.width / 2;
-
-			int dy = centerPoint.y - windowSize.height / 2;
-
-			setLocation(dx, dy);
-		}
-
-		private void openFolder() {
+		public void openFolder() {
 
 			try {
 
 				Desktop.getDesktop().open(new File(path.substring(0, path.lastIndexOf("\\"))));
-
-				this.dispose();
 
 			} catch (IOException e) {
 
@@ -1412,7 +1649,9 @@ public class VPX_MADPanel extends JPanel {
 
 			btnOpen.setEnabled(true);
 
-			btnCancel.setEnabled(true);
+			btnOpenFolder.setEnabled(true);
+
+			// btnCancel.setEnabled(true);
 
 			lblOpenFolder.setEnabled(true);
 		}
@@ -1421,7 +1660,9 @@ public class VPX_MADPanel extends JPanel {
 
 			btnOpen.setEnabled(false);
 
-			btnCancel.setEnabled(true);
+			btnOpenFolder.setEnabled(false);
+
+			// btnCancel.setEnabled(true);
 
 			lblOpenFolder.setEnabled(false);
 		}

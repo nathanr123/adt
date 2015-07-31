@@ -236,7 +236,7 @@ public class VPX_DetailPanel extends JDialog {
 
 		if (dif > VPXConstants.MAXRESPONSETIMEOUT) {
 
-			return "No Response";
+			return "Not Alive";
 		} else {
 			return "Alive";
 		}
@@ -256,25 +256,28 @@ public class VPX_DetailPanel extends JDialog {
 
 		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-		tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
-		tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+				VPXUtilities.getCurrentTime(2, vpxSubSystem.getP2020ResponseTime()) });
 
 		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
 		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-		tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
-		tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+				VPXUtilities.getCurrentTime(2, vpxSubSystem.getDsp1ResponseTime()) });
 
 		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
 		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-		tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
 
-		tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+				VPXUtilities.getCurrentTime(2, vpxSubSystem.getDsp2ResponseTime()) });
 
 	}
 
@@ -327,29 +330,33 @@ public class VPX_DetailPanel extends JDialog {
 
 				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-				tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+				tbl_Property_Model
+						.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
-				tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+						VPXUtilities.getCurrentTime(2, vpxSubSystem.getP2020ResponseTime()) });
 
 			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP1) {
 
 				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
-				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
 
-				tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
-				tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+						VPXUtilities.getCurrentTime(2, vpxSubSystem.getDsp1ResponseTime()) });
 
 			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP2) {
 
 				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
-				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
-				tbl_Property_Model.addRow(new String[] { "Status", "Alive" });
+				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
 
-				tbl_Property_Model.addRow(new String[] { "Last Responded Time ", VPXUtilities.getCurrentTime(2) });
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+						VPXUtilities.getCurrentTime(2, vpxSubSystem.getDsp2ResponseTime()) });
 			}
 		}
 	}

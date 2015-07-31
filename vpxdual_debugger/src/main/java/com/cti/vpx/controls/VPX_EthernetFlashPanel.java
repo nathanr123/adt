@@ -35,6 +35,10 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private JComboBox<String> cmbFlshDevice;
 
+	private JComboBox<String> cmbSubSystem;
+
+	private JComboBox<String> cmbFlshProcessors;
+
 	/**
 	 * Create the panel.
 	 */
@@ -49,7 +53,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		setLayout(new BorderLayout(0, 0));
 
-		setPreferredSize(new Dimension(700, 355));
+		setPreferredSize(new Dimension(800, 400));
 	}
 
 	private void loadComponents() {
@@ -71,7 +75,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		notePanel.setBorder(new TitledBorder(null, "Note", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		notePanel.setBounds(10, 227, 676, 119);
+		notePanel.setBounds(10, 317, 736, 119);
 
 		flashPanl.add(notePanel);
 
@@ -81,7 +85,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		JPanel flashOptionPanel = new JPanel();
 
-		flashOptionPanel.setBounds(10, 22, 676, 194);
+		flashOptionPanel.setBounds(10, 22, 736, 284);
 
 		flashPanl.add(flashOptionPanel);
 
@@ -89,37 +93,37 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		JLabel lblBinFile = new JLabel("Bin File");
 
-		lblBinFile.setBounds(10, 107, 114, 22);
+		lblBinFile.setBounds(15, 193, 114, 22);
 
 		flashOptionPanel.add(lblBinFile);
 
 		JLabel lblOffset = new JLabel("Offset");
 
-		lblOffset.setBounds(15, 64, 114, 22);
+		lblOffset.setBounds(15, 150, 114, 22);
 
 		flashOptionPanel.add(lblOffset);
 
 		JLabel lblFlashDevice = new JLabel("Flash Device");
 
-		lblFlashDevice.setBounds(15, 21, 114, 22);
+		lblFlashDevice.setBounds(15, 107, 114, 22);
 
 		flashOptionPanel.add(lblFlashDevice);
 
 		JButton btnFlash = new JButton("Flash");
 
-		btnFlash.setBounds(153, 150, 68, 23);
+		btnFlash.setBounds(153, 236, 68, 23);
 
 		flashOptionPanel.add(btnFlash);
 
 		JButton btnBoot = new JButton("Boot");
 
-		btnBoot.setBounds(231, 150, 68, 23);
+		btnBoot.setBounds(231, 236, 68, 23);
 
 		flashOptionPanel.add(btnBoot);
 
 		JButton btnFlashBoot = new JButton("Flash & Boot");
 
-		btnFlashBoot.setBounds(309, 150, 114, 23);
+		btnFlashBoot.setBounds(309, 236, 114, 23);
 
 		flashOptionPanel.add(btnFlashBoot);
 
@@ -127,13 +131,13 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		txtBinFilePath.setColumns(10);
 
-		txtBinFilePath.setBounds(153, 107, 406, 22);
+		txtBinFilePath.setBounds(153, 193, 406, 22);
 
 		flashOptionPanel.add(txtBinFilePath);
 
 		JButton btnBinFileBrowse = new JButton(new BrowseAction("Browse", txtBinFilePath));
 
-		btnBinFileBrowse.setBounds(564, 107, 91, 23);
+		btnBinFileBrowse.setBounds(564, 191, 91, 23);
 
 		flashOptionPanel.add(btnBinFileBrowse);
 
@@ -141,7 +145,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		cmbOffset.setPreferredSize(new Dimension(175, 22));
 
-		cmbOffset.setBounds(153, 64, 175, 22);
+		cmbOffset.setBounds(153, 150, 175, 22);
 
 		flashOptionPanel.add(cmbOffset);
 
@@ -149,9 +153,37 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		cmbFlshDevice.setPreferredSize(new Dimension(175, 22));
 
-		cmbFlshDevice.setBounds(153, 21, 175, 22);
+		cmbFlshDevice.setBounds(153, 107, 175, 22);
 
 		flashOptionPanel.add(cmbFlshDevice);
+
+		cmbSubSystem = new JComboBox<String>();
+
+		cmbSubSystem.setPreferredSize(new Dimension(175, 22));
+
+		cmbSubSystem.setBounds(153, 21, 175, 22);
+
+		flashOptionPanel.add(cmbSubSystem);
+
+		JLabel lblSubSystem = new JLabel("Sub System");
+
+		lblSubSystem.setBounds(15, 21, 114, 22);
+
+		flashOptionPanel.add(lblSubSystem);
+
+		cmbFlshProcessors = new JComboBox<String>();
+
+		cmbFlshProcessors.setPreferredSize(new Dimension(175, 22));
+
+		cmbFlshProcessors.setBounds(153, 64, 175, 22);
+
+		flashOptionPanel.add(cmbFlshProcessors);
+
+		JLabel lblProcessor = new JLabel("Processor");
+
+		lblProcessor.setBounds(15, 64, 114, 22);
+
+		flashOptionPanel.add(lblProcessor);
 	}
 
 	public class BrowseAction extends AbstractAction {
