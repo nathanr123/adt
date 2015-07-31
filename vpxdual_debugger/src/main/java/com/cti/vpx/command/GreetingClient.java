@@ -45,13 +45,13 @@ public class GreetingClient {
 		try {
 			datagramSocket = new DatagramSocket();
 
-			P2020ATPCommand msg = new P2020ATPCommand();
+			DSPATPCommand msg = new DSPATPCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
 			ByteBuffer bf = ByteBuffer.wrap(buffer);
 
-			bf.order(msg.byteOrder());
+			bf.order(ATP.BYTEORDER_DSP);
 
 			msg.setByteBuffer(bf, 0);
 
@@ -59,14 +59,14 @@ public class GreetingClient {
 
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
-			msg.params.periodicity.set(20);
+			msg.params.periodicity.set(1);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.1"),
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
 					UDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
-			 System.out.println("Message Sent");
+			System.out.println("Message Sent");
 
 		} catch (Exception e) {
 
@@ -88,7 +88,7 @@ public class GreetingClient {
 
 			ByteBuffer bf = ByteBuffer.wrap(buffer);
 
-			//bf.order(msg.byteOrder());
+			// bf.order(msg.byteOrder());
 
 			msg.setByteBuffer(bf, 0);
 
@@ -169,8 +169,8 @@ public class GreetingClient {
 	class CThreadMonitor implements Runnable {
 		DatagramSocket messageReceiverSocket;
 
-		ATPCommand msgCommand = new ATPCommand();
-
+		DSPATPCommand msgCommand = new DSPATPCommand();
+		
 		byte[] messageData = new byte[msgCommand.size()];
 
 		DatagramPacket messagePacket = new DatagramPacket(messageData, messageData.length);
@@ -193,6 +193,7 @@ public class GreetingClient {
 
 					messageReceiverSocket.receive(messagePacket);
 
+					
 					bf.clear();
 
 					bf.put(messageData);

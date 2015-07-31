@@ -4,6 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 
 import javax.swing.SwingWorker;
 
@@ -13,6 +14,8 @@ import com.cti.vpx.Listener.MessageListener;
 import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATPCommand;
+import com.cti.vpx.command.P2020ATPCommand;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPXUDPMonitor {
 
@@ -100,6 +103,44 @@ public class VPXUDPMonitor {
 			datagramSocket.send(packet);
 
 			// System.out.println("Message : " + msg + " to IP : " + ip);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void setPeriodicity(String ip, int period) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			P2020ATPCommand msg = new P2020ATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
+
+			msg.params.periodicity.set(period);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					UDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+			
+			((VPX_ETHWindow)listener).updateLog("Periodicity has changed to "+period+" seconds");
+
 
 		} catch (Exception e) {
 
@@ -215,7 +256,7 @@ public class VPXUDPMonitor {
 
 		DatagramSocket advertisementSocket;
 
-		byte[] advertisementData = new byte[4];
+		byte[] advertisementData = new byte[6];
 
 		DatagramPacket advertisementPacket = new DatagramPacket(advertisementData, advertisementData.length);
 
@@ -247,6 +288,8 @@ public class VPXUDPMonitor {
 				if (isipinRange) {
 
 					String sentence = new String(advertisementPacket.getData(), 0, advertisementPacket.getLength());
+					
+					System.out.println(sentence);
 
 					((AdvertisementListener) listener).updateProcessorStatus(advertisementPacket.getAddress()
 							.getHostAddress(), sentence);

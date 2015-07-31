@@ -53,7 +53,6 @@ import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.text.View;
 
 import com.cti.vpx.util.VPXConstants;
-import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 

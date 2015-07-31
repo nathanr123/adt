@@ -243,7 +243,8 @@ public class VPX_AppMode extends JFrame {
 
 					if (!flnmae.endsWith(".log")) {
 
-						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+						if (Boolean.valueOf(VPXUtilities
+								.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
 							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
 						} else {
@@ -251,7 +252,8 @@ public class VPX_AppMode extends JFrame {
 						}
 
 					} else {
-						if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+						if (Boolean.valueOf(VPXUtilities
+								.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
 							flnmae = flnmae.substring(0, flnmae.length() - 4);
 
@@ -427,6 +429,8 @@ public class VPX_AppMode extends JFrame {
 
 			cmbNWIface.setSelectedIndex(0);
 		}
+
+		txtPeriodicity.setText(String.format("%2d", VPXUtilities.getCurrentPeriodicity()));
 	}
 
 	private void loadCenterComponents() {
@@ -784,6 +788,8 @@ public class VPX_AppMode extends JFrame {
 								txtSubnet.getText(), txtGateway.getText());
 
 					}
+
+					VPXUtilities.setCurrentPeriodicity(Integer.valueOf(txtPeriodicity.getText().trim()));
 
 					VPXUtilities.setCurrentIP(txtIPAddress.getText());
 

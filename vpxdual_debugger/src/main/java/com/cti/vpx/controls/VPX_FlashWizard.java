@@ -174,6 +174,8 @@ public class VPX_FlashWizard extends JDialog {
 
 	private void init() {
 
+		setTitle("Flash Wizard");
+
 		setSize(800, 600);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -1634,7 +1636,7 @@ public class VPX_FlashWizard extends JDialog {
 
 			try {
 
-				Desktop.getDesktop().open(new File(path.substring(0, path.lastIndexOf("\\"))));
+				Desktop.getDesktop().open(new File(path));
 
 			} catch (IOException e) {
 

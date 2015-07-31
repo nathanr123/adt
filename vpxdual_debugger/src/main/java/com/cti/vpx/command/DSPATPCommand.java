@@ -18,7 +18,7 @@ public class DSPATPCommand extends ATPCommand {
 
 	@Override
 	public ByteOrder byteOrder() {
-		return ByteOrder.LITTLE_ENDIAN;
+		return  ATP.BYTEORDER_DSP;
 	}
 
 }

@@ -44,6 +44,7 @@ import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
+import com.cti.vpx.controls.VPX_ChangePeriodicity;
 import com.cti.vpx.controls.VPX_ConsolePanel;
 import com.cti.vpx.controls.VPX_DetailPanel;
 import com.cti.vpx.controls.VPX_EthernetFlashPanel;
@@ -136,6 +137,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	// Tools Menu Items
 	private JMenuItem vpx_Menu_Tools_ChangePWD;
+
+	private JMenuItem vpx_Menu_Tools_ChangePeriod;
 
 	private JMenuItem vpx_Menu_Tools_Prefrences;
 
@@ -646,6 +649,18 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 			}
 		});
 
+		vpx_Menu_Tools_ChangePeriod = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Periodicity"),
+				VPXUtilities.getEmptyIcon(14, 14));
+
+		vpx_Menu_Tools_ChangePeriod.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showChangePeriodicity();
+
+			}
+		});
 		vpx_Menu_Tools_Prefrences = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Preferences"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
@@ -769,6 +784,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 		// Tool Menu Items
 		vpx_Menu_Tool.add(vpx_Menu_Tools_ChangePWD);
+
+		vpx_Menu_Tool.add(vpx_Menu_Tools_ChangePeriod);
 
 		vpx_Menu_Tool.add(ComponentFactory.createJSeparator());
 
@@ -1471,6 +1488,14 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	}
 
+	public void showChangePeriodicity() {
+
+		updateLog("Showing change periodicity");
+
+		new VPX_ChangePeriodicity(VPX_ETHWindow.this).setVisible(true);
+
+	}
+
 	public void showPrefrences() {
 
 		updateLog("Showing Preference window");
@@ -1655,6 +1680,13 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	public void updateProcessorStatus(String ip, String msg) {
 
 		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
+
+	}
+
+	@Override
+	public void updatePeriodicity(String ip, int periodicity) {
+	
+		udpMonitor.setPeriodicity(ip, periodicity);
 
 	}
 }

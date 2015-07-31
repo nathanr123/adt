@@ -1,8 +1,5 @@
 package com.cti.vpx.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlTransient;
 
 public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {

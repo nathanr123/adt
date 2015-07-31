@@ -234,7 +234,7 @@ public class VPX_DetailPanel extends JDialog {
 
 		long dif = (cur - time) / 1000;
 
-		if (dif > VPXConstants.MAXRESPONSETIMEOUT) {
+		if (dif > (VPXUtilities.getCurrentPeriodicity() + VPXConstants.MAXRESPONSETIMEOUT)) {
 
 			return "Not Alive";
 		} else {

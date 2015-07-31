@@ -18,7 +18,7 @@ public class P2020ATPCommand extends ATPCommand {
 
 	@Override
 	public ByteOrder byteOrder() {
-		return ByteOrder.BIG_ENDIAN;
+		return ATP.BYTEORDER_P2020;
 	}
 
 }
