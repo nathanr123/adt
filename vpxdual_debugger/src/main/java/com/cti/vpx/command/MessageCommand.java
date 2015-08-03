@@ -7,50 +7,50 @@ import javolution.io.Struct;
 
 public class MessageCommand extends Struct implements ATP, Serializable {
 
-    /**
+	/**
      * 
      */
 
-    private static final long serialVersionUID = -3422816712139640712L;
+	private static final long serialVersionUID = -3422816712139640712L;
 
-    public final Enum32<MESSAGE_MODE> mode = new Enum32<MESSAGE_MODE>(MESSAGE_MODE.values());
+	public final Enum32<MESSAGE_MODE> mode = new Enum32<MESSAGE_MODE>(MESSAGE_MODE.values());
 
-    public final Unsigned32 core = new Unsigned32();
+	public final Unsigned32 core = new Unsigned32();
 
-    public final UTF8String command_msg = new UTF8String(128);
+	public final UTF8String command_msg = new UTF8String(128);
 
-    public MessageCommand() {
+	public MessageCommand() {
 
-    }
+	}
 
-    /**
-     * @return the mode
-     */
-    public Enum32<MESSAGE_MODE> getMode() {
-	return mode;
-    }
+	/**
+	 * @return the mode
+	 */
+	public Enum32<MESSAGE_MODE> getMode() {
+		return mode;
+	}
 
-    /**
-     * @return the core
-     */
-    public Unsigned32 getCore() {
-	return core;
-    }
+	/**
+	 * @return the core
+	 */
+	public Unsigned32 getCore() {
+		return core;
+	}
 
-    /**
-     * @return the command_msg
-     */
-    public UTF8String getCommand_msg() {
-	return command_msg;
-    }
+	/**
+	 * @return the command_msg
+	 */
+	public UTF8String getCommand_msg() {
+		return command_msg;
+	}
 
-    @Override
-    public ByteOrder byteOrder() {
-	return ByteOrder.nativeOrder();
-    }
+	@Override
+	public ByteOrder byteOrder() {
+		return ByteOrder.nativeOrder();
+	}
 
-    @Override
-    public boolean isPacked() {
-	return true;
-    }
+	@Override
+	public boolean isPacked() {
+		return true;
+	}
 }

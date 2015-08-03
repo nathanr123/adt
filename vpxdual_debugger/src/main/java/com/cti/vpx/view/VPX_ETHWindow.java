@@ -1685,8 +1685,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	@Override
 	public void updatePeriodicity(String ip, int periodicity) {
-	
-		udpMonitor.setPeriodicity(ip, periodicity);
+
+		udpMonitor.setPeriodicity(ip, VPXUtilities.getProcessorType(ip), periodicity);
 
 	}
 }

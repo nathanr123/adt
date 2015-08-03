@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -59,6 +62,7 @@ import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.controls.VPX_EmptyIcon;
 import com.cti.vpx.model.NWInterface;
+import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -93,6 +97,8 @@ public class VPXUtilities {
 	private static String currentSystemIP;
 
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
+
+	private static InterfaceAddress currentInterfaceAddress;
 
 	public static ResourceBundle getResourceBundle() {
 
@@ -290,17 +296,26 @@ public class VPXUtilities {
 	}
 
 	public static void showPopup(String msg) {
+
 		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE,
 				JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
 
 		final JDialog dialog = new JDialog();
+
 		dialog.setTitle("Message");
+
 		dialog.setModal(true);
+
 		dialog.setUndecorated(true);
+
 		dialog.setContentPane(optionPane);
+
 		optionPane.setBorder(new LineBorder(Color.GRAY));
+
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
 		dialog.setAlwaysOnTop(true);
+
 		dialog.setSize(new Dimension(450, 100));
 
 		// create timer to dispose of dialog after 5 seconds
@@ -322,11 +337,15 @@ public class VPXUtilities {
 		timer.start();
 
 		Dimension windowSize = dialog.getSize();
+
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
 		Point centerPoint = ge.getCenterPoint();
 
 		int dx = centerPoint.x - windowSize.width / 2;
+
 		int dy = centerPoint.y - windowSize.height / 2;
+
 		dialog.setLocation(dx, dy);
 
 		dialog.setVisible(true);
@@ -397,7 +416,61 @@ public class VPXUtilities {
 		return sub;
 	}
 
-	public static PROCESSOR_LIST getProcessor(Enum32<PROCESSOR_TYPE> pType) {
+	public static PROCESSOR_LIST getProcessorType(String ip) {
+
+		PROCESSOR_LIST proc = PROCESSOR_LIST.PROCESSOR_P2020;
+
+		VPXSystem syst = getVPXSystem();
+
+		List<VPXSubSystem> subsys = syst.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = subsys.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			if (vpxSubSystem.getIpP2020().equals(ip)) {
+
+				proc = PROCESSOR_LIST.PROCESSOR_P2020;
+
+			} else if (vpxSubSystem.getIpDSP1().equals(ip)) {
+
+				proc = PROCESSOR_LIST.PROCESSOR_DSP1;
+
+			} else if (vpxSubSystem.getIpDSP2().equals(ip)) {
+
+				proc = PROCESSOR_LIST.PROCESSOR_DSP2;
+			}
+		}
+
+		List<Processor> unlisted = syst.getUnListed();
+
+		for (Iterator<Processor> iterator = unlisted.iterator(); iterator.hasNext();) {
+
+			Processor processor = iterator.next();
+
+			if (processor.getiP_Addresses().equals(ip)) {
+
+				if (processor.getName().contains("P2020")) {
+
+					proc = PROCESSOR_LIST.PROCESSOR_P2020;
+
+				} else if (processor.getName().contains("DSP1")) {
+
+					proc = PROCESSOR_LIST.PROCESSOR_DSP1;
+
+				} else if (processor.getName().contains("DSP2")) {
+
+					proc = PROCESSOR_LIST.PROCESSOR_DSP2;
+				}
+
+			}
+		}
+
+		return proc;
+
+	}
+
+	public static PROCESSOR_LIST getProcessorType(Enum32<PROCESSOR_TYPE> pType) {
 
 		if (pType.toString().equals(PROCESSOR_LIST.PROCESSOR_P2020.toString())) {
 
@@ -1070,6 +1143,46 @@ public class VPXUtilities {
 
 		return nwIfaces;
 	}
+
+	public static void setCurrentNWIface(String ip) {
+
+		try {
+
+			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+
+			while (e.hasMoreElements()) {
+
+				NetworkInterface currentNetwordInterface = e.nextElement();
+
+				if (currentNetwordInterface.isLoopback() || !currentNetwordInterface.isUp())
+					continue;
+
+				List<InterfaceAddress> ls = currentNetwordInterface.getInterfaceAddresses();
+
+				for (Iterator<InterfaceAddress> iterator = ls.iterator(); iterator.hasNext();) {
+
+					InterfaceAddress interfaceAddress = iterator.next();
+
+					if (interfaceAddress.getAddress().getHostAddress().equals(ip)) {
+
+						currentInterfaceAddress = interfaceAddress;
+
+						break;
+					}
+
+				}
+			}
+		} catch (Exception e) {
+		}
+	}
+
+	public static InterfaceAddress getCurrentInterfaceAddress() {
+
+		return currentInterfaceAddress;
+
+	}
+	
+	
 
 	public static boolean setEthernetPort(String lan, String ip, String subnet, String gateway) {
 

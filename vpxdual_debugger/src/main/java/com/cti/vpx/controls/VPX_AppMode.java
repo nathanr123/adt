@@ -654,7 +654,7 @@ public class VPX_AppMode extends JFrame {
 			if (iterator.next().getName().equals(name)) {
 
 				nw = VPXUtilities.getEthernetPort(name);
-
+				
 				txtIPAddress.setText(nw.getIpAddresses().get(0));
 
 				txtSubnet.setText(nw.getSubnet());
@@ -724,9 +724,13 @@ public class VPX_AppMode extends JFrame {
 		chkLog.setSelected(isLogEnabled);
 
 		if (isLogEnabled) {
+			
 			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
+			
 		} else {
+			
 			txtLogFileName.setEnabled(false);
+			
 			btnBrowse.setEnabled(false);
 		}
 

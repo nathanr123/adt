@@ -16,6 +16,8 @@ public interface ATP {
 
 	public static final int MSG_TYPE_MEMORY = 0xC2;
 
+	public static final int MSG_TYPE_CLOSE = 0xC3;
+
 	// Result
 	public static final int TEST_RESULT_PASS = 0x01;
 
@@ -35,7 +37,6 @@ public interface ATP {
 		MSG_MODE_CONSOLE, MSG_MODE_MESSAGE
 	};
 
-	
 	// Endianess ByteOrder
 	public static final ByteOrder BYTEORDER_P2020 = ByteOrder.BIG_ENDIAN;
 
