@@ -484,21 +484,21 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				String str = txt_Msg_Send.getText();
 
-				if (str.length() > 0 && str.length() <= 16) {
+				if (str.length() > 0 && str.length() <= 48) {
 
 					String[] s = str.split(" ");
 
-					if (s.length != 5) {
+					if (s.length <= 5) {
+						parent.sendMessage(VPXUtilities.getCurrentProcessor(), cmbCores.getSelectedIndex(),
+								txt_Msg_Send.getText());
 
-						JOptionPane.showMessageDialog(parent, "Arguments are missing", "Message",
+						updateUserMessage(txt_Msg_Send.getText());
+						
+					} else {
+						JOptionPane.showMessageDialog(parent, "invalid Arguments", "Message",
 								JOptionPane.ERROR_MESSAGE);
 
 						txt_Msg_Send.requestFocus();
-
-					} else {
-						parent.sendMessage(VPXUtilities.getCurrentProcessor(),cmbCores.getSelectedIndex(), txt_Msg_Send.getText());
-
-						updateUserMessage(txt_Msg_Send.getText());
 					}
 
 				} else {

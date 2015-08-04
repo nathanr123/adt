@@ -3,7 +3,6 @@ package com.cti.vpx.util;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -15,18 +14,17 @@ import com.cti.vpx.Listener.CommunicationListener;
 import com.cti.vpx.Listener.MessageListener;
 import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP;
-import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
+import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.DSPMessageCommand;
 import com.cti.vpx.command.MessageCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.command.P2020MessageCommand;
-import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPXUDPMonitor {
@@ -35,25 +33,32 @@ public class VPXUDPMonitor {
 
 	private static SubnetFilter subnet = null;
 
-	private VPXCommunicationMonitor communicationMonitor = new VPXCommunicationMonitor();
+	private VPXCommunicationMonitor communicationMonitor;
 
-	private VPXMessageMonitor messageMonitor = new VPXMessageMonitor();
-
-	private VPXAdvertisementMonitor advertisementMonitor = new VPXAdvertisementMonitor();
+	private VPXAdvertisementMonitor advertisementMonitor;
 
 	private boolean isipinRange = true;
 
-	public VPXUDPMonitor() {
-
+	public VPXUDPMonitor() throws Exception {
+		
+		createDefaultMonitors();
 	}
 
-	public VPXUDPMonitor(UDPListener parent) {
+	public VPXUDPMonitor(UDPListener parent) throws Exception {
 
 		listener = parent;
 
+		createDefaultMonitors();
+
 	}
 
-	public void startMonitor() {
+	private void createDefaultMonitors() throws Exception {
+		communicationMonitor = new VPXCommunicationMonitor();
+
+		advertisementMonitor = new VPXAdvertisementMonitor();
+	}
+
+	public void startMonitor() throws Exception {
 
 		if (listener != null) {
 
@@ -80,22 +85,23 @@ public class VPXUDPMonitor {
 		subnet = null;
 	}
 
-	private void start() {
+	private void start() throws Exception {
 
 		advertisementMonitor.startMonitor();
 
 		communicationMonitor.startMonitor();
 
-		messageMonitor.startMonitor();
+		Thread th = new Thread(new MThreadMonitor());
+
+		th.start();
 	}
 
 	private void stop() {
 
 		advertisementMonitor.stopMonitor();
 
-		communicationMonitor.stoponitor();
+		communicationMonitor.stopMonitor();
 
-		messageMonitor.stopMonitor();
 	}
 
 	public void setPeriodicityByUnicast(int period) {
@@ -250,7 +256,9 @@ public class VPXUDPMonitor {
 
 			datagramSocket = new DatagramSocket();
 
-			PROCESSOR_LIST procesor = VPXUtilities.getProcessorType(ip);
+			PROCESSOR_LIST procesor = getProcType(ip);// VPXUtilities.getProcessorType(ip);
+
+			String recvip = getProcIP(ip);
 
 			msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
@@ -268,7 +276,7 @@ public class VPXUDPMonitor {
 
 			msg.params.periodicity.set(period);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(recvip),
 					UDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
@@ -278,6 +286,31 @@ public class VPXUDPMonitor {
 			e.printStackTrace();
 		}
 
+	}
+
+	private PROCESSOR_LIST getProcType(String ip) {
+
+		PROCESSOR_LIST proc = PROCESSOR_LIST.PROCESSOR_P2020;
+
+		if (ip.contains("P2020")) {
+
+			proc = PROCESSOR_LIST.PROCESSOR_P2020;
+
+		} else if (ip.contains("DSP1")) {
+
+			proc = PROCESSOR_LIST.PROCESSOR_DSP1;
+
+		} else if (ip.contains("DSP2")) {
+
+			proc = PROCESSOR_LIST.PROCESSOR_DSP2;
+		}
+
+		return proc;
+	}
+
+	private String getProcIP(String ip) {
+
+		return ip.trim().substring(ip.indexOf(")") + 1);
 	}
 
 	public void sendMessageToProcessor(String ip, int core, String message) {
@@ -293,8 +326,9 @@ public class VPXUDPMonitor {
 		try {
 			datagramSocket = new DatagramSocket();
 
-			msg = (VPXUtilities.getProcessorType(ip) == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020MessageCommand()
-					: new DSPMessageCommand();
+			PROCESSOR_LIST processor = VPXUtilities.getProcessorType(ip);
+
+			msg = (processor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020MessageCommand() : new DSPMessageCommand();
 
 			buffer = new byte[msg.size()];
 
@@ -353,7 +387,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void close(String ip) {
+	public void close() {
 
 		DatagramSocket datagramSocket;
 
@@ -374,7 +408,7 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(ATP.MSG_TYPE_CLOSE);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("0.0.0.0"),
 					UDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
@@ -394,86 +428,72 @@ public class VPXUDPMonitor {
 
 	}
 
-	class VPXMessageMonitor extends SwingWorker<Void, Void> {
+	class MThreadMonitor implements Runnable {
 
 		DatagramSocket messageReceiverSocket;
 
-		MessageCommand msg = null;
+		MessageCommand msgCommand = new MessageCommand();
 
-		byte[] messageData = null;
+		byte[] messageData = new byte[msgCommand.size()];
 
 		DatagramPacket messagePacket = new DatagramPacket(messageData, messageData.length);
 
-		public VPXMessageMonitor() {
-			try {
-				messageReceiverSocket = new DatagramSocket(UDPListener.CONSOLE_MSG_PORTNO);
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
+		public MThreadMonitor() throws Exception {
+
+			messageReceiverSocket = new DatagramSocket(UDPListener.CONSOLE_MSG_PORTNO);
+
 		}
 
 		@Override
-		protected Void doInBackground() throws Exception {
+		public void run() {
+
+			ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
+
 			while (true) {
+				try {
 
-				messageReceiverSocket.receive(messagePacket);
+					messageReceiverSocket.receive(messagePacket);
 
-				if (VPXUtilities.getProcessorType(messagePacket.getAddress().getHostAddress()) == PROCESSOR_LIST.PROCESSOR_P2020) {
+					if (VPXUtilities.getProcessorType(messagePacket.getAddress().getHostAddress()) == PROCESSOR_LIST.PROCESSOR_P2020) {
 
-					msg = new P2020MessageCommand();
-				} else {
-					msg = new DSPMessageCommand();
+						msgCommand = new P2020MessageCommand();
+
+					} else {
+
+						msgCommand = new DSPMessageCommand();
+					}
+
+					bf.clear();
+
+					bf.put(messageData);
+
+					bf.flip();
+
+					msgCommand.getByteBuffer().clear();
+
+					msgCommand.getByteBuffer().put(bf);
+
+					if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_CONSOLE) {
+
+						((MessageListener) listener).printConsoleMessage(messagePacket.getAddress().getHostAddress(),
+								msgCommand);
+
+					} else if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_MESSAGE) {
+
+						((MessageListener) listener).updateMessage(messagePacket.getAddress().getHostAddress(),
+								msgCommand);
+
+					}
+
+					Thread.sleep(500);
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-
-				messageData = new byte[msg.size()];
-
-				ByteBuffer bf = ByteBuffer.allocate(msg.size());
-
-				bf.clear();
-
-				bf.put(messageData);
-
-				bf.flip();
-
-				msg.getByteBuffer().clear();
-
-				msg.getByteBuffer().put(bf);
-
-				if (msg.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_CONSOLE) {
-
-					((MessageListener) listener).printConsoleMessage(messagePacket.getAddress().getHostAddress(), msg);
-
-				} else if (msg.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_MESSAGE) {
-
-					((MessageListener) listener).updateMessage(messagePacket.getAddress().getHostAddress(), msg);
-
-				}
-
-				/*
-				 * String sentence = new String(messagePacket.getData(), 0,
-				 * messagePacket.getLength());
-				 * 
-				 * if (sentence.startsWith("M:")) { ((MessageListener)
-				 * listener).
-				 * updateMessage(messagePacket.getAddress().getHostAddress(),
-				 * sentence.substring(2, sentence.length()));
-				 * 
-				 * } else if (sentence.startsWith("C:")) { ((MessageListener)
-				 * listener
-				 * ).printConsoleMessage(messagePacket.getAddress().getHostAddress
-				 * (), sentence.substring(2, sentence.length())); }
-				 */
-				Thread.sleep(500);
 			}
+
 		}
 
-		public void startMonitor() {
-			execute();
-		}
-
-		public void stopMonitor() {
-			cancel(true);
-		}
 	}
 
 	class VPXCommunicationMonitor extends SwingWorker<Void, Void> {
@@ -484,13 +504,9 @@ public class VPXUDPMonitor {
 
 		DatagramPacket commandPacket = new DatagramPacket(commandData, commandData.length);
 
-		public VPXCommunicationMonitor() {
-			try {
-				communicationSocket = new DatagramSocket(UDPListener.COMM_PORTNO);
+		public VPXCommunicationMonitor() throws Exception {
 
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
+			communicationSocket = new DatagramSocket(UDPListener.COMM_PORTNO);
 		}
 
 		@Override
@@ -517,7 +533,7 @@ public class VPXUDPMonitor {
 			execute();
 		}
 
-		public void stoponitor() {
+		public void stopMonitor() {
 			cancel(true);
 		}
 
@@ -531,15 +547,9 @@ public class VPXUDPMonitor {
 
 		DatagramPacket advertisementPacket = new DatagramPacket(advertisementData, advertisementData.length);
 
-		public VPXAdvertisementMonitor() {
+		public VPXAdvertisementMonitor() throws Exception {
 
-			try {
-
-				advertisementSocket = new DatagramSocket(UDPListener.ADV_PORTNO);
-
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
+			advertisementSocket = new DatagramSocket(UDPListener.ADV_PORTNO);
 		}
 
 		@Override
@@ -560,13 +570,11 @@ public class VPXUDPMonitor {
 
 					String sentence = new String(advertisementPacket.getData(), 0, advertisementPacket.getLength());
 
-					System.out.println(sentence);
-
 					((AdvertisementListener) listener).updateProcessorStatus(advertisementPacket.getAddress()
 							.getHostAddress(), sentence);
 				}
 
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			}
 		}
 

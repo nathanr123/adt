@@ -308,7 +308,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			if (node.isLeaf()) {
 
-				if (node.getUserObject().toString().contains(ip)) {
+				if (node.getUserObject().toString().contains(ip + "</")) {
 
 					parseResponse(node, res);
 
@@ -322,21 +322,16 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (!isNotFound) {
 
-			system.addInUnListed(ip, System.currentTimeMillis(), res);
+			Processor p = new Processor(ip, System.currentTimeMillis(), res);
 
+			system.addInUnListed(p);
+
+			
+			parent.updatePeriodicity(p.getName(), VPXUtilities.getCurrentPeriodicity());
+			
 			VPXUtilities.setVPXSystem(system);
 
 			loadSystemRootNode();
-			/*
-			 * systemRootNode.add(getProcessorNode(ip, res));
-			 * 
-			 * ((DefaultTreeModel) getModel()).reload();
-			 * 
-			 * for (int i = 0; i < getRowCount(); i++) {
-			 * 
-			 * expandRow(i); }
-			 */
-			// System.out.println(system.getUnListed().size());
 
 			parent.reloadVPXSystem();
 		}
@@ -528,11 +523,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		String sub = "<html>";
 
 		if (isAlive) {
-			
+
 			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
 
 		} else {
-			
+
 			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + name + "</font>" + "&nbsp;&nbsp;";
 		}
 
@@ -705,7 +700,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			VPX_ScanWindow ir = new VPX_ScanWindow(parent);
+			VPX_ScanWindow ir = new VPX_ScanWindow();
 
 			ir.setVisible(true);
 

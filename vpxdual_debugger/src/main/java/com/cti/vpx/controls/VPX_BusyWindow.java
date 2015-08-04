@@ -91,22 +91,23 @@ public class VPX_BusyWindow extends JDialog {
 		contentPanel.setLayout(new MigLayout("", "[523.00px]", "[14px][][][][][]"));
 
 		lbl_Detecting_Processor = ComponentFactory.createJLabel("Detecting Processors");
+		lbl_Detecting_Processor.setText("Flashing File");
 
 		contentPanel.add(lbl_Detecting_Processor, "cell 0 0 1 2");
-
-		lbl_Current_Scanning_IP = ComponentFactory.createJLabel("");
-
-		lbl_Current_Scanning_IP.setText(msg);
-
-		contentPanel.add(lbl_Current_Scanning_IP, "cell 0 4,alignx left,aligny top");
-
-		progressBar = new JProgressBar();
-
-		progressBar.setIndeterminate(true);
-
-		progressBar.setStringPainted(false);
-
-		contentPanel.add(progressBar, "cell 0 5,growx");
+		
+				lbl_Current_Scanning_IP = ComponentFactory.createJLabel("");
+				
+						lbl_Current_Scanning_IP.setText(msg);
+						
+								contentPanel.add(lbl_Current_Scanning_IP, "cell 0 2,alignx left,aligny top");
+		
+				progressBar = new JProgressBar();
+				
+						progressBar.setIndeterminate(true);
+						
+								progressBar.setStringPainted(false);
+								
+										contentPanel.add(progressBar, "cell 0 3,growx");
 
 		JPanel buttonPane = ComponentFactory.createJPanel();
 

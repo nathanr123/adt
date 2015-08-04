@@ -171,7 +171,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	private VPX_MessagePanel messagePanel;
 
-	private VPXUDPMonitor udpMonitor = new VPXUDPMonitor();
+	private VPXUDPMonitor udpMonitor;
 
 	public VPX_MemoryBrowser vpxMemoryBrowser = null;
 
@@ -192,7 +192,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	/**
 	 * Create the frame.
 	 */
-	public VPX_ETHWindow() {
+	public VPX_ETHWindow() throws Exception {
 
 		VPXUtilities.setParent(this);
 
@@ -203,6 +203,10 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 		promptAliasConfigFileName();
 
 		subnetFilter = new VPX_SubnetFilterWindow(VPX_ETHWindow.this);
+
+		udpMonitor = new VPXUDPMonitor();
+
+		udpMonitor.addUDPListener(this);
 
 		udpMonitor.startMonitor();
 
@@ -223,8 +227,6 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
 
 		setVisible(true);
-
-		udpMonitor.addUDPListener(this);
 
 		toFront();
 	}
@@ -1305,9 +1307,22 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	public void exitApplication() {
 
-		VPX_ETHWindow.this.dispose();
+		String ObjButtons[] = { "Yes", "No" };
 
-		System.exit(0);
+		int PromptResult = JOptionPane.showOptionDialog(null, "Are you sure you want to exit?",
+				rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version"),
+				JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
+
+		if (PromptResult == 0) {
+
+			udpMonitor.stopMonitor();
+
+			udpMonitor.close();
+
+			VPX_ETHWindow.this.dispose();
+
+			System.exit(0);
+		}
 
 	}
 
@@ -1439,7 +1454,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 			frame.setBounds(100, 100, 1400, 700);
 
-			frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
 			frame.setContentPane(contentPane);
 
@@ -1536,7 +1551,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		udpMonitor.stopMonitor();
+
+		exitApplication();
+
 	}
 
 	@Override
@@ -1573,7 +1590,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	@Override
 	public void updateMessage(String ip, MessageCommand command) {
-		// TODO Auto-generated method stub
+		messagePanel.updateProcessorMessage(ip, command);
 
 	}
 

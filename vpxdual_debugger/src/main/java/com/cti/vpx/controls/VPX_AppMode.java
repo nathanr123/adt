@@ -589,7 +589,7 @@ public class VPX_AppMode extends JFrame {
 		spinPeriodicity = new JSpinner(periodicitySpinnerModel);
 
 		JFormattedTextField txt = ((JSpinner.NumberEditor) spinPeriodicity.getEditor()).getTextField();
-		
+
 		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 
 		spinPeriodicity.setBounds(148, 163, 77, 22);
@@ -807,7 +807,15 @@ public class VPX_AppMode extends JFrame {
 
 					VPXUtilities.setCurrentIP(txtIPAddress.getText());
 
-					VPX_ETHWindow window = new VPX_ETHWindow();
+					try {
+						VPX_ETHWindow window = new VPX_ETHWindow();
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null,
+								"Another instance is running or the ports are bind by another application.",
+								"Opening Application", JOptionPane.ERROR_MESSAGE);
+						
+						System.exit(0);
+					}
 
 				} else {
 

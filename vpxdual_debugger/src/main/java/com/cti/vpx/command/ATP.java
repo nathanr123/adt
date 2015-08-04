@@ -16,7 +16,11 @@ public interface ATP {
 
 	public static final int MSG_TYPE_MEMORY = 0xC2;
 
-	public static final int MSG_TYPE_CLOSE = 0xC3;
+	public static final int MSG_TYPE_FLASH = 0xC3;
+
+	public static final int MSG_TYPE_FLASH_ACK = 0xC4;
+
+	public static final int MSG_TYPE_CLOSE = 0xC5;
 
 	// Result
 	public static final int TEST_RESULT_PASS = 0x01;

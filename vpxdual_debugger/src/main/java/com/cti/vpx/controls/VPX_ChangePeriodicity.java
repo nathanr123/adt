@@ -10,14 +10,18 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.NumberFormatter;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_ChangePeriodicity extends JDialog {
@@ -29,9 +33,11 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 
-	private JTextField txtPeriodicity;
+	private JSpinner spinPeriodicity;
 
 	private VPX_ETHWindow parent;
+
+	private SpinnerNumberModel periodicitySpinnerModel;
 
 	/**
 	 * Create the dialog.
@@ -48,6 +54,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 		centerFrame();
 
+		periodicitySpinnerModel.setValue(VPXUtilities.getCurrentPeriodicity());
 	}
 
 	private void init() {
@@ -63,10 +70,6 @@ public class VPX_ChangePeriodicity extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 	}
 
-	public void resetPassword() {
-		txtPeriodicity.setText("");
-	}
-
 	private void loadComponents() {
 
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -79,9 +82,15 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 		contentPanel.add(lblPeriodicity, "cell 0 1,alignx trailing");
 
-		txtPeriodicity = new JTextField();
+		periodicitySpinnerModel = new SpinnerNumberModel(3, 3, 60, 1);
 
-		contentPanel.add(txtPeriodicity, "cell 2 1,growx");
+		spinPeriodicity = new JSpinner(periodicitySpinnerModel);
+
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinPeriodicity.getEditor()).getTextField();
+
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
+		contentPanel.add(spinPeriodicity, "cell 2 1,growx");
 
 		JPanel buttonPane = new JPanel();
 
@@ -102,7 +111,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 					@Override
 					public void run() {
-						parent.updatePeriodicity(Integer.valueOf(txtPeriodicity.getText().trim()));
+						parent.updatePeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
 						parent.updateLog("Periodicity updated successfully");
 
@@ -131,18 +140,12 @@ public class VPX_ChangePeriodicity extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				txtPeriodicity.setText("");
-
 				VPX_ChangePeriodicity.this.dispose();
 
 			}
 		});
 
 		buttonPane.add(btnCancel);
-	}
-
-	public String getPasword() {
-		return new String(this.txtPeriodicity.getText());
 	}
 
 	private void centerFrame() {

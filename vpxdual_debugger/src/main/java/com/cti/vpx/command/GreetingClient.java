@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -18,6 +21,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import org.apache.commons.io.FileUtils;
 
 import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
@@ -37,6 +42,7 @@ public class GreetingClient {
 	}
 
 	private JTextArea jt;
+	private byte[] filestoSend;
 
 	public GreetingClient() {
 
@@ -94,6 +100,21 @@ public class GreetingClient {
 
 		jp.add(jb1);
 
+		JButton jb2 = new JButton("Send File");
+
+		jb2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// sendCMD();
+
+				sendFile();
+
+			}
+		});
+
+		jp.add(jb2);
+
 		f.getContentPane().setLayout(new BorderLayout());
 
 		f.getContentPane().add(new JScrollPane(jt));
@@ -142,6 +163,69 @@ public class GreetingClient {
 
 			}
 
+		}
+
+	}
+
+	public void sendFile() {
+
+		try {
+
+			File f = new File("G:\\1.flv");
+
+			long size = FileUtils.sizeOf(f) / (1024 * 1024);
+
+			filestoSend = FileUtils.readFileToByteArray(f);
+
+			byte b[] = new byte[1024];
+
+			System.arraycopy(filestoSend, 0, b, 0, 1024);
+
+			sendFileToProcessor("172.17.10.130", b);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendFileToProcessor(String ip, byte[] sendBuffer) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			datagramSocket.setBroadcast(true);
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_FLASH);
+
+			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+
+			for (int i = 0; i < sendBuffer.length; i++) {
+
+				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
+			}
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					UDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
 		}
 
 	}
@@ -302,7 +386,7 @@ public class GreetingClient {
 		try {
 			datagramSocket = new DatagramSocket();
 
-			MessageCommand msg = new P2020MessageCommand();
+			DSPMessageCommand msg = new DSPMessageCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
@@ -315,10 +399,10 @@ public class GreetingClient {
 
 			msg.core.set(0);
 
-			// msg.command_msg.set("memget 0xa0000000");
-			msg.command_msg.set("temp1");
+			msg.command_msg.set("memget 0xa0000000");
+			// msg.command_msg.set("temp1");
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.1"),
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
 					UDPListener.CONSOLE_MSG_PORTNO);
 
 			datagramSocket.send(packet);
@@ -335,7 +419,7 @@ public class GreetingClient {
 	class MThreadMonitor implements Runnable {
 		DatagramSocket messageReceiverSocket;
 
-		MessageCommand msgCommand = new P2020MessageCommand();
+		MessageCommand msgCommand = new DSPMessageCommand();
 
 		byte[] messageData = new byte[msgCommand.size()];
 

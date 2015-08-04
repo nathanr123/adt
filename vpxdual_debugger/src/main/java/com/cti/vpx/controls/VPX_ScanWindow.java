@@ -47,16 +47,10 @@ public class VPX_ScanWindow extends JDialog {
 
 	private JTextField txt_To_IP;
 
-	private VPX_ETHWindow parent;
-
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_ScanWindow(VPX_ETHWindow parent) {
-
-		super(parent);
-
-		this.parent = parent;
+	public VPX_ScanWindow() {
 
 		init();
 
@@ -165,8 +159,6 @@ public class VPX_ScanWindow extends JDialog {
 
 			VPX_ScanWindow.this.setVisible(false);
 
-			parent.updateLog("Scanning Processors between " + txt_From_IP.getText() + " and " + txt_To_IP.getText());
-
 			new VPX_ScanStatusWindow(txt_From_IP.getText(), txt_To_IP.getText());
 
 		}
@@ -217,8 +209,6 @@ public class VPX_ScanWindow extends JDialog {
 		 */
 		public VPX_ScanStatusWindow(String from_ip, String to_ip) {
 
-			super(parent);
-
 			this.fromIP = from_ip;
 
 			this.toIP = to_ip;
@@ -253,24 +243,20 @@ public class VPX_ScanWindow extends JDialog {
 							try {
 								VPXSystem vpx = (VPXSystem) scan.get();
 
-								//parent.reloadProcessorTree(vpx);
-
-								parent.updateLog("Scanning Completed.");
+								// parent.reloadProcessorTree(vpx);
 
 								VPX_ScanStatusWindow.this.dispose();
-								
 
 							} catch (InterruptedException | ExecutionException e) {
 
 								e.printStackTrace();
 
-								parent.updateLog("Scanning Canceled.");
 							}
 
 							break;
 
 						case STARTED:
-							parent.updateLog("Scanning Started.");
+
 						case PENDING:
 
 							break;
@@ -394,8 +380,6 @@ public class VPX_ScanWindow extends JDialog {
 
 						parseCMD(ip, processorInfo);
 
-						parent.updateLog("IP : " + ip + " Type : "
-								+ processorInfo.params.proccesorInfo.processorTYPE.get());
 					}
 
 					long scanning_IPs_Completed_Percentage = (ii + 1) * 100 / size;
@@ -431,11 +415,16 @@ public class VPX_ScanWindow extends JDialog {
 
 			private void parseCMD(String ip, ATPCommand cmd) {
 
-				//vpxSystem.addProcessor(new Processor(ip, VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
+				// vpxSystem.addProcessor(new Processor(ip,
+				// VPXUtilities.getProcessor(cmd.params.proccesorInfo.processorTYPE)));
 
 			}
 
 		}
+	}
+	
+	public static void main(String[] args) {
+		new VPX_ScanWindow().setVisible(true);
 	}
 
 }

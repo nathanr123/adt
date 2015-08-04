@@ -68,4 +68,9 @@ public class VPXSystem implements VPX {
 
 		unListed.add(new Processor(ip, duration, msg));
 	}
+	
+	public void addInUnListed(Processor p) {
+
+		unListed.add(p);
+	}
 }
