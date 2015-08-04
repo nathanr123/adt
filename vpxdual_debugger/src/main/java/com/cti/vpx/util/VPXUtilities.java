@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -1181,8 +1180,6 @@ public class VPXUtilities {
 		return currentInterfaceAddress;
 
 	}
-	
-	
 
 	public static boolean setEthernetPort(String lan, String ip, String subnet, String gateway) {
 
@@ -1437,7 +1434,7 @@ public class VPXUtilities {
 
 	}
 
-	public static VPXSubSystem getSubSystem(String name) {
+	public static VPXSubSystem getSubSystemByName(String name) {
 
 		VPXSubSystem sub = null;
 
@@ -1459,6 +1456,96 @@ public class VPXUtilities {
 			}
 		}
 		return sub;
+
+	}
+
+	public static VPXSubSystem getSubSystemByIP(String ip) {
+
+		VPXSubSystem sub = null;
+
+		if (vpxSystem != null) {
+
+			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
+
+			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				if (vpxSubSystem.getIpP2020().equals(ip) || vpxSubSystem.getIpDSP1().equals(ip)
+						|| vpxSubSystem.getIpDSP2().equals(ip)) {
+
+					sub = vpxSubSystem;
+
+					break;
+				}
+
+			}
+		}
+		return sub;
+
+	}
+
+	public static long getRespondedTime(String ip) {
+
+		long time = 0;
+
+		boolean isNotfound = false;
+
+		if (vpxSystem != null) {
+
+			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
+
+			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				if (vpxSubSystem.getIpP2020().equals(ip)) {
+
+					time = vpxSubSystem.getP2020ResponseTime();
+
+					isNotfound = true;
+
+					break;
+
+				} else if (vpxSubSystem.getIpDSP1().equals(ip)) {
+
+					time = vpxSubSystem.getDsp1ResponseTime();
+
+					isNotfound = true;
+
+					break;
+
+				} else if (vpxSubSystem.getIpDSP2().equals(ip)) {
+
+					time = vpxSubSystem.getDsp2ResponseTime();
+
+					isNotfound = true;
+
+					break;
+				}
+
+			}
+
+			if (!isNotfound) {
+
+				List<Processor> procs = vpxSystem.getUnListed();
+
+				for (Iterator<Processor> iterator = procs.iterator(); iterator.hasNext();) {
+
+					Processor processor = iterator.next();
+
+					if (processor.getiP_Addresses().equals(ip)) {
+
+						time = processor.getResponseTime();
+
+						break;
+					}
+
+				}
+			}
+		}
+		
+		return time;
 
 	}
 

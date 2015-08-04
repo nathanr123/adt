@@ -11,8 +11,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -97,6 +97,21 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
+				Thread th = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						parent.updatePeriodicity(Integer.valueOf(txtPeriodicity.getText().trim()));
+
+						parent.updateLog("Periodicity updated successfully");
+
+						JOptionPane.showMessageDialog(parent, "Periodicity updated successfully");
+
+					}
+				});
+
+				th.start();
 
 				VPX_ChangePeriodicity.this.dispose();
 

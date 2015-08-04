@@ -175,6 +175,8 @@ public class VPX_FlashWizard extends JDialog {
 	private void init() {
 
 		setTitle("Flash Wizard");
+		
+		setResizable(false);
 
 		setSize(800, 600);
 

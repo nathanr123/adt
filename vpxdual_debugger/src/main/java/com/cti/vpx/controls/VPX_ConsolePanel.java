@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
+import com.cti.vpx.command.MessageCommand;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -388,6 +389,18 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	}
 
+	public void printConsoleMsg(MessageCommand msg) {
+
+		if (txtA_Console.getCaretPosition() > 0)
+
+			txtA_Console.append("\n");
+
+		txtA_Console.append(String.format("Core %d : %s", msg.core.get(), msg.command_msg));
+
+		txtA_Console.setCaretPosition(txtA_Console.getText().length());
+
+	}
+
 	public void printConsoleMsg(String ip, String msg) {
 
 		if (isFilterApply) {
@@ -398,7 +411,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 				if (cmbSubSystem.getSelectedIndex() > 0) {
 
-					VPXSubSystem sub = VPXUtilities.getSubSystem(cmbSubSystem.getSelectedItem().toString());
+					VPXSubSystem sub = VPXUtilities.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
 
 					ips.add(sub.getIpP2020());
 
@@ -427,6 +440,59 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 				} else {
 
 					if (msg.startsWith(String.valueOf((coreindex - 1)))) {
+
+						printConsoleMsg(msg);
+					}
+				}
+
+			}
+
+		} else {
+
+			printConsoleMsg(msg);
+
+		}
+	}
+
+	public void printConsoleMsg(String ip, MessageCommand msg) {
+
+		if (isFilterApply) {
+
+			if (ips.size() == 0) {
+
+				ips.clear();
+
+				if (cmbSubSystem.getSelectedIndex() > 0) {
+
+					VPXSubSystem sub = VPXUtilities.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
+
+					ips.add(sub.getIpP2020());
+
+					ips.add(sub.getIpDSP1());
+
+					ips.add(sub.getIpDSP2());
+				}
+
+				if (cmbProcessor.getSelectedIndex() > 0) {
+
+					ips.clear();
+
+					ips.add(cmbProcessor.getSelectedItem().toString());
+
+				}
+
+				coreindex = cmbCores.getSelectedIndex();
+			}
+
+			if (ips.contains(ip)) {
+
+				if (coreindex == 0) {
+
+					printConsoleMsg(msg);
+
+				} else {
+
+					if (msg.core.get() == (coreindex - 1)) {
 
 						printConsoleMsg(msg);
 					}
@@ -514,7 +580,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		public SaveAction(String name) {
 			putValue(Action.SHORT_DESCRIPTION, name);
-			putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_SAVE);
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_SAVE);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;

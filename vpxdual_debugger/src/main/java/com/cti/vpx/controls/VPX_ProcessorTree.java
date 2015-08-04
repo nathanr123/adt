@@ -498,7 +498,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			int periods = Integer.parseInt(msg.substring(4, 6));
 
-			if (periods != VPXUtilities.getCurrentPeriodicity()) {
+			if (periods != VPXUtilities.getCurrentPeriodicity() || (VPXUtilities.getRespondedTime(name) == 0)) {
 
 				parent.updatePeriodicity(name, VPXUtilities.getCurrentPeriodicity());
 			}
@@ -528,9 +528,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		String sub = "<html>";
 
 		if (isAlive) {
+			
 			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + name + "</font>" + "&nbsp;&nbsp;";
 
 		} else {
+			
 			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + name + "</font>" + "&nbsp;&nbsp;";
 		}
 

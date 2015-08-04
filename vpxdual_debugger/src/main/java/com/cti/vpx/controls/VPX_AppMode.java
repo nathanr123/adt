@@ -19,15 +19,19 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.NumberFormatter;
 
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.util.VPXConstants;
@@ -44,7 +48,7 @@ public class VPX_AppMode extends JFrame {
 
 	private static String UARTNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UART Mode will be switched into minimal functionalities and windows.</left></body></html>";
 
-	private static String ETHNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ethernet Mode will be switched into full functional windows.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User must program LAN Configuration</left></body></html>";
+	private static String ETHNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ethernet Mode will be switched into full functional windows.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User must program LAN Configuration<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Peridicity limit Min: 3 Secs Max: 60 Secs</left></body></html>";
 
 	private JPanel contentPane, basePane;
 
@@ -82,7 +86,7 @@ public class VPX_AppMode extends JFrame {
 
 	private JTextField txtGateway;
 
-	private JTextField txtPeriodicity;
+	private JSpinner spinPeriodicity;
 
 	private JButton btnBrowse;
 
@@ -91,6 +95,8 @@ public class VPX_AppMode extends JFrame {
 	private JCheckBox chkLog;
 
 	private NWInterface nw;
+
+	private SpinnerNumberModel periodicitySpinnerModel;
 
 	/**
 	 * Launch the application.
@@ -430,7 +436,7 @@ public class VPX_AppMode extends JFrame {
 			cmbNWIface.setSelectedIndex(0);
 		}
 
-		txtPeriodicity.setText(String.format("%2d", VPXUtilities.getCurrentPeriodicity()));
+		periodicitySpinnerModel.setValue(VPXUtilities.getCurrentPeriodicity());
 	}
 
 	private void loadCenterComponents() {
@@ -578,17 +584,21 @@ public class VPX_AppMode extends JFrame {
 
 		ethPanel.add(txtGateway);
 
-		txtPeriodicity = new JTextField();
+		periodicitySpinnerModel = new SpinnerNumberModel(3, 3, 60, 1);
 
-		txtPeriodicity.setColumns(10);
+		spinPeriodicity = new JSpinner(periodicitySpinnerModel);
 
-		txtPeriodicity.setBounds(148, 163, 77, 22);
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinPeriodicity.getEditor()).getTextField();
+		
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 
-		ethPanel.add(txtPeriodicity);
+		spinPeriodicity.setBounds(148, 163, 77, 22);
 
-		JLabel lblInMins = new JLabel("in Mins");
+		ethPanel.add(spinPeriodicity);
 
-		lblInMins.setBounds(234, 163, 64, 22);
+		JLabel lblInMins = new JLabel("in Secs (Min: 3, Max: 60)");
+
+		lblInMins.setBounds(234, 163, 150, 22);
 
 		ethPanel.add(lblInMins);
 
@@ -654,7 +664,7 @@ public class VPX_AppMode extends JFrame {
 			if (iterator.next().getName().equals(name)) {
 
 				nw = VPXUtilities.getEthernetPort(name);
-				
+
 				txtIPAddress.setText(nw.getIpAddresses().get(0));
 
 				txtSubnet.setText(nw.getSubnet());
@@ -703,7 +713,7 @@ public class VPX_AppMode extends JFrame {
 
 		txtGateway.setEnabled(val);
 
-		txtPeriodicity.setEnabled(val);
+		spinPeriodicity.setEnabled(val);
 
 		setLogProperties();
 
@@ -724,13 +734,13 @@ public class VPX_AppMode extends JFrame {
 		chkLog.setSelected(isLogEnabled);
 
 		if (isLogEnabled) {
-			
+
 			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
-			
+
 		} else {
-			
+
 			txtLogFileName.setEnabled(false);
-			
+
 			btnBrowse.setEnabled(false);
 		}
 
@@ -793,7 +803,7 @@ public class VPX_AppMode extends JFrame {
 
 					}
 
-					VPXUtilities.setCurrentPeriodicity(Integer.valueOf(txtPeriodicity.getText().trim()));
+					VPXUtilities.setCurrentPeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
 					VPXUtilities.setCurrentIP(txtIPAddress.getText());
 

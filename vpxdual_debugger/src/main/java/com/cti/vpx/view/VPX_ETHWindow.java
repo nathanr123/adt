@@ -1578,38 +1578,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	}
 
 	@Override
-	public void updateMessage(String ip, DSPMessageCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateMessage(String ip, P2020MessageCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendMessage(String ip, String msg) {
-
-		udpMonitor.sendMessageToProcessor(ip, msg);
-	}
-
-	@Override
-	public void sendMessage(String ip, MessageCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendMessage(String ip, DSPMessageCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendMessage(String ip, P2020MessageCommand command) {
-		// TODO Auto-generated method stub
+	public void sendMessage(String ip, int core, String msg) {
+		udpMonitor.sendMessageToProcessor(ip, core, msg);
 
 	}
 
@@ -1622,19 +1592,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 
 	@Override
 	public void printConsoleMessage(String ip, MessageCommand command) {
-		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void printConsoleMessage(String ip, DSPMessageCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void printConsoleMessage(String ip, P2020MessageCommand command) {
-		// TODO Auto-generated method stub
+		console.printConsoleMsg(ip, command);
 
 	}
 
@@ -1686,7 +1645,14 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	@Override
 	public void updatePeriodicity(String ip, int periodicity) {
 
-		udpMonitor.setPeriodicity(ip, VPXUtilities.getProcessorType(ip), periodicity);
+		udpMonitor.sendPeriodicity(ip, periodicity);
+
+	}
+
+	@Override
+	public void updatePeriodicity(int periodicity) {
+
+		udpMonitor.setPeriodicityByUnicast(periodicity);
 
 	}
 }

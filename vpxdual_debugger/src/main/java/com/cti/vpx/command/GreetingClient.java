@@ -72,14 +72,13 @@ public class GreetingClient {
 
 				VPXUtilities.setVPXSystem(vpx);
 
-				setPeriodicity(4,true);
+				setPeriodicityByUnicast(4);
 
 			}
 		});
 
 		jp.add(jb);
-		
-		
+
 		JButton jb1 = new JButton("Send Message");
 
 		jb1.addActionListener(new ActionListener() {
@@ -103,14 +102,13 @@ public class GreetingClient {
 
 		f.setVisible(true);
 
-		
 		startMessage();
-		
+
 		startCMD();
 
 	}
 
-	public void setPeriodicity(int period, boolean isUseList) {
+	public void setPeriodicityByUnicast(int period) {
 
 		VPXSystem sys = VPXUtilities.getVPXSystem();
 
@@ -148,7 +146,7 @@ public class GreetingClient {
 
 	}
 
-	public void setPeriodicity(int period) {
+	public void setPeriodicityByBradcast(int period) {
 
 		DatagramSocket datagramSocket;
 
@@ -177,7 +175,6 @@ public class GreetingClient {
 					.getBroadcast(), UDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
-			/*
 
 			P2020ATPCommand msg1 = new P2020ATPCommand();
 
@@ -198,7 +195,7 @@ public class GreetingClient {
 			DatagramPacket packet1 = new DatagramPacket(buffer1, buffer1.length, VPXUtilities
 					.getCurrentInterfaceAddress().getBroadcast(), UDPListener.COMM_PORTNO);
 
-			datagramSocket.send(packet1);*/
+			datagramSocket.send(packet1);
 
 		} catch (Exception e) {
 
@@ -211,57 +208,36 @@ public class GreetingClient {
 
 		DatagramSocket datagramSocket;
 
+		ATPCommand msg = null;
+
+		byte[] buffer = null;
+
+		ByteBuffer bf = null;
+
 		try {
 
 			datagramSocket = new DatagramSocket();
 
-			if (procesor == PROCESSOR_LIST.PROCESSOR_P2020) {
+			msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
-				P2020ATPCommand msg = new P2020ATPCommand();
+			buffer = new byte[msg.size()];
 
-				byte[] buffer = new byte[msg.size()];
+			bf = ByteBuffer.wrap(buffer);
 
-				ByteBuffer bf = ByteBuffer.wrap(buffer);
+			bf.order(msg.byteOrder());
 
-				bf.order(msg.byteOrder());
+			msg.setByteBuffer(bf, 0);
 
-				msg.setByteBuffer(bf, 0);
+			msg.msgID.set(ATP.MSG_ID_SET);
 
-				msg.msgID.set(ATP.MSG_ID_SET);
+			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
-				msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
+			msg.params.periodicity.set(period);
 
-				msg.params.periodicity.set(period);
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					UDPListener.COMM_PORTNO);
 
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-						UDPListener.COMM_PORTNO);
-
-				datagramSocket.send(packet);
-
-			} else {
-
-				DSPATPCommand msg = new DSPATPCommand();
-
-				byte[] buffer = new byte[msg.size()];
-
-				ByteBuffer bf = ByteBuffer.wrap(buffer);
-
-				bf.order(msg.byteOrder());
-
-				msg.setByteBuffer(bf, 0);
-
-				msg.msgID.set(ATP.MSG_ID_SET);
-
-				msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
-
-				msg.params.periodicity.set(period);
-
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-						UDPListener.COMM_PORTNO);
-
-				datagramSocket.send(packet);
-
-			}
+			datagramSocket.send(packet);
 
 		} catch (Exception e) {
 
@@ -332,14 +308,14 @@ public class GreetingClient {
 
 			ByteBuffer bf = ByteBuffer.wrap(buffer);
 
-			 bf.order(msg.byteOrder());
+			bf.order(msg.byteOrder());
 			msg.setByteBuffer(bf, 0);
 
 			msg.mode.set(MESSAGE_MODE.MSG_MODE_MESSAGE);
 
 			msg.core.set(0);
 
-		//	msg.command_msg.set("memget 0xa0000000");
+			// msg.command_msg.set("memget 0xa0000000");
 			msg.command_msg.set("temp1");
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.1"),
@@ -392,10 +368,10 @@ public class GreetingClient {
 					msgCommand.getByteBuffer().clear();
 
 					msgCommand.getByteBuffer().put(bf);
-					
-					jt.append(msgCommand.mode+"\n");
 
-					jt.append(msgCommand.command_msg+"\n");
+					jt.append(msgCommand.mode + "\n");
+
+					jt.append(msgCommand.command_msg + "\n");
 
 					Thread.sleep(500);
 
