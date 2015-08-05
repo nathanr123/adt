@@ -5,8 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -43,6 +42,12 @@ public class GreetingClient {
 
 	private JTextArea jt;
 	private byte[] filestoSend;
+	private byte[] filesfromRecv;
+	private int offset = 0;
+	private int start;
+	private int end;
+	private int tot;
+	private long size;
 
 	public GreetingClient() {
 
@@ -163,69 +168,6 @@ public class GreetingClient {
 
 			}
 
-		}
-
-	}
-
-	public void sendFile() {
-
-		try {
-
-			File f = new File("G:\\1.flv");
-
-			long size = FileUtils.sizeOf(f) / (1024 * 1024);
-
-			filestoSend = FileUtils.readFileToByteArray(f);
-
-			byte b[] = new byte[1024];
-
-			System.arraycopy(filestoSend, 0, b, 0, 1024);
-
-			sendFileToProcessor("172.17.10.130", b);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void sendFileToProcessor(String ip, byte[] sendBuffer) {
-
-		DatagramSocket datagramSocket;
-
-		try {
-			datagramSocket = new DatagramSocket();
-
-			datagramSocket.setBroadcast(true);
-
-			DSPATPCommand msg = new DSPATPCommand();
-
-			byte[] buffer = new byte[msg.size()];
-
-			ByteBuffer bf = ByteBuffer.wrap(buffer);
-
-			bf.order(msg.byteOrder());
-
-			msg.setByteBuffer(bf, 0);
-
-			msg.msgID.set(ATP.MSG_ID_SET);
-
-			msg.msgType.set(ATP.MSG_TYPE_FLASH);
-
-			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
-
-			for (int i = 0; i < sendBuffer.length; i++) {
-
-				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
-			}
-
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					UDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
 		}
 
 	}
@@ -471,7 +413,7 @@ public class GreetingClient {
 	class CThreadMonitor implements Runnable {
 		DatagramSocket messageReceiverSocket;
 
-		DSPATPCommand msgCommand = new DSPATPCommand();
+		ATPCommand msgCommand = new ATPCommand();
 
 		byte[] messageData = new byte[msgCommand.size()];
 
@@ -505,11 +447,17 @@ public class GreetingClient {
 
 					msgCommand.getByteBuffer().put(bf);
 
-					jt.append("Message ID : " + msgCommand.msgID + "\n");
+					if (msgCommand.msgID.get() == ATP.MSG_ID_SET) {
 
-					jt.append("Message Type : " + msgCommand.msgType + "\n");
+						int i = (int) msgCommand.msgType.get();
 
-					jt.append("Periodicity : " + msgCommand.params.periodicity + "\n");
+						if (i == ATP.MSG_TYPE_FLASH) {
+							recvAndSaveFile(messagePacket.getAddress().getHostAddress(), msgCommand);
+						} else if (i == ATP.MSG_TYPE_FLASH_ACK) {
+							sendNextPacket(messagePacket.getAddress().getHostAddress(), msgCommand);
+						}
+
+					}
 
 					Thread.sleep(500);
 
@@ -518,6 +466,211 @@ public class GreetingClient {
 				}
 			}
 
+		}
+
+	}
+
+	public void sendFile() {
+
+		try {
+
+			File f = new File("e:\\bookmarks_2_23_15.html");
+
+			size = FileUtils.sizeOf(f);
+
+			filestoSend = FileUtils.readFileToByteArray(f);
+
+			byte b[] = new byte[1024];
+
+			System.arraycopy(filestoSend, 0, b, 0, 1024);
+
+			sendFileToProcessor("192.168.0.100", FileUtils.sizeOf(f), b);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendFileToProcessor(String ip, long size, byte[] sendBuffer) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			datagramSocket.setBroadcast(true);
+
+			ATPCommand msg = new ATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_FLASH);
+
+			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+
+			msg.params.flash_info.totalfilesize.set(size);
+
+			tot = (int) (size / 1024);
+
+			int rem = (int) (size % 1024);
+
+			if (rem > 0)
+				tot++;
+
+			msg.params.flash_info.totalnoofpackets.set(tot);
+
+			for (int i = 0; i < sendBuffer.length; i++) {
+
+				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
+			}
+
+			msg.params.flash_info.currentpacket.set(0);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					UDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void recvAndSaveFile(String ip, ATPCommand msg) {
+
+		int currPacket = (int) msg.params.flash_info.currentpacket.get();
+
+		if (currPacket == 0) {
+			filesfromRecv = new byte[(int) msg.params.flash_info.totalfilesize.get()];
+		}
+		start = currPacket * msg.params.memoryinfo.buffer.length;
+
+		end = start + msg.params.memoryinfo.buffer.length;
+		
+		if(end > filestoSend.length) {
+			end = filestoSend.length;
+		}
+
+		for (int i = start, j = 0; i < end; i++, j++) {
+		
+				filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get();
+		
+		}
+		//System.out.println(currPacket);
+
+		// Sending part
+		
+		System.out.println(currPacket +" "+ msg.params.flash_info.totalnoofpackets.get());
+
+		if (currPacket < msg.params.flash_info.totalnoofpackets.get()) {
+
+			DatagramSocket datagramSocket;
+
+			try {
+				datagramSocket = new DatagramSocket();
+
+				datagramSocket.setBroadcast(true);
+
+				byte[] buffer = new byte[msg.size()];
+
+				ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+				bf.order(msg.byteOrder());
+
+				msg.setByteBuffer(bf, 0);
+
+				msg.msgID.set(ATP.MSG_ID_SET);
+
+				msg.msgType.set(ATP.MSG_TYPE_FLASH_ACK);
+
+				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+
+				msg.params.flash_info.currentpacket.set(currPacket);
+
+				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+						UDPListener.COMM_PORTNO);
+
+				datagramSocket.send(packet);
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				FileOutputStream fos = new FileOutputStream("D:\\Test1.html");
+				fos.write(filesfromRecv);
+				fos.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public void sendNextPacket(String ip, ATPCommand msg) {
+
+		DatagramSocket datagramSocket;
+
+		int currPacket = (int) msg.params.flash_info.currentpacket.get();
+
+		currPacket++;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			datagramSocket.setBroadcast(true);
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_FLASH);
+
+			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+
+			start = currPacket * 1024;
+
+			end = start + 1024;
+
+			if (end > filestoSend.length) {
+				end = filestoSend.length;
+			}
+			System.out.println(filestoSend.length + " " + end);
+
+			for (int i = start, j = 0; i < end; i++, j++) {
+
+				msg.params.memoryinfo.buffer[j].set(filestoSend[i]);
+			}
+
+			msg.params.flash_info.totalfilesize.set(size);
+			msg.params.flash_info.totalnoofpackets.set(tot);
+
+			msg.params.flash_info.currentpacket.set(currPacket);
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					UDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
 		}
 
 	}

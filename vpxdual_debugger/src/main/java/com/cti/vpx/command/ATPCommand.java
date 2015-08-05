@@ -81,7 +81,6 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 
 		public final Unsigned32 currentpacket = new Unsigned32();
 
-		//public final Unsigned8 buffer[] = array(new Unsigned8[1024]);
 	}
 
 	public class ProcessorInfo extends Struct {
@@ -104,7 +103,7 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 
 		public final Unsigned32 newvalue = new Unsigned32();
 
-		public final Unsigned32 buffer[] = array(new Unsigned32[1024]);
+		public final Unsigned8 buffer[] = array(new Unsigned8[1024]);
 
 	}
 
