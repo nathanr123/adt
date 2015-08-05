@@ -1,20 +1,25 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import com.cti.vpx.command.ATPCommand;
-
 import net.miginfocom.swing.MigLayout;
 
-public class VPX_FlashProgressWindow extends JDialog {
+import com.cti.vpx.util.VPXUtilities;
+
+public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	/**
 	 * 
@@ -28,13 +33,18 @@ public class VPX_FlashProgressWindow extends JDialog {
 	private JProgressBar progressFileSent;
 	private JLabel lblFlashing;
 
+	private long starttime;
+
+	private boolean isFlashingStatred = false;
+
+	private JFrame parent;
+
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		try {
-			VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(null);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -44,7 +54,11 @@ public class VPX_FlashProgressWindow extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_FlashProgressWindow() {
+	public VPX_FlashProgressWindow(JFrame prnt) {
+
+		super(prnt);
+
+		this.parent = prnt;
 
 		init();
 
@@ -56,9 +70,15 @@ public class VPX_FlashProgressWindow extends JDialog {
 
 		setTitle("Flash Out File");
 
+		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
 		setSize(450, 200);
 
+		setLocationRelativeTo(parent);
+
 		getContentPane().setLayout(new BorderLayout(0, 0));
+
+		addWindowListener(this);
 
 	}
 
@@ -77,6 +97,8 @@ public class VPX_FlashProgressWindow extends JDialog {
 		progressPanel.add(lblFlashing, BorderLayout.NORTH);
 
 		progressFileSent = new JProgressBar();
+
+		progressFileSent.setStringPainted(true);
 
 		progressPanel.add(progressFileSent, BorderLayout.SOUTH);
 
@@ -152,14 +174,135 @@ public class VPX_FlashProgressWindow extends JDialog {
 		detailPanel.add(lblElapsedTimeVal, "cell 3 4,aligny center");
 	}
 
-	public void updatePackets(ATPCommand cmd) {
+	public void updatePackets(long size, long totpkt, long curpacket) {
 
-		lblTotalFileSizeVal.setText("" + cmd.params.flash_info.totalfilesize.get());
+		if (curpacket == 0) {
 
-		lblTotalPacketsVal.setText("" + cmd.params.flash_info.totalfilesize.get());
+			progressFileSent.setMaximum((int) totpkt);
 
-		lblPacketsSentVal.setText("" + cmd.params.flash_info.totalfilesize.get());
+			progressFileSent.setMinimum((int) curpacket);
 
-		lblPacketsRemainingVal.setText("" + cmd.params.flash_info.totalfilesize.get());
+			lblFlashing.setText("Sending File");
+
+			starttime = System.currentTimeMillis();
+		}
+
+		progressFileSent.setValue((int) curpacket);
+
+		lblTotalFileSizeVal.setText(toNumInUnits(size));
+
+		lblTotalPacketsVal.setText("" + totpkt);
+
+		lblPacketsSentVal.setText("" + curpacket);
+
+		long remain = (totpkt - curpacket);
+
+		lblPacketsRemainingVal.setText("" + remain);
+
+		if (remain == 0) {
+			progressFileSent.setString("done!");
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) {
+			}
+			flashFile();
+
+		}
+
+		lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(2, (System.currentTimeMillis() - starttime)));
+	}
+
+	public void flashFile() {
+
+		isFlashingStatred = true;
+
+		lblFlashing.setText("Flashing File");
+
+		progressFileSent.setString("Flashing on progress");
+
+		progressFileSent.setIndeterminate(true);
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (isFlashingStatred) {
+					try {
+
+						lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(2,
+								(System.currentTimeMillis() - starttime)));
+
+						Thread.sleep(1000);
+					} catch (Exception e) {
+					}
+				}
+
+			}
+		});
+		th.start();
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+
+		String ObjButtons[] = { "Yes", "No" };
+
+		int PromptResult = JOptionPane.showOptionDialog(VPX_FlashProgressWindow.this, "Do you want cancel flashing ?",
+				"Confirmation", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons,
+				ObjButtons[1]);
+
+		if (PromptResult == 0) {
+
+			isFlashingStatred = false;
+
+			VPX_FlashProgressWindow.this.dispose();
+		}
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public String toNumInUnits(long bytes) {
+		int u = 0;
+		for (; bytes > 1024 * 1024; bytes >>= 10) {
+			u++;
+		}
+		if (bytes > 1024)
+			u++;
+		return String.format("%.1f %cB", bytes / 1024f, " kMGTPE".charAt(u));
 	}
 }

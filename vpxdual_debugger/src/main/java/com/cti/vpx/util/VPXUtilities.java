@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -268,15 +269,44 @@ public class VPXUtilities {
 
 			ret = VPXConstants.DATEFORMAT_DATE.format(millis);
 
-		else if (format == 2)
+		else if (format == 2) {
 
+			VPXConstants.DATEFORMAT_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
+		
 			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
-		else if (format == 3)
+		} else if (format == 3)
 
 			ret = VPXConstants.DATEFORMAT_TIMEFULL.format(millis);
 
 		return ret;
+	}
+
+	public static String formatElapsedTime(long elapsedTime) {
+
+		int centiseconds = (int) (((elapsedTime % 1000L) + 5L) / 10L);
+
+		int seconds = (int) (elapsedTime / 1000L);
+
+		int minutes = seconds / 60;
+
+		seconds -= minutes * 60;
+
+		int hours = minutes / 60;
+
+		minutes -= hours * 60;
+
+		if (hours > 0) {
+
+			return String.format("%2d:%02d:%02d.%02d", hours, minutes, seconds, centiseconds);
+
+		} else if (minutes > 0) {
+
+			return String.format("%2d:%02d.%02d", minutes, seconds, centiseconds);
+		} else {
+
+			return String.format("%2d.%02d", seconds, centiseconds);
+		}
 	}
 
 	public static long getLongFromIP(String ip) {
@@ -1544,7 +1574,7 @@ public class VPXUtilities {
 				}
 			}
 		}
-		
+
 		return time;
 
 	}

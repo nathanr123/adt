@@ -23,7 +23,10 @@ public class VPX_EthernetFlashPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 3656689916187874512L;
 
-	private static String ETHNOTE = "<html><body><br><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ethernet Mode will be switched into full functional windows.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User must program LAN Configuration</left></body></html>";
+	private static String ETHNOTE = "<html><body><left><b>Flash - User must select the .bin file to flash at above selected Device and Location<br><br>"
+			+ "Boot - Application will be booted from selected Device and Location<br><br>"
+			+ "Flash & Boot - User must select the .bin file to flash at above selected Device and Location.<br>"
+			+ "Rebooted from the selected Device and Location</b></left></body></html>";
 
 	private JTextField txtBinFilePath;
 
@@ -39,10 +42,23 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private JComboBox<String> cmbFlshProcessors;
 
+	private boolean isWizard = false;
+
+	public VPX_EthernetFlashPanel() {
+
+		init();
+
+		loadComponents();
+
+	}
+
 	/**
 	 * Create the panel.
 	 */
-	public VPX_EthernetFlashPanel() {
+	public VPX_EthernetFlashPanel(boolean iswizard) {
+
+		this.isWizard = iswizard;
+
 		init();
 
 		loadComponents();
@@ -53,7 +69,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		setLayout(new BorderLayout(0, 0));
 
-		setPreferredSize(new Dimension(800, 400));
+		setPreferredSize(new Dimension(800, 496));
 	}
 
 	private void loadComponents() {
@@ -75,7 +91,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		notePanel.setBorder(new TitledBorder(null, "Note", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		notePanel.setBounds(10, 317, 736, 119);
+		notePanel.setBounds(10, 317, 780, 119);
 
 		flashPanl.add(notePanel);
 
@@ -85,7 +101,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		JPanel flashOptionPanel = new JPanel();
 
-		flashOptionPanel.setBounds(10, 22, 736, 284);
+		flashOptionPanel.setBounds(10, 22, 780, 284);
 
 		flashPanl.add(flashOptionPanel);
 
@@ -115,18 +131,21 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		flashOptionPanel.add(btnFlash);
 
-		JButton btnBoot = new JButton("Boot");
+		if (!isWizard) {
 
-		btnBoot.setBounds(231, 236, 68, 23);
+			JButton btnBoot = new JButton("Boot");
 
-		flashOptionPanel.add(btnBoot);
+			btnBoot.setBounds(231, 236, 68, 23);
 
-		JButton btnFlashBoot = new JButton("Flash & Boot");
+			flashOptionPanel.add(btnBoot);
 
-		btnFlashBoot.setBounds(309, 236, 114, 23);
+			JButton btnFlashBoot = new JButton("Flash & Boot");
 
-		flashOptionPanel.add(btnFlashBoot);
+			btnFlashBoot.setBounds(309, 236, 114, 23);
 
+			flashOptionPanel.add(btnFlashBoot);
+
+		}
 		txtBinFilePath = new JTextField();
 
 		txtBinFilePath.setColumns(10);

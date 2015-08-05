@@ -6,14 +6,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,6 +31,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
+import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
@@ -48,12 +55,15 @@ public class GreetingClient {
 	private int end;
 	private int tot;
 	private long size;
+	private VPX_FlashProgressWindow dialog;
+	private JFrame f;
+	private FileBytesToSend fb;
 
 	public GreetingClient() {
 
 		VPXUtilities.setCurrentNWIface("172.17.1.28");
 
-		JFrame f = new JFrame();
+		f = new JFrame();
 
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -119,6 +129,21 @@ public class GreetingClient {
 		});
 
 		jp.add(jb2);
+
+		JButton jb3 = new JButton("Start BIST");
+
+		jb3.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// sendCMD();
+
+				startBist();
+
+			}
+		});
+
+		jp.add(jb3);
 
 		f.getContentPane().setLayout(new BorderLayout());
 
@@ -272,6 +297,52 @@ public class GreetingClient {
 
 	}
 
+	public void populateBISTResult(ATPCommand msg) {
+
+		/*
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_PROCESSOR);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_DDR3);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_NORFLASH);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_ETHERNET);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_SRIO);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_PCIE);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_TEMP1);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_TEMP2);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_TEMP3);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT1_3p3);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT2_2p5);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT3_1p8);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT4_1p5);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT5_1p2);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT6_1p0);
+		 * 
+		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT7_1p05);
+		 */
+
+		System.out.println(msg.params.testinfo.RESULT_DSP_DDR3);
+
+		System.out.println(msg.params.testinfo.RESULT_DSP_NAND);
+
+		System.out.println(msg.params.testinfo.RESULT_DSP_NOR);
+
+		System.out.println(msg.params.testinfo.RESULT_DSP_PROCESSOR);
+
+	}
+
 	private void startMessage() {
 		Thread th = new Thread(new MThreadMonitor());
 
@@ -313,6 +384,46 @@ public class GreetingClient {
 			datagramSocket.send(packet);
 
 			jt.append("Message Sent\n");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void startBist() {
+
+		DatagramSocket datagramSocket;
+
+		ATPCommand msg = null;
+
+		byte[] buffer = null;
+
+		ByteBuffer bf = null;
+
+		try {
+
+			datagramSocket = new DatagramSocket();
+
+			msg = new DSPATPCommand();
+
+			buffer = new byte[msg.size()];
+
+			bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_BIST);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
+					UDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
 
 		} catch (Exception e) {
 
@@ -457,6 +568,8 @@ public class GreetingClient {
 							sendNextPacket(messagePacket.getAddress().getHostAddress(), msgCommand);
 						}
 
+					} else if (msgCommand.msgID.get() == ATP.MSG_ID_GET) {
+						populateBISTResult(msgCommand);
 					}
 
 					Thread.sleep(500);
@@ -474,21 +587,71 @@ public class GreetingClient {
 
 		try {
 
-			File f = new File("e:\\bookmarks_2_23_15.html");
+			File f = new File("D:\\WinRegistry.java");
 
 			size = FileUtils.sizeOf(f);
 
 			filestoSend = FileUtils.readFileToByteArray(f);
 
+			Map<Long, byte[]> t = divideArrayAsMap(filestoSend, 1024);
+
+			fb = new FileBytesToSend(size, t);
+
 			byte b[] = new byte[1024];
 
-			System.arraycopy(filestoSend, 0, b, 0, 1024);
+			for (int i = 0; i < b.length; i++) {
+				b[i] = filestoSend[i];
+			}
 
-			sendFileToProcessor("192.168.0.100", FileUtils.sizeOf(f), b);
+			dialog = new VPX_FlashProgressWindow(GreetingClient.this.f);
+
+			dialog.setVisible(true);
+
+			sendFileToProcessor("172.17.1.28", FileUtils.sizeOf(f), fb.getBytePacket(0));
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static List<byte[]> divideArray(byte[] source, int chunksize) {
+
+		List<byte[]> result = new ArrayList<byte[]>();
+
+		int start = 0;
+
+		while (start < source.length) {
+
+			int end = Math.min(source.length, start + chunksize);
+
+			result.add(Arrays.copyOfRange(source, start, end));
+
+			start += chunksize;
+		}
+
+		return result;
+	}
+
+	public static Map<Long, byte[]> divideArrayAsMap(byte[] source, int chunksize) {
+
+		Map<Long, byte[]> bytesMap = new LinkedHashMap<Long, byte[]>();
+
+		int start = 0;
+
+		long i = 0;
+
+		while (start < source.length) {
+
+			int end = Math.min(source.length, start + chunksize);
+
+			bytesMap.put(i, Arrays.copyOfRange(source, start, end));
+
+			start += chunksize;
+
+			i++;
+		}
+
+		return bytesMap;
 	}
 
 	public void sendFileToProcessor(String ip, long size, byte[] sendBuffer) {
@@ -527,12 +690,16 @@ public class GreetingClient {
 
 			msg.params.flash_info.totalnoofpackets.set(tot);
 
+			msg.params.memoryinfo.buffer[0].set(sendBuffer[0]);
+
 			for (int i = 0; i < sendBuffer.length; i++) {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
 			}
 
 			msg.params.flash_info.currentpacket.set(0);
+
+			dialog.updatePackets(size, tot, 0);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					UDPListener.COMM_PORTNO);
@@ -551,26 +718,23 @@ public class GreetingClient {
 		int currPacket = (int) msg.params.flash_info.currentpacket.get();
 
 		if (currPacket == 0) {
+
 			filesfromRecv = new byte[(int) msg.params.flash_info.totalfilesize.get()];
 		}
 		start = currPacket * msg.params.memoryinfo.buffer.length;
 
 		end = start + msg.params.memoryinfo.buffer.length;
-		
-		if(end > filestoSend.length) {
+
+		if (end > filestoSend.length) {
 			end = filestoSend.length;
 		}
 
 		for (int i = start, j = 0; i < end; i++, j++) {
-		
-				filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get();
-		
+
+			filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get();
 		}
-		//System.out.println(currPacket);
 
 		// Sending part
-		
-		System.out.println(currPacket +" "+ msg.params.flash_info.totalnoofpackets.get());
 
 		if (currPacket < msg.params.flash_info.totalnoofpackets.get()) {
 
@@ -608,7 +772,7 @@ public class GreetingClient {
 			}
 		} else {
 			try {
-				FileOutputStream fos = new FileOutputStream("D:\\Test1.html");
+				FileOutputStream fos = new FileOutputStream("D:\\WinRegistry1.java");
 				fos.write(filesfromRecv);
 				fos.close();
 			} catch (Exception e) {
@@ -652,13 +816,17 @@ public class GreetingClient {
 			if (end > filestoSend.length) {
 				end = filestoSend.length;
 			}
-			System.out.println(filestoSend.length + " " + end);
 
-			for (int i = start, j = 0; i < end; i++, j++) {
+			dialog.updatePackets(size, tot, currPacket);
 
-				msg.params.memoryinfo.buffer[j].set(filestoSend[i]);
+			byte[] bb = fb.getBytePacket(currPacket);
+			if (bb != null) {
+
+				msg.params.memoryinfo.buffer[0].set(bb[0]);
+				for (int i = 0; i < bb.length; i++) {
+					msg.params.memoryinfo.buffer[i].set(bb[i]);
+				}
 			}
-
 			msg.params.flash_info.totalfilesize.set(size);
 			msg.params.flash_info.totalnoofpackets.set(tot);
 
@@ -674,4 +842,189 @@ public class GreetingClient {
 		}
 
 	}
+
+	public class FileBytesToSend implements Serializable {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		private long fileSize;
+
+		private long totalpackets;
+
+		private long currentPacket;
+
+		private long remainigPacket;
+
+		private Map<Long, byte[]> bytesMap = new LinkedHashMap<Long, byte[]>();
+
+		private Iterator<Entry<Long, byte[]>> iteratorByteArray;
+
+		/**
+		 * @param fileSize
+		 * @param totalpackets
+		 * @param currentPacket
+		 * @param remainigPacket
+		 */
+		public FileBytesToSend(long fileSize, long totalpackets, long currentPacket, long remainigPacket) {
+
+			super();
+
+			this.fileSize = fileSize;
+
+			this.totalpackets = totalpackets;
+
+			this.currentPacket = currentPacket;
+
+			this.remainigPacket = remainigPacket;
+		}
+
+		public FileBytesToSend(long fileSize, Map<Long, byte[]> map) {
+
+			super();
+
+			this.fileSize = fileSize;
+
+			this.bytesMap = map;
+
+			setTotalpackets(map.size());
+
+			setCurrentPacket(0);
+
+			setIterator();
+
+		}
+
+		/**
+		 * @return the fileSize
+		 */
+		public long getFileSize() {
+			return fileSize;
+		}
+
+		/**
+		 * @param fileSize
+		 *            the fileSize to set
+		 */
+		public void setFileSize(long fileSize) {
+			this.fileSize = fileSize;
+		}
+
+		/**
+		 * @return the totalpackets
+		 */
+		public long getTotalpackets() {
+			return totalpackets;
+		}
+
+		/**
+		 * @param totalpackets
+		 *            the totalpackets to set
+		 */
+		public void setTotalpackets(long totalpackets) {
+			this.totalpackets = totalpackets;
+		}
+
+		/**
+		 * @return the currentPacket
+		 */
+		public long getCurrentPacket() {
+			return currentPacket;
+		}
+
+		/**
+		 * @param currentPacket
+		 *            the currentPacket to set
+		 */
+		public void setCurrentPacket(long currentPacket) {
+
+			this.remainigPacket = this.totalpackets - currentPacket;
+
+			this.currentPacket = currentPacket;
+		}
+
+		/**
+		 * @return the remainigPacket
+		 */
+		public long getRemainigPacket() {
+			return remainigPacket;
+		}
+
+		/**
+		 * @param remainigPacket
+		 *            the remainigPacket to set
+		 */
+		public void setRemainigPacket(long remainigPacket) {
+			this.remainigPacket = remainigPacket;
+		}
+
+		/**
+		 * @return the bytesMap
+		 */
+		public Map<Long, byte[]> getBytesMap() {
+			return bytesMap;
+		}
+
+		/**
+		 * @param bytesMap
+		 *            the bytesMap to set
+		 */
+		public void setBytesMap(Map<Long, byte[]> bytesMap) {
+
+			this.bytesMap = bytesMap;
+
+			setIterator();
+		}
+
+		public byte[] getBytePacket(long index) {
+
+			return bytesMap.get(index);
+		}
+
+		public byte[] getCurrentBytePacket() {
+
+			return bytesMap.get(currentPacket);
+		}
+
+		public byte[] getNextPacket() {
+
+			long temp = currentPacket++;
+
+			setCurrentPacket(currentPacket);
+
+			if (bytesMap.containsKey(temp))
+
+				return bytesMap.get(temp);
+			else
+				return null;
+		}
+
+		public byte[] getNext() {
+
+			if (iteratorByteArray != null) {
+				if (iteratorByteArray.hasNext()) {
+
+					Entry<Long, byte[]> e = iteratorByteArray.next();
+
+					currentPacket = e.getKey();
+
+					return e.getValue();
+
+				} else
+					return null;
+			} else
+				return null;
+		}
+
+		public void setIterator() {
+
+			Set<Entry<Long, byte[]>> set = bytesMap.entrySet();
+
+			iteratorByteArray = set.iterator();
+
+		}
+	}
+
 }
