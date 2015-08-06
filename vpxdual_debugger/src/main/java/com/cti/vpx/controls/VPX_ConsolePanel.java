@@ -136,7 +136,9 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 			public void itemStateChanged(ItemEvent arg0) {
 
 				if (arg0.getSource().equals(cmbProcessor)) {
+
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
 						loadCoresFilter();
 					}
 				}

@@ -62,7 +62,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		init();
 
 		loadComponents();
-
+		
 	}
 
 	private void init() {
@@ -146,6 +146,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 			flashOptionPanel.add(btnFlashBoot);
 
 		}
+		
 		txtBinFilePath = new JTextField();
 
 		txtBinFilePath.setColumns(10);

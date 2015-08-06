@@ -27,10 +27,10 @@ import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.cti.vpx.Listener.VPXTCPConnector;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
-import com.cti.vpx.util.VPXTCPConnector;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 

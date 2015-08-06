@@ -1,4 +1,4 @@
-package com.cti.vpx.util;
+package com.cti.vpx.Listener;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,10 +9,6 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import com.cti.vpx.Listener.AdvertisementListener;
-import com.cti.vpx.Listener.CommunicationListener;
-import com.cti.vpx.Listener.MessageListener;
-import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.command.ATPCommand;
@@ -25,6 +21,8 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.SubnetFilter;
+import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPXUDPMonitor {

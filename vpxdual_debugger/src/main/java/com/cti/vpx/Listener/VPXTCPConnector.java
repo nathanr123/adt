@@ -1,4 +1,4 @@
-package com.cti.vpx.util;
+package com.cti.vpx.Listener;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,7 +9,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-import com.cti.vpx.Listener.UDPListener;
 import com.cti.vpx.command.ATPCommand;
 
 public class VPXTCPConnector {

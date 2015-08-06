@@ -34,6 +34,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.cti.vpx.Listener.AdvertisementListener;
 import com.cti.vpx.Listener.CommunicationListener;
 import com.cti.vpx.Listener.MessageListener;
+import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.DSPMessageCommand;
@@ -68,7 +69,6 @@ import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXConstants;
-import com.cti.vpx.util.VPXUDPMonitor;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_ETHWindow extends JFrame implements WindowListener, AdvertisementListener, MessageListener,
