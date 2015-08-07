@@ -8,7 +8,7 @@ import com.cti.vpx.command.P2020ATPCommand;
  * @author RajuDhachu
  *
  */
-public interface CommunicationListener extends UDPListener {
+public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void updateCommand(ATPCommand command);
 

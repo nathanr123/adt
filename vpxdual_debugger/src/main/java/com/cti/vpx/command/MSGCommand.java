@@ -5,7 +5,7 @@ import java.nio.ByteOrder;
 
 import javolution.io.Struct;
 
-public class MessageCommand extends Struct implements ATP, Serializable {
+public class MSGCommand extends Struct implements ATP, Serializable {
 
 	/**
      * 
@@ -19,7 +19,9 @@ public class MessageCommand extends Struct implements ATP, Serializable {
 
 	public final UTF8String command_msg = new UTF8String(128);
 
-	public MessageCommand() {
+	private static final transient MSGCommand instance = new MSGCommand();
+
+	public MSGCommand() {
 
 	}
 
@@ -52,5 +54,9 @@ public class MessageCommand extends Struct implements ATP, Serializable {
 	@Override
 	public boolean isPacked() {
 		return true;
+	}
+
+	public static int getSize() {
+		return instance.size();
 	}
 }

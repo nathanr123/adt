@@ -2,7 +2,7 @@ package com.cti.vpx.command;
 
 import java.nio.ByteOrder;
 
-public class P2020MessageCommand extends MessageCommand {
+public class P2020MSGCommand extends MSGCommand {
 
     /**
      * 

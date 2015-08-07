@@ -31,16 +31,16 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.Listener.AdvertisementListener;
-import com.cti.vpx.Listener.CommunicationListener;
-import com.cti.vpx.Listener.MessageListener;
+import com.cti.vpx.Listener.VPXAdvertisementListener;
+import com.cti.vpx.Listener.VPXCommunicationListener;
+import com.cti.vpx.Listener.VPXMessageListener;
 import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
-import com.cti.vpx.command.DSPMessageCommand;
-import com.cti.vpx.command.MessageCommand;
+import com.cti.vpx.command.DSPMSGCommand;
+import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.command.P2020ATPCommand;
-import com.cti.vpx.command.P2020MessageCommand;
+import com.cti.vpx.command.P2020MSGCommand;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
@@ -71,8 +71,8 @@ import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
-public class VPX_ETHWindow extends JFrame implements WindowListener, AdvertisementListener, MessageListener,
-		CommunicationListener {
+public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertisementListener, VPXMessageListener,
+		VPXCommunicationListener {
 
 	/**
 	 * 
@@ -1589,7 +1589,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	}
 
 	@Override
-	public void updateMessage(String ip, MessageCommand command) {
+	public void updateMessage(String ip, MSGCommand command) {
 		messagePanel.updateProcessorMessage(ip, command);
 
 	}
@@ -1608,7 +1608,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, Advertiseme
 	}
 
 	@Override
-	public void printConsoleMessage(String ip, MessageCommand command) {
+	public void printConsoleMessage(String ip, MSGCommand command) {
 
 		console.printConsoleMsg(ip, command);
 

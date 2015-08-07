@@ -28,7 +28,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import com.cti.vpx.command.MessageCommand;
+import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
@@ -322,7 +322,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		}
 	}
 
-	public void updateProcessorMessage(String ip, MessageCommand msg) {
+	public void updateProcessorMessage(String ip, MSGCommand msg) {
 
 		if (ip.equals(VPXUtilities.getCurrentProcessor())) {
 

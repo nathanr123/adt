@@ -28,7 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
-import com.cti.vpx.command.MessageCommand;
+import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -391,7 +391,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	}
 
-	public void printConsoleMsg(MessageCommand msg) {
+	public void printConsoleMsg(MSGCommand msg) {
 
 		if (txtA_Console.getCaretPosition() > 0)
 
@@ -456,7 +456,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 		}
 	}
 
-	public void printConsoleMsg(String ip, MessageCommand msg) {
+	public void printConsoleMsg(String ip, MSGCommand msg) {
 
 		if (isFilterApply) {
 

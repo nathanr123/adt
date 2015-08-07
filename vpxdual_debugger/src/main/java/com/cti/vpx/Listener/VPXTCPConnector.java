@@ -18,7 +18,7 @@ public class VPXTCPConnector {
 		try {
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(ipaddress, UDPListener.COMM_PORTNO), 100);
+			client.connect(new InetSocketAddress(ipaddress, VPXUDPListener.COMM_PORTNO), 100);
 
 			client.setSoTimeout(1000);
 
@@ -58,7 +58,7 @@ public class VPXTCPConnector {
 
 			Socket client = new Socket();
 
-			client.connect(new InetSocketAddress(ipaddress, UDPListener.COMM_PORTNO), 1000);
+			client.connect(new InetSocketAddress(ipaddress, VPXUDPListener.COMM_PORTNO), 1000);
 
 			client.setSoTimeout(1000);
 

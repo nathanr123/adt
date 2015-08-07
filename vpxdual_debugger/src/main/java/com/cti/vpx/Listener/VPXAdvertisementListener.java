@@ -8,7 +8,7 @@ package com.cti.vpx.Listener;
  * @author RajuDhachu
  *
  */
-public interface AdvertisementListener extends UDPListener {
+public interface VPXAdvertisementListener extends VPXUDPListener {
 
 	public void updateProcessorStatus(String ip, String msg);
 	

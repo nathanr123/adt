@@ -19,6 +19,8 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 
 	public final MSGParamaenters params = inner(new MSGParamaenters());
 
+	private static final transient ATPCommand instance = new ATPCommand();
+
 	public ATPCommand() {
 
 	}
@@ -133,5 +135,9 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 	@Override
 	public boolean isPacked() {
 		return true;
+	}
+
+	public static int getSize() {
+		return instance.size();
 	}
 }

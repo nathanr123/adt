@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author RajuDhachu
  *
  */
-public interface UDPListener extends Serializable{
+public interface VPXUDPListener extends Serializable{
 
 	public int ADV_PORTNO = 12345;
 

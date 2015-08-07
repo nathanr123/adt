@@ -29,7 +29,7 @@ import javax.swing.JTextArea;
 
 import org.apache.commons.io.FileUtils;
 
-import com.cti.vpx.Listener.UDPListener;
+import com.cti.vpx.Listener.VPXUDPListener;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.model.Processor;
@@ -223,7 +223,7 @@ public class GreetingClient {
 			msg.params.periodicity.set(period);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, VPXUtilities.getCurrentInterfaceAddress()
-					.getBroadcast(), UDPListener.COMM_PORTNO);
+					.getBroadcast(), VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -244,7 +244,7 @@ public class GreetingClient {
 			msg1.params.periodicity.set(period);
 
 			DatagramPacket packet1 = new DatagramPacket(buffer1, buffer1.length, VPXUtilities
-					.getCurrentInterfaceAddress().getBroadcast(), UDPListener.COMM_PORTNO);
+					.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet1);
 
@@ -286,7 +286,7 @@ public class GreetingClient {
 			msg.params.periodicity.set(period);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					UDPListener.COMM_PORTNO);
+					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -379,7 +379,7 @@ public class GreetingClient {
 			msg.params.periodicity.set(5);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
-					UDPListener.COMM_PORTNO);
+					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -421,7 +421,7 @@ public class GreetingClient {
 			msg.msgType.set(ATP.MSG_TYPE_BIST);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
-					UDPListener.COMM_PORTNO);
+					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -439,7 +439,7 @@ public class GreetingClient {
 		try {
 			datagramSocket = new DatagramSocket();
 
-			DSPMessageCommand msg = new DSPMessageCommand();
+			DSPMSGCommand msg = new DSPMSGCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
@@ -456,7 +456,7 @@ public class GreetingClient {
 			// msg.command_msg.set("temp1");
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
-					UDPListener.CONSOLE_MSG_PORTNO);
+					VPXUDPListener.CONSOLE_MSG_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -472,7 +472,7 @@ public class GreetingClient {
 	class MThreadMonitor implements Runnable {
 		DatagramSocket messageReceiverSocket;
 
-		MessageCommand msgCommand = new DSPMessageCommand();
+		MSGCommand msgCommand = new DSPMSGCommand();
 
 		byte[] messageData = new byte[msgCommand.size()];
 
@@ -480,7 +480,7 @@ public class GreetingClient {
 
 		public MThreadMonitor() {
 			try {
-				messageReceiverSocket = new DatagramSocket(UDPListener.CONSOLE_MSG_PORTNO);
+				messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO);
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
@@ -532,7 +532,7 @@ public class GreetingClient {
 
 		public CThreadMonitor() {
 			try {
-				messageReceiverSocket = new DatagramSocket(UDPListener.COMM_PORTNO);
+				messageReceiverSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO);
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
@@ -563,8 +563,11 @@ public class GreetingClient {
 						int i = (int) msgCommand.msgType.get();
 
 						if (i == ATP.MSG_TYPE_FLASH) {
+							
 							recvAndSaveFile(messagePacket.getAddress().getHostAddress(), msgCommand);
+							
 						} else if (i == ATP.MSG_TYPE_FLASH_ACK) {
+							
 							sendNextPacket(messagePacket.getAddress().getHostAddress(), msgCommand);
 						}
 
@@ -702,7 +705,7 @@ public class GreetingClient {
 			dialog.updatePackets(size, tot, 0);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					UDPListener.COMM_PORTNO);
+					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -762,7 +765,7 @@ public class GreetingClient {
 				msg.params.flash_info.currentpacket.set(currPacket);
 
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-						UDPListener.COMM_PORTNO);
+						VPXUDPListener.COMM_PORTNO);
 
 				datagramSocket.send(packet);
 
@@ -832,7 +835,7 @@ public class GreetingClient {
 
 			msg.params.flash_info.currentpacket.set(currPacket);
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					UDPListener.COMM_PORTNO);
+					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 

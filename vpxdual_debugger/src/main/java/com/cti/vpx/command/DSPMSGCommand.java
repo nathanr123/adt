@@ -2,7 +2,7 @@ package com.cti.vpx.command;
 
 import java.nio.ByteOrder;
 
-public class DSPMessageCommand extends MessageCommand {
+public class DSPMSGCommand extends MSGCommand {
 
     /**
      * 
