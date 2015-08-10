@@ -23,9 +23,12 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import javolution.io.Struct.Unsigned32;
 
 import org.apache.commons.io.FileUtils;
 
@@ -61,7 +64,7 @@ public class GreetingClient {
 
 	public GreetingClient() {
 
-		VPXUtilities.setCurrentNWIface("172.17.1.28");
+		// VPXUtilities.setCurrentNWIface("172.17.1.28");
 
 		f = new JFrame();
 
@@ -81,19 +84,22 @@ public class GreetingClient {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// sendCMD();
+				sendCMD();
 
-				VPXSystem vpx = new VPXSystem();
-
-				List<VPXSubSystem> sub = new ArrayList<VPXSubSystem>();
-
-				sub.add(new VPXSubSystem(1, "Sub", "172.17.10.1", "172.17.10.130", "172.17.1.131"));
-
-				vpx.setSubsystem(sub);
-
-				VPXUtilities.setVPXSystem(vpx);
-
-				setPeriodicityByUnicast(4);
+				/*
+				 * VPXSystem vpx = new VPXSystem();
+				 * 
+				 * List<VPXSubSystem> sub = new ArrayList<VPXSubSystem>();
+				 * 
+				 * sub.add(new VPXSubSystem(1, "Sub", "172.17.10.1",
+				 * "172.17.10.130", "172.17.1.131"));
+				 * 
+				 * vpx.setSubsystem(sub);
+				 * 
+				 * VPXUtilities.setVPXSystem(vpx);
+				 * 
+				 * setPeriodicityByUnicast(4);
+				 */
 
 			}
 		});
@@ -357,38 +363,41 @@ public class GreetingClient {
 	}
 
 	public void sendCMD() {
-		DatagramSocket datagramSocket;
+		/*
+		 * DatagramSocket datagramSocket;
+		 * 
+		 * try {
+		 * 
+		 * 
+		 * datagramSocket = new DatagramSocket();
+		 * 
+		 * DSPATPCommand msg = new DSPATPCommand();
+		 * 
+		 * byte[] buffer = new byte[msg.size()];
+		 * 
+		 * ByteBuffer bf = ByteBuffer.wrap(buffer);
+		 * 
+		 * bf.order(msg.byteOrder()); msg.setByteBuffer(bf, 0);
+		 * 
+		 * msg.msgID.set(ATP.MSG_ID_SET);
+		 * 
+		 * msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
+		 * 
+		 * msg.params.periodicity.set(5);
+		 * 
+		 * DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+		 * InetAddress.getByName("172.17.10.130"), VPXUDPListener.COMM_PORTNO);
+		 * 
+		 * datagramSocket.send(packet);
+		 * 
+		 * jt.append("Message Sent\n");
+		 * 
+		 * } catch (Exception e) {
+		 * 
+		 * e.printStackTrace(); }
+		 */
 
-		try {
-			datagramSocket = new DatagramSocket();
-
-			DSPATPCommand msg = new DSPATPCommand();
-
-			byte[] buffer = new byte[msg.size()];
-
-			ByteBuffer bf = ByteBuffer.wrap(buffer);
-
-			bf.order(ATP.BYTEORDER_DSP);
-
-			msg.setByteBuffer(bf, 0);
-
-			msg.msgID.set(ATP.MSG_ID_SET);
-
-			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
-
-			msg.params.periodicity.set(5);
-
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
-					VPXUDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
-
-			jt.append("Message Sent\n");
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
+		sendPeriodicity("172.17.10.130", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
 
 	}
 
@@ -406,7 +415,7 @@ public class GreetingClient {
 
 			datagramSocket = new DatagramSocket();
 
-			msg = new DSPATPCommand();
+			msg = new P2020ATPCommand();
 
 			buffer = new byte[msg.size()];
 
@@ -420,7 +429,7 @@ public class GreetingClient {
 
 			msg.msgType.set(ATP.MSG_TYPE_BIST);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.1"),
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
@@ -563,12 +572,19 @@ public class GreetingClient {
 						int i = (int) msgCommand.msgType.get();
 
 						if (i == ATP.MSG_TYPE_FLASH) {
-							
+
 							recvAndSaveFile(messagePacket.getAddress().getHostAddress(), msgCommand);
-							
+
 						} else if (i == ATP.MSG_TYPE_FLASH_ACK) {
-							
+
 							sendNextPacket(messagePacket.getAddress().getHostAddress(), msgCommand);
+
+						} else if (i == ATP.MSG_TYPE_PERIDAICITY) {
+
+							System.out.println("Periodcity : " + msgCommand.params.periodicity);
+						} else if (i == ATP.MSG_TYPE_FLASH_DONE) {
+
+							JOptionPane.showMessageDialog(null, "Flash Completed");
 						}
 
 					} else if (msgCommand.msgID.get() == ATP.MSG_ID_GET) {
@@ -590,17 +606,17 @@ public class GreetingClient {
 
 		try {
 
-			File f = new File("D:\\WinRegistry.java");
+			File f = new File("D:\\UARTTestProject.bin");
 
 			size = FileUtils.sizeOf(f);
 
 			filestoSend = FileUtils.readFileToByteArray(f);
 
-			Map<Long, byte[]> t = divideArrayAsMap(filestoSend, 1024);
+			Map<Long, byte[]> t = divideArrayAsMap(filestoSend, ATP.DEFAULTBUFFERSIZE);
 
 			fb = new FileBytesToSend(size, t);
 
-			byte b[] = new byte[1024];
+			byte b[] = new byte[ATP.DEFAULTBUFFERSIZE];
 
 			for (int i = 0; i < b.length; i++) {
 				b[i] = filestoSend[i];
@@ -610,7 +626,7 @@ public class GreetingClient {
 
 			dialog.setVisible(true);
 
-			sendFileToProcessor("172.17.1.28", FileUtils.sizeOf(f), fb.getBytePacket(0));
+			sendFileToProcessor("172.17.10.130", FileUtils.sizeOf(f), fb.getBytePacket(0));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -666,7 +682,7 @@ public class GreetingClient {
 
 			datagramSocket.setBroadcast(true);
 
-			ATPCommand msg = new ATPCommand();
+			DSPATPCommand msg = new DSPATPCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
@@ -684,20 +700,23 @@ public class GreetingClient {
 
 			msg.params.flash_info.totalfilesize.set(size);
 
-			tot = (int) (size / 1024);
+			tot = (int) (size / ATP.DEFAULTBUFFERSIZE);
 
-			int rem = (int) (size % 1024);
+			int rem = (int) (size % ATP.DEFAULTBUFFERSIZE);
 
 			if (rem > 0)
 				tot++;
 
 			msg.params.flash_info.totalnoofpackets.set(tot);
 
-			msg.params.memoryinfo.buffer[0].set(sendBuffer[0]);
+			msg.params.memoryinfo.byteZero.set(sendBuffer[0]);
 
 			for (int i = 0; i < sendBuffer.length; i++) {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
+			
+				System.out.println(sendBuffer[i]);
+			
 			}
 
 			msg.params.flash_info.currentpacket.set(0);
@@ -736,6 +755,7 @@ public class GreetingClient {
 
 			filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get();
 		}
+
 
 		// Sending part
 
@@ -793,55 +813,61 @@ public class GreetingClient {
 
 		currPacket++;
 
-		try {
-			datagramSocket = new DatagramSocket();
+		if (currPacket <= tot) {
+			try {
+				datagramSocket = new DatagramSocket();
 
-			datagramSocket.setBroadcast(true);
+				datagramSocket.setBroadcast(true);
 
-			byte[] buffer = new byte[msg.size()];
+				byte[] buffer = new byte[msg.size()];
 
-			ByteBuffer bf = ByteBuffer.wrap(buffer);
+				ByteBuffer bf = ByteBuffer.wrap(buffer);
 
-			bf.order(msg.byteOrder());
+				bf.order(msg.byteOrder());
 
-			msg.setByteBuffer(bf, 0);
+				msg.setByteBuffer(bf, 0);
 
-			msg.msgID.set(ATP.MSG_ID_SET);
+				msg.msgID.set(ATP.MSG_ID_SET);
 
-			msg.msgType.set(ATP.MSG_TYPE_FLASH);
+				msg.msgType.set(ATP.MSG_TYPE_FLASH);
 
-			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
 
-			start = currPacket * 1024;
+				start = currPacket * 1024;
 
-			end = start + 1024;
+				end = start + 1024;
 
-			if (end > filestoSend.length) {
-				end = filestoSend.length;
-			}
-
-			dialog.updatePackets(size, tot, currPacket);
-
-			byte[] bb = fb.getBytePacket(currPacket);
-			if (bb != null) {
-
-				msg.params.memoryinfo.buffer[0].set(bb[0]);
-				for (int i = 0; i < bb.length; i++) {
-					msg.params.memoryinfo.buffer[i].set(bb[i]);
+				if (end > filestoSend.length) {
+					end = filestoSend.length;
 				}
+
+				dialog.updatePackets(size, tot, currPacket);
+
+				byte[] bb = fb.getBytePacket(currPacket);
+				if (bb != null) {
+
+					msg.params.memoryinfo.byteZero.set(bb[0]);
+
+					for (int i = 0; i < bb.length; i++) {
+						msg.params.memoryinfo.buffer[i].set(bb[i]);
+						
+							System.out.println(bb[i]);
+						
+					}
+				}
+				msg.params.flash_info.totalfilesize.set(size);
+				msg.params.flash_info.totalnoofpackets.set(tot);
+
+				msg.params.flash_info.currentpacket.set(currPacket);
+				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+						VPXUDPListener.COMM_PORTNO);
+
+				datagramSocket.send(packet);
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
 			}
-			msg.params.flash_info.totalfilesize.set(size);
-			msg.params.flash_info.totalnoofpackets.set(tot);
-
-			msg.params.flash_info.currentpacket.set(currPacket);
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
 		}
 
 	}

@@ -19,8 +19,10 @@ public interface ATP {
 	public static final int MSG_TYPE_FLASH = 0xC3;
 
 	public static final int MSG_TYPE_FLASH_ACK = 0xC4;
+	
+	public static final int MSG_TYPE_FLASH_DONE = 0xC5;
 
-	public static final int MSG_TYPE_CLOSE = 0xC5;
+	public static final int MSG_TYPE_CLOSE = 0xC6;
 
 	// Result
 	public static final int TEST_RESULT_PASS = 0x01;
@@ -45,5 +47,7 @@ public interface ATP {
 	public static final ByteOrder BYTEORDER_P2020 = ByteOrder.BIG_ENDIAN;
 
 	public static final ByteOrder BYTEORDER_DSP = ByteOrder.LITTLE_ENDIAN;
+
+	public static final int DEFAULTBUFFERSIZE = 1024;
 
 }

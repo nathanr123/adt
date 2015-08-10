@@ -1,25 +1,21 @@
 package com.cti.vpx.command;
 
-import java.io.Serializable;
 import java.nio.ByteOrder;
 
 import javolution.io.Struct;
 import javolution.io.Union;
 
-public class ATPCommand extends Struct implements ATP, Serializable {
+public class ATPCommand extends Struct implements ATP {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -799775047978799947L;
-
+	
 	public final Unsigned32 msgType = new Unsigned32();
 
 	public final Unsigned32 msgID = new Unsigned32();
 
 	public final MSGParamaenters params = inner(new MSGParamaenters());
-
-	private static final transient ATPCommand instance = new ATPCommand();
 
 	public ATPCommand() {
 
@@ -104,8 +100,10 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 		public final Unsigned32 stride = new Unsigned32();
 
 		public final Unsigned32 newvalue = new Unsigned32();
+		
+		public final Unsigned32 byteZero = new Unsigned32();
 
-		public final Unsigned32 buffer[] = array(new Unsigned32[1024]);
+		public final Unsigned32 buffer[] = array(new Unsigned32[DEFAULTBUFFERSIZE]);
 
 	}
 
@@ -137,7 +135,4 @@ public class ATPCommand extends Struct implements ATP, Serializable {
 		return true;
 	}
 
-	public static int getSize() {
-		return instance.size();
-	}
 }

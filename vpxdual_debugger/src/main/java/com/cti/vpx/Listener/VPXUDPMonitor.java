@@ -51,7 +51,6 @@ public class VPXUDPMonitor {
 	}
 
 	private void createDefaultMonitors() throws Exception {
-
 		communicationMonitor = new VPXCommunicationMonitor();
 
 		advertisementMonitor = new VPXAdvertisementMonitor();
@@ -90,7 +89,7 @@ public class VPXUDPMonitor {
 
 		communicationMonitor.startMonitor();
 
-		Thread th = new Thread(new VPXMessageConsoleMonitor());
+		Thread th = new Thread(new MThreadMonitor());
 
 		th.start();
 	}
@@ -427,172 +426,17 @@ public class VPXUDPMonitor {
 
 	}
 
-	// Parsing Commication Packets
-	private synchronized void parseCommunicationPacket(String ip, ATPCommand msgCommand) {
-
-		int msgID = (int) msgCommand.msgID.get();
-
-		int msgType = (int) msgCommand.msgType.get();
-
-		if (msgID == ATP.MSG_ID_SET) {
-
-			switch (msgType) {
-
-			case ATP.MSG_TYPE_FLASH:
-
-				// recvAndSaveFile(ip, msgCommand);
-
-				break;
-
-			case ATP.MSG_TYPE_FLASH_ACK:
-
-				// sendNextPacket(ip, msgCommand);
-
-				break;
-
-			case ATP.MSG_TYPE_PERIDAICITY:
-
-				break;
-
-			case ATP.MSG_TYPE_BIST:
-
-				break;
-
-			case ATP.MSG_TYPE_MEMORY:
-
-				break;
-			}
-
-		} else if (msgID == ATP.MSG_ID_GET) {
-
-			switch (msgType) {
-
-			case ATP.MSG_TYPE_FLASH:
-
-				break;
-
-			case ATP.MSG_TYPE_FLASH_ACK:
-
-				break;
-
-			case ATP.MSG_TYPE_PERIDAICITY:
-
-				break;
-
-			case ATP.MSG_TYPE_BIST:
-
-				// populateBISTResult(msgCommand);
-
-				break;
-
-			case ATP.MSG_TYPE_MEMORY:
-
-				break;
-			}
-
-		}
-
-	}
-
-	// Parsing Advertisement Packets
-	private synchronized void parseAdvertisementPacket(String ip, String msg) {
-
-		if (subnet != null) {
-
-			isipinRange = subnet.isInNet(ip);
-
-		}
-
-		if (isipinRange) {
-
-			((VPXAdvertisementListener) listener).updateProcessorStatus(ip, msg);
-		}
-
-	}
-
-	// Parsing Advertisement Packets
-	private synchronized void parseMessagePacket(String ip, MSGCommand msgCommand) {
-
-		if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_CONSOLE) {
-
-			((VPXMessageListener) listener).printConsoleMessage(ip, msgCommand);
-
-		} else if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_MESSAGE) {
-
-			((VPXMessageListener) listener).updateMessage(ip, msgCommand);
-
-		}
-
-	}
-
-	private ATPCommand createATPCommand(String ip, byte[] recvdBytes) {
-
-		ATPCommand msgCommand = new ATPCommand();
-
-		ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
-
-		if (VPXUtilities.getProcessorType(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
-
-			msgCommand = new P2020ATPCommand();
-
-		} else {
-
-			msgCommand = new DSPATPCommand();
-		}
-
-		bf.clear();
-
-		bf.put(recvdBytes);
-
-		bf.flip();
-
-		msgCommand.getByteBuffer().clear();
-
-		msgCommand.getByteBuffer().put(bf);
-
-		return msgCommand;
-	}
-
-	private MSGCommand createMSGCommand(String ip, byte[] recvdBytes) {
-
-		MSGCommand msgCommand = new MSGCommand();
-
-		ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
-
-		if (VPXUtilities.getProcessorType(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
-
-			msgCommand = new P2020MSGCommand();
-
-		} else {
-
-			msgCommand = new DSPMSGCommand();
-		}
-
-		bf.clear();
-
-		bf.put(recvdBytes);
-
-		bf.flip();
-
-		msgCommand.getByteBuffer().clear();
-
-		msgCommand.getByteBuffer().put(bf);
-
-		return msgCommand;
-	}
-
-	// Monitors Starts
-
-	// Message Monitor
-	class VPXMessageConsoleMonitor implements Runnable {
+	class MThreadMonitor implements Runnable {
 
 		DatagramSocket messageReceiverSocket;
 
-		byte[] messageData = new byte[MSGCommand.getSize()];
+		MSGCommand msgCommand = new MSGCommand();
+
+		byte[] messageData = new byte[msgCommand.size()];
 
 		DatagramPacket messagePacket = new DatagramPacket(messageData, messageData.length);
 
-		public VPXMessageConsoleMonitor() throws Exception {
+		public MThreadMonitor() throws Exception {
 
 			messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO);
 
@@ -601,14 +445,43 @@ public class VPXUDPMonitor {
 		@Override
 		public void run() {
 
+			ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
+
 			while (true) {
 				try {
 
 					messageReceiverSocket.receive(messagePacket);
 
-					String ip = messagePacket.getAddress().getHostAddress();
+					if (VPXUtilities.getProcessorType(messagePacket.getAddress().getHostAddress()) == PROCESSOR_LIST.PROCESSOR_P2020) {
 
-					parseMessagePacket(ip, createMSGCommand(ip, messageData));
+						msgCommand = new P2020MSGCommand();
+
+					} else {
+
+						msgCommand = new DSPMSGCommand();
+					}
+
+					bf.clear();
+
+					bf.put(messageData);
+
+					bf.flip();
+
+					msgCommand.getByteBuffer().clear();
+
+					msgCommand.getByteBuffer().put(bf);
+
+					if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_CONSOLE) {
+
+						((VPXMessageListener) listener).printConsoleMessage(
+								messagePacket.getAddress().getHostAddress(), msgCommand);
+
+					} else if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_MESSAGE) {
+
+						((VPXMessageListener) listener).updateMessage(messagePacket.getAddress().getHostAddress(),
+								msgCommand);
+
+					}
 
 					Thread.sleep(500);
 
@@ -621,14 +494,13 @@ public class VPXUDPMonitor {
 
 	}
 
-	// Communication Monitor
 	class VPXCommunicationMonitor extends SwingWorker<Void, Void> {
 
 		DatagramSocket communicationSocket = null;
 
-		byte[] commandData = new byte[ATPCommand.getSize()];
+		byte[] commandData = new byte[1024];
 
-		DatagramPacket messagePacket = new DatagramPacket(commandData, commandData.length);
+		DatagramPacket commandPacket = new DatagramPacket(commandData, commandData.length);
 
 		public VPXCommunicationMonitor() throws Exception {
 
@@ -642,11 +514,9 @@ public class VPXUDPMonitor {
 
 				try {
 
-					communicationSocket.receive(messagePacket);
+					communicationSocket.receive(commandPacket);
 
-					String ip = messagePacket.getAddress().getHostAddress();
-
-					parseCommunicationPacket(ip, createATPCommand(ip, commandData));
+					((VPXCommunicationListener) listener).updateCommand(new ATPCommand());
 
 					Thread.sleep(500);
 
@@ -667,7 +537,6 @@ public class VPXUDPMonitor {
 
 	}
 
-	// Advertisement Monitor
 	class VPXAdvertisementMonitor extends SwingWorker<Void, Void> {
 
 		DatagramSocket advertisementSocket;
@@ -683,15 +552,25 @@ public class VPXUDPMonitor {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-
 			while (true) {
 
 				isipinRange = true;
 
 				advertisementSocket.receive(advertisementPacket);
 
-				parseAdvertisementPacket(advertisementPacket.getAddress().getHostAddress(), new String(
-						advertisementPacket.getData(), 0, advertisementPacket.getLength()));
+				if (subnet != null) {
+
+					isipinRange = subnet.isInNet(advertisementPacket.getAddress().getHostAddress());
+
+				}
+
+				if (isipinRange) {
+
+					String sentence = new String(advertisementPacket.getData(), 0, advertisementPacket.getLength());
+
+					((VPXAdvertisementListener) listener).updateProcessorStatus(advertisementPacket.getAddress()
+							.getHostAddress(), sentence);
+				}
 
 				Thread.sleep(1000);
 			}
@@ -705,5 +584,4 @@ public class VPXUDPMonitor {
 			cancel(true);
 		}
 	}
-
 }
