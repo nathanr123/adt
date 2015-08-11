@@ -25,10 +25,13 @@ import java.io.OutputStream;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -272,7 +275,7 @@ public class VPXUtilities {
 		else if (format == 2) {
 
 			VPXConstants.DATEFORMAT_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
-		
+
 			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
 		} else if (format == 3)
@@ -391,6 +394,28 @@ public class VPXUtilities {
 	public static void setVPXSystem(VPXSystem sys) {
 
 		vpxSystem = sys;
+	}
+
+	public static Map<Long, byte[]> divideArrayAsMap(byte[] source, int chunksize) {
+
+		Map<Long, byte[]> bytesMap = new LinkedHashMap<Long, byte[]>();
+
+		int start = 0;
+
+		long i = 0;
+
+		while (start < source.length) {
+
+			int end = Math.min(source.length, start + chunksize);
+
+			bytesMap.put(i, Arrays.copyOfRange(source, start, end));
+
+			start += chunksize;
+
+			i++;
+		}
+
+		return bytesMap;
 	}
 
 	public static Image getAppIcon() {

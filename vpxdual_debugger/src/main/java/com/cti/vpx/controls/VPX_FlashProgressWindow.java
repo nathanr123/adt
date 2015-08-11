@@ -35,9 +35,14 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	private long starttime;
 
+	private long bytesRecieved;
+
 	private boolean isFlashingStatred = false;
 
 	private JFrame parent;
+	private JLabel lblBytesSentVal;
+	private JLabel lblBytesRemainingVal;
+	private JLabel lblBytesTotalVal;
 
 	/**
 	 * Launch the application.
@@ -72,7 +77,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-		setSize(450, 200);
+		setSize(500, 250);
 
 		setLocationRelativeTo(parent);
 
@@ -110,71 +115,90 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		getContentPane().add(detailPanel, BorderLayout.CENTER);
 
-		detailPanel.setLayout(new MigLayout("", "[pref!][89px][pref!][46px,grow]",
+		detailPanel.setLayout(new MigLayout("", "[89px,grow][pref!,grow][pref!,grow][][][fill][grow,fill]",
 				"[16px,grow][16px,grow][23.00px,grow][22.00px,grow][14px,grow]"));
-
-		JLabel lblDummy2 = new JLabel("");
-
-		lblDummy2.setPreferredSize(new Dimension(30, 0));
-
-		detailPanel.add(lblDummy2, "cell 0 0");
 
 		JLabel lblTotalFileSize = new JLabel("Total File Size");
 
 		lblTotalFileSize.setHorizontalAlignment(SwingConstants.LEFT);
 
-		detailPanel.add(lblTotalFileSize, "cell 1 0,alignx left,aligny center");
+		detailPanel.add(lblTotalFileSize, "cell 0 0,alignx left,aligny center");
 
 		JLabel lblDummy1 = new JLabel("");
 
 		lblDummy1.setPreferredSize(new Dimension(30, 0));
 
-		detailPanel.add(lblDummy1, "cell 2 0");
+		detailPanel.add(lblDummy1, "cell 1 0");
 
 		lblTotalFileSizeVal = new JLabel("10 MBs");
 
-		detailPanel.add(lblTotalFileSizeVal, "cell 3 0,alignx left,aligny center");
+		detailPanel.add(lblTotalFileSizeVal, "cell 2 0,alignx left,aligny center");
+
+		JLabel label = new JLabel("");
+		label.setPreferredSize(new Dimension(30, 0));
+		detailPanel.add(label, "cell 5 0");
 
 		JLabel lblTotalPackets = new JLabel("Total Packets");
 
 		lblTotalPackets.setHorizontalAlignment(SwingConstants.LEFT);
 
-		detailPanel.add(lblTotalPackets, "cell 1 1,alignx left,aligny center");
+		detailPanel.add(lblTotalPackets, "cell 0 1,alignx left,aligny center");
 
 		lblTotalPacketsVal = new JLabel("1500 ");
 
-		detailPanel.add(lblTotalPacketsVal, "cell 3 1,alignx left,aligny center");
+		detailPanel.add(lblTotalPacketsVal, "cell 2 1,alignx left,aligny center");
+
+		JLabel lblBytesTotal = new JLabel("Total Bytes");
+		lblBytesTotal.setHorizontalAlignment(SwingConstants.LEFT);
+		detailPanel.add(lblBytesTotal, "cell 4 1");
+
+		lblBytesTotalVal = new JLabel("10 MBs");
+		detailPanel.add(lblBytesTotalVal, "cell 6 1");
 
 		JLabel lblPacketsSent = new JLabel("Pakets Sent");
 
 		lblPacketsSent.setHorizontalAlignment(SwingConstants.LEFT);
 
-		detailPanel.add(lblPacketsSent, "cell 1 2,alignx left,aligny center");
+		detailPanel.add(lblPacketsSent, "cell 0 2,alignx left,aligny center");
 
 		lblPacketsSentVal = new JLabel("100");
 
-		detailPanel.add(lblPacketsSentVal, "cell 3 2,alignx left,aligny center");
+		detailPanel.add(lblPacketsSentVal, "cell 2 2,alignx left,aligny center");
+
+		JLabel lblBytesSent = new JLabel("Bytes Sent");
+		lblBytesSent.setHorizontalAlignment(SwingConstants.LEFT);
+		detailPanel.add(lblBytesSent, "cell 4 2");
+
+		lblBytesSentVal = new JLabel("10 MBs");
+		detailPanel.add(lblBytesSentVal, "cell 6 2");
 
 		JLabel lblPacketsRemaining = new JLabel("Packets Remaining");
 
 		lblPacketsRemaining.setHorizontalAlignment(SwingConstants.LEFT);
 
-		detailPanel.add(lblPacketsRemaining, "cell 1 3,alignx left,aligny center");
+		detailPanel.add(lblPacketsRemaining, "cell 0 3,alignx left,aligny center");
 
 		lblPacketsRemainingVal = new JLabel("1400");
 
-		detailPanel.add(lblPacketsRemainingVal, "cell 3 3,alignx left,aligny center");
+		detailPanel.add(lblPacketsRemainingVal, "cell 2 3,alignx left,aligny center");
+
+		JLabel lblBytesRemaining = new JLabel("Bytes Remaining");
+		lblBytesRemaining.setHorizontalAlignment(SwingConstants.LEFT);
+		detailPanel.add(lblBytesRemaining, "cell 4 3");
+
+		lblBytesRemainingVal = new JLabel("10 MBs");
+		detailPanel.add(lblBytesRemainingVal, "cell 6 3");
 
 		JLabel lblElapsedTime = new JLabel("Elapsed Time");
 
-		detailPanel.add(lblElapsedTime, "cell 1 4,alignx left,aligny center");
+		detailPanel.add(lblElapsedTime, "cell 0 4,alignx left,aligny center");
 
 		lblElapsedTimeVal = new JLabel("00:00:03");
 
-		detailPanel.add(lblElapsedTimeVal, "cell 3 4,aligny center");
+		detailPanel.add(lblElapsedTimeVal, "cell 2 4,aligny center");
 	}
 
-	public void updatePackets(long size, long totpkt, long curpacket) {
+	public void updatePackets(long size, long totpkt, long curpacket, long bytesRcvd) {
 
 		if (curpacket == 0) {
 
@@ -194,6 +218,14 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		lblTotalPacketsVal.setText("" + totpkt);
 
 		lblPacketsSentVal.setText("" + curpacket);
+
+		bytesRecieved = bytesRecieved + bytesRcvd;
+
+		lblBytesSentVal.setText(bytesRecieved + " bytes");
+
+		lblBytesRemainingVal.setText((size - bytesRecieved) + " bytes");
+
+		lblBytesTotalVal.setText(size + " bytes");
 
 		long remain = (totpkt - curpacket);
 

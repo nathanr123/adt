@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -16,6 +17,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.cti.vpx.command.GreetingClient;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_EthernetFlashPanel extends JPanel {
 	/**
@@ -44,7 +48,11 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private boolean isWizard = false;
 
-	public VPX_EthernetFlashPanel() {
+	private VPX_ETHWindow parent;
+
+	public VPX_EthernetFlashPanel(VPX_ETHWindow parent) {
+
+		this.parent = parent;
 
 		init();
 
@@ -55,14 +63,16 @@ public class VPX_EthernetFlashPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public VPX_EthernetFlashPanel(boolean iswizard) {
+	public VPX_EthernetFlashPanel(VPX_ETHWindow parent, boolean iswizard) {
+
+		this.parent = parent;
 
 		this.isWizard = iswizard;
 
 		init();
 
 		loadComponents();
-		
+
 	}
 
 	private void init() {
@@ -127,6 +137,20 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		JButton btnFlash = new JButton("Flash");
 
+		btnFlash.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(parent);
+
+				dialog.setVisible(true);
+
+				parent.sendFile("192.168.0.102", "D:\\VPXUDPMonitor.java", dialog);
+
+			}
+		});
+
 		btnFlash.setBounds(153, 236, 68, 23);
 
 		flashOptionPanel.add(btnFlash);
@@ -146,7 +170,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 			flashOptionPanel.add(btnFlashBoot);
 
 		}
-		
+
 		txtBinFilePath = new JTextField();
 
 		txtBinFilePath.setColumns(10);

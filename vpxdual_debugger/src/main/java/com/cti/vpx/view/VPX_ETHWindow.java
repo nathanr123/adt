@@ -36,11 +36,7 @@ import com.cti.vpx.Listener.VPXCommunicationListener;
 import com.cti.vpx.Listener.VPXMessageListener;
 import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATPCommand;
-import com.cti.vpx.command.DSPATPCommand;
-import com.cti.vpx.command.DSPMSGCommand;
 import com.cti.vpx.command.MSGCommand;
-import com.cti.vpx.command.P2020ATPCommand;
-import com.cti.vpx.command.P2020MSGCommand;
 import com.cti.vpx.controls.VPX_About_Dialog;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
@@ -50,6 +46,7 @@ import com.cti.vpx.controls.VPX_ConsolePanel;
 import com.cti.vpx.controls.VPX_DetailPanel;
 import com.cti.vpx.controls.VPX_EthernetFlashPanel;
 import com.cti.vpx.controls.VPX_ExecutionPanel;
+import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.controls.VPX_FlashWizard;
 import com.cti.vpx.controls.VPX_LogFileViewPanel;
 import com.cti.vpx.controls.VPX_LoggerPanel;
@@ -1366,7 +1363,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	public void showEthFlash() {
 
-		vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(new VPX_EthernetFlashPanel()));
+		vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(new VPX_EthernetFlashPanel(
+				VPX_ETHWindow.this)));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -1622,32 +1620,14 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	}
 
 	@Override
-	public void updateCommand(P2020ATPCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateCommand(DSPATPCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void sendCommand(ATPCommand command) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
-	public void sendCommand(P2020ATPCommand command) {
-		// TODO Auto-generated method stub
+	public void sendFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow) {
 
-	}
-
-	@Override
-	public void sendCommand(DSPATPCommand command) {
-		// TODO Auto-generated method stub
+		udpMonitor.sendFile(flashingWindow, filename, ip);
 
 	}
 

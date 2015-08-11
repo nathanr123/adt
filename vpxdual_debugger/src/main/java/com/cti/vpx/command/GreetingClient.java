@@ -6,20 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,20 +22,23 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import javolution.io.Struct.Unsigned32;
-
 import org.apache.commons.io.FileUtils;
 
+import com.cti.vpx.Listener.VPXAdvertisementListener;
+import com.cti.vpx.Listener.VPXCommunicationListener;
+import com.cti.vpx.Listener.VPXMessageListener;
 import com.cti.vpx.Listener.VPXUDPListener;
+import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
+import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXUtilities;
 
-public class GreetingClient {
+public class GreetingClient implements VPXAdvertisementListener, VPXMessageListener, VPXCommunicationListener {
 	public static void main(String[] args) {
 
 		// new GreetingClient().identify("172.17.10.21", 12345);
@@ -53,7 +50,6 @@ public class GreetingClient {
 	private JTextArea jt;
 	private byte[] filestoSend;
 	private byte[] filesfromRecv;
-	private int offset = 0;
 	private int start;
 	private int end;
 	private int tot;
@@ -159,9 +155,9 @@ public class GreetingClient {
 
 		f.setVisible(true);
 
-		startMessage();
+		//startMessage();
 
-		startCMD();
+		//startCMD();
 
 	}
 
@@ -606,71 +602,44 @@ public class GreetingClient {
 
 		try {
 
-			File f = new File("D:\\UARTTestProject.bin");
-
-			size = FileUtils.sizeOf(f);
-
-			filestoSend = FileUtils.readFileToByteArray(f);
-
-			Map<Long, byte[]> t = divideArrayAsMap(filestoSend, ATP.DEFAULTBUFFERSIZE);
-
-			fb = new FileBytesToSend(size, t);
-
-			byte b[] = new byte[ATP.DEFAULTBUFFERSIZE];
-
-			for (int i = 0; i < b.length; i++) {
-				b[i] = filestoSend[i];
-			}
+			VPXUDPMonitor udp = new VPXUDPMonitor(this);
+			
+			udp.addUDPListener(this);
+			
+			udp.startMonitor();
 
 			dialog = new VPX_FlashProgressWindow(GreetingClient.this.f);
 
 			dialog.setVisible(true);
 
-			sendFileToProcessor("172.17.10.130", FileUtils.sizeOf(f), fb.getBytePacket(0));
+			udp.sendFile(dialog, "D:\\VPXUDPMonitor.java", "192.168.0.102");
+			/*
+			 * File f = new File("D:\\1.jpg");
+			 * 
+			 * size = FileUtils.sizeOf(f);
+			 * 
+			 * filestoSend = FileUtils.readFileToByteArray(f);
+			 * 
+			 * Map<Long, byte[]> t = VPXUtilities.divideArrayAsMap(filestoSend,
+			 * ATP.DEFAULTBUFFERSIZE);
+			 * 
+			 * fb = new FileBytesToSend(size, t);
+			 * 
+			 * byte b[] = new byte[ATP.DEFAULTBUFFERSIZE];
+			 * 
+			 * for (int i = 0; i < b.length; i++) { b[i] = filestoSend[i]; }
+			 * 
+			 * 
+			 * 
+			 * 
+			 * 
+			 * sendFileToProcessor("192.168.0.102", FileUtils.sizeOf(f),
+			 * fb.getBytePacket(0));
+			 */
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static List<byte[]> divideArray(byte[] source, int chunksize) {
-
-		List<byte[]> result = new ArrayList<byte[]>();
-
-		int start = 0;
-
-		while (start < source.length) {
-
-			int end = Math.min(source.length, start + chunksize);
-
-			result.add(Arrays.copyOfRange(source, start, end));
-
-			start += chunksize;
-		}
-
-		return result;
-	}
-
-	public static Map<Long, byte[]> divideArrayAsMap(byte[] source, int chunksize) {
-
-		Map<Long, byte[]> bytesMap = new LinkedHashMap<Long, byte[]>();
-
-		int start = 0;
-
-		long i = 0;
-
-		while (start < source.length) {
-
-			int end = Math.min(source.length, start + chunksize);
-
-			bytesMap.put(i, Arrays.copyOfRange(source, start, end));
-
-			start += chunksize;
-
-			i++;
-		}
-
-		return bytesMap;
 	}
 
 	public void sendFileToProcessor(String ip, long size, byte[] sendBuffer) {
@@ -714,14 +683,12 @@ public class GreetingClient {
 			for (int i = 0; i < sendBuffer.length; i++) {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
-			
-				System.out.println(sendBuffer[i]);
-			
+
 			}
 
 			msg.params.flash_info.currentpacket.set(0);
 
-			dialog.updatePackets(size, tot, 0);
+			dialog.updatePackets(size, tot, 0, sendBuffer.length);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					VPXUDPListener.COMM_PORTNO);
@@ -755,7 +722,6 @@ public class GreetingClient {
 
 			filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get();
 		}
-
 
 		// Sending part
 
@@ -795,7 +761,7 @@ public class GreetingClient {
 			}
 		} else {
 			try {
-				FileOutputStream fos = new FileOutputStream("D:\\WinRegistry1.java");
+				FileOutputStream fos = new FileOutputStream("D:\\2.jpg");
 				fos.write(filesfromRecv);
 				fos.close();
 			} catch (Exception e) {
@@ -841,20 +807,22 @@ public class GreetingClient {
 					end = filestoSend.length;
 				}
 
-				dialog.updatePackets(size, tot, currPacket);
-
 				byte[] bb = fb.getBytePacket(currPacket);
+
 				if (bb != null) {
 
 					msg.params.memoryinfo.byteZero.set(bb[0]);
 
 					for (int i = 0; i < bb.length; i++) {
+
 						msg.params.memoryinfo.buffer[i].set(bb[i]);
-						
-							System.out.println(bb[i]);
-						
+
 					}
+					dialog.updatePackets(size, tot, currPacket, bb.length);
+				} else {
+					dialog.updatePackets(size, tot, currPacket, 0);
 				}
+
 				msg.params.flash_info.totalfilesize.set(size);
 				msg.params.flash_info.totalnoofpackets.set(tot);
 
@@ -872,188 +840,64 @@ public class GreetingClient {
 
 	}
 
-	public class FileBytesToSend implements Serializable {
+	@Override
+	public void updateCommand(ATPCommand command) {
+		// TODO Auto-generated method stub
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+	}
 
-		private long fileSize;
+	@Override
+	public void sendCommand(ATPCommand command) {
+		// TODO Auto-generated method stub
 
-		private long totalpackets;
+	}
 
-		private long currentPacket;
+	@Override
+	public void updateMessage(String ip, String msg) {
+		// TODO Auto-generated method stub
 
-		private long remainigPacket;
+	}
 
-		private Map<Long, byte[]> bytesMap = new LinkedHashMap<Long, byte[]>();
+	@Override
+	public void updateMessage(String ip, MSGCommand command) {
+		// TODO Auto-generated method stub
 
-		private Iterator<Entry<Long, byte[]>> iteratorByteArray;
+	}
 
-		/**
-		 * @param fileSize
-		 * @param totalpackets
-		 * @param currentPacket
-		 * @param remainigPacket
-		 */
-		public FileBytesToSend(long fileSize, long totalpackets, long currentPacket, long remainigPacket) {
+	@Override
+	public void sendMessage(String ip, int core, String msg) {
+		// TODO Auto-generated method stub
 
-			super();
+	}
 
-			this.fileSize = fileSize;
+	@Override
+	public void printConsoleMessage(String ip, String msg) {
+		// TODO Auto-generated method stub
 
-			this.totalpackets = totalpackets;
+	}
 
-			this.currentPacket = currentPacket;
+	@Override
+	public void printConsoleMessage(String ip, MSGCommand command) {
+		// TODO Auto-generated method stub
 
-			this.remainigPacket = remainigPacket;
-		}
+	}
 
-		public FileBytesToSend(long fileSize, Map<Long, byte[]> map) {
+	@Override
+	public void updateProcessorStatus(String ip, String msg) {
+		// TODO Auto-generated method stub
 
-			super();
+	}
 
-			this.fileSize = fileSize;
+	@Override
+	public void updatePeriodicity(String ip, int periodicity) {
+		// TODO Auto-generated method stub
 
-			this.bytesMap = map;
+	}
 
-			setTotalpackets(map.size());
+	@Override
+	public void updatePeriodicity(int periodicity) {
+		// TODO Auto-generated method stub
 
-			setCurrentPacket(0);
-
-			setIterator();
-
-		}
-
-		/**
-		 * @return the fileSize
-		 */
-		public long getFileSize() {
-			return fileSize;
-		}
-
-		/**
-		 * @param fileSize
-		 *            the fileSize to set
-		 */
-		public void setFileSize(long fileSize) {
-			this.fileSize = fileSize;
-		}
-
-		/**
-		 * @return the totalpackets
-		 */
-		public long getTotalpackets() {
-			return totalpackets;
-		}
-
-		/**
-		 * @param totalpackets
-		 *            the totalpackets to set
-		 */
-		public void setTotalpackets(long totalpackets) {
-			this.totalpackets = totalpackets;
-		}
-
-		/**
-		 * @return the currentPacket
-		 */
-		public long getCurrentPacket() {
-			return currentPacket;
-		}
-
-		/**
-		 * @param currentPacket
-		 *            the currentPacket to set
-		 */
-		public void setCurrentPacket(long currentPacket) {
-
-			this.remainigPacket = this.totalpackets - currentPacket;
-
-			this.currentPacket = currentPacket;
-		}
-
-		/**
-		 * @return the remainigPacket
-		 */
-		public long getRemainigPacket() {
-			return remainigPacket;
-		}
-
-		/**
-		 * @param remainigPacket
-		 *            the remainigPacket to set
-		 */
-		public void setRemainigPacket(long remainigPacket) {
-			this.remainigPacket = remainigPacket;
-		}
-
-		/**
-		 * @return the bytesMap
-		 */
-		public Map<Long, byte[]> getBytesMap() {
-			return bytesMap;
-		}
-
-		/**
-		 * @param bytesMap
-		 *            the bytesMap to set
-		 */
-		public void setBytesMap(Map<Long, byte[]> bytesMap) {
-
-			this.bytesMap = bytesMap;
-
-			setIterator();
-		}
-
-		public byte[] getBytePacket(long index) {
-
-			return bytesMap.get(index);
-		}
-
-		public byte[] getCurrentBytePacket() {
-
-			return bytesMap.get(currentPacket);
-		}
-
-		public byte[] getNextPacket() {
-
-			long temp = currentPacket++;
-
-			setCurrentPacket(currentPacket);
-
-			if (bytesMap.containsKey(temp))
-
-				return bytesMap.get(temp);
-			else
-				return null;
-		}
-
-		public byte[] getNext() {
-
-			if (iteratorByteArray != null) {
-				if (iteratorByteArray.hasNext()) {
-
-					Entry<Long, byte[]> e = iteratorByteArray.next();
-
-					currentPacket = e.getKey();
-
-					return e.getValue();
-
-				} else
-					return null;
-			} else
-				return null;
-		}
-
-		public void setIterator() {
-
-			Set<Entry<Long, byte[]>> set = bytesMap.entrySet();
-
-			iteratorByteArray = set.iterator();
-
-		}
 	}
 
 }

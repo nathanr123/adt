@@ -686,7 +686,7 @@ public class VPX_FlashWizard extends JDialog {
 
 	private void createFlashPanel() {
 
-		flashPanel = new VPX_EthernetFlashPanel(true);
+		flashPanel = new VPX_EthernetFlashPanel(parent,true);
 	}
 
 	private void createControlsPanel() {
