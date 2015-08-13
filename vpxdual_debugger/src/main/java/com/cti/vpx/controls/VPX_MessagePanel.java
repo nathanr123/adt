@@ -9,6 +9,10 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Calendar;
@@ -17,6 +21,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -128,6 +133,30 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		panel.add(btn_Msg_Send);
 
 		txt_Msg_Send = ComponentFactory.createJTextField();
+
+		txt_Msg_Send.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if (arg0.getKeyChar() == KeyEvent.VK_ENTER) {
+
+					btn_Msg_Send.doClick();
+				}
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 		base_Panel.add(txt_Msg_Send, BorderLayout.CENTER);
 
@@ -435,6 +464,49 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	}
 
+	public void showHelp() {
+
+		parent.updateLog("Help document opened");
+
+		final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+
+		JPanel contentPane = new JPanel();
+
+		contentPane.setLayout(new BorderLayout());
+
+		contentPane.add(browserCanvas, BorderLayout.CENTER);
+
+		JDialog frame = new JDialog(parent, "List of commands");
+
+		frame.setBounds(100, 100, 1400, 700);
+
+		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+		frame.setContentPane(contentPane);
+
+		frame.setResizable(true);
+
+		frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) { // Dispose of the
+				// native
+				// component cleanly
+				browserCanvas.dispose();
+			}
+		});
+
+		frame.setVisible(true);
+
+		if (browserCanvas.initialise()) {
+
+			browserCanvas.setUrl(System.getProperty("user.dir") + "\\help\\help.html");
+		} else {
+		}
+
+		frame.setSize(1401, 701);
+	}
+
 	private String getCurrentTime() {
 
 		return VPXConstants.DATEFORMAT_FULL.format(Calendar.getInstance().getTime());
@@ -480,9 +552,13 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			if (VPXUtilities.getCurrentProcessor().length() > 0) {
+			String str = txt_Msg_Send.getText();
 
-				String str = txt_Msg_Send.getText();
+			if (str.equalsIgnoreCase("ls") || str.equalsIgnoreCase("help")) {
+
+				showHelp();
+
+			} else if (VPXUtilities.getCurrentProcessor().length() > 0) {
 
 				if (str.length() > 0 && str.length() <= 48) {
 
@@ -493,10 +569,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 								txt_Msg_Send.getText());
 
 						updateUserMessage(txt_Msg_Send.getText());
-						
+
 					} else {
-						JOptionPane.showMessageDialog(parent, "invalid Arguments", "Message",
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane
+								.showMessageDialog(parent, "invalid Arguments", "Message", JOptionPane.ERROR_MESSAGE);
 
 						txt_Msg_Send.requestFocus();
 					}

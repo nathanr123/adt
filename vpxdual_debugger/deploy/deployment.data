@@ -15,58 +15,37 @@
 			"name"			 : "app1",
 			"fileName"       : "out1",
 			"allowedCores"   : [0]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app2",
 			"fileName"       : "out2",
 			"allowedCores"   : [1]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app3",
 			"fileName"       : "out3",
 			"allowedCores"   : [2]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app4",
 			"fileName"       : "out4",
 			"allowedCores"   : [3]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app5",
 			"fileName"       : "out5",
 			"allowedCores"   : [4]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app6",
 			"fileName"       : "out6",
 			"allowedCores"   : [5]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app7",
 			"fileName"       : "out7",
 			"allowedCores"   : [6]
-		}
-	],
-	
-	"applications" : [
+		},
 		{
 			"name"			 : "app8",
 			"fileName"       : "out8",
@@ -85,5 +64,3 @@
 		"app8"
 	]
 }
-
-==end==

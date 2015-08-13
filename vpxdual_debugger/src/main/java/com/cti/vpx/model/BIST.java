@@ -16,85 +16,102 @@ public class BIST implements Serializable {
 
 	private String testType = "Full Test";
 
-	private String testSubSystem = "Sub1";
+	private String testSubSystem = "";
 
-	private String testP2020IP = "172.17.1.1";
+	private String testP2020IP = "";
 
-	private String testDSP1IP = "172.17.1.2";
+	private String testDSP1IP = "";
 
-	private String testDSP2IP = "172.17.1.3";
+	private String testDSP2IP = "";
 
 	private String testDate = VPXUtilities.getCurrentTime(1);
 
 	private String testTime = VPXUtilities.getCurrentTime(2);
 
 	// Result detail
-	private String resultTestNoofTests = "16";
+	private String resultTestNoofTests = "";
 
-	private String resultTestPassed = "11";
+	private String resultTestPassed = "";
 
-	private String resultTestFailed = "5";
+	private String resultTestFailed = "";
 
 	private String resultTestStartedAt = VPXUtilities.getCurrentTime(2);
 
 	private String resultTestCompletedAt = VPXUtilities.getCurrentTime(2);
 
-	private String resultTestDuration = "2 Minutes";
+	private String resultTestDuration = "";
 
-	private String resultTestStatus = "Success!";
+	private String resultTestStatus = "";
 
 	// P2020 Test Result
-	private String resultP2020Processor = "PASS";
+	private String resultP2020Processor = "";
 
-	private String resultP2020DDR3 = "PASS";
+	private String resultP2020DDR3 = "";
 
-	private String resultP2020NORFlash = "PASS";
+	private String resultP2020NORFlash = "";
 
-	private String resultP2020Ethernet = "PASS";
+	private String resultP2020Ethernet = "";
 
-	private String resultP2020PCIe = "PASS";
+	private String resultP2020PCIe = "";
 
-	private String resultP2020SRIO = "PASS";
+	private String resultP2020SRIO = "";
 
-	private String resultP2020Temprature1 = "45";
+	private String resultP2020Temprature1 = "";
 
-	private String resultP2020Temprature2 = "46";
+	private String resultP2020Temprature2 = "";
 
-	private String resultP2020Temprature3 = "47";
+	private String resultP2020Temprature3 = "";
 
-	private String resultP2020Voltage1 = "3.3 V";
+	private String resultP2020Voltage1 = "";
 
-	private String resultP2020Voltage2 = "3.3 V";
+	private String resultP2020Voltage2 = "";
 
-	private String resultP2020Voltage3 = "3.3 V";
+	private String resultP2020Voltage3 = "";
 
-	private String resultP2020Voltage4 = "3.3 V";
+	private String resultP2020Voltage4 = "";
 
-	private String resultP2020Voltage5 = "3.3 V";
+	private String resultP2020Voltage5 = "";
 
-	private String resultP2020Voltage6 = "3.3 V";
+	private String resultP2020Voltage6 = "";
 
-	private String resultP2020Voltage7 = "3.3 V";
+	private String resultP2020Voltage7 = "";
+
+	private boolean isP2020Completed = false;
 
 	// DSP 1 Test Result
-	private String resultDSP1Processor = "PASS";
+	private String resultDSP1Processor = "";
 
-	private String resultDSP1DDR3 = "PASS";
+	private String resultDSP1DDR3 = "";
 
-	private String resultDSP1NAND = "PASS";
+	private String resultDSP1NAND = "";
 
-	private String resultDSP1NOR = "PASS";
+	private String resultDSP1NOR = "";
+
+	private boolean isDSP1Completed = false;
 
 	// DSP 2 Test Result
-	private String resultDSP2Processor = "PASS";
+	private String resultDSP2Processor = "";
 
-	private String resultDSP2DDR3 = "PASS";
+	private String resultDSP2DDR3 = "";
 
-	private String resultDSP2NAND = "PASS";
+	private String resultDSP2NAND = "";
 
-	private String resultDSP2NOR = "PASS";
+	private String resultDSP2NOR = "";
+
+	private boolean isDSP2Completed = false;
+
+	private long startTime;
 
 	public BIST() {
+
+		startTime = System.currentTimeMillis();
+
+		testDate = VPXUtilities.getCurrentTime(1);
+
+		testTime = VPXUtilities.getCurrentTime(2);
+
+		resultTestStartedAt = VPXUtilities.getCurrentTime(2);
+
 	}
 
 	public BIST(String test, String testType, String testSubSystem, String testP2020IP, String testDSP1IP,
@@ -108,45 +125,85 @@ public class BIST implements Serializable {
 			String resultP2020Voltage6, String resultP2020Voltage7, String resultDSP1Processor, String resultDSP1DDR3,
 			String resultDSP1BAND, String resultDSP1NOR, String resultDSP2Processor, String resultDSP2DDR3,
 			String resultDSP2BAND, String resultDSP2NOR) {
+
 		super();
+
 		this.test = test;
+
 		this.testType = testType;
+
 		this.testSubSystem = testSubSystem;
+
 		this.testP2020IP = testP2020IP;
+
 		this.testDSP1IP = testDSP1IP;
+
 		this.testDSP2IP = testDSP2IP;
+
 		this.testDate = testDate;
+
 		this.testTime = testTime;
+
 		this.resultTestNoofTests = resultNoofTests;
+
 		this.resultTestPassed = resultTestPassed;
+
 		this.resultTestFailed = resultTestFailed;
+
 		this.resultTestStartedAt = resultTestStartedAt;
+
 		this.resultTestCompletedAt = resultTestCompletedAt;
+
 		this.resultTestDuration = resultTestDuration;
+
 		this.resultTestStatus = resultTestStatus;
+
 		this.resultP2020Processor = resultresultP2020020Processor;
+
 		this.resultP2020DDR3 = resultP2020DDR3;
+
 		this.resultP2020NORFlash = resultP2020NORFlash;
+
 		this.resultP2020Ethernet = resultP2020Ethernet;
+
 		this.resultP2020PCIe = resultP2020PCIe;
+
 		this.resultP2020SRIO = resultP2020SRIO;
+
 		this.resultP2020Temprature1 = resultP2020Temprature1;
+
 		this.resultP2020Temprature2 = resultP2020Temprature2;
+
 		this.resultP2020Temprature3 = resultP2020Temprature3;
+
 		this.resultP2020Voltage1 = resultP2020Voltage1;
+
 		this.resultP2020Voltage2 = resultP2020Voltage2;
+
 		this.resultP2020Voltage3 = resultP2020Voltage3;
+
 		this.resultP2020Voltage4 = resultP2020Voltage4;
+
 		this.resultP2020Voltage5 = resultP2020Voltage5;
+
 		this.resultP2020Voltage6 = resultP2020Voltage6;
+
 		this.resultP2020Voltage7 = resultP2020Voltage7;
+
 		this.resultDSP1Processor = resultDSP1Processor;
+
 		this.resultDSP1DDR3 = resultDSP1DDR3;
+
 		this.resultDSP1NAND = resultDSP1BAND;
+
 		this.resultDSP1NOR = resultDSP1NOR;
+
 		this.resultDSP2Processor = resultDSP2Processor;
+
 		this.resultDSP2DDR3 = resultDSP2DDR3;
+
 		this.resultDSP2NAND = resultDSP2BAND;
+
 		this.resultDSP2NOR = resultDSP2NOR;
 	}
 
@@ -461,4 +518,37 @@ public class BIST implements Serializable {
 	public void setResultDSP2NOR(String resultDSP2NOR) {
 		this.resultDSP2NOR = resultDSP2NOR;
 	}
+
+	public boolean isP2020Completed() {
+		return isP2020Completed;
+	}
+
+	public void setP2020Completed(boolean isP2020Completed) {
+		this.isP2020Completed = isP2020Completed;
+	}
+
+	public boolean isDSP1Completed() {
+		return isDSP1Completed;
+	}
+
+	public void setDSP1Completed(boolean isDSP1Completed) {
+		this.isDSP1Completed = isDSP1Completed;
+	}
+
+	public boolean isDSP2Completed() {
+		return isDSP2Completed;
+	}
+
+	public void setDSP2Completed(boolean isDSP2Completed) {
+		this.isDSP2Completed = isDSP2Completed;
+	}
+
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
 }

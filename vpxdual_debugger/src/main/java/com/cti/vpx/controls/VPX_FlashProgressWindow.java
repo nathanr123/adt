@@ -1,7 +1,6 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -39,10 +38,11 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	private boolean isFlashingStatred = false;
 
-	private JFrame parent;
+	private JPanel parent;
 	private JLabel lblBytesSentVal;
 	private JLabel lblBytesRemainingVal;
 	private JLabel lblBytesTotalVal;
+	private JLabel lblCurrentBytesVal;
 
 	/**
 	 * Launch the application.
@@ -59,9 +59,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_FlashProgressWindow(JFrame prnt) {
-
-		super(prnt);
+	public VPX_FlashProgressWindow(JPanel prnt) {
 
 		this.parent = prnt;
 
@@ -134,9 +132,16 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		detailPanel.add(lblTotalFileSizeVal, "cell 2 0,alignx left,aligny center");
 
+		JLabel lblCurrentBytes = new JLabel("Current Bytes");
+		lblCurrentBytes.setHorizontalAlignment(SwingConstants.LEFT);
+		detailPanel.add(lblCurrentBytes, "cell 4 0");
+
 		JLabel label = new JLabel("");
 		label.setPreferredSize(new Dimension(30, 0));
 		detailPanel.add(label, "cell 5 0");
+
+		lblCurrentBytesVal = new JLabel("10 MBs");
+		detailPanel.add(lblCurrentBytesVal, "cell 6 0");
 
 		JLabel lblTotalPackets = new JLabel("Total Packets");
 
@@ -198,7 +203,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		detailPanel.add(lblElapsedTimeVal, "cell 2 4,aligny center");
 	}
 
-	public void updatePackets(long size, long totpkt, long curpacket, long bytesRcvd) {
+	public void updatePackets(long size, long totpkt, long curpacket, long bytesRcvd, long currBufferSize) {
 
 		if (curpacket == 0) {
 
@@ -211,6 +216,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 			starttime = System.currentTimeMillis();
 		}
 
+		curpacket = curpacket + 1;
+		
 		progressFileSent.setValue((int) curpacket);
 
 		lblTotalFileSizeVal.setText(toNumInUnits(size));
@@ -227,6 +234,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		lblBytesTotalVal.setText(size + " bytes");
 
+		lblCurrentBytesVal.setText(currBufferSize + " bytes");
+
 		long remain = (totpkt - curpacket);
 
 		lblPacketsRemainingVal.setText("" + remain);
@@ -242,6 +251,14 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		}
 
 		lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(2, (System.currentTimeMillis() - starttime)));
+	}
+
+	public void doneFlash() {
+
+		JOptionPane.showMessageDialog(VPX_FlashProgressWindow.this, "Flash Completed");
+
+		VPX_FlashProgressWindow.this.dispose();
+
 	}
 
 	public void flashFile() {

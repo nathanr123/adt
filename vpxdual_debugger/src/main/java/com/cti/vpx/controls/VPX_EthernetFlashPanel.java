@@ -6,19 +6,27 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.command.GreetingClient;
+import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPXSubSystem;
+import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_EthernetFlashPanel extends JPanel {
@@ -27,16 +35,13 @@ public class VPX_EthernetFlashPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 3656689916187874512L;
 
-	private static String ETHNOTE = "<html><body><left><b>Flash - User must select the .bin file to flash at above selected Device and Location<br><br>"
-			+ "Boot - Application will be booted from selected Device and Location<br><br>"
-			+ "Flash & Boot - User must select the .bin file to flash at above selected Device and Location.<br>"
-			+ "Rebooted from the selected Device and Location</b></left></body></html>";
+	private static String ETHNOTE = "<html><body><left><b>Flash - User must select the .bin file to flash at above selected Device and Location for DSP<br></b></left></body></html>";
 
 	private JTextField txtBinFilePath;
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
-	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Bin Files", "bin");
 
 	private JComboBox<String> cmbOffset;
 
@@ -50,6 +55,12 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private VPX_ETHWindow parent;
 
+	private VPXSystem sys;
+
+	private JButton btnFlash;
+
+	private String flashIP = "";
+
 	public VPX_EthernetFlashPanel(VPX_ETHWindow parent) {
 
 		this.parent = parent;
@@ -58,6 +69,13 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		loadComponents();
 
+		loadSubSystems();
+
+		enableWizardComponents();
+
+		loadFlashDevices();
+
+		loadFlashLocations();
 	}
 
 	/**
@@ -73,6 +91,11 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		loadComponents();
 
+		enableWizardComponents();
+
+		loadFlashDevices();
+
+		loadFlashLocations();
 	}
 
 	private void init() {
@@ -135,41 +158,38 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		flashOptionPanel.add(lblFlashDevice);
 
-		JButton btnFlash = new JButton("Flash");
+		btnFlash = new JButton("Flash");
 
 		btnFlash.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(parent);
+				VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(VPX_EthernetFlashPanel.this);
 
 				dialog.setVisible(true);
 
-				parent.sendFile("192.168.0.102", "D:\\VPXUDPMonitor.java", dialog);
+				if (VPXUtilities.isFileValid(txtBinFilePath.getText().trim())) {
 
+					if (flashIP.length() == 0) {
+						flashIP = cmbFlshProcessors.getSelectedItem().toString();
+					}
+
+					parent.sendFile(flashIP, txtBinFilePath.getText(), dialog);
+
+				} else {
+
+					JOptionPane.showMessageDialog(parent, "Selected file is not valid", "Validation",
+							JOptionPane.ERROR_MESSAGE);
+
+					txtBinFilePath.requestFocus();
+				}
 			}
 		});
 
 		btnFlash.setBounds(153, 236, 68, 23);
 
 		flashOptionPanel.add(btnFlash);
-
-		if (!isWizard) {
-
-			JButton btnBoot = new JButton("Boot");
-
-			btnBoot.setBounds(231, 236, 68, 23);
-
-			flashOptionPanel.add(btnBoot);
-
-			JButton btnFlashBoot = new JButton("Flash & Boot");
-
-			btnFlashBoot.setBounds(309, 236, 114, 23);
-
-			flashOptionPanel.add(btnFlashBoot);
-
-		}
 
 		txtBinFilePath = new JTextField();
 
@@ -203,6 +223,23 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		cmbSubSystem = new JComboBox<String>();
 
+		loadSubSystems();
+
+		cmbSubSystem.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbSubSystem)) {
+
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
+						loadProcessors();
+					}
+				}
+			}
+		});
+
 		cmbSubSystem.setPreferredSize(new Dimension(175, 22));
 
 		cmbSubSystem.setBounds(153, 21, 175, 22);
@@ -228,6 +265,159 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		lblProcessor.setBounds(15, 64, 114, 22);
 
 		flashOptionPanel.add(lblProcessor);
+	}
+
+	public void setProcessor(String ip) {
+
+		boolean isFound = false;
+
+		flashIP = ip;
+
+		String subs = "";
+
+		List<VPXSubSystem> sub = sys.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = sub.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			if (vpxSubSystem.getIpP2020().equals(ip) || vpxSubSystem.getIpDSP1().equals(ip)
+					|| vpxSubSystem.getIpDSP2().equals(ip)) {
+
+				subs = vpxSubSystem.getSubSystem();
+
+				isFound = true;
+
+				break;
+			}
+
+		}
+
+		if (!isFound) {
+
+			List<Processor> unListed = sys.getUnListed();
+
+			for (Iterator<Processor> iterator = unListed.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				if (ip.equals(processor.getiP_Addresses())) {
+
+					subs = "Unlisted";
+
+					isFound = true;
+
+					break;
+
+				}
+			}
+		}
+
+		if (isFound) {
+
+			cmbSubSystem.setSelectedItem(subs);
+
+			cmbFlshProcessors.setSelectedItem(ip);
+		}
+	}
+
+	private void loadFlashDevices() {
+
+		cmbFlshDevice.addItem("NAND");
+
+		cmbFlshDevice.addItem("NOR");
+	}
+
+	private void loadFlashLocations() {
+
+		cmbOffset.addItem("Location 0");
+
+		cmbOffset.addItem("Location 1");
+	}
+
+	private void enableWizardComponents() {
+
+		cmbSubSystem.setEnabled(isWizard);
+
+		cmbFlshProcessors.setEnabled(isWizard);
+
+	}
+
+	private void loadSubSystems() {
+
+		cmbSubSystem.removeAllItems();
+
+		cmbSubSystem.addItem("Select Subsystem");
+
+		sys = VPXUtilities.getVPXSystem();
+
+		List<VPXSubSystem> sub = sys.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = sub.iterator(); iterator.hasNext();) {
+
+			VPXSubSystem vpxSubSystem = iterator.next();
+
+			cmbSubSystem.addItem(vpxSubSystem.getSubSystem());
+
+		}
+
+		List<Processor> unListed = sys.getUnListed();
+
+		if (unListed.size() > 0) {
+
+			cmbSubSystem.addItem("Unlisted");
+		}
+
+	}
+
+	private void loadProcessors() {
+
+		cmbFlshProcessors.removeAllItems();
+
+		cmbSubSystem.addItem("Select Processor");
+
+		if (cmbSubSystem.getSelectedItem().toString().equals("Unlisted")) {
+
+			List<Processor> unListed = sys.getUnListed();
+
+			for (Iterator<Processor> iterator = unListed.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				if (!processor.getName().contains("P2020")) {
+
+					cmbFlshProcessors.addItem(processor.getiP_Addresses());
+				}
+			}
+
+		} else {
+
+			List<VPXSubSystem> sub = sys.getSubsystem();
+
+			for (Iterator<VPXSubSystem> iterator = sub.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
+
+					// cmbFlshProcessors.addItem(vpxSubSystem.getIpP2020());
+
+					cmbFlshProcessors.addItem(vpxSubSystem.getIpDSP1());
+
+					cmbFlshProcessors.addItem(vpxSubSystem.getIpDSP2());
+
+					break;
+				}
+
+			}
+
+		}
+
+	}
+
+	public void setFilePath(String path) {
+
+		txtBinFilePath.setText(path);
 	}
 
 	public class BrowseAction extends AbstractAction {

@@ -18,11 +18,15 @@ public interface ATP {
 
 	public static final int MSG_TYPE_FLASH = 0xC3;
 
-	public static final int MSG_TYPE_FLASH_ACK = 0xC4;
-	
-	public static final int MSG_TYPE_FLASH_DONE = 0xC5;
+	public static final int MSG_TYPE_BOOT = 0xC4;
 
-	public static final int MSG_TYPE_CLOSE = 0xC6;
+	public static final int MSG_TYPE_FLASH_ACK = 0xC5;
+
+	public static final int MSG_TYPE_FLASH_INTERRUPTED = 0xC6;
+
+	public static final int MSG_TYPE_FLASH_DONE = 0xC7;
+
+	public static final int MSG_TYPE_CLOSE = 0xC8;
 
 	// Result
 	public static final int TEST_RESULT_PASS = 0x01;

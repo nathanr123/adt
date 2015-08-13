@@ -175,7 +175,7 @@ public class VPX_FlashWizard extends JDialog {
 	private void init() {
 
 		setTitle("Flash Wizard");
-		
+
 		setResizable(false);
 
 		setSize(800, 600);
@@ -686,7 +686,7 @@ public class VPX_FlashWizard extends JDialog {
 
 	private void createFlashPanel() {
 
-		flashPanel = new VPX_EthernetFlashPanel(parent,true);
+		flashPanel = new VPX_EthernetFlashPanel(parent, true);
 	}
 
 	private void createControlsPanel() {
@@ -842,6 +842,10 @@ public class VPX_FlashWizard extends JDialog {
 
 			disableAll(idx);
 
+			if (idx == 4) {
+				applyFlash();
+			}
+
 		} else if (madTab.getSelectedIndex() == 1) {
 
 			applyConfiguration();
@@ -849,6 +853,11 @@ public class VPX_FlashWizard extends JDialog {
 		} else if (madTab.getSelectedIndex() == 2) {
 
 			applyCompilation();
+
+			btnNext.setEnabled(false);
+
+			btnBack.setEnabled(false);
+
 		}
 
 	}
@@ -1026,6 +1035,11 @@ public class VPX_FlashWizard extends JDialog {
 
 			parent.updateLog(error);
 		}
+	}
+
+	private void applyFlash() {
+
+		flashPanel.setFilePath(txtCompilePathFinalOut.getText().trim());
 	}
 
 	private void clearCompilationFields() {
@@ -1288,6 +1302,22 @@ public class VPX_FlashWizard extends JDialog {
 	public void updateConfigFile(String pythonPath, String mapTool, String prelinker, String ofd, String strip,
 			String mal, String nml, boolean isUseDummy, String dummy) {
 
+		pythonPath = pythonPath.replaceAll("\\\\", "/");
+
+		mapTool = mapTool.replaceAll("\\\\", "/");
+
+		prelinker = prelinker.replaceAll("\\\\", "/");
+
+		ofd = ofd.replaceAll("\\\\", "/");
+
+		strip = strip.replaceAll("\\\\", "/");
+
+		mal = mal.replaceAll("\\\\", "/");
+
+		nml = nml.replaceAll("\\\\", "/");
+
+		dummy = dummy.replaceAll("\\\\", "/");
+
 		Properties p = VPXUtilities.readProperties();
 
 		p.setProperty(VPXConstants.ResourceFields.PATH_PYTHON, pythonPath);
@@ -1312,7 +1342,7 @@ public class VPX_FlashWizard extends JDialog {
 
 		currMapPath = mapTool;
 
-		currentdployCfg = VPXUtilities.readFile("deploy\\config.data");
+		currentdployCfg = VPXUtilities.readFile("deploy/config.data");
 
 		currentdployCfg = currentdployCfg.replace("prelinkpath", prelinker);
 
@@ -1330,21 +1360,21 @@ public class VPX_FlashWizard extends JDialog {
 
 		String str = VPXUtilities.readFile("deploy/deployment.data");
 
-		str = str.replace("out1", out1Path);
+		str = str.replace("out1", out1Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out2", out2Path);
+		str = str.replace("out2", out2Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out3", out3Path);
+		str = str.replace("out3", out3Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out4", out4Path);
+		str = str.replace("out4", out4Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out5", out5Path);
+		str = str.replace("out5", out5Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out6", out6Path);
+		str = str.replace("out6", out6Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out7", out7Path);
+		str = str.replace("out7", out7Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out8", out8Path);
+		str = str.replace("out8", out8Path.replaceAll("\\\\", "/"));
 
 		Properties p = VPXUtilities.readProperties();
 
@@ -1368,16 +1398,16 @@ public class VPX_FlashWizard extends JDialog {
 
 		VPXUtilities.updateProperties(p);
 
-		folderPath = currMapPath.substring(0, currMapPath.lastIndexOf("\\"));
+		folderPath = currMapPath.substring(0, currMapPath.lastIndexOf("/"));
 
-		VPXUtilities.writeFile(folderPath + "\\" + VPXConstants.ResourceFields.DEPLOYMENTFILE, str);
+		VPXUtilities.writeFile(folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE, str);
 
-		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "\\"
+		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "/"
 				+ VPXConstants.ResourceFields.DEPLOYMENTFILE);
 
 		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
 
-		VPXUtilities.writeFile(folderPath + "\\" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, currentdployCfg);
+		VPXUtilities.writeFile(folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, currentdployCfg);
 
 	}
 
@@ -1388,7 +1418,7 @@ public class VPX_FlashWizard extends JDialog {
 		Properties p = VPXUtilities.readProperties();
 
 		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(VPXConstants.ResourceFields.PATH_MAP),
-				folderPath + "\\" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
+				folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
 		// String cmd = String.format("cmd /c ping 192.168.0.102");
 
 		parent.updateLog("Creating deployment files");
@@ -1655,6 +1685,9 @@ public class VPX_FlashWizard extends JDialog {
 
 			btnOpenFolder.setEnabled(true);
 
+			btnNext.setEnabled(true);
+
+			btnBack.setEnabled(true);
 			// btnCancel.setEnabled(true);
 
 			lblOpenFolder.setEnabled(true);
@@ -1665,6 +1698,10 @@ public class VPX_FlashWizard extends JDialog {
 			btnOpen.setEnabled(false);
 
 			btnOpenFolder.setEnabled(false);
+
+			btnNext.setEnabled(true);
+
+			btnBack.setEnabled(true);
 
 			// btnCancel.setEnabled(true);
 

@@ -77,6 +77,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private JMenuItem vpx_Menu_Window_BIST;
 
+	private JMenuItem vpx_Menu_Window_Reboot;
+
 	private JMenuItem vpx_Menu_Window_Execution;
 
 	private JMenuItem vpx_Menu_Window_P2020Config;
@@ -89,6 +91,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	private VPX_ETHWindow parent;
 
 	private VPXSystem system = new VPXSystem();
+
+	private int count = -1;
 
 	private static DefaultMutableTreeNode systemRootNode = new DefaultMutableTreeNode();
 
@@ -223,8 +227,29 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		setRowHeight(20);
 
-		monitor.execute();
+		// monitor.execute();
 
+	}
+
+	public int getProcessorCount() {
+
+		int count = 0;
+
+		DefaultMutableTreeNode node = null;
+
+		Enumeration<DefaultMutableTreeNode> e = systemRootNode.depthFirstEnumeration();
+
+		while (e.hasMoreElements()) {
+
+			node = e.nextElement();
+
+			if (node.isLeaf()) {
+
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	public void setVPXSystem(VPXSystem sys) {
@@ -326,9 +351,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			system.addInUnListed(p);
 
-			
 			parent.updatePeriodicity(p.getName(), VPXUtilities.getCurrentPeriodicity());
-			
+
 			VPXUtilities.setVPXSystem(system);
 
 			loadSystemRootNode();
@@ -987,6 +1011,19 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
+		vpx_Menu_Window_Reboot = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot"),
+				VPXConstants.Icons.ICON_BIST);
+
+		vpx_Menu_Window_Reboot.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.setReboot(VPXUtilities.getCurrentProcessor());
+
+			}
+		});
+
 		vpx_Menu_Window_BIST = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"),
 				VPXConstants.Icons.ICON_BIST);
 
@@ -1187,8 +1224,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_contextMenu.add(vpx_Menu_Window_EthFlash);
 
-			vpx_contextMenu.add(vpx_Menu_Window_BIST);
-
 			vpx_contextMenu.add(vpx_Menu_Window_Execution);
 
 			vpx_contextMenu.add(ComponentFactory.createJSeparator());
@@ -1199,9 +1234,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		} else if (nodeLevel == 3) {
 
+			vpx_contextMenu.add(vpx_Menu_Window_BIST);
+
 			vpx_contextMenu.add(vpx_Menu_Window_P2020Config);
 
 			vpx_contextMenu.add(vpx_Menu_Window_ChangeIP);
+
+			vpx_contextMenu.add(vpx_Menu_Window_Reboot);
 
 			vpx_contextMenu.add(ComponentFactory.createJSeparator());
 
@@ -1209,12 +1248,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_contextMenu.add(vpx_Menu_File_Detail);
 		}
-
-		// Dimension d = vpx_contextMenu.getPreferredSize();
-
-		// d.width = 250;
-
-		// vpx_contextMenu.setPreferredSize(d);
 
 		return vpx_contextMenu;
 	}

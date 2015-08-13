@@ -203,19 +203,19 @@ public class VPXUtilities {
 		}
 		if (elapsedHours > 0) {
 
-			str += elapsedHours + " hours ";
+			str += elapsedHours + " hrs ";
 		}
 		if (elapsedMinutes > 0) {
 
-			str += elapsedMinutes + " minutes ";
+			str += elapsedMinutes + " mins ";
 		}
 		if (elapsedSeconds > 0) {
 
-			str += elapsedSeconds + " seconds ";
+			str += elapsedSeconds + " secs ";
 		}
 		if (elapsedMilliSeconds > 0) {
 
-			str += elapsedMilliSeconds + "  milli seconds ";
+			str += elapsedMilliSeconds + "  millis ";
 		}
 
 		return str;
@@ -432,7 +432,7 @@ public class VPXUtilities {
 
 		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
 	}
-
+	
 	private static Image getImage(String name) {
 
 		try {

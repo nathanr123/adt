@@ -23,6 +23,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -63,6 +64,8 @@ import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
+import com.cti.vpx.model.BIST;
+import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXConstants;
@@ -83,6 +86,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	private static final VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
 
 	private static VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
+
+	private static VPX_BISTResultWindow bistWindow = new VPX_BISTResultWindow();
 
 	private ResourceBundle rBundle;
 
@@ -180,6 +185,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	private JToggleButton btnFilter;
 
+	private VPX_CloseProgressWindow closeWindow;
+
 	private static VPX_SubnetFilterWindow subnetFilter;
 
 	public static int currentNoofMemoryView;
@@ -213,7 +220,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		setTitle(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version"));
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -222,6 +229,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		loadComponents();
 
 		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
+
+		addWindowListener(this);
 
 		setVisible(true);
 
@@ -1312,13 +1321,26 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		if (PromptResult == 0) {
 
-			udpMonitor.stopMonitor();
+			Thread th = new Thread(new Runnable() {
 
-			udpMonitor.close();
+				@Override
+				public void run() {
+					closeWindow = new VPX_CloseProgressWindow(VPX_ETHWindow.this,
+							VPX_ETHWindow.this.vpx_Processor_Tree.getProcessorCount());
 
-			VPX_ETHWindow.this.dispose();
+					closeWindow.setVisible(true);
 
-			System.exit(0);
+					udpMonitor.close();
+
+					// udpMonitor.stopMonitor();
+
+					VPX_ETHWindow.this.dispose();
+
+					System.exit(0);
+
+				}
+			});
+			th.start();
 		}
 
 	}
@@ -1363,8 +1385,11 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	public void showEthFlash() {
 
-		vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(new VPX_EthernetFlashPanel(
-				VPX_ETHWindow.this)));
+		VPX_EthernetFlashPanel eth = new VPX_EthernetFlashPanel(VPX_ETHWindow.this);
+
+		eth.setProcessor(VPXUtilities.getCurrentProcessor());
+
+		vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(eth));
 
 		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -1405,9 +1430,27 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		updateLog("Starting Built in Self Test");
 
-		new VPX_BISTResultWindow().setVisible(true);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				bistWindow.showBISTWindow();
+
+			}
+		});
+
+		th.start();
+
+		udpMonitor.startBist(VPXUtilities.getCurrentProcessor(),VPXUtilities.getCurrentSubSystem());
 
 		updateLog("Built in Self Test Completed");
+	}
+
+	public void setReboot(String ip) {
+
+		udpMonitor.sendBoot(ip);
+
+		updateLog("P2020 " + ip + " is set to Reboot");
 	}
 
 	public void showExecution() {
@@ -1625,6 +1668,28 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	}
 
+	@Override
+	public void updateBIST(BIST bist) {
+
+		bistWindow.setResult(bist);
+
+	}
+
+	@Override
+	public void updateExit(int val) {
+
+		closeWindow.updateExitProgress(val);
+
+	}
+	
+	@Override
+	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
+		
+		bistWindow.updateTestProgress(pType, val);
+		
+	}
+
+
 	public void sendFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow) {
 
 		udpMonitor.sendFile(flashingWindow, filename, ip);
@@ -1652,4 +1717,101 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		udpMonitor.setPeriodicityByUnicast(periodicity);
 
 	}
+
+	public class VPX_CloseProgressWindow extends JDialog {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7250292684798353091L;
+
+		private JProgressBar progressFileSent;
+
+		private JFrame parent;
+
+		private int maxVal;
+
+		/**
+		 * Create the dialog.
+		 */
+		public VPX_CloseProgressWindow(JFrame prnt, int max) {
+
+			super(prnt);
+
+			this.maxVal = max;
+
+			this.parent = prnt;
+
+			init();
+
+			loadComponents();
+
+		}
+
+		private void init() {
+
+			setTitle("Closing Application");
+
+			setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+			setSize(500, 150);
+
+			setLocationRelativeTo(parent);
+
+			getContentPane().setLayout(new BorderLayout(0, 0));
+
+		}
+
+		private void loadComponents() {
+
+			JPanel progressPanel = new JPanel();
+
+			progressPanel.setPreferredSize(new Dimension(10, 35));
+
+			getContentPane().add(progressPanel, BorderLayout.SOUTH);
+
+			progressPanel.setLayout(new BorderLayout(0, 0));
+
+			progressFileSent = new JProgressBar();
+
+			progressFileSent.setStringPainted(true);
+
+			progressFileSent.setMaximum(maxVal);
+
+			progressFileSent.setMinimum(0);
+
+			progressPanel.add(progressFileSent, BorderLayout.SOUTH);
+
+			JPanel detailPanel = new JPanel();
+
+			detailPanel.setBorder(null);
+
+			detailPanel.setPreferredSize(new Dimension(25, 10));
+
+			getContentPane().add(detailPanel, BorderLayout.CENTER);
+
+			detailPanel.setLayout(new BorderLayout(0, 0));
+
+			JLabel lblExitingApplication = new JLabel("   Exiting Application....");
+
+			lblExitingApplication.setPreferredSize(new Dimension(30, 0));
+
+			detailPanel.add(lblExitingApplication);
+		}
+
+		public void updateExitProgress(int value) {
+
+			if (value == -1) {
+
+				VPX_CloseProgressWindow.this.dispose();
+
+			} else {
+
+				progressFileSent.setValue(value);
+			}
+		}
+
+	}
+
+	
 }

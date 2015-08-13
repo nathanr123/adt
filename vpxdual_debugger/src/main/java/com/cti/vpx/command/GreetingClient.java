@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,7 +12,6 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,15 +20,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.apache.commons.io.FileUtils;
-
 import com.cti.vpx.Listener.VPXAdvertisementListener;
 import com.cti.vpx.Listener.VPXCommunicationListener;
 import com.cti.vpx.Listener.VPXMessageListener;
 import com.cti.vpx.Listener.VPXUDPListener;
 import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
+import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
+import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
@@ -57,6 +55,9 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	private VPX_FlashProgressWindow dialog;
 	private JFrame f;
 	private FileBytesToSend fb;
+	private VPXUDPMonitor udp;
+
+	private VPX_BISTResultWindow bistWindow = new VPX_BISTResultWindow();
 
 	public GreetingClient() {
 
@@ -155,9 +156,21 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		f.setVisible(true);
 
-		//startMessage();
+		// startMessage();
 
-		//startCMD();
+		// startCMD();
+
+		try {
+
+			udp = new VPXUDPMonitor(this);
+
+			udp.addUDPListener(this);
+
+			udp.startMonitor();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 	}
 
@@ -222,7 +235,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
-			msg.params.periodicity.set(period);
+			msg.periodicity.set(period);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, VPXUtilities.getCurrentInterfaceAddress()
 					.getBroadcast(), VPXUDPListener.COMM_PORTNO);
@@ -243,7 +256,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg1.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
-			msg1.params.periodicity.set(period);
+			msg1.periodicity.set(period);
 
 			DatagramPacket packet1 = new DatagramPacket(buffer1, buffer1.length, VPXUtilities
 					.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO);
@@ -285,12 +298,14 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
-			msg.params.periodicity.set(period);
+			msg.periodicity.set(period);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
+
+			datagramSocket.close();
 
 		} catch (Exception e) {
 
@@ -301,47 +316,51 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	public void populateBISTResult(ATPCommand msg) {
 
-		/*
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_PROCESSOR);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_DDR3);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_NORFLASH);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_ETHERNET);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_SRIO);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_PCIE);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_TEMP1);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_TEMP2);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_TEMP3);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT1_3p3);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT2_2p5);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT3_1p8);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT4_1p5);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT5_1p2);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT6_1p0);
-		 * 
-		 * System.out.println(msg.params.testinfo.RESULT_P2020_VOLT7_1p05);
-		 */
+		if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_P2020) {
 
-		System.out.println(msg.params.testinfo.RESULT_DSP_DDR3);
+			System.out.println(" Processor : " + msg.params.testinfo.RESULT_P2020_PROCESSOR.get());
 
-		System.out.println(msg.params.testinfo.RESULT_DSP_NAND);
+			System.out.println(msg.params.testinfo.RESULT_P2020_DDR3.get());
 
-		System.out.println(msg.params.testinfo.RESULT_DSP_NOR);
+			System.out.println(msg.params.testinfo.RESULT_P2020_NORFLASH.get());
 
-		System.out.println(msg.params.testinfo.RESULT_DSP_PROCESSOR);
+			System.out.println(msg.params.testinfo.RESULT_P2020_ETHERNET.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_SRIO.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_PCIE.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_TEMP1.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_TEMP2.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_TEMP3.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT1_3p3.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT2_2p5.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT3_1p8.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT4_1p5.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT5_1p2.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT6_1p0.get());
+
+			System.out.println(msg.params.testinfo.RESULT_P2020_VOLT7_1p05.get());
+
+		} else if ((msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP1)
+				|| (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP2)) {
+
+			System.out.println(msg.params.testinfo.RESULT_DSP_DDR3.get());
+
+			System.out.println(msg.params.testinfo.RESULT_DSP_NAND.get());
+
+			System.out.println(msg.params.testinfo.RESULT_DSP_NOR.get());
+
+			System.out.println(msg.params.testinfo.RESULT_DSP_PROCESSOR.get());
+		}
 
 	}
 
@@ -399,41 +418,18 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	public void startBist() {
 
-		DatagramSocket datagramSocket;
+		Thread th = new Thread(new Runnable() {
 
-		ATPCommand msg = null;
+			@Override
+			public void run() {
+				bistWindow.showBISTWindow();
 
-		byte[] buffer = null;
+			}
+		});
 
-		ByteBuffer bf = null;
+		th.start();
 
-		try {
-
-			datagramSocket = new DatagramSocket();
-
-			msg = new P2020ATPCommand();
-
-			buffer = new byte[msg.size()];
-
-			bf = ByteBuffer.wrap(buffer);
-
-			bf.order(msg.byteOrder());
-
-			msg.setByteBuffer(bf, 0);
-
-			msg.msgID.set(ATP.MSG_ID_GET);
-
-			msg.msgType.set(ATP.MSG_TYPE_BIST);
-
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.1"),
-					VPXUDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
+		udp.startBist("172.17.10.1", "Sub");
 
 	}
 
@@ -529,7 +525,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	class CThreadMonitor implements Runnable {
 		DatagramSocket messageReceiverSocket;
 
-		ATPCommand msgCommand = new ATPCommand();
+		P2020ATPCommand msgCommand = new P2020ATPCommand();
 
 		byte[] messageData = new byte[msgCommand.size()];
 
@@ -577,7 +573,6 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 						} else if (i == ATP.MSG_TYPE_PERIDAICITY) {
 
-							System.out.println("Periodcity : " + msgCommand.params.periodicity);
 						} else if (i == ATP.MSG_TYPE_FLASH_DONE) {
 
 							JOptionPane.showMessageDialog(null, "Flash Completed");
@@ -602,40 +597,11 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		try {
 
-			VPXUDPMonitor udp = new VPXUDPMonitor(this);
-			
-			udp.addUDPListener(this);
-			
-			udp.startMonitor();
-
-			dialog = new VPX_FlashProgressWindow(GreetingClient.this.f);
+			dialog = new VPX_FlashProgressWindow(null);
 
 			dialog.setVisible(true);
 
-			udp.sendFile(dialog, "D:\\VPXUDPMonitor.java", "192.168.0.102");
-			/*
-			 * File f = new File("D:\\1.jpg");
-			 * 
-			 * size = FileUtils.sizeOf(f);
-			 * 
-			 * filestoSend = FileUtils.readFileToByteArray(f);
-			 * 
-			 * Map<Long, byte[]> t = VPXUtilities.divideArrayAsMap(filestoSend,
-			 * ATP.DEFAULTBUFFERSIZE);
-			 * 
-			 * fb = new FileBytesToSend(size, t);
-			 * 
-			 * byte b[] = new byte[ATP.DEFAULTBUFFERSIZE];
-			 * 
-			 * for (int i = 0; i < b.length; i++) { b[i] = filestoSend[i]; }
-			 * 
-			 * 
-			 * 
-			 * 
-			 * 
-			 * sendFileToProcessor("192.168.0.102", FileUtils.sizeOf(f),
-			 * fb.getBytePacket(0));
-			 */
+			udp.sendFile(dialog, "D:\\MAD_util\\DSP2.bin", "172.17.10.120");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -688,7 +654,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.params.flash_info.currentpacket.set(0);
 
-			dialog.updatePackets(size, tot, 0, sendBuffer.length);
+			dialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					VPXUDPListener.COMM_PORTNO);
@@ -779,7 +745,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		currPacket++;
 
-		if (currPacket <= tot) {
+		if (currPacket < tot) {
 			try {
 				datagramSocket = new DatagramSocket();
 
@@ -818,9 +784,9 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 						msg.params.memoryinfo.buffer[i].set(bb[i]);
 
 					}
-					dialog.updatePackets(size, tot, currPacket, bb.length);
+					dialog.updatePackets(size, tot, currPacket, bb.length, bb.length);
 				} else {
-					dialog.updatePackets(size, tot, currPacket, 0);
+					dialog.updatePackets(size, tot, currPacket, 0, 0);
 				}
 
 				msg.params.flash_info.totalfilesize.set(size);
@@ -898,6 +864,25 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	public void updatePeriodicity(int periodicity) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void updateExit(int val) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void updateBIST(BIST bist) {
+
+		bistWindow.setResult(bist);
+
+	}
+
+	@Override
+	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
+		bistWindow.updateTestProgress(pType, val);
+		
 	}
 
 }

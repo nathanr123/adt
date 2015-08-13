@@ -15,16 +15,20 @@ import java.io.UnsupportedEncodingException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.model.BIST;
+import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow.VPX_CloseProgressWindow;
 
 public class VPX_BISTResultWindow extends JDialog {
 
@@ -121,6 +125,8 @@ public class VPX_BISTResultWindow extends JDialog {
 
 	private JLabel lblTestDetailTestVal;
 
+	private VPX_TestProgressWindow progress;
+
 	/**
 	 * Launch the application.
 	 */
@@ -164,7 +170,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		setTitle("Buil In Self Test");
 
-		setBounds(100, 100, 850, 600);
+		setBounds(100, 100, 900, 600);
 
 		getContentPane().setLayout(new BorderLayout());
 
@@ -173,6 +179,8 @@ public class VPX_BISTResultWindow extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
 		contentPanel.setLayout(new BorderLayout(0, 0));
+
+		progress = new VPX_TestProgressWindow(VPX_BISTResultWindow.this, 2);
 	}
 
 	private void loadComponents() {
@@ -189,7 +197,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		detailPanel = new JPanel();
 
-		detailPanel.setPreferredSize(new Dimension(250, 10));
+		detailPanel.setPreferredSize(new Dimension(300, 10));
 
 		contentPanel.add(detailPanel, BorderLayout.WEST);
 
@@ -235,7 +243,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.add(lblTestDetailSubSystem);
 
-		lblTestDetailSubSystemVal = new JLabel("Sub_1");
+		lblTestDetailSubSystemVal = new JLabel("");
 
 		lblTestDetailSubSystemVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -245,7 +253,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.add(lblTestDetailP2020IP);
 
-		lblTestDetailP2020IPVal = new JLabel("172.17.1.1");
+		lblTestDetailP2020IPVal = new JLabel("");
 
 		lblTestDetailP2020IPVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -255,7 +263,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.add(lblTestDetailDSP1IP);
 
-		lblTestDetailDSP1IPVal = new JLabel("172.17.1.2");
+		lblTestDetailDSP1IPVal = new JLabel("");
 
 		lblTestDetailDSP1IPVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -265,7 +273,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.add(lblTestDetailDSP2IP);
 
-		lblTestDetailDSP2IPVal = new JLabel("172.17.1.3");
+		lblTestDetailDSP2IPVal = new JLabel("");
 
 		lblTestDetailDSP2IPVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -275,7 +283,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.add(lblTestDetailTestDate);
 
-		lblTestDetailTestDateVal = new JLabel("18-07-2015");
+		lblTestDetailTestDateVal = new JLabel("");
 
 		lblTestDetailTestDateVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -285,7 +293,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.add(lblTestDetailTestTime);
 
-		lblTestDetailTestTimeVal = new JLabel("08:12:04");
+		lblTestDetailTestTimeVal = new JLabel("");
 
 		lblTestDetailTestTimeVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -307,7 +315,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailNofTests);
 
-		lblResultDetailNofTestsVal = new JLabel("14 Tests");
+		lblResultDetailNofTestsVal = new JLabel("");
 
 		lblResultDetailNofTestsVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -317,7 +325,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailTestsPassed);
 
-		lblResultDetailTestsPassedVal = new JLabel("9 Tests");
+		lblResultDetailTestsPassedVal = new JLabel("");
 
 		lblResultDetailTestsPassedVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -327,7 +335,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailTestsFailed);
 
-		lblResultDetailTestsFailedVal = new JLabel("5 Tests");
+		lblResultDetailTestsFailedVal = new JLabel("");
 
 		lblResultDetailTestsFailedVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -337,7 +345,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailTestStartedAt);
 
-		lblResultDetailTestStartedAtVal = new JLabel("08:12:04");
+		lblResultDetailTestStartedAtVal = new JLabel("");
 
 		lblResultDetailTestStartedAtVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -347,7 +355,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailTestCompletedAt);
 
-		lblResultDetailTestCompletedAtVal = new JLabel("08:14:04");
+		lblResultDetailTestCompletedAtVal = new JLabel("");
 
 		lblResultDetailTestCompletedAtVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -357,7 +365,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailTestDuration);
 
-		lblResultDetailTestDurationVal = new JLabel("2 Minutes");
+		lblResultDetailTestDurationVal = new JLabel("");
 
 		lblResultDetailTestDurationVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -367,7 +375,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.add(lblResultDetailTestStatus);
 
-		lblResultDetailTestStatusVal = new JLabel("Success!");
+		lblResultDetailTestStatusVal = new JLabel("");
 
 		lblResultDetailTestStatusVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -415,7 +423,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultProcessor);
 
-		lblP2020TestResultProcessorVal = new JLabel("PASS");
+		lblP2020TestResultProcessorVal = new JLabel("");
 
 		lblP2020TestResultProcessorVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -425,7 +433,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultTemprature3);
 
-		lblP2020TestResultTemprature3Val = new JLabel("PASS");
+		lblP2020TestResultTemprature3Val = new JLabel("");
 
 		lblP2020TestResultTemprature3Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -435,7 +443,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultDDR3);
 
-		lblP2020TestResultDDR3Val = new JLabel("PASS");
+		lblP2020TestResultDDR3Val = new JLabel("");
 
 		lblP2020TestResultDDR3Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -445,7 +453,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage1);
 
-		lblP2020TestResultVoltage1Val = new JLabel("PASS");
+		lblP2020TestResultVoltage1Val = new JLabel("");
 
 		lblP2020TestResultVoltage1Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -455,7 +463,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultNORFlash);
 
-		lblP2020TestResultNORFlashVal = new JLabel("PASS");
+		lblP2020TestResultNORFlashVal = new JLabel("");
 
 		lblP2020TestResultNORFlashVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -465,7 +473,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage2);
 
-		lblP2020TestResultVoltage2Val = new JLabel("PASS");
+		lblP2020TestResultVoltage2Val = new JLabel("");
 
 		lblP2020TestResultVoltage2Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -475,7 +483,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultEthernet);
 
-		lblP2020TestResultEthernetVal = new JLabel("PASS");
+		lblP2020TestResultEthernetVal = new JLabel("");
 
 		lblP2020TestResultEthernetVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -485,7 +493,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage3);
 
-		lblP2020TestResultVoltage3Val = new JLabel("PASS");
+		lblP2020TestResultVoltage3Val = new JLabel("");
 
 		lblP2020TestResultVoltage3Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -495,7 +503,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultPCIE);
 
-		lblP2020TestResultPCIEVal = new JLabel("PASS");
+		lblP2020TestResultPCIEVal = new JLabel("");
 
 		lblP2020TestResultPCIEVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -505,7 +513,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage4);
 
-		lblP2020TestResultVoltage4Val = new JLabel("PASS");
+		lblP2020TestResultVoltage4Val = new JLabel("");
 
 		lblP2020TestResultVoltage4Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -515,7 +523,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultSRIO);
 
-		lblP2020TestResultSRIOVal = new JLabel("PASS");
+		lblP2020TestResultSRIOVal = new JLabel("");
 
 		lblP2020TestResultSRIOVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -525,7 +533,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage5);
 
-		lblP2020TestResultVoltage5Val = new JLabel("PASS");
+		lblP2020TestResultVoltage5Val = new JLabel("");
 
 		lblP2020TestResultVoltage5Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -535,7 +543,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultTemprature1);
 
-		lblP2020TestResultTemprature1Val = new JLabel("PASS");
+		lblP2020TestResultTemprature1Val = new JLabel("");
 
 		lblP2020TestResultTemprature1Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -545,7 +553,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage6);
 
-		lblP2020TestResultVoltage6Val = new JLabel("PASS");
+		lblP2020TestResultVoltage6Val = new JLabel("");
 
 		lblP2020TestResultVoltage6Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -555,7 +563,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultTemprature2);
 
-		lblP2020TestResultTemprature2Val = new JLabel("PASS");
+		lblP2020TestResultTemprature2Val = new JLabel("");
 
 		lblP2020TestResultTemprature2Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -565,7 +573,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage7);
 
-		lblP2020TestResultVoltage7Val = new JLabel("PASS");
+		lblP2020TestResultVoltage7Val = new JLabel("");
 
 		lblP2020TestResultVoltage7Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -586,7 +594,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp1TestResultPanel.add(lblDSP1TestResultProcessor);
 
-		lblDSP1TestResultProcessorVal = new JLabel("PASS");
+		lblDSP1TestResultProcessorVal = new JLabel("");
 
 		lblDSP1TestResultProcessorVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -596,7 +604,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp1TestResultPanel.add(lblDSP1TestResultDDR3);
 
-		lblDSP1TestResultDDR3Val = new JLabel("PASS");
+		lblDSP1TestResultDDR3Val = new JLabel("");
 
 		lblDSP1TestResultDDR3Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -606,7 +614,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp1TestResultPanel.add(lblDSP1TestResultNAND);
 
-		lblDSP1TestResultNANDVal = new JLabel("PASS");
+		lblDSP1TestResultNANDVal = new JLabel("");
 
 		lblDSP1TestResultNANDVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -616,7 +624,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp1TestResultPanel.add(lblDSP1TestResultNOR);
 
-		lblDSP1TestResultNORVal = new JLabel("PASS");
+		lblDSP1TestResultNORVal = new JLabel("");
 
 		lblDSP1TestResultNORVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -639,7 +647,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp2TestResultPanel.add(lblDSP2TestResultProcessor);
 
-		lblDSP2TestResultProcessorVal = new JLabel("PASS");
+		lblDSP2TestResultProcessorVal = new JLabel("");
 
 		lblDSP2TestResultProcessorVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -649,7 +657,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp2TestResultPanel.add(lblDSP2TestResultDDR3);
 
-		lblDSP2TestResultDDR3Val = new JLabel("PASS");
+		lblDSP2TestResultDDR3Val = new JLabel("");
 
 		lblDSP2TestResultDDR3Val.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -659,7 +667,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp2TestResultPanel.add(lblDSP2TestResultNAND);
 
-		lblDSP2TestResultNANDVal = new JLabel("PASS");
+		lblDSP2TestResultNANDVal = new JLabel("");
 
 		lblDSP2TestResultNANDVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -669,7 +677,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp2TestResultPanel.add(lblDSP2TestResultNOR);
 
-		lblDSP2TestResultNORVal = new JLabel("PASS");
+		lblDSP2TestResultNORVal = new JLabel("");
 
 		lblDSP2TestResultNORVal.setFont(VPXConstants.BISTRESULTFONT);
 
@@ -714,6 +722,25 @@ public class VPX_BISTResultWindow extends JDialog {
 		controlsPanel.add(btnClose);
 	}
 
+	public void showBISTWindow() {
+
+		//
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				setVisible(true);
+
+			}
+		});
+
+		th.start();
+
+		progress.setVisible(true);
+	}
+
 	public void setResult(BIST result) {
 
 		this.testResult = result;
@@ -722,7 +749,6 @@ public class VPX_BISTResultWindow extends JDialog {
 	}
 
 	private void loadResult() {
-		// "<html>41 &deg;C</html>" // for degree represntation
 
 		// Test Detail
 		lblTestDetailTestTimeVal.setText(testResult.getTestTime());
@@ -770,14 +796,11 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		lblP2020TestResultSRIOVal.setText(testResult.getResultP2020SRIO());
 
-		lblP2020TestResultTemprature1Val.setText(String.format("<html>%s &deg;C</html>",
-				testResult.getResultP2020Temprature1()));
+		lblP2020TestResultTemprature1Val.setText(testResult.getResultP2020Temprature1());
 
-		lblP2020TestResultTemprature2Val.setText(String.format("<html>%s &deg;C</html>",
-				testResult.getResultP2020Temprature2()));
+		lblP2020TestResultTemprature2Val.setText(testResult.getResultP2020Temprature2());
 
-		lblP2020TestResultTemprature3Val.setText(String.format("<html>%s &deg;C</html>",
-				testResult.getResultP2020Temprature3()));
+		lblP2020TestResultTemprature3Val.setText(testResult.getResultP2020Temprature3());
 
 		lblP2020TestResultVoltage1Val.setText(testResult.getResultP2020Voltage1());
 
@@ -810,6 +833,11 @@ public class VPX_BISTResultWindow extends JDialog {
 		lblDSP2TestResultDDR3Val.setText(testResult.getResultDSP2DDR3());
 
 		lblDSP2TestResultProcessorVal.setText(testResult.getResultDSP2Processor());
+
+		lblResultDetailTestCompletedAtVal.setText(VPXUtilities.getCurrentTime(2));
+
+		lblResultDetailTestDurationVal.setText(VPXUtilities.getCurrentTime(2,
+				System.currentTimeMillis() - testResult.getStartTime()));
 
 	}
 
@@ -963,8 +991,125 @@ public class VPX_BISTResultWindow extends JDialog {
 
 			JOptionPane.showMessageDialog(VPX_BISTResultWindow.this, "File Saved at " + fileName, "Result File",
 					JOptionPane.NO_OPTION);
+
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
+		}
+
+	}
+
+	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
+
+		progress.updateTestProgress(pType, val);
+
+	}
+
+	public class VPX_TestProgressWindow extends JDialog {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7250292684798353091L;
+
+		private JProgressBar progressFileSent;
+
+		private JDialog parent;
+
+		private int maxVal;
+
+		private JLabel lblExitingApplication;
+
+		/**
+		 * Create the dialog.
+		 */
+		public VPX_TestProgressWindow(JDialog prnt, int max) {
+
+			super(prnt);
+
+			this.maxVal = max;
+
+			this.parent = prnt;
+
+			init();
+
+			loadComponents();
+
+		}
+
+		private void init() {
+
+			setTitle("Built in Self Test");
+
+			setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+			setSize(500, 150);
+
+			setLocationRelativeTo(parent);
+
+			getContentPane().setLayout(new BorderLayout(0, 0));
+
+		}
+
+		private void loadComponents() {
+
+			JPanel progressPanel = new JPanel();
+
+			progressPanel.setPreferredSize(new Dimension(10, 35));
+
+			getContentPane().add(progressPanel, BorderLayout.SOUTH);
+
+			progressPanel.setLayout(new BorderLayout(0, 0));
+
+			progressFileSent = new JProgressBar();
+
+			progressFileSent.setStringPainted(true);
+
+			progressFileSent.setMaximum(maxVal);
+
+			progressFileSent.setMinimum(0);
+
+			progressPanel.add(progressFileSent, BorderLayout.SOUTH);
+
+			JPanel detailPanel = new JPanel();
+
+			detailPanel.setBorder(null);
+
+			detailPanel.setPreferredSize(new Dimension(25, 10));
+
+			getContentPane().add(detailPanel, BorderLayout.CENTER);
+
+			detailPanel.setLayout(new BorderLayout(0, 0));
+
+			lblExitingApplication = new JLabel("Built in Self Testing in progress...");
+
+			lblExitingApplication.setPreferredSize(new Dimension(30, 0));
+
+			detailPanel.add(lblExitingApplication);
+		}
+
+		public void updateTestProgress(PROCESSOR_LIST pType, int value) {
+
+			if (value == -1) {
+
+				VPX_TestProgressWindow.this.dispose();
+
+			} else {
+
+				if (pType == PROCESSOR_LIST.PROCESSOR_P2020) {
+
+					lblExitingApplication.setText("Built in Self Testing in progress...\nP2020 Test Completed");
+
+				} else if (pType == PROCESSOR_LIST.PROCESSOR_DSP1) {
+
+					lblExitingApplication.setText("Built in Self Testing in progress...\nDSP1 Test Completed");
+
+				} else if (pType == PROCESSOR_LIST.PROCESSOR_DSP2) {
+
+					lblExitingApplication.setText("Built in Self Testing in progress...\nDSP2 Test Completed");
+				}
+
+				progressFileSent.setValue(value);
+			}
 		}
 
 	}
