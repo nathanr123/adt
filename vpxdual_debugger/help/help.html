@@ -17,61 +17,41 @@
 	</div>
 	<div class="contentContainer">
 		<hr>
-		<br> public class <span class="strong">Struct</span> extends <a
-			href="http://docs.oracle.com/javase/6/docs/api/java/lang/Object.html?is-external=true"
-			title="class or interface in java.lang">Object</a>
+		<br>
 		</pre>
 		<div class="block">
-			<p>
-				Equivalent to a
-				<code>C/C++ struct</code>
-				; this class confers interoperability between Java classes and C/C++
-				struct.
-			</p>
+			<p>The following command are passed to the selected processors.</p>
 
 			<p>
-				Unlike
-				<code>C/C++</code>
-				, the storage layout of Java objects is not determined by the
-				compiler. The layout of objects in memory is deferred to run time
-				and determined by the interpreter (or just-in-time compiler). This
-				approach allows for dynamic loading and binding; but also makes
-				interfacing with
-				<code>C/C++</code>
-				code difficult. Hence, this class for which the memory layout is
-				defined by the initialization order of the <a
-					href="../../javolution/io/Struct.html"
-					title="class in javolution.io"><code>Struct</code></a>'s <a
-					href="../../javolution/io/Struct.Member.html"
-					title="class in javolution.io"><code>members</code></a> and follows
-				the same wordSize rules as
-				<code>C/C++ structs</code>
-				.
+				The Message command has splitted in to <b>5</b> parts
 			</p>
-
-			<p>
-				This class (as well as the <a href="../../javolution/io/Union.html"
-					title="class in javolution.io"><code>Union</code></a> sub-class)
-				facilitates:
 			<ul>
-				<li>Memory sharing between Java applications and native
-					libraries.</li>
-				<li>Direct encoding/decoding of streams for which the structure
-					is defined by legacy C/C++ code.</li>
-				<li>Serialization/deserialization of Java objects (complete
-					control, e.g. no class header)</li>
-				<li>Mapping of Java objects to physical addresses (with JNI).</li>
+				<li>Message commands</li>
+				<li>argument 1</li>
+				<li>argument 2</li>
+				<li>argument 3</li>
+				<li>argument 4</li>
+			</ul>
+
+			<p>Total length of the message command with arguments is 48. Each
+				and every argument length is 8
+			<ul>
+				<li>Message &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp; <b>16</b> character
+					length
+				</li>
+				<li>argument 1 &nbsp;-&nbsp; <b>8</b> character length
+				</li>
+				<li>argument 2 &nbsp;-&nbsp; <b>8</b> character length
+				</li>
+				<li>argument 3 &nbsp;-&nbsp; <b>8</b> character length
+				</li>
+				<li>argument 4 &nbsp;-&nbsp; <b>8</b> character length
+				</li>
+
 			</ul>
 			</p>
 
 			<p>
-				Because of its one-to-one mapping, it is relatively easy to convert
-				C header files (e.g. OpenGL bindings) to Java <a
-					href="../../javolution/io/Struct.html"
-					title="class in javolution.io"><code>Struct</code></a>/<a
-					href="../../javolution/io/Union.html"
-					title="class in javolution.io"><code>Union</code></a> using simple
-				text macros. Here is an example of C struct:
 			<div class="summary">
 				<ul class="blockList">
 					<li class="blockList">
@@ -80,66 +60,33 @@
 							<li class="blockList"><a name="method_summary"> <!--   -->
 							</a>
 								<h3>Command Summary</h3>
-								<!--<table class="overviewSummary" border="0" cellpadding="3"
-									cellspacing="0"
-									summary="Method Summary table, listing methods, and an explanation">
-									<caption>
-										<span>Methods</span><span class="tabEnd">&nbsp;</span>
-									</caption>
+
+								<table class="overviewSummary" border="0" cellpadding="3"
+									bgcolor="#9eadc0">
 									<tr>
-										<th bgcolor="lightgrey">Command</th>
-										<th bgcolor="lightgrey">Arguments</th>
-										<th bgcolor="lightgrey">Optional</th>
-										<th bgcolor="lightgrey">Max Arguments</th>
-										<th bgcolor="lightgrey">Description</th>
-									</tr>
-									<tr class="altColor">
-										<td class="colOne"><code>long1</code></td>
-										<td class="colOne"><code>long2</code></td>
-										<td class="colOne"><code>long3</code></td>
-										<td class="colOne"><code>long4</code></td>
-										<td class="colLast"><code>
-												<strong><a
-													href="../../javolution/io/Struct.html#address()">address</a></strong>()
-											</code>
-											<div class="block">Returns this struct address (if
-												supported by the platform).</div></td>
-									</tr>
-									<tr class="rowColor">
-										<td class="colOne"><code>long5</code></td>
-										<td class="colOne"><code>long6</code></td>
-										<td class="colOne"><code>long7</code></td>
-										<td class="colOne"><code>
-												protected &lt;M extends <a
-													href="../../javolution/io/Struct.Member.html"
-													title="class in javolution.io">Struct.Member</a>&gt;&nbsp;<br>M[]
-											</code></td>
-										<td class="colLast"><code>
-												<strong><a
-													href="../../javolution/io/Struct.html#array(M[])">array</a></strong>(M[]&nbsp;arrayMember)
-											</code>
-											<div class="block">Defines the specified array member.</div>
-										</td>
-									</tr>
-								</table>-->
-								
-								<table class="overviewSummary" border="0" cellpadding="3" bgcolor="#9eadc0">
-									<tr >
-										<th width="20%" height="30" bgcolor="#dee3e9"><center>Command</center></th>
-										<th width="20%" height="30" bgcolor="#dee3e9"><center>Arguments</center></th>
+										<th width="15%" height="30" bgcolor="#dee3e9"><center>Command</center></th>
+										<th width="15%" height="30" bgcolor="#dee3e9"><center>Arguments</center></th>
 										<th width="5%" height="30" bgcolor="#dee3e9"><center>Optional</center></th>
-										<th width="5%" height="30" bgcolor="#dee3e9"><center>Max Arguments</center></th>
+										<th width="5%" height="30" bgcolor="#dee3e9"><center>Max
+												Arguments</center></th>
+										<th width="10%" height="30" bgcolor="#dee3e9"><center>Result</center></th>
 										<th width="10%" height="30" bgcolor="#dee3e9"><center>Processor</center></th>
 										<th width="40%" height="30" bgcolor="#dee3e9"><center>Description</center></th>
 									</tr>
 									<tr class="altColor">
-										<td height="30" >memget</td>
-										<td height="30" >Memory Address</td>
-										<td height="30" ><center>No</center></td>
-										<td height="30" ><center>1</center></td>
-										<td height="30" ><center>Dsp</center></td>
-										<td height="30" >This retrives the value of given address &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>
-												<b> Ex: memget 0xA0000000</b>
+										<td height="30">memget</td>
+										<td height="30">Memory Address</td>
+										<td height="30"><center>No</center></td>
+										<td height="30"><center>1</center></td>
+										<td>
+											<center>Value at given address</center>
+										</td>
+										<td height="30"><center>Dsp</center></td>
+										<td height="30">This retrives the value of given address
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+											<br> <b> Ex: memget 0xA0000000
+												&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												Result : 0x12345678</b>
 										</td>
 									</tr>
 									<tr class="rowColor">
@@ -147,39 +94,126 @@
 										<td>Memory Address &nbsp;&nbsp;&nbsp;&nbsp; Memory Value</td>
 										<td><center>No</center></td>
 										<td><center>2</center></td>
+										<td>
+											<center>0/1</center>
+										</td>
 										<td><center>Dsp</center></td>
-										<td>The given value is set to the given address  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>
-										   <b> Ex: memset 0xA0000000   &nbsp;&nbsp;&nbsp;&nbsp; 0x12345678 </b>
+										<td>The given value is set to the given address
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br> <br> <b>
+												Ex: memset 0xA0000000 &nbsp;&nbsp;&nbsp;&nbsp; 0x12345678
+												&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												Result : 1</b>
 										</td>
 									</tr>
 									<tr class="altColor">
-										<td height="30" >temp1</td>
-										<td height="30" >Nil</td>
-										<td height="30" ><center>No</center></td>
-										<td height="30" ><center>0</center></td>
-										<td height="30" ><center>P2020</center></td>
-										<td>This returns the temperature1 value</td>
+										<td height="30">temp1</td>
+										<td height="30">Nil</td>
+										<td height="30"><center>No</center></td>
+										<td height="30"><center>0</center></td>
+										<td><center>temperature value</center></td>
+										<td height="30"><center>P2020</center></td>
+										<td>This returns the temperature1
+											value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br> <br>
+											<b> Ex: temp1 &nbsp;&nbsp;&nbsp;&nbsp; Result : 46</b>
+										</td>
 									</tr>
 									<tr class="rowColor">
 										<td height="30">temp2</td>
 										<td>Nil</td>
 										<td><center>No</center></td>
 										<td><center>0</center></td>
+										<td><center>temperature value</center></td>
 										<td><center>P2020</center></td>
-										<td>This returns the temperature2 value</td>
+										<td>This returns the temperature2
+											value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br> <br>
+											<b> Ex: temp2 &nbsp;&nbsp;&nbsp;&nbsp; Result : 46</b>
+										</td>
 									</tr>
 									<tr class="altColor">
-										<td height="30" >temp3</td>
-										<td height="30" >Nil</td>
-										<td height="30" ><center>No</center></td>
-										<td height="30" ><center>0</center></td>
-										<td height="30" ><center>P2020</center></td>
-										<td>This returns the temperature3 value</td>
+										<td height="30">temp3</td>
+										<td height="30">Nil</td>
+										<td height="30"><center>No</center></td>
+										<td height="30"><center>0</center></td>
+										<td><center>temperature value</center></td>
+										<td height="30"><center>P2020</center></td>
+										<td>This returns the temperature3
+											value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br> <br>
+											<b> Ex: temp3 &nbsp;&nbsp;&nbsp;&nbsp; Result : 46</b>
+										</td>
 									</tr>
-									
+
 								</table>
-								
-								
+								<div>
+									Result<br>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+									- Failure <br>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-
+									Success <br>
+								</div>
 			</div>
+
+			<ul class="blockList">
+				<li class="blockList">
+					<h3>Detail</h3>
+					<table class="overviewSummary" border="0" cellpadding="3"
+						cellspacing="0"
+						summary="Method Summary table, listing methods, and an explanation">
+
+						<tbody>
+							<tr>
+								<th class="colFirst" scope="col">Property</th>
+								<th class="colLast" scope="col">Description</th>
+							</tr>
+							<tr class="rowColor">
+								<td class="colFirst"><strong>Command</strong></td>
+								<td class="colLast"><code> Command passing to the
+										processor </code>
+							</tr>
+
+							<tr class="altColor">
+								<td class="colFirst"><strong>arguments</strong></td>
+								<td class="colLast"><code> What arguments passing </code>
+							</tr>
+
+							<tr class="rowColor">
+								<td class="colFirst"><strong>optional</strong></td>
+								<td class="colLast"><code> if arguments are optional
+										or not </code>
+							</tr>
+
+							<tr class="altColor">
+								<td class="colFirst"><strong>Max arguments</strong></td>
+								<td class="colLast"><code> Maximum number of
+										arguments allowed </code>
+							</tr>
+
+							<tr class="rowColor">
+								<td class="colFirst"><strong>processor</strong></td>
+								<td class="colLast"><code> The command belongs to
+										which processor </code>
+							</tr>
+
+							<tr class="altColor">
+								<td class="colFirst"><strong>Description</strong></td>
+								<td class="colLast"><code> Brief of the command and
+										an example </code>
+							</tr>
+
+							<tr class="rowColor">
+								<td class="colFirst"><strong>Result</strong></td>
+								<td class="colLast"><code> Return value of the
+										corresponding command.If any set commands it will return 0 or
+										1 </code>
+									<div class="block">
+										<strong>1 - Success</strong>
+									</div>
+									<div class="block">
+										<strong>0 - Failure</strong>
+									</div>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+			</ul>
 </body>
 </html>

@@ -38,7 +38,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	private boolean isFlashingStatred = false;
 
-	private JPanel parent;
+	private VPX_EthernetFlashPanel parent;
 	private JLabel lblBytesSentVal;
 	private JLabel lblBytesRemainingVal;
 	private JLabel lblBytesTotalVal;
@@ -59,7 +59,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_FlashProgressWindow(JPanel prnt) {
+	public VPX_FlashProgressWindow(VPX_EthernetFlashPanel prnt) {
 
 		this.parent = prnt;
 
@@ -205,26 +205,28 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	public void updatePackets(long size, long totpkt, long curpacket, long bytesRcvd, long currBufferSize) {
 
-		if (curpacket == 0) {
+		long cur = curpacket;
+
+		if (cur == 0) {
 
 			progressFileSent.setMaximum((int) totpkt);
 
-			progressFileSent.setMinimum((int) curpacket);
+			progressFileSent.setMinimum((int) cur);
 
 			lblFlashing.setText("Sending File");
 
 			starttime = System.currentTimeMillis();
 		}
 
-		curpacket = curpacket + 1;
-		
-		progressFileSent.setValue((int) curpacket);
+		cur = cur + 1;
+
+		progressFileSent.setValue((int) cur);
 
 		lblTotalFileSizeVal.setText(toNumInUnits(size));
 
 		lblTotalPacketsVal.setText("" + totpkt);
 
-		lblPacketsSentVal.setText("" + curpacket);
+		lblPacketsSentVal.setText("" + cur);
 
 		bytesRecieved = bytesRecieved + bytesRcvd;
 
@@ -236,7 +238,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		lblCurrentBytesVal.setText(currBufferSize + " bytes");
 
-		long remain = (totpkt - curpacket);
+		long remain = (totpkt - cur);
 
 		lblPacketsRemainingVal.setText("" + remain);
 
@@ -315,6 +317,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		if (PromptResult == 0) {
 
 			isFlashingStatred = false;
+
+			parent.interruptFlash();
 
 			VPX_FlashProgressWindow.this.dispose();
 		}

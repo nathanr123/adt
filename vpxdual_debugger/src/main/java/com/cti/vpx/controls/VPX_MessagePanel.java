@@ -38,6 +38,7 @@ import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+import java.awt.Font;
 
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
@@ -133,6 +134,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		panel.add(btn_Msg_Send);
 
 		txt_Msg_Send = ComponentFactory.createJTextField();
+
+		txt_Msg_Send.setFont(VPXConstants.BISTRESULTFONT);
 
 		txt_Msg_Send.addKeyListener(new KeyListener() {
 

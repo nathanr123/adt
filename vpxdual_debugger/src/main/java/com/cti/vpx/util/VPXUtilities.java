@@ -432,7 +432,7 @@ public class VPXUtilities {
 
 		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
 	}
-	
+
 	private static Image getImage(String name) {
 
 		try {
@@ -1540,9 +1540,17 @@ public class VPXUtilities {
 
 	}
 
-	public static long getRespondedTime(String ip) {
+	public static long getRespondedTime(String ips) {
 
 		long time = 0;
+
+		String ip = "";
+
+		if (ips.contains(")")) {
+
+			ip = ips.substring(ips.indexOf(")") + 1, ips.length());
+		} else
+			ip = ips;
 
 		boolean isNotfound = false;
 
@@ -1606,7 +1614,7 @@ public class VPXUtilities {
 
 	public static void deleteAllGeneratedFilesAndFlders(String path, String deployFile, String cfgFile) {
 
-		deleteDeploymentFiles(path + "\\" + VPXConstants.ResourceFields.DEPLOYMENTFILE, path + "\\"
+		deleteDeploymentFiles(path + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE, path + "/"
 				+ VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, false);
 
 		deleteDeploymentFiles("images", "", true);
@@ -1621,9 +1629,9 @@ public class VPXUtilities {
 		if (isdirectory) {
 			cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
 		} else {
-			cmd = String.format("cmd /c del /F %s %s", deployFile, cfgFile);
+			cmd = String.format("cmd /c del /F %s %s", deployFile.replaceAll("/","\\\\"), cfgFile.replaceAll("/","\\\\"));
 		}
-
+		
 		String s = null;
 
 		try {

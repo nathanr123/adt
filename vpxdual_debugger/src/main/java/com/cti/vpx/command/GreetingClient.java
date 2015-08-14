@@ -601,7 +601,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			dialog.setVisible(true);
 
-			udp.sendFile(dialog, "D:\\MAD_util\\DSP2.bin", "172.17.10.120");
+			udp.sendFile(dialog, "D:\\UARTTestProject.bin", "172.17.10.130");
 
 		} catch (Exception e) {
 			e.printStackTrace();

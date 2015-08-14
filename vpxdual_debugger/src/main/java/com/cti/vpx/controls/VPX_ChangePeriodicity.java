@@ -113,6 +113,9 @@ public class VPX_ChangePeriodicity extends JDialog {
 					public void run() {
 						parent.updatePeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
+						VPXUtilities.setCurrentPeriodicity(Integer
+								.valueOf(spinPeriodicity.getValue().toString().trim()));
+
 						parent.updateLog("Periodicity updated successfully");
 
 						JOptionPane.showMessageDialog(parent, "Periodicity updated successfully");

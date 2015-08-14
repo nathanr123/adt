@@ -358,10 +358,36 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			loadSystemRootNode();
 
 			parent.reloadVPXSystem();
+
 		}
 
 		setRespondTimetoVPXSystem(ip);
 
+	}
+
+	private boolean isExist(String ip) {
+
+		boolean ret = false;
+
+		List<Processor> unList = system.getUnListed();
+
+		if (unList.size() > 0) {
+
+			for (Iterator<Processor> iterator = unList.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				if (processor.getiP_Addresses().equals(ip)) {
+
+					ret = true;
+
+					break;
+				}
+
+			}
+		}
+
+		return ret;
 	}
 
 	private void setRespondTimetoVPXSystem(String ip) {

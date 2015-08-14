@@ -1,10 +1,10 @@
 package com.cti.vpx.Listener;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +30,7 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.SubnetFilter;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -68,6 +69,8 @@ public class VPXUDPMonitor {
 	private int fail;
 
 	private int loop = 0;
+
+	private static boolean isFlashingStatred = false;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -207,12 +210,7 @@ public class VPXUDPMonitor {
 
 	public void setPeriodicityByBroadcast(int period) {
 
-		DatagramSocket datagramSocket;
-
 		try {
-			datagramSocket = new DatagramSocket();
-
-			datagramSocket.setBroadcast(true);
 
 			DSPATPCommand msg = new DSPATPCommand();
 
@@ -266,7 +264,7 @@ public class VPXUDPMonitor {
 		ByteBuffer bf = null;
 
 		try {
-
+			
 			msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
 			buffer = new byte[msg.size()];
@@ -282,7 +280,7 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
 			msg.periodicity.set(period);
-
+			
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
@@ -292,7 +290,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void sendPeriodicity(String ip, int period) {
+	public void sendPeriodicity(String ips, int period) {
 
 		ATPCommand msg = null;
 
@@ -300,7 +298,15 @@ public class VPXUDPMonitor {
 
 		ByteBuffer bf = null;
 
+		String ip = "";
+
 		try {
+
+			if (ips.contains(")")) {
+
+				ip = ips.substring(ips.indexOf(")") + 1, ips.length());
+			} else
+				ip = ips;
 
 			PROCESSOR_LIST procesor = getProcType(ip);// VPXUtilities.getProcessorType(ip);
 
@@ -425,21 +431,18 @@ public class VPXUDPMonitor {
 
 			this.dialog = parentDialog;
 
+			isFlashingStatred = true;
+
 			sendFileToProcessor(ip, FileUtils.sizeOf(f), fb.getBytePacket(0));
 
 		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 	}
 
 	public void sendFileToProcessor(String ip, long size, byte[] sendBuffer) {
-
-		DatagramSocket datagramSocket;
-
 		try {
-			datagramSocket = new DatagramSocket();
-
-			// datagramSocket.setBroadcast(true);
 
 			ATPCommand msg = new DSPATPCommand();
 
@@ -478,16 +481,11 @@ public class VPXUDPMonitor {
 
 			msg.params.memoryinfo.length.set(sendBuffer.length);
 
-			System.out.println(msg.params.memoryinfo.length.get());
-
 			msg.params.flash_info.currentpacket.set(0);
 
 			dialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
+			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
 
@@ -497,77 +495,64 @@ public class VPXUDPMonitor {
 	}
 
 	public void recvAndSaveFile(String ip, ATPCommand msg) {
-
-		int currPacket = (int) msg.params.flash_info.currentpacket.get();
-
-		if (currPacket == 0) {
-
-			filesfromRecv = new byte[(int) msg.params.flash_info.totalfilesize.get()];
-		}
-		start = currPacket * msg.params.memoryinfo.buffer.length;
-
-		end = start + msg.params.memoryinfo.buffer.length;
-
-		if (end > filestoSend.length) {
-			end = filestoSend.length;
-		}
-
-		for (int i = start, j = 0; i < end; i++, j++) {
-
-			filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get();
-		}
-
-		// Sending part
-
-		if (currPacket < msg.params.flash_info.totalnoofpackets.get()) {
-
-			DatagramSocket datagramSocket;
-
-			try {
-				datagramSocket = new DatagramSocket();
-
-				datagramSocket.setBroadcast(true);
-
-				byte[] buffer = new byte[msg.size()];
-
-				ByteBuffer bf = ByteBuffer.wrap(buffer);
-
-				bf.order(msg.byteOrder());
-
-				msg.setByteBuffer(bf, 0);
-
-				msg.msgID.set(ATP.MSG_ID_SET);
-
-				msg.msgType.set(ATP.MSG_TYPE_FLASH_ACK);
-
-				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
-
-				msg.params.flash_info.currentpacket.set(currPacket);
-
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-						VPXUDPListener.COMM_PORTNO);
-
-				datagramSocket.send(packet);
-
-			} catch (Exception e) {
-
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				FileOutputStream fos = new FileOutputStream("D:\\2.java");
-				fos.write(filesfromRecv);
-				fos.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
+		/*
+		 * 
+		 * int currPacket = (int) msg.params.flash_info.currentpacket.get();
+		 * 
+		 * if (currPacket == 0) {
+		 * 
+		 * filesfromRecv = new byte[(int)
+		 * msg.params.flash_info.totalfilesize.get()]; } start = currPacket *
+		 * msg.params.memoryinfo.buffer.length;
+		 * 
+		 * end = start + msg.params.memoryinfo.buffer.length;
+		 * 
+		 * if (end > filestoSend.length) { end = filestoSend.length; }
+		 * 
+		 * for (int i = start, j = 0; i < end; i++, j++) {
+		 * 
+		 * filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get(); }
+		 * 
+		 * // Sending part
+		 * 
+		 * if (currPacket < msg.params.flash_info.totalnoofpackets.get()) {
+		 * 
+		 * DatagramSocket datagramSocket;
+		 * 
+		 * try { datagramSocket = new DatagramSocket();
+		 * 
+		 * datagramSocket.setBroadcast(true);
+		 * 
+		 * byte[] buffer = new byte[msg.size()];
+		 * 
+		 * ByteBuffer bf = ByteBuffer.wrap(buffer);
+		 * 
+		 * bf.order(msg.byteOrder());
+		 * 
+		 * msg.setByteBuffer(bf, 0);
+		 * 
+		 * msg.msgID.set(ATP.MSG_ID_SET);
+		 * 
+		 * msg.msgType.set(ATP.MSG_TYPE_FLASH_ACK);
+		 * 
+		 * msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+		 * 
+		 * msg.params.flash_info.currentpacket.set(currPacket);
+		 * 
+		 * DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+		 * InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO);
+		 * 
+		 * datagramSocket.send(packet);
+		 * 
+		 * } catch (Exception e) {
+		 * 
+		 * e.printStackTrace(); } } else { try { FileOutputStream fos = new
+		 * FileOutputStream("D:\\2.java"); fos.write(filesfromRecv);
+		 * fos.close(); } catch (Exception e) { e.printStackTrace(); } }
+		 */
 	}
 
 	public void sendNextPacket(String ip, ATPCommand msg) {
-
-		DatagramSocket datagramSocket;
 
 		int currPacket = (int) msg.params.flash_info.currentpacket.get();
 
@@ -575,9 +560,6 @@ public class VPXUDPMonitor {
 
 		if (currPacket < tot) {
 			try {
-				datagramSocket = new DatagramSocket();
-
-				// datagramSocket.setBroadcast(true);
 
 				byte[] buffer = new byte[msg.size()];
 
@@ -619,16 +601,13 @@ public class VPXUDPMonitor {
 					dialog.updatePackets(size, tot, currPacket, 0, 0);
 				}
 
-				System.out.println(msg.params.memoryinfo.length.get());
-
 				msg.params.flash_info.totalfilesize.set(size);
+
 				msg.params.flash_info.totalnoofpackets.set(tot);
 
 				msg.params.flash_info.currentpacket.set(currPacket);
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-						VPXUDPListener.COMM_PORTNO);
 
-				datagramSocket.send(packet);
+				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 			} catch (Exception e) {
 
@@ -643,20 +622,11 @@ public class VPXUDPMonitor {
 
 	public void send(byte[] buffer, String ip, int port, boolean isBroadCast) {
 
-		DatagramSocket datagramSocket;
-
 		try {
-			datagramSocket = new DatagramSocket();
 
-			if (isBroadCast) {
-				datagramSocket.setBroadcast(true);
-			}
+			send(buffer, InetAddress.getByName(ip), port, isBroadCast);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip), port);
-
-			datagramSocket.send(packet);
-
-		} catch (Exception e) {
+		} catch (UnknownHostException e) {
 
 			e.printStackTrace();
 		}
@@ -670,6 +640,7 @@ public class VPXUDPMonitor {
 			datagramSocket = new DatagramSocket();
 
 			if (isBroadCast) {
+
 				datagramSocket.setBroadcast(true);
 			}
 
@@ -677,10 +648,47 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
+			datagramSocket.close();
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
+	}
+
+	public void sendInterrupt(String ip, PROCESSOR_LIST procesor) {
+
+		ATPCommand msg = null;
+
+		byte[] buffer = null;
+
+		ByteBuffer bf = null;
+
+		try {
+
+			msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
+
+			buffer = new byte[msg.size()];
+
+			bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_FLASH_INTERRUPTED);
+
+			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
+
+			isFlashingStatred = false;
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
 	}
 
 	public void startBist(String ip, String SubSystem) {
@@ -692,6 +700,8 @@ public class VPXUDPMonitor {
 		fail = 0;
 
 		bist.setTestSubSystem(SubSystem);
+
+		loop = 0;
 
 		DatagramSocket datagramSocket;
 
@@ -811,25 +821,31 @@ public class VPXUDPMonitor {
 			bist.setDSP2Completed(true);
 		}
 
-		if (bist.isDSP1Completed() && bist.isP2020Completed()) {// &&
-																// bist.isP2020Completed())
-																// {
+		if (bist.isDSP1Completed() && bist.isP2020Completed() && bist.isDSP2Completed()) {
 
 			bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
 
 			bist.setResultTestFailed(String.format("%d Tests", fail));
 
 			if (fail == 0)
+
 				bist.setResultTestStatus("Success !");
+
 			else
+
 				bist.setResultTestStatus("Failed !");
 
 			bist.setResultTestPassed(String.format("%d Tests", pass));
 
+			bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
+
+			bist.setResultTestDuration(VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
+
 			((VPXCommunicationListener) listener).updateBIST(bist);
 		}
 
-		if (loop == 2) {
+		if (loop == VPXConstants.MAX_PROCESSOR) {
+
 			((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
 		}
 	}
@@ -996,7 +1012,11 @@ public class VPXUDPMonitor {
 
 			case ATP.MSG_TYPE_FLASH_ACK:
 
-				sendNextPacket(ip, msgCommand);
+				if (isFlashingStatred) {
+
+					sendNextPacket(ip, msgCommand);
+
+				}
 
 				break;
 
@@ -1085,24 +1105,24 @@ public class VPXUDPMonitor {
 		ATPCommand msgCommand = new DSPATPCommand();
 
 		ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
-		/*
-		 * if (VPXUtilities.getProcessorType(ip) ==
-		 * PROCESSOR_LIST.PROCESSOR_P2020) {
-		 * 
-		 * msgCommand = new P2020ATPCommand();
-		 * 
-		 * } else {
-		 * 
-		 * msgCommand = new DSPATPCommand(); }
-		 */
-		if (ip.equals("172.17.10.1")) {
+
+		if (VPXUtilities.getProcessorType(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
 
 			msgCommand = new P2020ATPCommand();
 
-		} else if (ip.equals("172.17.10.130")) {
+		} else {
 
 			msgCommand = new DSPATPCommand();
 		}
+		/*
+		 * if (ip.equals("172.17.10.1")) {
+		 * 
+		 * msgCommand = new P2020ATPCommand();
+		 * 
+		 * } else if (ip.equals("172.17.10.130")) {
+		 * 
+		 * msgCommand = new DSPATPCommand(); }
+		 */
 
 		bf.clear();
 

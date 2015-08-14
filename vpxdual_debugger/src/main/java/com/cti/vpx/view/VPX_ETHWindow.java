@@ -1441,7 +1441,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		th.start();
 
-		udpMonitor.startBist(VPXUtilities.getCurrentProcessor(),VPXUtilities.getCurrentSubSystem());
+		udpMonitor.startBist(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentSubSystem());
 
 		updateLog("Built in Self Test Completed");
 	}
@@ -1451,6 +1451,11 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		udpMonitor.sendBoot(ip);
 
 		updateLog("P2020 " + ip + " is set to Reboot");
+	}
+
+	public void setInterrupt(String ip) {
+
+		udpMonitor.sendInterrupt(ip, PROCESSOR_LIST.PROCESSOR_DSP1);
 	}
 
 	public void showExecution() {
@@ -1571,6 +1576,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	}
 
 	public void showHelp() {
+
+		messagePanel.showHelp();
 	}
 
 	public void showAbout() {
@@ -1681,14 +1688,13 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		closeWindow.updateExitProgress(val);
 
 	}
-	
+
 	@Override
 	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
-		
-		bistWindow.updateTestProgress(pType, val);
-		
-	}
 
+		bistWindow.updateTestProgress(pType, val);
+
+	}
 
 	public void sendFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow) {
 
@@ -1699,7 +1705,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	// Advertisement Listener
 	@Override
 	public void updateProcessorStatus(String ip, String msg) {
-
+		
 		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
 
 	}
@@ -1813,5 +1819,4 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	}
 
-	
 }

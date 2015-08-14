@@ -5,10 +5,10 @@ import java.awt.EventQueue;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import com.cti.vpx.controls.VPX_AppMode;
 import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_Dual_ADT {
 
@@ -28,13 +28,12 @@ public class VPX_Dual_ADT {
 						new VPX_SplashWindow();
 
 					} else {
-						// VPX_AppMode window = new
-						// VPX_AppMode(VPXUtilities.getEthernetPorts(),
-						// VPXUtilities.getSerialPorts());
+						VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities
+								.getSerialPorts());
 
-						VPX_ETHWindow window = new VPX_ETHWindow();
+						// VPX_ETHWindow window = new VPX_ETHWindow();
 
-						// window.showWindow();
+						window.showWindow();
 
 						// window.setVisible(true);
 					}
@@ -43,9 +42,9 @@ public class VPX_Dual_ADT {
 					JOptionPane.showMessageDialog(null,
 							"Another instance is running or the ports are bind by another application.",
 							"Opening Application", JOptionPane.ERROR_MESSAGE);
-					
+
 					e.printStackTrace();
-					//System.exit(0);
+					// System.exit(0);
 				}
 			}
 		});

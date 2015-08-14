@@ -115,6 +115,8 @@ public class VPX_FlashWizard extends JDialog {
 
 	private JButton btnClearFields;
 
+	private boolean isFileCreated = false;
+
 	/**
 	 * Launch the application.
 	 */
@@ -1007,6 +1009,15 @@ public class VPX_FlashWizard extends JDialog {
 
 			parent.updateLog("MAD Compilation started");
 
+			if (isFileCreated) {
+
+				updateConfigFile(txtConfigPathPython.getText(), txtConfigPathMAP.getText(),
+						txtConfigPathPrelinker.getText(), txtConfigPathOFD.getText(), txtConfigPathStriper.getText(),
+						txtConfigPathMAL.getText(), txtConfigPathNML.getText(), chkConfigDummyOut.isSelected(),
+						txtConfigPathDummyOut.getText());
+
+			}
+
 			createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
 					txtCompilePathCore1.getText(), txtCompilePathCore2.getText(), txtCompilePathCore3.getText(),
 					txtCompilePathCore4.getText(), txtCompilePathCore5.getText(), txtCompilePathCore6.getText(),
@@ -1433,6 +1444,8 @@ public class VPX_FlashWizard extends JDialog {
 
 			String s = null;
 
+			madProcessPanel.clearMessage();
+
 			while ((s = stdInput.readLine()) != null) {
 
 				madProcessPanel.updateGeneratingMessage(s);
@@ -1460,6 +1473,8 @@ public class VPX_FlashWizard extends JDialog {
 
 			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXConstants.ResourceFields.DEPLOYMENTFILE,
 					VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
+
+			isFileCreated = true;
 
 			return ret;
 		} catch (Exception e) {
@@ -1675,8 +1690,15 @@ public class VPX_FlashWizard extends JDialog {
 			}
 		}
 
+		public void clearMessage() {
+
+			txtAResult.setText("");
+		}
+
 		public void updateGeneratingMessage(String msg) {
 			txtAResult.append(msg + "\n");
+
+			txtAResult.setCaretPosition(txtAResult.getDocument().getLength());
 		}
 
 		public void setSuccess() {

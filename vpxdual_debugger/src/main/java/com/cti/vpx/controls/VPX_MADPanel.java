@@ -102,6 +102,8 @@ public class VPX_MADPanel extends JPanel {
 
 	private JButton btnCompileClear;
 
+	private boolean isFileCreated = false;
+
 	/**
 	 * Create the panel.
 	 */
@@ -116,7 +118,7 @@ public class VPX_MADPanel extends JPanel {
 		loadPathsFromProperties();
 
 	}
-	
+
 	public VPX_MADPanel() {
 
 	}
@@ -664,6 +666,15 @@ public class VPX_MADPanel extends JPanel {
 
 					parent.updateLog("MAD Compilation started");
 
+					if (isFileCreated) {
+
+						updateConfigFile(txtConfigPathPython.getText(), txtConfigPathMAP.getText(),
+								txtConfigPathPrelinker.getText(), txtConfigPathOFD.getText(),
+								txtConfigPathStriper.getText(), txtConfigPathMAL.getText(), txtConfigPathNML.getText(),
+								chkConfigDummyOut.isSelected(), txtConfigPathDummyOut.getText());
+
+					}
+
 					createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
 							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
 							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
@@ -1014,23 +1025,22 @@ public class VPX_MADPanel extends JPanel {
 
 		Properties p = VPXUtilities.readProperties();
 
-		pythonPath = pythonPath.replaceAll("\\\\","/");
+		pythonPath = pythonPath.replaceAll("\\\\", "/");
 
-		mapTool = mapTool.replaceAll("\\\\","/");
+		mapTool = mapTool.replaceAll("\\\\", "/");
 
-		prelinker = prelinker.replaceAll("\\\\","/");
+		prelinker = prelinker.replaceAll("\\\\", "/");
 
-		ofd = ofd.replaceAll("\\\\","/");
+		ofd = ofd.replaceAll("\\\\", "/");
 
-		strip = strip.replaceAll("\\\\","/");
+		strip = strip.replaceAll("\\\\", "/");
 
-		mal = mal.replaceAll("\\\\","/");
+		mal = mal.replaceAll("\\\\", "/");
 
-		nml = nml.replaceAll("\\\\","/");
+		nml = nml.replaceAll("\\\\", "/");
 
-		dummy =dummy.replaceAll("\\\\","/");
-		
-		
+		dummy = dummy.replaceAll("\\\\", "/");
+
 		p.setProperty(VPXConstants.ResourceFields.PATH_PYTHON, pythonPath);
 
 		p.setProperty(VPXConstants.ResourceFields.PATH_MAP, mapTool);
@@ -1048,8 +1058,6 @@ public class VPX_MADPanel extends JPanel {
 		p.setProperty(VPXConstants.ResourceFields.DUMMY_CHK, isUseDummy ? "true" : "false");
 
 		p.setProperty(VPXConstants.ResourceFields.PATH_DUMMY, dummy);
-		
-		
 
 		VPXUtilities.updateProperties(p);
 
@@ -1073,21 +1081,21 @@ public class VPX_MADPanel extends JPanel {
 
 		String str = VPXUtilities.readFile("deploy/deployment.data");
 
-		str = str.replace("out1", out1Path.replaceAll("\\\\","/"));
+		str = str.replace("out1", out1Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out2", out2Path.replaceAll("\\\\","/"));
+		str = str.replace("out2", out2Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out3", out3Path.replaceAll("\\\\","/"));
+		str = str.replace("out3", out3Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out4", out4Path.replaceAll("\\\\","/"));
+		str = str.replace("out4", out4Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out5", out5Path.replaceAll("\\\\","/"));
+		str = str.replace("out5", out5Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out6", out6Path.replaceAll("\\\\","/"));
+		str = str.replace("out6", out6Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out7", out7Path.replaceAll("\\\\","/"));
+		str = str.replace("out7", out7Path.replaceAll("\\\\", "/"));
 
-		str = str.replace("out8", out8Path.replaceAll("\\\\","/"));
+		str = str.replace("out8", out8Path.replaceAll("\\\\", "/"));
 
 		Properties p = VPXUtilities.readProperties();
 
@@ -1173,6 +1181,8 @@ public class VPX_MADPanel extends JPanel {
 
 			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXConstants.ResourceFields.DEPLOYMENTFILE,
 					VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
+
+			isFileCreated = true;
 
 			return ret;
 		} catch (Exception e) {
@@ -1424,7 +1434,10 @@ public class VPX_MADPanel extends JPanel {
 		}
 
 		public void updateGeneratingMessage(String msg) {
+
 			txtAResult.append(msg + "\n");
+
+			txtAResult.setCaretPosition(txtAResult.getDocument().getLength());
 		}
 
 		public void setSuccess() {

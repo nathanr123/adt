@@ -105,6 +105,10 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		setPreferredSize(new Dimension(800, 496));
 	}
 
+	public void interruptFlash(){
+		parent.setInterrupt(flashIP);
+	}
+	
 	private void loadComponents() {
 
 		JPanel flashPanl = new JPanel();
