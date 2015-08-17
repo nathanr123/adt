@@ -38,7 +38,6 @@ import com.cti.vpx.util.ComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
-import java.awt.Font;
 
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
@@ -450,11 +449,29 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		try {
 
 			String path = System.getProperty("user.home") + "\\Messages."
-					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".rtf";
+					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".txt";
 
 			FileWriter fw = new FileWriter(new File(path), true);
 
-			txtP_Proc_Msg_Display.write(fw);
+			fw.write("User Messages\n");
+
+			fw.write("_______________________________\n");
+
+			fw.write("\n");
+
+			fw.write(txtP_User_Msg_Display.getText());
+
+			fw.write("\n");
+
+			fw.write("Processor Messages\n");
+
+			fw.write("_______________________________\n");
+
+			fw.write("\n");
+
+			fw.write(txtP_Proc_Msg_Display.getText());
+
+			fw.write("\n");
 
 			fw.close();
 
@@ -561,6 +578,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				showHelp();
 
+				txt_Msg_Send.setText("");
+
 			} else if (VPXUtilities.getCurrentProcessor().length() > 0) {
 
 				if (str.length() > 0 && str.length() <= 48) {
@@ -573,6 +592,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 						updateUserMessage(txt_Msg_Send.getText());
 
+						txt_Msg_Send.setText("");
 					} else {
 						JOptionPane
 								.showMessageDialog(parent, "invalid Arguments", "Message", JOptionPane.ERROR_MESSAGE);

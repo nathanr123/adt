@@ -24,184 +24,186 @@ import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_SplashWindow extends JWindow {
 
-    /**
+	/**
 	 * 
 	 */
 
-    private static final long serialVersionUID = 3933173505852261011L;
+	private static final long serialVersionUID = 3933173505852261011L;
 
-    private static JProgressBar progressBar = new JProgressBar();
+	private static JProgressBar progressBar = new JProgressBar();
 
-    private static int count = 1, TIMER_PAUSE = 25, PROGBAR_MAX = 100;
+	private static int count = 1, TIMER_PAUSE = 25, PROGBAR_MAX = 100;
 
-    private static Timer progressBarTimer;
+	private static Timer progressBarTimer;
 
-    private JLabel lblCurrreading;
+	private JLabel lblCurrreading;
 
-    Properties props = System.getProperties();
+	Properties props = System.getProperties();
 
-    Enumeration<?> e;
+	Enumeration<?> e;
 
-    ResourceBundle rBundle = VPXUtilities.getResourceBundle();
+	ResourceBundle rBundle = VPXUtilities.getResourceBundle();
 
-    ActionListener al = new ActionListener() {
+	ActionListener al = new ActionListener() {
 
-	@Override
-	public void actionPerformed(java.awt.event.ActionEvent evt) {
+		@Override
+		public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-	    progressBar.setValue(count);
+			progressBar.setValue(count);
 
-	    if (PROGBAR_MAX == count) {
+			if (PROGBAR_MAX == count) {
 
-		VPX_SplashWindow.this.dispose();// dispose
-						// of
-						// splashscreen
+				VPX_SplashWindow.this.dispose();// dispose
+				// of
+				// splashscreen
 
-		progressBarTimer.stop();// stop
-					// the
-					// timer
+				progressBarTimer.stop();// stop
+				// the
+				// timer
 
-		createAndShowADTWindow();
-	    }
-	    if (e == null)
+				createAndShowADTWindow();
+			}
+			if (e == null)
 
-		e = props.propertyNames();
+				e = props.propertyNames();
 
-	    else if (!e.hasMoreElements()) {
+			else if (!e.hasMoreElements()) {
 
-		props = VPXUtilities.readProperties();
+				props = VPXUtilities.readProperties();
 
-		e = props.propertyNames();
+				e = props.propertyNames();
 
-	    } else {
+			} else {
 
-		lblCurrreading.setText("");
-	    }
+				lblCurrreading.setText("");
+			}
 
-	    String key = (String) e.nextElement();
+			String key = (String) e.nextElement();
 
-	    lblCurrreading.setText("reading " + key + " = " + props.getProperty(key));
+			lblCurrreading.setText("reading " + key + " = " + props.getProperty(key));
 
-	    try {
+			try {
 
-		Thread.sleep(50);
+				Thread.sleep(50);
 
-	    } catch (Exception e) {
+			} catch (Exception e) {
 
-	    }
-	    count++;// increase
-		    // counter
+			}
+			count++;// increase
+			// counter
 
+		}
+	};
+
+	public VPX_SplashWindow() {
+
+		setIconImage(VPXUtilities.getAppIcon());
+
+		createSplash();
+
+		setAlwaysOnTop(true);
 	}
-    };
 
-    public VPX_SplashWindow() {
+	private void createSplash() {
 
-	createSplash();
+		Container container = getContentPane();
 
-	setAlwaysOnTop(true);
-    }
+		JPanel panel = new JPanel();
 
-    private void createSplash() {
+		panel.setBorder(new javax.swing.border.EtchedBorder());
 
-	Container container = getContentPane();
+		container.add(panel, BorderLayout.CENTER);
 
-	JPanel panel = new JPanel();
+		panel.setLayout(null);
 
-	panel.setBorder(new javax.swing.border.EtchedBorder());
+		lblCurrreading = new JLabel("");
 
-	container.add(panel, BorderLayout.CENTER);
+		lblCurrreading.setForeground(SystemColor.activeCaptionBorder);
 
-	panel.setLayout(null);
+		lblCurrreading.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 12));
 
-	lblCurrreading = new JLabel("");
+		lblCurrreading.setBounds(2, 268, 495, 20);
 
-	lblCurrreading.setForeground(SystemColor.activeCaptionBorder);
+		panel.add(lblCurrreading);
 
-	lblCurrreading.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 12));
+		JLabel lblV = new JLabel("V " + rBundle.getString("App.title.version"));
 
-	lblCurrreading.setBounds(2, 268, 495, 20);
+		lblV.setHorizontalAlignment(SwingConstants.RIGHT);
 
-	panel.add(lblCurrreading);
+		lblV.setForeground(SystemColor.activeCaptionBorder);
 
-	JLabel lblV = new JLabel("V " + rBundle.getString("App.title.version"));
+		lblV.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 14));
 
-	lblV.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblV.setBounds(369, 148, 44, 20);
 
-	lblV.setForeground(SystemColor.activeCaptionBorder);
+		panel.add(lblV);
 
-	lblV.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 14));
+		JLabel lblCaption = new JLabel("A VPX Dual Application Debugger Tool");
 
-	lblV.setBounds(369, 148, 44, 20);
+		lblCaption.setForeground(UIManager.getColor("CheckBox.background"));
 
-	panel.add(lblV);
+		lblCaption.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 14));
 
-	JLabel lblCaption = new JLabel("A VPX Dual Application Debugger Tool");
+		lblCaption.setBounds(29, 175, 243, 29);
 
-	lblCaption.setForeground(UIManager.getColor("CheckBox.background"));
+		panel.add(lblCaption);
 
-	lblCaption.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 14));
+		JLabel lblIcon = new JLabel();
 
-	lblCaption.setBounds(29, 175, 243, 29);
+		lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
 
-	panel.add(lblCaption);
+		lblIcon.setIcon(VPXUtilities.getImageIcon(VPXConstants.Icons.ICON_CORNET_NAME, 72, 72));
 
-	JLabel lblIcon = new JLabel();
+		lblIcon.setBounds(29, 94, 72, 72);
 
-	lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
+		panel.add(lblIcon);
 
-	lblIcon.setIcon(VPXUtilities.getImageIcon(VPXConstants.Icons.ICON_CORNET_NAME, 72, 72));
+		JLabel lblBanner = new JLabel("Application Debugger Tool");
 
-	lblIcon.setBounds(29, 94, 72, 72);
+		lblBanner.setForeground(Color.WHITE);
 
-	panel.add(lblIcon);
+		lblBanner.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 26));
 
-	JLabel lblBanner = new JLabel("Application Debugger Tool");
+		lblBanner.setBounds(111, 94, 321, 72);
 
-	lblBanner.setForeground(Color.WHITE);
+		panel.add(lblBanner);
 
-	lblBanner.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 26));
+		JLabel lblBGImage = new JLabel("");
 
-	lblBanner.setBounds(111, 94, 321, 72);
+		lblBGImage.setBounds(2, 2, 495, 290);
 
-	panel.add(lblBanner);
+		lblBGImage.setIcon(VPXConstants.Icons.IMAGE_BG);
 
-	JLabel lblBGImage = new JLabel("");
+		panel.add(lblBGImage);
 
-	lblBGImage.setBounds(2, 2, 495, 290);
+		progressBar.setPreferredSize(new Dimension(150, 8));
 
-	lblBGImage.setIcon(VPXConstants.Icons.IMAGE_BG);
+		progressBar.setMaximum(PROGBAR_MAX);
 
-	panel.add(lblBGImage);
+		container.add(progressBar, BorderLayout.SOUTH);
 
-	progressBar.setPreferredSize(new Dimension(150, 8));
+		setBounds(600, 600, 499, 300);
 
-	progressBar.setMaximum(PROGBAR_MAX);
+		// pack();
 
-	container.add(progressBar, BorderLayout.SOUTH);
+		setLocationRelativeTo(null);
 
-	setBounds(600, 600, 499, 300);
+		setVisible(true);
 
-	// pack();
+		startProgressBar();
+	}
 
-	setLocationRelativeTo(null);
+	private void startProgressBar() {
 
-	setVisible(true);
+		progressBarTimer = new Timer(TIMER_PAUSE, al);
 
-	startProgressBar();
-    }
+		progressBarTimer.start();
+	}
 
-    private void startProgressBar() {
+	private void createAndShowADTWindow() {
 
-	progressBarTimer = new Timer(TIMER_PAUSE, al);
+		VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
 
-	progressBarTimer.start();
-    }
-
-    private void createAndShowADTWindow() {
-
-	VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
-
-	window.showWindow();
-    }
+		window.showWindow();
+	}
 }

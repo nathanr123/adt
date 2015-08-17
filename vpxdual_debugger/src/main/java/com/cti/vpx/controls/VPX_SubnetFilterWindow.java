@@ -24,138 +24,141 @@ import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_SubnetFilterWindow extends JDialog {
 
-    /**
+	/**
 	 * 
 	 */
-    private static final long serialVersionUID = 1991438363434310071L;
+	private static final long serialVersionUID = 1991438363434310071L;
 
-    private final JPanel contentPanel = new JPanel();
+	private final JPanel contentPanel = new JPanel();
 
-    private JTextField subnetMask;
+	private JTextField subnetMask;
 
-    private VPX_ETHWindow parent;
+	private VPX_ETHWindow parent;
 
-    /**
-     * Create the dialog.
-     */
-    public VPX_SubnetFilterWindow(VPX_ETHWindow parent) {
+	/**
+	 * Create the dialog.
+	 */
+	public VPX_SubnetFilterWindow(VPX_ETHWindow parent) {
 
-	this.parent = parent;
+		this.parent = parent;
 
-	init();
+		init();
 
-	loadComponents();
+		loadComponents();
 
-	centerFrame();
+		centerFrame();
 
-    }
+	}
 
-    private void init() {
+	private void init() {
 
-	setResizable(false);
+		setResizable(false);
 
-	setTitle("Subnet Filter");
+		setIconImage(VPXUtilities.getAppIcon());
 
-	setBounds(100, 100, 261, 130);
+		setTitle("Subnet Filter");
 
-	setModal(true);
+		setBounds(100, 100, 261, 130);
 
-	getContentPane().setLayout(new BorderLayout());
-    }
+		setModal(true);
 
-    private void loadComponents() {
+		getContentPane().setLayout(new BorderLayout());
+	}
 
-	contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+	private void loadComponents() {
 
-	getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-	contentPanel.setLayout(new MigLayout("", "[79.00,grow]", "[14.00,fill][fill]"));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-	JLabel lblAdminPassword = new JLabel("Enter subnet mask to filter");
+		contentPanel.setLayout(new MigLayout("", "[79.00,grow]", "[14.00,fill][fill]"));
 
-	contentPanel.add(lblAdminPassword, "cell 0 0,alignx left");
+		JLabel lblAdminPassword = new JLabel("Enter subnet mask to filter");
 
-	subnetMask = new JTextField();
+		contentPanel.add(lblAdminPassword, "cell 0 0,alignx left");
 
-	contentPanel.add(subnetMask, "cell 0 1,growx");
+		subnetMask = new JTextField();
 
-	JPanel buttonPane = new JPanel();
+		contentPanel.add(subnetMask, "cell 0 1,growx");
 
-	buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
+		JPanel buttonPane = new JPanel();
 
-	getContentPane().add(buttonPane, BorderLayout.SOUTH);
+		buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-	JButton btnOK = new JButton("Apply Filter");
+		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
-	btnOK.setActionCommand("OK");
+		JButton btnOK = new JButton("Apply Filter");
 
-	btnOK.addActionListener(new ActionListener() {
+		btnOK.setActionCommand("OK");
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
+		btnOK.addActionListener(new ActionListener() {
 
-		if (VPXUtilities.isValidIP(subnetMask.getText())) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-		    parent.applyMask(subnetMask.getText());
+				if (VPXUtilities.isValidIP(subnetMask.getText())) {
 
-		    VPXUtilities.updateProperties(VPXConstants.ResourceFields.FILTER_SUBNET, subnetMask.getText().trim());
+					parent.applyMask(subnetMask.getText());
 
-		    parent.refreshProcessorTree(true);
+					VPXUtilities.updateProperties(VPXConstants.ResourceFields.FILTER_SUBNET, subnetMask.getText()
+							.trim());
 
-		    VPX_SubnetFilterWindow.this.dispose();
-		} else {
+					parent.refreshProcessorTree(true);
 
-		    JOptionPane.showMessageDialog(VPX_SubnetFilterWindow.this,
-			    "Given subnet mask is not valid.Please check", "Validation", JOptionPane.ERROR_MESSAGE);
+					VPX_SubnetFilterWindow.this.dispose();
+				} else {
 
-		    subnetMask.requestFocus();
-		}
-	    }
-	});
+					JOptionPane.showMessageDialog(VPX_SubnetFilterWindow.this,
+							"Given subnet mask is not valid.Please check", "Validation", JOptionPane.ERROR_MESSAGE);
 
-	buttonPane.add(btnOK);
+					subnetMask.requestFocus();
+				}
+			}
+		});
 
-	getRootPane().setDefaultButton(btnOK);
+		buttonPane.add(btnOK);
 
-	JButton btnCancel = new JButton("Close");
+		getRootPane().setDefaultButton(btnOK);
 
-	btnCancel.setActionCommand("Cancel");
+		JButton btnCancel = new JButton("Close");
 
-	btnCancel.addActionListener(new ActionListener() {
+		btnCancel.setActionCommand("Cancel");
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
+		btnCancel.addActionListener(new ActionListener() {
 
-		parent.unToggleFilter();
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-		VPX_SubnetFilterWindow.this.dispose();
+				parent.unToggleFilter();
 
-	    }
-	});
+				VPX_SubnetFilterWindow.this.dispose();
 
-	buttonPane.add(btnCancel);
-    }
+			}
+		});
 
-    public void showFilter() {
+		buttonPane.add(btnCancel);
+	}
 
-	subnetMask.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.FILTER_SUBNET));
+	public void showFilter() {
 
-	setVisible(true);
-    }
+		subnetMask.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.FILTER_SUBNET));
 
-    private void centerFrame() {
+		setVisible(true);
+	}
 
-	Dimension windowSize = getSize();
+	private void centerFrame() {
 
-	GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Dimension windowSize = getSize();
 
-	Point centerPoint = ge.getCenterPoint();
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-	int dx = centerPoint.x - windowSize.width / 2;
+		Point centerPoint = ge.getCenterPoint();
 
-	int dy = centerPoint.y - windowSize.height / 2;
+		int dx = centerPoint.x - windowSize.width / 2;
 
-	setLocation(dx, dy);
-    }
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
+	}
 
 }

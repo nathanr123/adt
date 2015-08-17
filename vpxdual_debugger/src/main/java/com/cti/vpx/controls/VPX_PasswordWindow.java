@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
+import com.cti.vpx.util.VPXUtilities;
+
 import net.miginfocom.swing.MigLayout;
 
 public class VPX_PasswordWindow extends JDialog {
@@ -44,6 +46,8 @@ public class VPX_PasswordWindow extends JDialog {
 	private void init() {
 
 		setResizable(false);
+		
+		setIconImage(VPXUtilities.getAppIcon());
 
 		setTitle("Authentication");
 

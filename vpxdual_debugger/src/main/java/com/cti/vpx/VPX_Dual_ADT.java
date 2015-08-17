@@ -1,6 +1,7 @@
 package com.cti.vpx;
 
 import java.awt.EventQueue;
+import java.net.SocketException;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -39,12 +40,14 @@ public class VPX_Dual_ADT {
 					}
 
 				} catch (Exception e) {
+					
 					JOptionPane.showMessageDialog(null,
 							"Another instance is running or the ports are bind by another application.",
 							"Opening Application", JOptionPane.ERROR_MESSAGE);
 
 					e.printStackTrace();
-					// System.exit(0);
+					
+					System.exit(0);
 				}
 			}
 		});

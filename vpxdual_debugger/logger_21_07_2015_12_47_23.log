@@ -78,3 +78,242 @@
 14-08-2015 18:53:58  INFO:   Periodicity updated successfully
 14-08-2015 18:54:37  INFO:   Message sent to 172.17.10.140
 14-08-2015 18:54:49  INFO:   Message sent to 172.17.10.1
+17-08-2015 10:16:56  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:17:08  INFO:   Showing change password
+17-08-2015 10:17:11  INFO:   Showing change periodicity
+17-08-2015 10:17:21  INFO:   Asking Super user password for VLAN Configuration
+17-08-2015 10:17:22  INFO:   VLAN Configuration opened
+17-08-2015 10:19:50  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:19:54  INFO:   Showing Preference window
+17-08-2015 10:20:02  INFO:   Help document opened
+17-08-2015 10:21:19  INFO:   Showing Execution Window
+17-08-2015 10:21:23  INFO:   Ethernet Flash opened
+17-08-2015 10:21:26  INFO:   MAD utility opened
+17-08-2015 10:21:33  INFO:   Starting Built in Self Test
+17-08-2015 10:21:33  INFO:   Built in Self Test Completed
+17-08-2015 10:22:58  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:23:03  INFO:   Memory Browser opened
+17-08-2015 10:23:07  INFO:   Memory Plot opened
+17-08-2015 10:23:13  INFO:   Showing Amplitude Graph
+17-08-2015 10:23:32  INFO:   Asking Super user password for VLAN Configuration
+17-08-2015 10:23:34  INFO:   Invalid Password
+17-08-2015 10:23:50  INFO:   Help document opened
+17-08-2015 10:24:20  INFO:   Showing VPXSystem Details
+17-08-2015 10:24:52  INFO:   Help document opened
+17-08-2015 10:25:05  INFO:   Message sent to 172.17.20.25
+17-08-2015 10:34:55  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:35:15  INFO:   Help document opened
+17-08-2015 10:35:23  INFO:   Message sent to 172.17.20.25
+17-08-2015 10:38:43  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:38:52  INFO:   Message sent to 172.17.20.26
+17-08-2015 10:40:28  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:41:22  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:41:40  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:42:50  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:43:00  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:49:58  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:56:51  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 10:57:00  INFO:   Message sent to 172.17.20.25
+17-08-2015 11:10:12  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:10:14  INFO:   Showing Preference window
+17-08-2015 11:11:18  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:11:22  INFO:   MAD utility opened
+17-08-2015 11:11:24  INFO:   Configured Susccessfully
+17-08-2015 11:11:25  INFO:   MAD Compilation started
+17-08-2015 11:11:25  INFO:   Creating deployment files
+17-08-2015 11:11:25  INFO:   Creating deployment configuration files
+17-08-2015 11:11:28  INFO:   
+17-08-2015 11:11:28  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:11:28  INFO:   
+17-08-2015 11:11:28  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:11:29  INFO:   
+17-08-2015 11:11:29  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpibk0r3.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:11:35  INFO:   
+17-08-2015 11:11:35  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpmplnt3.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:11:36  INFO:   
+17-08-2015 11:11:36  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpv1gcc3.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:11:37  INFO:   
+17-08-2015 11:11:37  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpe9vmir.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:11:38  INFO:   
+17-08-2015 11:11:38  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpj__9mw.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:11:39  INFO:   
+17-08-2015 11:11:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpn6xfn5.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:11:39  INFO:   
+17-08-2015 11:11:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpzgjahb.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:11:40  INFO:   
+17-08-2015 11:11:40  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp7rgiqx.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:11:41  INFO:   
+17-08-2015 11:11:41  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpo8cere.xml "./tmp/fs\mal_app" 
+17-08-2015 11:11:41  INFO:   
+17-08-2015 11:11:41  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpwciajc.xml "./tmp/fs\nml" 
+17-08-2015 11:11:43  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:12:02  INFO:   MAD Compilation Completed
+17-08-2015 11:13:34  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:13:38  INFO:   MAD utility opened
+17-08-2015 11:13:40  INFO:   Configured Susccessfully
+17-08-2015 11:13:41  INFO:   MAD Compilation started
+17-08-2015 11:13:41  INFO:   Creating deployment files
+17-08-2015 11:13:41  INFO:   Creating deployment configuration files
+17-08-2015 11:13:41  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:13:42  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpxxdwwa.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:13:47  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpuftbax.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:13:48  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp7hqnmj.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:13:49  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpmv3g5l.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:13:50  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmptew2rf.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:13:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpaejonp.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:13:52  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpxmvi4w.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:13:53  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp1kbjrn.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:13:54  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpj0iw55.xml "./tmp/fs\mal_app" 
+17-08-2015 11:13:54  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp0ogev3.xml "./tmp/fs\nml" 
+17-08-2015 11:13:55  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:13:57  INFO:   MAD Compilation Completed
+17-08-2015 11:15:50  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:15:54  INFO:   MAD utility opened
+17-08-2015 11:15:55  INFO:   Configured Susccessfully
+17-08-2015 11:15:56  INFO:   MAD Compilation started
+17-08-2015 11:15:56  INFO:   Creating deployment files
+17-08-2015 11:15:56  INFO:   Creating deployment configuration files
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:15:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmplctsyi.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:16:02  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpstpc5e.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:16:03  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp2budaa.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:16:04  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpih5p7h.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:16:05  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmppakyxk.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:16:06  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpspvfor.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:16:07  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp7plnju.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:16:08  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpc6xdws.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:16:09  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpao7msd.xml "./tmp/fs\mal_app" 
+17-08-2015 11:16:09  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp7_rwdp.xml "./tmp/fs\nml" 
+17-08-2015 11:16:10  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:16:12  INFO:   MAD Compilation Completed
+17-08-2015 11:17:39  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:17:47  INFO:   MAD utility opened
+17-08-2015 11:17:49  INFO:   Configured Susccessfully
+17-08-2015 11:17:50  INFO:   MAD Compilation started
+17-08-2015 11:17:50  INFO:   Creating deployment files
+17-08-2015 11:17:50  INFO:   Creating deployment configuration files
+17-08-2015 11:17:50  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:17:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmppgo6ou.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:17:56  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmplyepyf.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:17:57  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpwppbbi.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:17:58  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpznp9d2.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:17:59  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpfjskxm.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:18:00  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpujkpno.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:18:01  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpv81dff.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:18:01  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpipkmsb.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:18:02  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmptt3oaz.xml "./tmp/fs\mal_app" 
+17-08-2015 11:18:02  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpz3ijic.xml "./tmp/fs\nml" 
+17-08-2015 11:18:04  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:18:12  INFO:   MAD Compilation Completed
+17-08-2015 11:19:02  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:19:09  INFO:   Configured Successfully
+17-08-2015 11:19:10  INFO:   MAD Compilation started
+17-08-2015 11:19:10  INFO:   MAD Compilation Completed
+17-08-2015 11:19:10  INFO:   Creating deployment files
+17-08-2015 11:19:10  INFO:   Creating deployment configuration files
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:19:10  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:19:11  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpciivtc.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:19:15  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpbnv2ln.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:19:16  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpci0ewv.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:19:17  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpbhi1yc.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:19:18  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpnuwmvl.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:19:19  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpyvmdap.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:19:20  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpa21w1h.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:19:21  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp187j9u.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:19:22  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpj4jfvl.xml "./tmp/fs\mal_app" 
+17-08-2015 11:19:22  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp6bevn8.xml "./tmp/fs\nml" 
+17-08-2015 11:19:24  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:36:44  INFO:   VPX Dual Application Debugger Tool - 1.0 Started
+17-08-2015 11:37:07  INFO:   MAD utility opened
+17-08-2015 11:37:12  INFO:   Configured Susccessfully
+17-08-2015 11:38:14  INFO:   MAD Compilation started
+17-08-2015 11:38:14  INFO:   Creating deployment files
+17-08-2015 11:38:14  INFO:   Creating deployment configuration files
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:38:14  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:38:15  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpnpq6en.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:38:20  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpejivw5.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:38:21  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpstgkze.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:38:22  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpqohqak.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:38:22  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmplaie7j.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:38:23  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpv8vyqw.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:38:24  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpzr15d_.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:38:25  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp6kyfy9.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:38:26  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpar1j61.xml "./tmp/fs\mal_app" 
+17-08-2015 11:38:26  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpf8kdwq.xml "./tmp/fs\nml" 
+17-08-2015 11:38:28  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:38:31  INFO:   MAD Compilation Completed
+17-08-2015 11:40:01  INFO:   MAD utility opened
+17-08-2015 11:40:04  INFO:   Configured Susccessfully
+17-08-2015 11:40:38  INFO:   MAD Compilation started
+17-08-2015 11:40:38  INFO:   Creating deployment files
+17-08-2015 11:40:38  INFO:   Creating deployment configuration files
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app1.strip ./images/appImages\app1 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app2.strip ./images/appImages\app2 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app3.strip ./images/appImages\app3 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app4.strip ./images/appImages\app4 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app5.strip ./images/appImages\app5 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app6.strip ./images/appImages\app6 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app7.strip ./images/appImages\app7 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/strip6x.exe" -o=./tmp/strippedImages\app8.strip ./images/appImages\app8 
+17-08-2015 11:40:39  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpqspvvp.xml "./tmp/strippedImages\app1.strip" 
+17-08-2015 11:40:44  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp2wvs1q.xml "./tmp/strippedImages\app2.strip" 
+17-08-2015 11:40:45  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmphhkqyn.xml "./tmp/strippedImages\app3.strip" 
+17-08-2015 11:40:46  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpxm_aow.xml "./tmp/strippedImages\app4.strip" 
+17-08-2015 11:40:47  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpwmm65m.xml "./tmp/strippedImages\app5.strip" 
+17-08-2015 11:40:48  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmp6eedpc.xml "./tmp/strippedImages\app6.strip" 
+17-08-2015 11:40:49  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpm4tvcg.xml "./tmp/strippedImages\app7.strip" 
+17-08-2015 11:40:50  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpvjl4pl.xml "./tmp/strippedImages\app8.strip" 
+17-08-2015 11:40:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpj0mohy.xml "./tmp/fs\mal_app" 
+17-08-2015 11:40:51  INFO:   F:\git\vpxdual_debugger>"C:/ti/ccsv5/tools/compiler/c6000_7.4.1/bin/ofd6x.exe" -x -o c:\users\nathan~1\appdata\local\temp\tmpm1jnnh.xml "./tmp/fs\nml" 
+17-08-2015 11:40:52  INFO:   MAP tool executing in prelink bypass mode
+17-08-2015 11:40:54  INFO:   MAD Compilation Completed
+17-08-2015 11:42:39  INFO:   Showing change periodicity
+17-08-2015 11:42:42  INFO:   Periodicity updated successfully
+17-08-2015 11:42:47  INFO:   Showing change periodicity

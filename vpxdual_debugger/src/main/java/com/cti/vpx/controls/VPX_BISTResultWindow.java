@@ -142,10 +142,6 @@ public class VPX_BISTResultWindow extends JDialog {
 	 */
 	public VPX_BISTResultWindow() {
 
-		getContentPane().setBackground(Color.WHITE);
-
-		setBackground(Color.WHITE);
-
 		init();
 
 		loadComponents();
@@ -165,11 +161,17 @@ public class VPX_BISTResultWindow extends JDialog {
 
 	private void init() {
 
+		getContentPane().setBackground(Color.WHITE);
+
+		setBackground(Color.WHITE);
+
 		setModal(true);
 
 		setResizable(false);
 
 		setTitle("Buil In Self Test");
+
+		setIconImage(VPXUtilities.getAppIcon());
 
 		setBounds(100, 100, 900, 600);
 
@@ -1328,7 +1330,7 @@ public class VPX_BISTResultWindow extends JDialog {
 	private void clearAllFields() {
 
 		progress.lblExitingApplication.setText("Built in Self Testing in progress...");
-		
+
 		// Test Detail
 		lblTestDetailTestTimeVal.setText("");
 

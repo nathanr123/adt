@@ -72,6 +72,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	private void init() {
 
 		setTitle("Flash Out File");
+		
+		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 

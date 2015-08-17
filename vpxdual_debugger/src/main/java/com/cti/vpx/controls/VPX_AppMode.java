@@ -149,6 +149,8 @@ public class VPX_AppMode extends JFrame {
 	private void init() {
 
 		setTitle("Debugg Wizard");
+		
+		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -813,7 +815,7 @@ public class VPX_AppMode extends JFrame {
 						JOptionPane.showMessageDialog(null,
 								"Another instance is running or the ports are bind by another application.",
 								"Opening Application", JOptionPane.ERROR_MESSAGE);
-						
+
 						System.exit(0);
 					}
 

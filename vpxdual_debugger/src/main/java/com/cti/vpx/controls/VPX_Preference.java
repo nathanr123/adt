@@ -120,6 +120,8 @@ public class VPX_Preference extends JDialog {
 		setModal(true);
 
 		setResizable(false);
+		
+		setIconImage(VPXUtilities.getAppIcon());
 
 		fileDialog.setAcceptAllFileFilterUsed(false);
 	}

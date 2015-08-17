@@ -1299,15 +1299,35 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	public void showAliasConfig() {
 
-		new VPX_AliasConfigWindow(VPX_ETHWindow.this).setVisible(true);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				new VPX_AliasConfigWindow(VPX_ETHWindow.this).setVisible(true);
+
+			}
+		});
+
+		th.start();
 
 	}
 
 	public void showDetail() {
 
-		VPX_DetailPanel detail = new VPX_DetailPanel(VPX_ETHWindow.this, VPXSystem.class.getSimpleName());
+		Thread th = new Thread(new Runnable() {
 
-		detail.setVisible(true);
+			@Override
+			public void run() {
+
+				VPX_DetailPanel detail = new VPX_DetailPanel(VPX_ETHWindow.this, VPXSystem.class.getSimpleName());
+
+				detail.setVisible(true);
+
+			}
+		});
+
+		th.start();
 
 	}
 
@@ -1347,53 +1367,84 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	public void showMemoryBrowser() {
 
-		MemoryViewFilter m = new MemoryViewFilter();
+		Thread th = new Thread(new Runnable() {
 
-		m.setSubsystem("Sub1");
+			@Override
+			public void run() {
 
-		m.setProcessor("192.168.0.102");
+				MemoryViewFilter m = new MemoryViewFilter();
 
-		m.setCore("Core 3");
+				m.setSubsystem("Sub1");
 
-		m.setAutoRefresh(true);
+				m.setProcessor("192.168.0.102");
 
-		m.setTimeinterval(10);
+				m.setCore("Core 3");
 
-		m.setUseMapFile(false);
+				m.setAutoRefresh(true);
 
-		m.setMapPath("C:\\temp.map");
+				m.setTimeinterval(10);
 
-		m.setMemoryName("memory X");
+				m.setUseMapFile(false);
 
-		m.setMemoryLength(10 + "");
+				m.setMapPath("C:\\temp.map");
 
-		m.setMemoryStride(10 + "");
+				m.setMemoryName("memory X");
 
-		m.setDirectMemory(true);
+				m.setMemoryLength(10 + "");
 
-		m.setMemoryAddress("0XFF00000");
+				m.setMemoryStride(10 + "");
 
-		openMemoryBrowser(m);
+				m.setDirectMemory(true);
+
+				m.setMemoryAddress("0XFF00000");
+
+				openMemoryBrowser(m);
+
+			}
+		});
+
+		th.start();
 
 	}
 
 	public void showMemoryPlot() {
 
-		openMemoryPlot();
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				openMemoryPlot();
+
+			}
+		});
+
+		th.start();
 
 	}
 
 	public void showEthFlash() {
 
-		VPX_EthernetFlashPanel eth = new VPX_EthernetFlashPanel(VPX_ETHWindow.this);
+		Thread th = new Thread(new Runnable() {
 
-		eth.setProcessor(VPXUtilities.getCurrentProcessor());
+			@Override
+			public void run() {
 
-		vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(eth));
+				VPX_EthernetFlashPanel eth = new VPX_EthernetFlashPanel(VPX_ETHWindow.this);
 
-		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+				eth.setProcessor(VPXUtilities.getCurrentProcessor());
 
-		updateLog("Ethernet Flash opened");
+				vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(eth));
+
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
+				updateLog("Ethernet Flash opened");
+
+			}
+		});
+
+		th.start();
+
 	}
 
 	public void showAmplitude() {
@@ -1408,22 +1459,34 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	public void showMAD() {
 
-		int i = isAlreadyExist("Mad Utility");
+		Thread th = new Thread(new Runnable() {
 
-		if (i == -1) {
+			@Override
+			public void run() {
 
-			vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility", new JScrollPane(new VPX_MADPanel(VPX_ETHWindow.this)));
+				int i = isAlreadyExist("Mad Utility");
 
-			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+				if (i == -1) {
 
-			updateLog("MAD utility opened");
+					vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility", new JScrollPane(new VPX_MADPanel(
+							VPX_ETHWindow.this)));
 
-		} else {
+					vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
-			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
+					updateLog("MAD utility opened");
 
-			updateLog("MAD utility already opened");
-		}
+				} else {
+
+					vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
+
+					updateLog("MAD utility already opened");
+				}
+
+			}
+		});
+
+		th.start();
+
 	}
 
 	public void showBIST() {
@@ -1436,43 +1499,85 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			public void run() {
 				bistWindow.showBISTWindow();
 
+				udpMonitor.startBist(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentSubSystem());
+
+				updateLog("Built in Self Test Completed");
+
 			}
 		});
 
 		th.start();
 
-		udpMonitor.startBist(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentSubSystem());
-
-		updateLog("Built in Self Test Completed");
 	}
 
 	public void setReboot(String ip) {
 
-		udpMonitor.sendBoot(ip);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				udpMonitor.sendBoot(ip);
+
+			}
+		});
+
+		th.start();
 
 		updateLog("P2020 " + ip + " is set to Reboot");
 	}
 
 	public void setInterrupt(String ip) {
 
-		udpMonitor.sendInterrupt(ip, PROCESSOR_LIST.PROCESSOR_DSP1);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				udpMonitor.sendInterrupt(ip, PROCESSOR_LIST.PROCESSOR_DSP1);
+			}
+		});
+
+		th.start();
+
 	}
 
 	public void showExecution() {
 
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				vpx_Content_Tabbed_Pane_Right.addTab("Execution", new JScrollPane(new VPX_ExecutionPanel()));
+
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
+			}
+		});
+
+		th.start();
+
 		updateLog("Showing Execution Window");
-
-		vpx_Content_Tabbed_Pane_Right.addTab("Execution", new JScrollPane(new VPX_ExecutionPanel()));
-
-		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
 	}
 
 	public void showFlashWizard() {
 
-		VPX_FlashWizard dialog = new VPX_FlashWizard(VPX_ETHWindow.this);
+		Thread th = new Thread(new Runnable() {
 
-		dialog.setVisible(true);
+			@Override
+			public void run() {
+
+				VPX_FlashWizard dialog = new VPX_FlashWizard(VPX_ETHWindow.this);
+
+				dialog.setVisible(true);
+
+			}
+		});
+
+		th.start();
+
 	}
 
 	public void showVLAN(int tab) {
@@ -1500,7 +1605,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 			frame.setBounds(100, 100, 1400, 700);
 
-			frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 			frame.setContentPane(contentPane);
 
@@ -1545,7 +1650,17 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		updateLog("Showing change password");
 
-		new VPX_ChangePasswordWindow(VPX_ETHWindow.this).setVisible(true);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				new VPX_ChangePasswordWindow(VPX_ETHWindow.this).setVisible(true);
+
+			}
+		});
+
+		th.start();
 
 	}
 
@@ -1553,7 +1668,17 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		updateLog("Showing change periodicity");
 
-		new VPX_ChangePeriodicity(VPX_ETHWindow.this).setVisible(true);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				new VPX_ChangePeriodicity(VPX_ETHWindow.this).setVisible(true);
+
+			}
+		});
+
+		th.start();
 
 	}
 
@@ -1561,7 +1686,16 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		updateLog("Showing Preference window");
 
-		new VPX_Preference().showPreferenceWindow();
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				new VPX_Preference().showPreferenceWindow();
+			}
+		});
+
+		th.start();
 
 	}
 
@@ -1577,12 +1711,34 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	public void showHelp() {
 
-		messagePanel.showHelp();
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				messagePanel.showHelp();
+
+			}
+		});
+
+		th.start();
+
 	}
 
 	public void showAbout() {
 
-		aboutDialog.setVisible(true);
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				aboutDialog.setVisible(true);
+
+			}
+		});
+
+		th.start();
+
 	}
 
 	@Override
@@ -1705,7 +1861,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	// Advertisement Listener
 	@Override
 	public void updateProcessorStatus(String ip, String msg) {
-		
+
 		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
 
 	}

@@ -112,17 +112,20 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	public void updateLog(int LEVEL, String log) {
 
-		if (txtA_Log.getCaretPosition() > 0)
+		if (log.length() > 0) {
 
-			txtA_Log.append("\n");
+			if (txtA_Log.getCaretPosition() > 0)
 
-		String logMsg = VPXUtilities.getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log;
+				txtA_Log.append("\n");
 
-		txtA_Log.append(logMsg);
+			String logMsg = VPXUtilities.getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log;
 
-		txtA_Log.setCaretPosition(txtA_Log.getText().length());
+			txtA_Log.append(logMsg);
 
-		updateLogtoFile(logMsg);
+			txtA_Log.setCaretPosition(txtA_Log.getText().length());
+
+			updateLogtoFile(logMsg);
+		}
 	}
 
 	public void updateLogtoFile(String log) {
@@ -217,7 +220,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_SAVE);
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_SAVE);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;
@@ -260,7 +263,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			putValue(Action.SHORT_DESCRIPTION, name);
 
-			putValue(Action.SMALL_ICON,VPXConstants.Icons.ICON_COPY);
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_COPY);
 		}
 
 		private static final long serialVersionUID = -780929428772240491L;

@@ -62,6 +62,8 @@ public class VPX_ChangePeriodicity extends JDialog {
 		setResizable(false);
 
 		setTitle("Change Periodicity");
+		
+		setIconImage(VPXUtilities.getAppIcon());
 
 		setBounds(100, 100, 350, 130);
 

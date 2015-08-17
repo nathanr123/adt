@@ -57,6 +57,8 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 		setResizable(false);
 
+		setIconImage(VPXUtilities.getAppIcon());
+		
 		setTitle("Change Passoword");
 
 		setBounds(100, 100, 350, 190);

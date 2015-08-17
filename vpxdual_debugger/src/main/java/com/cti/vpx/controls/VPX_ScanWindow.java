@@ -77,7 +77,9 @@ public class VPX_ScanWindow extends JDialog {
 	private void init() {
 
 		setTitle("Processor Scanning Window");
-
+		
+		setIconImage(VPXUtilities.getAppIcon());
+		
 		setBounds(100, 100, 305, 165);
 
 		setIconImage(VPXUtilities.getAppIcon());

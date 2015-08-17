@@ -1344,6 +1344,10 @@ public class VPX_MADPanel extends JPanel {
 
 			txtAResult = new JTextArea();
 
+			txtAResult.setBackground(Color.BLACK);
+
+			txtAResult.setForeground(Color.WHITE);
+
 			txtAResult.setEditable(false);
 
 			scrResult.setViewportView(txtAResult);
@@ -1435,9 +1439,12 @@ public class VPX_MADPanel extends JPanel {
 
 		public void updateGeneratingMessage(String msg) {
 
-			txtAResult.append(msg + "\n");
+			if (msg.length() > 0) {
 
-			txtAResult.setCaretPosition(txtAResult.getDocument().getLength());
+				txtAResult.append(msg + "\n");
+
+				txtAResult.setCaretPosition(txtAResult.getDocument().getLength());
+			}
 		}
 
 		public void setSuccess() {

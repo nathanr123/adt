@@ -178,6 +178,8 @@ public class VPX_FlashWizard extends JDialog {
 
 		setTitle("Flash Wizard");
 
+		setIconImage(VPXUtilities.getAppIcon());
+
 		setResizable(false);
 
 		setSize(800, 600);
@@ -1637,6 +1639,10 @@ public class VPX_FlashWizard extends JDialog {
 
 			txtAResult = new JTextArea();
 
+			txtAResult.setBackground(Color.BLACK);
+
+			txtAResult.setForeground(Color.WHITE);
+
 			txtAResult.setEditable(false);
 
 			scrResult.setViewportView(txtAResult);
@@ -1696,9 +1702,13 @@ public class VPX_FlashWizard extends JDialog {
 		}
 
 		public void updateGeneratingMessage(String msg) {
-			txtAResult.append(msg + "\n");
 
-			txtAResult.setCaretPosition(txtAResult.getDocument().getLength());
+			if (msg.length() > 0) {
+
+				txtAResult.append(msg + "\n");
+
+				txtAResult.setCaretPosition(txtAResult.getDocument().getLength());
+			}
 		}
 
 		public void setSuccess() {
