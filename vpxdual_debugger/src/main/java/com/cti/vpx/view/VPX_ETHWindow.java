@@ -1603,7 +1603,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 			JDialog frame = new JDialog(this, "VLAN Configuration");
 
-			frame.setBounds(100, 100, 1400, 700);
+			frame.setBounds(100, 100, 1000, 600);
+
+			frame.setLocationRelativeTo(VPX_ETHWindow.this);
 
 			frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -1629,7 +1631,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			} else {
 			}
 
-			frame.setSize(1401, 701);
+			frame.setSize(1001, 601);
 
 			updateLog("VLAN Configuration opened");
 
@@ -1834,8 +1836,10 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	@Override
 	public void updateBIST(BIST bist) {
 
-		bistWindow.setResult(bist);
+		if (bistWindow.isVisible()) {
 
+			bistWindow.setResult(bist);
+		}
 	}
 
 	@Override
@@ -1848,8 +1852,11 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	@Override
 	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
 
-		bistWindow.updateTestProgress(pType, val);
+		if (bistWindow.isVisible()) {
 
+			bistWindow.updateTestProgress(pType, val);
+
+		}
 	}
 
 	public void sendFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow) {

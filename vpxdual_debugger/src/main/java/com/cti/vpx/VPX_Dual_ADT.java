@@ -42,12 +42,12 @@ public class VPX_Dual_ADT {
 				} catch (Exception e) {
 					
 					JOptionPane.showMessageDialog(null,
-							"Another instance is running or the ports are bind by another application.",
+							e.getMessage(),
 							"Opening Application", JOptionPane.ERROR_MESSAGE);
 
 					e.printStackTrace();
 					
-					System.exit(0);
+					//System.exit(0);
 				}
 			}
 		});

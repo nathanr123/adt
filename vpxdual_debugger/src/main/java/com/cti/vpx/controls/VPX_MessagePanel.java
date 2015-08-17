@@ -498,7 +498,9 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		JDialog frame = new JDialog(parent, "List of commands");
 
-		frame.setBounds(100, 100, 1400, 700);
+		frame.setBounds(100, 100, 650, 600);
+		
+		frame.setLocationRelativeTo(parent);
 
 		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -524,8 +526,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		} else {
 		}
 
-		frame.setSize(1401, 701);
-	}
+		frame.setSize(651, 601);	}
 
 	private String getCurrentTime() {
 
