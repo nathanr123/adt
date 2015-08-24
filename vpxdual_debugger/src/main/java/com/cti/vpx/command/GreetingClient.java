@@ -451,7 +451,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.mode.set(MESSAGE_MODE.MSG_MODE_MESSAGE);
 
-			msg.core.set(0);
+			msg.core.set(1);
 
 			msg.command_msg.set("memget 0xa0000000");
 			// msg.command_msg.set("temp1");

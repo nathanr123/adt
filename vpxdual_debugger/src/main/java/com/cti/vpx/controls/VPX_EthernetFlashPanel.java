@@ -150,7 +150,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		flashOptionPanel.add(lblBinFile);
 
-		JLabel lblOffset = new JLabel("Offset");
+		JLabel lblOffset = new JLabel("Page");
 
 		lblOffset.setBounds(15, 150, 114, 22);
 
@@ -334,9 +334,9 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private void loadFlashLocations() {
 
-		cmbOffset.addItem("Location 0");
+		cmbOffset.addItem("0");
 
-		cmbOffset.addItem("Location 1");
+		cmbOffset.addItem("1");
 	}
 
 	private void enableWizardComponents() {

@@ -510,7 +510,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultProcessorVal);
 
-		JLabel lblP2020TestResultTemprature3 = new JLabel("Temprature 3");
+		JLabel lblP2020TestResultTemprature3 = new JLabel("Bottom Temp");
 
 		lblP2020TestResultTemprature3.setBackground(Color.WHITE);
 
@@ -538,7 +538,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultDDR3Val);
 
-		JLabel lblP2020TestResultVoltage1 = new JLabel("Voltage 1");
+		JLabel lblP2020TestResultVoltage1 = new JLabel("Voltage 3.3");
 
 		lblP2020TestResultVoltage1.setBackground(Color.WHITE);
 
@@ -566,7 +566,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultNORFlashVal);
 
-		JLabel lblP2020TestResultVoltage2 = new JLabel("Voltage 2");
+		JLabel lblP2020TestResultVoltage2 = new JLabel("Voltage 2.5");
 
 		lblP2020TestResultVoltage2.setBackground(Color.WHITE);
 
@@ -594,7 +594,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultEthernetVal);
 
-		JLabel lblP2020TestResultVoltage3 = new JLabel("Voltage 3");
+		JLabel lblP2020TestResultVoltage3 = new JLabel("Voltage 1.8");
 
 		lblP2020TestResultVoltage3.setBackground(Color.WHITE);
 
@@ -622,7 +622,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultPCIEVal);
 
-		JLabel lblP2020TestResultVoltage4 = new JLabel("Voltage 4");
+		JLabel lblP2020TestResultVoltage4 = new JLabel("Voltage 1.5");
 
 		lblP2020TestResultVoltage4.setBackground(Color.WHITE);
 
@@ -650,7 +650,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultSRIOVal);
 
-		JLabel lblP2020TestResultVoltage5 = new JLabel("Voltage 5");
+		JLabel lblP2020TestResultVoltage5 = new JLabel("Voltage 1.2");
 
 		lblP2020TestResultVoltage5.setBackground(Color.WHITE);
 
@@ -664,7 +664,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage5Val);
 
-		JLabel lblP2020TestResultTemprature1 = new JLabel("Temprature 1");
+		JLabel lblP2020TestResultTemprature1 = new JLabel("Local Temp");
 
 		lblP2020TestResultTemprature1.setBackground(Color.WHITE);
 
@@ -678,7 +678,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultTemprature1Val);
 
-		JLabel lblP2020TestResultVoltage6 = new JLabel("Voltage 6");
+		JLabel lblP2020TestResultVoltage6 = new JLabel("Voltage 1.0");
 
 		lblP2020TestResultVoltage6.setBackground(Color.WHITE);
 
@@ -692,7 +692,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultVoltage6Val);
 
-		JLabel lblP2020TestResultTemprature2 = new JLabel("Temprature 2");
+		JLabel lblP2020TestResultTemprature2 = new JLabel("Top Temp");
 
 		lblP2020TestResultTemprature2.setBackground(Color.WHITE);
 
@@ -706,7 +706,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.add(lblP2020TestResultTemprature2Val);
 
-		JLabel lblP2020TestResultVoltage7 = new JLabel("Voltage 7");
+		JLabel lblP2020TestResultVoltage7 = new JLabel("Voltage 1.05");
 
 		lblP2020TestResultVoltage7.setBackground(Color.WHITE);
 
@@ -1108,25 +1108,25 @@ public class VPX_BISTResultWindow extends JDialog {
 
 			writer.println(String.format("SRIO : %s", getAsPlainText(testResult.getResultP2020SRIO())));
 
-			writer.println(String.format("Temprature 1 : %s", getAsPlainText(testResult.getResultP2020Temprature1())));
+			writer.println(String.format("Local Temp : %s", getAsPlainText(testResult.getResultP2020Temprature1())));
 
-			writer.println(String.format("Temprature 2 : %s", getAsPlainText(testResult.getResultP2020Temprature2())));
+			writer.println(String.format("Top Temp : %s", getAsPlainText(testResult.getResultP2020Temprature2())));
 
-			writer.println(String.format("Temprature 3 : %s", getAsPlainText(testResult.getResultP2020Temprature3())));
+			writer.println(String.format("Bottom Temp : %s", getAsPlainText(testResult.getResultP2020Temprature3())));
 
-			writer.println(String.format("Voltage 1 : %s", getAsPlainText(testResult.getResultP2020Voltage1())));
+			writer.println(String.format("Voltage 3.3 : %s", getAsPlainText(testResult.getResultP2020Voltage1())));
 
-			writer.println(String.format("Voltage 2 : %s", getAsPlainText(testResult.getResultP2020Voltage2())));
+			writer.println(String.format("Voltage 2.5 : %s", getAsPlainText(testResult.getResultP2020Voltage2())));
 
-			writer.println(String.format("Voltage 3 : %s", getAsPlainText(testResult.getResultP2020Voltage3())));
+			writer.println(String.format("Voltage 1.8 : %s", getAsPlainText(testResult.getResultP2020Voltage3())));
 
-			writer.println(String.format("Voltage 4 : %s", getAsPlainText(testResult.getResultP2020Voltage4())));
+			writer.println(String.format("Voltage 1.5 : %s", getAsPlainText(testResult.getResultP2020Voltage4())));
 
-			writer.println(String.format("Voltage 5 : %s", getAsPlainText(testResult.getResultP2020Voltage5())));
+			writer.println(String.format("Voltage 1.2 : %s", getAsPlainText(testResult.getResultP2020Voltage5())));
 
-			writer.println(String.format("Voltage 6 : %s", getAsPlainText(testResult.getResultP2020Voltage6())));
+			writer.println(String.format("Voltage 1.0 : %s", getAsPlainText(testResult.getResultP2020Voltage6())));
 
-			writer.println(String.format("Voltage 7 : %s", getAsPlainText(testResult.getResultP2020Voltage7())));
+			writer.println(String.format("Voltage 1.05 : %s", getAsPlainText(testResult.getResultP2020Voltage7())));
 
 			writer.println("");
 

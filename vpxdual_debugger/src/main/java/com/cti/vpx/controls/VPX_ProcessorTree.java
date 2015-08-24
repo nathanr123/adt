@@ -541,7 +541,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			name = name.substring(name.indexOf(">(") + 1, name.indexOf("</"));
 
-			int periods = Integer.parseInt(msg.substring(4, 6));
+			int periods = Integer.parseInt(msg.substring(4, 6).trim());
 
 			if (periods != VPXUtilities.getCurrentPeriodicity() || (VPXUtilities.getRespondedTime(name) == 0)) {
 
@@ -554,9 +554,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			} else {
 
-				String w = msg.substring(2, 3);
+				String w = msg.substring(2, 3).trim();
 
-				String a = msg.substring(3, 4);
+				String a = msg.substring(3, 4).trim();
 
 				name = getNodeUserObject(name, true, w.equals("1"), a.equals("1"));
 
@@ -870,6 +870,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			VPXUtilities.setCurrentProcessor(((DefaultMutableTreeNode) node.getParent()).getUserObject().toString(),
 					ss.substring(0, ss.indexOf(")") + 1), ss.substring(ss.indexOf(")") + 1));
+
+			parent.updateProcessorSettings();
 		}
 	}
 
@@ -1037,8 +1039,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Menu_Window_Reboot = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot"),
-				VPXConstants.Icons.ICON_BIST);
+		vpx_Menu_Window_Reboot = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot"));
 
 		vpx_Menu_Window_Reboot.addActionListener(new ActionListener() {
 

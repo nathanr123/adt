@@ -1,7 +1,6 @@
 package com.cti.vpx;
 
 import java.awt.EventQueue;
-import java.net.SocketException;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -36,7 +35,6 @@ public class VPX_Dual_ADT {
 
 						window.showWindow();
 
-						// window.setVisible(true);
 					}
 
 				} catch (Exception e) {
@@ -47,7 +45,7 @@ public class VPX_Dual_ADT {
 
 					e.printStackTrace();
 					
-					//System.exit(0);
+					System.exit(0);
 				}
 			}
 		});

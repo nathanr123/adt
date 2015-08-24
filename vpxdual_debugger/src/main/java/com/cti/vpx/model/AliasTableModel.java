@@ -176,7 +176,7 @@ public class AliasTableModel extends AbstractTableModel {
 			}
 		}
 
-		if (i > 0) {
+		if (i >= 0) {
 			subSystems.remove(i);
 
 			Collections.sort(subSystems);

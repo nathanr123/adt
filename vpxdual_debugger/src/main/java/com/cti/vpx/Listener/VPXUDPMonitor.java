@@ -48,7 +48,7 @@ public class VPXUDPMonitor {
 
 	private byte[] filestoSend;
 
-	private byte[] filesfromRecv;
+	// private byte[] filesfromRecv;
 
 	private int start;
 
@@ -264,7 +264,7 @@ public class VPXUDPMonitor {
 		ByteBuffer bf = null;
 
 		try {
-			
+
 			msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
 			buffer = new byte[msg.size()];
@@ -280,7 +280,7 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
 			msg.periodicity.set(period);
-			
+
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
@@ -652,7 +652,8 @@ public class VPXUDPMonitor {
 
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			// Fix Me
+			// e.printStackTrace();
 		}
 	}
 
@@ -742,111 +743,115 @@ public class VPXUDPMonitor {
 
 	public void populateBISTResult(String ip, ATPCommand msg) {
 
-		if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_P2020) {
+		if (bist != null) {
 
-			bist.setResultP2020Processor(getResultInColor(msg.params.testinfo.RESULT_P2020_PROCESSOR.get(), 0));
+			if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_P2020) {
 
-			bist.setResultP2020DDR3(getResultInColor(msg.params.testinfo.RESULT_P2020_DDR3.get(), 0));
+				bist.setResultP2020Processor(getResultInColor(msg.params.testinfo.RESULT_P2020_PROCESSOR.get(), 0));
 
-			bist.setResultP2020NORFlash(getResultInColor(msg.params.testinfo.RESULT_P2020_NORFLASH.get(), 0));
+				bist.setResultP2020DDR3(getResultInColor(msg.params.testinfo.RESULT_P2020_DDR3.get(), 0));
 
-			bist.setResultP2020Ethernet(getResultInColor(msg.params.testinfo.RESULT_P2020_ETHERNET.get(), 0));
+				bist.setResultP2020NORFlash(getResultInColor(msg.params.testinfo.RESULT_P2020_NORFLASH.get(), 0));
 
-			bist.setResultP2020SRIO(getResultInColor(msg.params.testinfo.RESULT_P2020_SRIO.get(), 0));
+				bist.setResultP2020Ethernet(getResultInColor(msg.params.testinfo.RESULT_P2020_ETHERNET.get(), 0));
 
-			bist.setResultP2020PCIe(getResultInColor(msg.params.testinfo.RESULT_P2020_PCIE.get(), 0));
+				bist.setResultP2020SRIO(getResultInColor(msg.params.testinfo.RESULT_P2020_SRIO.get(), 0));
 
-			bist.setResultP2020Temprature1(getResultInColor(msg.params.testinfo.RESULT_P2020_TEMP1.get(), 1));
+				bist.setResultP2020PCIe(getResultInColor(msg.params.testinfo.RESULT_P2020_PCIE.get(), 0));
 
-			bist.setResultP2020Temprature2(getResultInColor(msg.params.testinfo.RESULT_P2020_TEMP2.get(), 1));
+				bist.setResultP2020Temprature1(getResultInColor(msg.params.testinfo.RESULT_P2020_TEMP1.get(), 1));
 
-			bist.setResultP2020Temprature3(getResultInColor(msg.params.testinfo.RESULT_P2020_TEMP3.get(), 1));
+				bist.setResultP2020Temprature2(getResultInColor(msg.params.testinfo.RESULT_P2020_TEMP2.get(), 1));
 
-			bist.setResultP2020Voltage1(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT1_3p3.get(), 2));
+				bist.setResultP2020Temprature3(getResultInColor(msg.params.testinfo.RESULT_P2020_TEMP3.get(), 1));
 
-			bist.setResultP2020Voltage2(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT2_2p5.get(), 2));
+				bist.setResultP2020Voltage1(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT1_3p3.get(), 2));
 
-			bist.setResultP2020Voltage3(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT3_1p8.get(), 2));
+				bist.setResultP2020Voltage2(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT2_2p5.get(), 2));
 
-			bist.setResultP2020Voltage4(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT4_1p5.get(), 2));
+				bist.setResultP2020Voltage3(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT3_1p8.get(), 2));
 
-			bist.setResultP2020Voltage5(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT5_1p2.get(), 2));
+				bist.setResultP2020Voltage4(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT4_1p5.get(), 2));
 
-			bist.setResultP2020Voltage6(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT6_1p0.get(), 2));
+				bist.setResultP2020Voltage5(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT5_1p2.get(), 2));
 
-			bist.setResultP2020Voltage7(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT7_1p05.get(), 2));
+				bist.setResultP2020Voltage6(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT6_1p0.get(), 2));
 
-			bist.setTestP2020IP(ip);
+				bist.setResultP2020Voltage7(getResultInColor(msg.params.testinfo.RESULT_P2020_VOLT7_1p05.get(), 2));
 
-			loop++;
+				bist.setTestP2020IP(ip);
 
-			((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, loop);
+				loop++;
 
-			bist.setP2020Completed(true);
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, loop);
 
-		} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP1) {
+				bist.setP2020Completed(true);
 
-			bist.setResultDSP1DDR3(getResultInColor(msg.params.testinfo.RESULT_DSP_DDR3.get(), 0));
+			} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP1) {
 
-			bist.setResultDSP1NAND(getResultInColor(msg.params.testinfo.RESULT_DSP_NAND.get(), 0));
+				bist.setResultDSP1DDR3(getResultInColor(msg.params.testinfo.RESULT_DSP_DDR3.get(), 0));
 
-			bist.setResultDSP1NOR(getResultInColor(msg.params.testinfo.RESULT_DSP_NOR.get(), 0));
+				bist.setResultDSP1NAND(getResultInColor(msg.params.testinfo.RESULT_DSP_NAND.get(), 0));
 
-			bist.setResultDSP1Processor(getResultInColor(msg.params.testinfo.RESULT_DSP_PROCESSOR.get(), 0));
+				bist.setResultDSP1NOR(getResultInColor(msg.params.testinfo.RESULT_DSP_NOR.get(), 0));
 
-			bist.setTestDSP1IP(ip);
+				bist.setResultDSP1Processor(getResultInColor(msg.params.testinfo.RESULT_DSP_PROCESSOR.get(), 0));
 
-			loop++;
+				bist.setTestDSP1IP(ip);
 
-			((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP1, loop);
+				loop++;
 
-			bist.setDSP1Completed(true);
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP1, loop);
 
-		} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP2) {
+				bist.setDSP1Completed(true);
 
-			bist.setResultDSP2DDR3(getResultInColor(msg.params.testinfo.RESULT_DSP_DDR3.get(), 0));
+			} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP2) {
 
-			bist.setResultDSP2NAND(getResultInColor(msg.params.testinfo.RESULT_DSP_NAND.get(), 0));
+				bist.setResultDSP2DDR3(getResultInColor(msg.params.testinfo.RESULT_DSP_DDR3.get(), 0));
 
-			bist.setResultDSP2NOR(getResultInColor(msg.params.testinfo.RESULT_DSP_NOR.get(), 0));
+				bist.setResultDSP2NAND(getResultInColor(msg.params.testinfo.RESULT_DSP_NAND.get(), 0));
 
-			bist.setResultDSP2Processor(getResultInColor(msg.params.testinfo.RESULT_DSP_PROCESSOR.get(), 0));
+				bist.setResultDSP2NOR(getResultInColor(msg.params.testinfo.RESULT_DSP_NOR.get(), 0));
 
-			bist.setTestDSP2IP(ip);
+				bist.setResultDSP2Processor(getResultInColor(msg.params.testinfo.RESULT_DSP_PROCESSOR.get(), 0));
 
-			loop++;
+				bist.setTestDSP2IP(ip);
 
-			((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP2, loop);
+				loop++;
 
-			bist.setDSP2Completed(true);
-		}
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP2, loop);
 
-		if (bist.isDSP1Completed() && bist.isP2020Completed() && bist.isDSP2Completed()) {
+				bist.setDSP2Completed(true);
+			}
 
-			bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
+			if (bist.isDSP1Completed() && bist.isP2020Completed() && bist.isDSP2Completed()) {
 
-			bist.setResultTestFailed(String.format("%d Tests", fail));
+				bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
 
-			if (fail == 0)
+				bist.setResultTestFailed(String.format("%d Tests", fail));
 
-				bist.setResultTestStatus("Success !");
+				if (fail == 0)
 
-			else
+					bist.setResultTestStatus("Success !");
 
-				bist.setResultTestStatus("Failed !");
+				else
 
-			bist.setResultTestPassed(String.format("%d Tests", pass));
+					bist.setResultTestStatus("Failed !");
 
-			bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
+				bist.setResultTestPassed(String.format("%d Tests", pass));
 
-			bist.setResultTestDuration(VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
+				bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
 
-			((VPXCommunicationListener) listener).updateBIST(bist);
-		}
+				bist.setResultTestDuration(VPXUtilities.getCurrentTime(2,
+						System.currentTimeMillis() - bist.getStartTime()));
 
-		if (loop == VPXConstants.MAX_PROCESSOR) {
+				((VPXCommunicationListener) listener).updateBIST(bist);
+			}
 
-			((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
+			if (loop == VPXConstants.MAX_PROCESSOR) {
+
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
+			}
 		}
 	}
 
@@ -1152,6 +1157,8 @@ public class VPXUDPMonitor {
 			msgCommand = new DSPMSGCommand();
 		}
 
+		// msgCommand = new DSPMSGCommand();
+
 		bf.clear();
 
 		bf.put(recvdBytes);
@@ -1236,7 +1243,7 @@ public class VPXUDPMonitor {
 
 					parseCommunicationPacket(ip, createATPCommand(ip, commandData));
 
-					Thread.sleep(500);
+					Thread.sleep(10);
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -1270,18 +1277,22 @@ public class VPXUDPMonitor {
 		}
 
 		@Override
-		protected Void doInBackground() throws Exception {
+		protected Void doInBackground() {
 
 			while (true) {
 
-				isipinRange = true;
+				try {
+					isipinRange = true;
 
-				advertisementSocket.receive(advertisementPacket);
+					advertisementSocket.receive(advertisementPacket);
 
-				parseAdvertisementPacket(advertisementPacket.getAddress().getHostAddress(), new String(
-						advertisementPacket.getData(), 0, advertisementPacket.getLength()));
+					parseAdvertisementPacket(advertisementPacket.getAddress().getHostAddress(), new String(
+							advertisementPacket.getData(), 0, advertisementPacket.getLength()));
 
-				Thread.sleep(1000);
+					Thread.sleep(500);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 

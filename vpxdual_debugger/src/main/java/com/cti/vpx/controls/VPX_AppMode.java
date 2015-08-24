@@ -148,7 +148,7 @@ public class VPX_AppMode extends JFrame {
 
 	private void init() {
 
-		setTitle("Debugg Wizard");
+		setTitle("Debug Wizard");
 		
 		setIconImage(VPXUtilities.getAppIcon());
 

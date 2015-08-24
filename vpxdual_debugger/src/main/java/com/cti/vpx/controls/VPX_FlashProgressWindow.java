@@ -259,6 +259,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	public void doneFlash() {
 
+		isFlashingStatred = false;
+		
 		JOptionPane.showMessageDialog(VPX_FlashProgressWindow.this, "Flash Completed");
 
 		VPX_FlashProgressWindow.this.dispose();

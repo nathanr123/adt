@@ -59,7 +59,7 @@ public class VPXConstants {
 
 	public static final int DSP2AVAILBLE = -4;
 
-	public static final int MAXRESPONSETIMEOUT = 10;
+	public static final int MAXRESPONSETIMEOUT = 5;
 
 	public static final int PERIODICITY = 03;
 

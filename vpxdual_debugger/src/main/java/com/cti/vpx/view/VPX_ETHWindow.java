@@ -815,6 +815,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		setJMenuBar(vpx_MenuBar);
 	}
 
+	
 	private void createToolBar() {
 
 		vpx_ToolBar = ComponentFactory.createJToolBar();
@@ -1052,6 +1053,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		statusBar = new VPX_StatusBar();
 
+		statusBar.setPreferredSize(new Dimension(10, 30));
+
 		statusBar.setOpaque(true);
 
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
@@ -1198,6 +1201,10 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		treeLegendPanel.add(lblUnavailable);
 
 		baseTreePanel.add(treeLegendPanel, BorderLayout.SOUTH);
+	}
+	
+	public void updateProcessorSettings(){
+		messagePanel.updateProcessorSettings();
 	}
 
 	public void unToggleFilter() {

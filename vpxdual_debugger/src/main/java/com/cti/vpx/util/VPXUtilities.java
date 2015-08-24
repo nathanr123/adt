@@ -1043,7 +1043,9 @@ public class VPXUtilities {
 	public static List<String> getSerialPorts() {
 
 		List<String> portList = new ArrayList<String>();
-
+		
+		portList.add("Select Comm Port");
+/*
 		@SuppressWarnings("unchecked")
 		Enumeration<CommPortIdentifier> thePorts = CommPortIdentifier.getPortIdentifiers();
 
@@ -1059,7 +1061,7 @@ public class VPXUtilities {
 
 			}
 		}
-
+*/
 		return portList;
 	}
 
