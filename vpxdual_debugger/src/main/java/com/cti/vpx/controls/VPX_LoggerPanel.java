@@ -20,7 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -55,7 +55,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	private void loadComponents() {
 
-		JPanel log_Panel = ComponentFactory.createJPanel();
+		JPanel log_Panel = VPXComponentFactory.createJPanel();
 
 		FlowLayout flowLayout = (FlowLayout) log_Panel.getLayout();
 
@@ -63,7 +63,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		add(log_Panel, BorderLayout.NORTH);
 
-		JButton btn_Log_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
+		JButton btn_Log_Clear = VPXComponentFactory.createJButton(new ClearAction("Clear"));
 
 		btn_Log_Clear.setFocusPainted(false);
 
@@ -73,7 +73,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		log_Panel.add(btn_Log_Clear);
 
-		JButton btn_Log_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
+		JButton btn_Log_Copy = VPXComponentFactory.createJButton(new CopyAction("Copy"));
 
 		btn_Log_Copy.setFocusPainted(false);
 
@@ -83,7 +83,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		log_Panel.add(btn_Log_Copy);
 
-		JButton btn_Log_Save = ComponentFactory.createJButton(new SaveAction("Save"));
+		JButton btn_Log_Save = VPXComponentFactory.createJButton(new SaveAction("Save"));
 
 		btn_Log_Save.setFocusPainted(false);
 
@@ -93,11 +93,11 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		log_Panel.add(btn_Log_Save);
 
-		JScrollPane scrl_Log = ComponentFactory.createJScrollPane();
+		JScrollPane scrl_Log = VPXComponentFactory.createJScrollPane();
 
 		add(scrl_Log, BorderLayout.CENTER);
 
-		txtA_Log = ComponentFactory.createJTextArea();
+		txtA_Log = VPXComponentFactory.createJTextArea();
 
 		scrl_Log.setViewportView(txtA_Log);
 

@@ -30,7 +30,7 @@ import net.miginfocom.swing.MigLayout;
 
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.view.VPX_ETHWindow;
 import com.peralex.example.GraphWithMultipleLines;
 
@@ -801,7 +801,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	private void loadPlot1Filters() {
 
 		if (vpxSystem == null)
-			vpxSystem = VPXUtilities.getVPXSystem();
+			vpxSystem = VPXSessionManager.getVPXSystem();
 
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 
@@ -1200,7 +1200,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	private void loadPlot2Filters() {
 
 		if (vpxSystem == null)
-			vpxSystem = VPXUtilities.getVPXSystem();
+			vpxSystem = VPXSessionManager.getVPXSystem();
 
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 

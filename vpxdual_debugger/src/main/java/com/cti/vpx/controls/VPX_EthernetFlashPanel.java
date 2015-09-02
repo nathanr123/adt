@@ -26,6 +26,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -307,7 +309,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 				if (ip.equals(processor.getiP_Addresses())) {
 
-					subs = "Unlisted";
+					subs = VPXConstants.VPXUNLIST;
 
 					isFound = true;
 
@@ -353,7 +355,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		cmbSubSystem.addItem("Select Subsystem");
 
-		sys = VPXUtilities.getVPXSystem();
+		sys = VPXSessionManager.getVPXSystem();
 
 		List<VPXSubSystem> sub = sys.getSubsystem();
 
@@ -369,7 +371,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		if (unListed.size() > 0) {
 
-			cmbSubSystem.addItem("Unlisted");
+			cmbSubSystem.addItem(VPXConstants.VPXUNLIST);
 		}
 
 	}
@@ -380,7 +382,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		cmbSubSystem.addItem("Select Processor");
 
-		if (cmbSubSystem.getSelectedItem().toString().equals("Unlisted")) {
+		if (cmbSubSystem.getSelectedItem().toString().equals(VPXConstants.VPXUNLIST)) {
 
 			List<Processor> unListed = sys.getUnListed();
 

@@ -21,10 +21,11 @@ import javax.swing.text.NumberFormatter;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_ChangePeriodicity extends JDialog {
+public class VPX_ChangePeriodicityWindow extends JDialog {
 
 	/**
 	 * 
@@ -42,7 +43,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_ChangePeriodicity(VPX_ETHWindow prent) {
+	public VPX_ChangePeriodicityWindow(VPX_ETHWindow prent) {
 
 		super(prent);
 
@@ -54,7 +55,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 		centerFrame();
 
-		periodicitySpinnerModel.setValue(VPXUtilities.getCurrentPeriodicity());
+		periodicitySpinnerModel.setValue(VPXSessionManager.getCurrentPeriodicity());
 	}
 
 	private void init() {
@@ -115,7 +116,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 					public void run() {
 						parent.updatePeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
-						VPXUtilities.setCurrentPeriodicity(Integer
+						VPXSessionManager.setCurrentPeriodicity(Integer
 								.valueOf(spinPeriodicity.getValue().toString().trim()));
 
 						parent.updateLog("Periodicity updated successfully");
@@ -127,7 +128,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 
 				th.start();
 
-				VPX_ChangePeriodicity.this.dispose();
+				VPX_ChangePeriodicityWindow.this.dispose();
 
 			}
 		});
@@ -145,7 +146,7 @@ public class VPX_ChangePeriodicity extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				VPX_ChangePeriodicity.this.dispose();
+				VPX_ChangePeriodicityWindow.this.dispose();
 
 			}
 		});

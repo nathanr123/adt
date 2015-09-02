@@ -32,29 +32,25 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.Listener.VPXAdvertisementListener;
-import com.cti.vpx.Listener.VPXCommunicationListener;
-import com.cti.vpx.Listener.VPXMessageListener;
-import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.MSGCommand;
-import com.cti.vpx.controls.VPX_About_Dialog;
+import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
-import com.cti.vpx.controls.VPX_ChangePeriodicity;
+import com.cti.vpx.controls.VPX_ChangePeriodicityWindow;
 import com.cti.vpx.controls.VPX_ConsolePanel;
-import com.cti.vpx.controls.VPX_DetailPanel;
+import com.cti.vpx.controls.VPX_DetailWindow;
 import com.cti.vpx.controls.VPX_EthernetFlashPanel;
 import com.cti.vpx.controls.VPX_ExecutionPanel;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
-import com.cti.vpx.controls.VPX_FlashWizard;
+import com.cti.vpx.controls.VPX_FlashWizardWindow;
 import com.cti.vpx.controls.VPX_LogFileViewPanel;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MADPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
-import com.cti.vpx.controls.VPX_Preference;
+import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
@@ -64,12 +60,17 @@ import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
+import com.cti.vpx.listener.VPXAdvertisementListener;
+import com.cti.vpx.listener.VPXCommunicationListener;
+import com.cti.vpx.listener.VPXMessageListener;
+import com.cti.vpx.listener.VPXUDPMonitor;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.VPXSessionManager;
 
 public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertisementListener, VPXMessageListener,
 		VPXCommunicationListener {
@@ -83,7 +84,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 	final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Log Files", "log");
 
-	private static final VPX_About_Dialog aboutDialog = new VPX_About_Dialog();
+	private static final VPX_AboutWindow aboutDialog = new VPX_AboutWindow();
 
 	private static VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
 
@@ -214,6 +215,9 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		udpMonitor.startMonitor();
 
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+		setVisible(true);
 	}
 
 	private void init() {
@@ -232,9 +236,6 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		addWindowListener(this);
 
-		setVisible(true);
-
-		toFront();
 	}
 
 	private void loadComponents() {
@@ -407,21 +408,21 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	private void createMenuBar() {
 
 		// Creating MenuBar
-		vpx_MenuBar = ComponentFactory.createJMenuBar();// new JMenuBar();
+		vpx_MenuBar = VPXComponentFactory.createJMenuBar();// new JMenuBar();
 
 		// Creating Menus
-		vpx_Menu_File = ComponentFactory.createJMenu(rBundle.getString("Menu.File"));
+		vpx_Menu_File = VPXComponentFactory.createJMenu(rBundle.getString("Menu.File"));
 
-		vpx_Menu_Window = ComponentFactory.createJMenu(rBundle.getString("Menu.Window"));
+		vpx_Menu_Window = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Window"));
 
-		vpx_Menu_Tool = ComponentFactory.createJMenu(rBundle.getString("Menu.Tools"));
+		vpx_Menu_Tool = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Tools"));
 
-		vpx_Menu_Help = ComponentFactory.createJMenu(rBundle.getString("Menu.Help"));
+		vpx_Menu_Help = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Help"));
 
 		// Creating MenuItems
 
 		// File Menus
-		vpx_Menu_File_AliasConfig = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Config"),
+		vpx_Menu_File_AliasConfig = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Config"),
 				VPXConstants.Icons.ICON_CONFIG);
 
 		vpx_Menu_File_AliasConfig.addActionListener(new ActionListener() {
@@ -434,7 +435,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_File_SubnetFilter = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Filter"),
+		vpx_Menu_File_SubnetFilter = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Filter"),
 				VPXConstants.Icons.ICON_FILTER);
 
 		vpx_Menu_File_SubnetFilter.addActionListener(new ActionListener() {
@@ -447,7 +448,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_File_OpenLog = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.OpenLog"),
+		vpx_Menu_File_OpenLog = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.OpenLog"),
 				VPXConstants.Icons.ICON_OPEN);
 
 		vpx_Menu_File_OpenLog.addActionListener(new ActionListener() {
@@ -460,7 +461,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_File_Refresh = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Refresh"),
+		vpx_Menu_File_Refresh = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Refresh"),
 				VPXConstants.Icons.ICON_REFRESH);
 
 		vpx_Menu_File_Refresh.addActionListener(new ActionListener() {
@@ -473,7 +474,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_File_Detail = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Detail"),
+		vpx_Menu_File_Detail = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Detail"),
 				VPXConstants.Icons.ICON_DETAIL);
 
 		vpx_Menu_File_Detail.addActionListener(new ActionListener() {
@@ -486,7 +487,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_File_Exit = ComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Exit"),
+		vpx_Menu_File_Exit = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Exit"),
 				VPXConstants.Icons.ICON_DELETE_EXIT);
 
 		vpx_Menu_File_Exit.addActionListener(new ActionListener() {
@@ -500,7 +501,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		});
 
 		// Window Menus
-		vpx_Menu_Window_MemoryBrowser = ComponentFactory
+		vpx_Menu_Window_MemoryBrowser = VPXComponentFactory
 
 		.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ", VPXConstants.Icons.ICON_MEMORY);
@@ -515,7 +516,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_MemoryPlot = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MemoryPlot")
+		vpx_Menu_Window_MemoryPlot = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MemoryPlot")
 				+ " ( " + (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ", VPXConstants.Icons.ICON_PLOT);
 
 		vpx_Menu_Window_MemoryPlot.addActionListener(new ActionListener() {
@@ -528,7 +529,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_EthFlash = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.EthFlash"),
+		vpx_Menu_Window_EthFlash = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.EthFlash"),
 				VPXConstants.Icons.ICON_ETHFLASH);
 
 		vpx_Menu_Window_EthFlash.addActionListener(new ActionListener() {
@@ -540,7 +541,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_Amplitude = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude"),
+		vpx_Menu_Window_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Window_Amplitude.addActionListener(new ActionListener() {
@@ -552,7 +553,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 			}
 		});
-		vpx_Menu_Window_Waterfall = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall"),
+		vpx_Menu_Window_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Window_Waterfall.addActionListener(new ActionListener() {
@@ -565,7 +566,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_MAD = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"),
+		vpx_Menu_Window_MAD = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"),
 				VPXConstants.Icons.ICON_MAD);
 
 		vpx_Menu_Window_MAD.addActionListener(new ActionListener() {
@@ -578,7 +579,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_FlashWizard = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Wizard"),
+		vpx_Menu_Window_FlashWizard = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Wizard"),
 				VPXConstants.Icons.ICON_MAD);
 
 		vpx_Menu_Window_FlashWizard.addActionListener(new ActionListener() {
@@ -591,7 +592,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_BIST = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"),
+		vpx_Menu_Window_BIST = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"),
 				VPXConstants.Icons.ICON_BIST);
 
 		vpx_Menu_Window_BIST.addActionListener(new ActionListener() {
@@ -604,7 +605,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_Execution = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Execute"),
+		vpx_Menu_Window_Execution = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Execute"),
 				VPXConstants.Icons.ICON_EXECUTION);
 
 		vpx_Menu_Window_Execution.addActionListener(new ActionListener() {
@@ -617,7 +618,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_P2020Config = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.P2020Config"),
+		vpx_Menu_Window_P2020Config = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.P2020Config"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Window_P2020Config.addActionListener(new ActionListener() {
@@ -630,7 +631,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Window_ChangeIP = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.ChangeIP"),
+		vpx_Menu_Window_ChangeIP = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.ChangeIP"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Window_ChangeIP.addActionListener(new ActionListener() {
@@ -644,7 +645,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		});
 		// Tools Menus
 
-		vpx_Menu_Tools_ChangePWD = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.ChangePWD"),
+		vpx_Menu_Tools_ChangePWD = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.ChangePWD"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Tools_ChangePWD.addActionListener(new ActionListener() {
@@ -657,7 +658,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Tools_ChangePeriod = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Periodicity"),
+		vpx_Menu_Tools_ChangePeriod = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Periodicity"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Tools_ChangePeriod.addActionListener(new ActionListener() {
@@ -669,7 +670,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 			}
 		});
-		vpx_Menu_Tools_Prefrences = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Preferences"),
+		vpx_Menu_Tools_Prefrences = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Preferences"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Tools_Prefrences.addActionListener(new ActionListener() {
@@ -681,7 +682,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Tools_Console = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Console"),
+		vpx_Menu_Tools_Console = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Console"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Tools_Console.addActionListener(new ActionListener() {
@@ -694,7 +695,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Tools_Log = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Log"),
+		vpx_Menu_Tools_Log = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Log"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
 		vpx_Menu_Tools_Log.addActionListener(new ActionListener() {
@@ -708,7 +709,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		});
 
 		// Help Menus
-		vpx_Menu_Help_Help = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Help"),
+		vpx_Menu_Help_Help = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Help"),
 				VPXConstants.Icons.ICON_HELP);
 
 		vpx_Menu_Help_Help.addActionListener(new ActionListener() {
@@ -721,7 +722,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		vpx_Menu_Help_About = ComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.About"),
+		vpx_Menu_Help_About = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.About"),
 				VPXConstants.Icons.ICON_ABOUT);
 
 		vpx_Menu_Help_About.addActionListener(new ActionListener() {
@@ -753,13 +754,13 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_Menu_File.add(vpx_Menu_File_SubnetFilter);
 
-		vpx_Menu_File.add(ComponentFactory.createJSeparator());
+		vpx_Menu_File.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_File.add(vpx_Menu_File_Refresh);
 
 		vpx_Menu_File.add(vpx_Menu_File_Detail);
 
-		vpx_Menu_File.add(ComponentFactory.createJSeparator());
+		vpx_Menu_File.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_File.add(vpx_Menu_File_Exit);
 
@@ -774,7 +775,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_Menu_Window.add(vpx_Menu_Window_BIST);
 
-		vpx_Menu_Window.add(ComponentFactory.createJSeparator());
+		vpx_Menu_Window.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
 
@@ -784,7 +785,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_Menu_Window.add(vpx_Menu_Window_Waterfall);
 
-		vpx_Menu_Window.add(ComponentFactory.createJSeparator());
+		vpx_Menu_Window.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_Window.add(vpx_Menu_Window_P2020Config);
 
@@ -795,34 +796,33 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_Menu_Tool.add(vpx_Menu_Tools_ChangePeriod);
 
-		vpx_Menu_Tool.add(ComponentFactory.createJSeparator());
+		vpx_Menu_Tool.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_Tool.add(vpx_Menu_Tools_Console);
 
 		vpx_Menu_Tool.add(vpx_Menu_Tools_Log);
 
-		vpx_Menu_Tool.add(ComponentFactory.createJSeparator());
+		vpx_Menu_Tool.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_Tool.add(vpx_Menu_Tools_Prefrences);
 
 		// Help Menu Items
 		vpx_Menu_Help.add(vpx_Menu_Help_Help);
 
-		vpx_Menu_Help.add(ComponentFactory.createJSeparator());
+		vpx_Menu_Help.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_Help.add(vpx_Menu_Help_About);
 
 		setJMenuBar(vpx_MenuBar);
 	}
 
-	
 	private void createToolBar() {
 
-		vpx_ToolBar = ComponentFactory.createJToolBar();
+		vpx_ToolBar = VPXComponentFactory.createJToolBar();
 
 		vpx_ToolBar.setFloatable(false);
 
-		JButton btnAliasRefresh = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_REFRESH, null);
+		JButton btnAliasRefresh = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_REFRESH, null);
 
 		btnAliasRefresh.setToolTipText("Refresh Processors List Tree");
 
@@ -870,7 +870,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnOpenLog = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_OPEN, null);
+		JButton btnOpenLog = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_OPEN, null);
 
 		btnOpenLog.setToolTipText("Open Log File");
 
@@ -886,7 +886,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_ToolBar.add(btnOpenLog);
 
-		JButton btnAliasConfig = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_CONFIG, null);
+		JButton btnAliasConfig = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_CONFIG, null);
 
 		btnAliasConfig.setToolTipText("Alias Configuration");
 
@@ -902,7 +902,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_ToolBar.add(btnAliasConfig);
 
-		JButton btnDetail = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_DETAIL, null);
+		JButton btnDetail = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_DETAIL, null);
 
 		btnDetail.setToolTipText("VPX System Detail");
 
@@ -916,7 +916,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnMemoryBrowser = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_MEMORY, null);
+		JButton btnMemoryBrowser = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MEMORY, null);
 
 		btnMemoryBrowser.setToolTipText("Memory Browser");
 
@@ -929,7 +929,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnMemoryPlot = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_PLOT, null);
+		JButton btnMemoryPlot = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_PLOT, null);
 
 		btnMemoryPlot.setToolTipText("Memory Plots");
 
@@ -943,7 +943,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnMAD = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_MAD, null);
+		JButton btnMAD = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MAD, null);
 
 		btnMAD.setToolTipText("MAD Utility");
 
@@ -957,7 +957,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnBIST = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_BIST, null);
+		JButton btnBIST = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_BIST, null);
 
 		btnBIST.setToolTipText("Built In Self Test");
 
@@ -971,7 +971,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnFlash = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_ETHFLASH, null);
+		JButton btnFlash = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_ETHFLASH, null);
 
 		btnFlash.setToolTipText("Ethernet Flash");
 
@@ -985,7 +985,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			}
 		});
 
-		JButton btnExecute = ComponentFactory.createJButton("", VPXConstants.Icons.ICON_EXECUTION, null);
+		JButton btnExecute = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_EXECUTION, null);
 
 		btnExecute.setToolTipText("Execution");
 
@@ -1064,7 +1064,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-		JPanel contentPanel = ComponentFactory.createJPanel();
+		JPanel contentPanel = VPXComponentFactory.createJPanel();
 
 		contentPanel.setLayout(new BorderLayout());
 
@@ -1108,7 +1108,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		createLegendPanel();
 
-		vpx_Processor_Tree = ComponentFactory.createProcessorTree(this);
+		vpx_Processor_Tree = VPXComponentFactory.createProcessorTree(this);
 
 		JScrollPane vpx_Processor_Tree_ScrollPane = new JScrollPane(vpx_Processor_Tree);
 
@@ -1202,8 +1202,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		baseTreePanel.add(treeLegendPanel, BorderLayout.SOUTH);
 	}
-	
-	public void updateProcessorSettings(){
+
+	public void updateProcessorSettings() {
 		messagePanel.updateProcessorSettings();
 	}
 
@@ -1327,7 +1327,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			@Override
 			public void run() {
 
-				VPX_DetailPanel detail = new VPX_DetailPanel(VPX_ETHWindow.this, VPXSystem.class.getSimpleName());
+				VPX_DetailWindow detail = new VPX_DetailWindow(VPX_ETHWindow.this, VPXSystem.class.getSimpleName());
 
 				detail.setVisible(true);
 
@@ -1439,7 +1439,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 				VPX_EthernetFlashPanel eth = new VPX_EthernetFlashPanel(VPX_ETHWindow.this);
 
-				eth.setProcessor(VPXUtilities.getCurrentProcessor());
+				eth.setProcessor(VPXSessionManager.getCurrentProcessor());
 
 				vpx_Content_Tabbed_Pane_Right.addTab("Ethernet Flash", new JScrollPane(eth));
 
@@ -1506,7 +1506,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			public void run() {
 				bistWindow.showBISTWindow();
 
-				udpMonitor.startBist(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentSubSystem());
+				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem());
 
 				updateLog("Built in Self Test Completed");
 
@@ -1576,7 +1576,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			@Override
 			public void run() {
 
-				VPX_FlashWizard dialog = new VPX_FlashWizard(VPX_ETHWindow.this);
+				VPX_FlashWizardWindow dialog = new VPX_FlashWizardWindow(VPX_ETHWindow.this);
 
 				dialog.setVisible(true);
 
@@ -1682,7 +1682,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			@Override
 			public void run() {
 
-				new VPX_ChangePeriodicity(VPX_ETHWindow.this).setVisible(true);
+				new VPX_ChangePeriodicityWindow(VPX_ETHWindow.this).setVisible(true);
 
 			}
 		});
@@ -1700,7 +1700,7 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 			@Override
 			public void run() {
 
-				new VPX_Preference().showPreferenceWindow();
+				new VPX_PreferenceWindow().showPreferenceWindow();
 			}
 		});
 

@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +64,6 @@ import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.controls.VPX_EmptyIcon;
 import com.cti.vpx.model.NWInterface;
-import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -90,16 +88,6 @@ public class VPXUtilities {
 	private static VPXSystem vpxSystem = null;
 
 	private static VPX_ETHWindow parent;
-
-	private static String currentProcessor = "";
-
-	private static String currentSubSystem = "";
-
-	private static String currentProcType = "";
-
-	private static String currentSystemIP;
-
-	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
 	private static InterfaceAddress currentInterfaceAddress;
 
@@ -154,20 +142,7 @@ public class VPXUtilities {
 		return new DSPATPCommand();
 	}
 
-	/**
-	 * @return the currentPeriodicity
-	 */
-	public static int getCurrentPeriodicity() {
-		return currentPeriodicity;
-	}
-
-	/**
-	 * @param currentPeriodicity
-	 *            the currentPeriodicity to set
-	 */
-	public static void setCurrentPeriodicity(int currentPeriodicity) {
-		VPXUtilities.currentPeriodicity = currentPeriodicity;
-	}
+	
 
 	public static String friendlyTimeDiff(long different) {
 
@@ -274,7 +249,7 @@ public class VPXUtilities {
 
 		else if (format == 2) {
 
-			VPXConstants.DATEFORMAT_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
+			// VPXConstants.DATEFORMAT_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
@@ -383,18 +358,6 @@ public class VPXUtilities {
 		dialog.setVisible(true);
 	}
 
-	public static VPXSystem getVPXSystem() {
-
-		if (vpxSystem == null)
-			vpxSystem = readFromXMLFile();
-
-		return vpxSystem;
-	}
-
-	public static void setVPXSystem(VPXSystem sys) {
-
-		vpxSystem = sys;
-	}
 
 	public static Map<Long, byte[]> divideArrayAsMap(byte[] source, int chunksize) {
 
@@ -468,60 +431,6 @@ public class VPXUtilities {
 
 		}
 		return sub;
-	}
-
-	public static PROCESSOR_LIST getProcessorType(String ip) {
-
-		PROCESSOR_LIST proc = PROCESSOR_LIST.PROCESSOR_P2020;
-
-		VPXSystem syst = getVPXSystem();
-
-		List<VPXSubSystem> subsys = syst.getSubsystem();
-
-		for (Iterator<VPXSubSystem> iterator = subsys.iterator(); iterator.hasNext();) {
-
-			VPXSubSystem vpxSubSystem = iterator.next();
-
-			if (vpxSubSystem.getIpP2020().equals(ip)) {
-
-				proc = PROCESSOR_LIST.PROCESSOR_P2020;
-
-			} else if (vpxSubSystem.getIpDSP1().equals(ip)) {
-
-				proc = PROCESSOR_LIST.PROCESSOR_DSP1;
-
-			} else if (vpxSubSystem.getIpDSP2().equals(ip)) {
-
-				proc = PROCESSOR_LIST.PROCESSOR_DSP2;
-			}
-		}
-
-		List<Processor> unlisted = syst.getUnListed();
-
-		for (Iterator<Processor> iterator = unlisted.iterator(); iterator.hasNext();) {
-
-			Processor processor = iterator.next();
-
-			if (processor.getiP_Addresses().equals(ip)) {
-
-				if (processor.getName().contains("P2020")) {
-
-					proc = PROCESSOR_LIST.PROCESSOR_P2020;
-
-				} else if (processor.getName().contains("DSP1")) {
-
-					proc = PROCESSOR_LIST.PROCESSOR_DSP1;
-
-				} else if (processor.getName().contains("DSP2")) {
-
-					proc = PROCESSOR_LIST.PROCESSOR_DSP2;
-				}
-
-			}
-		}
-
-		return proc;
-
 	}
 
 	public static PROCESSOR_LIST getProcessorType(Enum32<PROCESSOR_TYPE> pType) {
@@ -1043,9 +952,9 @@ public class VPXUtilities {
 	public static List<String> getSerialPorts() {
 
 		List<String> portList = new ArrayList<String>();
-		
+
 		portList.add("Select Comm Port");
-/*
+
 		@SuppressWarnings("unchecked")
 		Enumeration<CommPortIdentifier> thePorts = CommPortIdentifier.getPortIdentifiers();
 
@@ -1061,7 +970,7 @@ public class VPXUtilities {
 
 			}
 		}
-*/
+
 		return portList;
 	}
 
@@ -1275,16 +1184,7 @@ public class VPXUtilities {
 
 	}
 
-	public static String getCurrentIP() {
-
-		return currentSystemIP;
-	}
-
-	public static void setCurrentIP(String ip) {
-
-		currentSystemIP = ip;
-	}
-
+	
 	public static NWInterface getEthernetPort(String name) {
 
 		String s;
@@ -1372,56 +1272,7 @@ public class VPXUtilities {
 		return nw;
 	}
 
-	/**
-	 * @return the currentProcessor
-	 */
-	public static String getCurrentProcessor() {
-		return currentProcessor;
-	}
-
-	/**
-	 * @return the currentSubSystem
-	 */
-	public static String getCurrentSubSystem() {
-		return currentSubSystem;
-	}
-
-	/**
-	 * @param currentSubSystem
-	 *            the currentSubSystem to set
-	 */
-	public static void setCurrentSubSystem(String currentSubSystem) {
-		VPXUtilities.currentSubSystem = currentSubSystem;
-	}
-
-	/**
-	 * @return the currentProcType
-	 */
-	public static String getCurrentProcType() {
-		return currentProcType;
-	}
-
-	/**
-	 * @param currentProcType
-	 *            the currentProcType to set
-	 */
-	public static void setCurrentProcType(String currentProcType) {
-		VPXUtilities.currentProcType = currentProcType;
-	}
-
-	/**
-	 * @param currentProcessor
-	 *            the currentProcessor to set
-	 */
-	public static void setCurrentProcessor(String sub, String procType, String currentProcessor) {
-
-		VPXUtilities.currentSubSystem = sub;
-
-		VPXUtilities.currentProcessor = currentProcessor;
-
-		VPXUtilities.currentProcType = procType;
-
-	}
+	
 
 	public static String readFile(String filename) {
 		try {
@@ -1491,129 +1342,6 @@ public class VPXUtilities {
 
 	}
 
-	public static VPXSubSystem getSubSystemByName(String name) {
-
-		VPXSubSystem sub = null;
-
-		if (vpxSystem != null) {
-
-			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
-
-			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
-
-				VPXSubSystem vpxSubSystem = iterator.next();
-
-				if (vpxSubSystem.getSubSystem().equals(name)) {
-
-					sub = vpxSubSystem;
-
-					break;
-				}
-
-			}
-		}
-		return sub;
-
-	}
-
-	public static VPXSubSystem getSubSystemByIP(String ip) {
-
-		VPXSubSystem sub = null;
-
-		if (vpxSystem != null) {
-
-			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
-
-			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
-
-				VPXSubSystem vpxSubSystem = iterator.next();
-
-				if (vpxSubSystem.getIpP2020().equals(ip) || vpxSubSystem.getIpDSP1().equals(ip)
-						|| vpxSubSystem.getIpDSP2().equals(ip)) {
-
-					sub = vpxSubSystem;
-
-					break;
-				}
-
-			}
-		}
-		return sub;
-
-	}
-
-	public static long getRespondedTime(String ips) {
-
-		long time = 0;
-
-		String ip = "";
-
-		if (ips.contains(")")) {
-
-			ip = ips.substring(ips.indexOf(")") + 1, ips.length());
-		} else
-			ip = ips;
-
-		boolean isNotfound = false;
-
-		if (vpxSystem != null) {
-
-			List<VPXSubSystem> subs = vpxSystem.getSubsystem();
-
-			for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
-
-				VPXSubSystem vpxSubSystem = iterator.next();
-
-				if (vpxSubSystem.getIpP2020().equals(ip)) {
-
-					time = vpxSubSystem.getP2020ResponseTime();
-
-					isNotfound = true;
-
-					break;
-
-				} else if (vpxSubSystem.getIpDSP1().equals(ip)) {
-
-					time = vpxSubSystem.getDsp1ResponseTime();
-
-					isNotfound = true;
-
-					break;
-
-				} else if (vpxSubSystem.getIpDSP2().equals(ip)) {
-
-					time = vpxSubSystem.getDsp2ResponseTime();
-
-					isNotfound = true;
-
-					break;
-				}
-
-			}
-
-			if (!isNotfound) {
-
-				List<Processor> procs = vpxSystem.getUnListed();
-
-				for (Iterator<Processor> iterator = procs.iterator(); iterator.hasNext();) {
-
-					Processor processor = iterator.next();
-
-					if (processor.getiP_Addresses().equals(ip)) {
-
-						time = processor.getResponseTime();
-
-						break;
-					}
-
-				}
-			}
-		}
-
-		return time;
-
-	}
-
 	public static void deleteAllGeneratedFilesAndFlders(String path, String deployFile, String cfgFile) {
 
 		deleteDeploymentFiles(path + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE, path + "/"
@@ -1631,9 +1359,10 @@ public class VPXUtilities {
 		if (isdirectory) {
 			cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
 		} else {
-			cmd = String.format("cmd /c del /F %s %s", deployFile.replaceAll("/","\\\\"), cfgFile.replaceAll("/","\\\\"));
+			cmd = String.format("cmd /c del /F %s %s", deployFile.replaceAll("/", "\\\\"),
+					cfgFile.replaceAll("/", "\\\\"));
 		}
-		
+
 		String s = null;
 
 		try {

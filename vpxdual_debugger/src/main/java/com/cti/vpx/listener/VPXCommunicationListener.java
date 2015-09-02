@@ -1,4 +1,4 @@
-package com.cti.vpx.Listener;
+package com.cti.vpx.listener;
 
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.model.BIST;

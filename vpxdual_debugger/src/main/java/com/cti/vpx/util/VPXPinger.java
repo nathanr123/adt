@@ -3,7 +3,7 @@ package com.cti.vpx.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class Pinger {
+public class VPXPinger {
 
 	public static boolean ping(String hostAddress) {
 		String s;
@@ -40,6 +40,6 @@ public class Pinger {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(Pinger.ping("172.17.1.28"));		
+		System.out.println(VPXPinger.ping("172.17.1.28"));		
 	}
 }

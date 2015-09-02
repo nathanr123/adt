@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.model.VPX;
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
@@ -68,17 +68,17 @@ public class VPX_MemoryBrowser extends JPanel {
 
 	private JPanel createAddressPanel() {
 
-		JPanel base_Panel = ComponentFactory.createJPanel();
+		JPanel base_Panel = VPXComponentFactory.createJPanel();
 
 		add(base_Panel, BorderLayout.SOUTH);
 
 		base_Panel.setLayout(new BorderLayout(10, 0));
 
-		JPanel btn_Panel = ComponentFactory.createJPanel();
+		JPanel btn_Panel = VPXComponentFactory.createJPanel();
 
 		base_Panel.add(btn_Panel, BorderLayout.EAST);
 
-		btn_Addr_Go = ComponentFactory.createJButton("Go");
+		btn_Addr_Go = VPXComponentFactory.createJButton("Go");
 		
 		btn_Addr_Go.addActionListener(new ActionListener() {
 			
@@ -111,11 +111,11 @@ public class VPX_MemoryBrowser extends JPanel {
 
 		btn_Panel.add(btn_Addr_Go);
 
-		btn_Addr_NewTab = ComponentFactory.createJButton(new NewTabAction("New Tab"));
+		btn_Addr_NewTab = VPXComponentFactory.createJButton(new NewTabAction("New Tab"));
 
 		btn_Panel.add(btn_Addr_NewTab);
 
-		lbl_Addr_View = ComponentFactory.createJLabel("Address");
+		lbl_Addr_View = VPXComponentFactory.createJLabel("Address");
 
 		base_Panel.add(lbl_Addr_View, BorderLayout.WEST);
 
@@ -126,7 +126,7 @@ public class VPX_MemoryBrowser extends JPanel {
 		panel.setLayout(new FormLayout(new ColumnSpec[] { FormSpecs.GROWING_BUTTON_COLSPEC, }, new RowSpec[] { RowSpec
 				.decode("35px"), }));
 
-		comboBox = ComponentFactory.createJComboBox();
+		comboBox = VPXComponentFactory.createJComboBox();
 		panel.add(comboBox, "1, 1, fill, center");
 
 		return base_Panel;

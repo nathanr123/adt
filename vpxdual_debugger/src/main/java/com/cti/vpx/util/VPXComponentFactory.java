@@ -39,7 +39,7 @@ import com.cti.vpx.view.VPX_ETHWindow;
  * @author nathanr_kamal
  *
  */
-public class ComponentFactory {
+public class VPXComponentFactory {
 
 	public static JPanel createJPanel() {
 
@@ -215,7 +215,7 @@ public class ComponentFactory {
 
 	private static Image getImage(String name) {
 
-		ClassLoader cl = ComponentFactory.class.getClassLoader();
+		ClassLoader cl = VPXComponentFactory.class.getClassLoader();
 
 		InputStream in = cl.getResourceAsStream(name);
 

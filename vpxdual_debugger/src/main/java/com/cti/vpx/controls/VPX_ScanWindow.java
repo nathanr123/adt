@@ -27,10 +27,10 @@ import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 
-import com.cti.vpx.Listener.VPXTCPConnector;
 import com.cti.vpx.command.ATPCommand;
+import com.cti.vpx.listener.VPXTCPConnector;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -95,19 +95,19 @@ public class VPX_ScanWindow extends JDialog {
 
 	private void loadComponents() {
 
-		JLabel lbl_From_IP = ComponentFactory.createJLabel("From");
+		JLabel lbl_From_IP = VPXComponentFactory.createJLabel("From");
 
 		lbl_From_IP.setBounds(20, 11, 61, 29);
 
 		contentPanel.add(lbl_From_IP);
 
-		JLabel lbl_To_IP = ComponentFactory.createJLabel("To");
+		JLabel lbl_To_IP = VPXComponentFactory.createJLabel("To");
 
 		lbl_To_IP.setBounds(20, 51, 61, 29);
 
 		contentPanel.add(lbl_To_IP);
 
-		txt_From_IP = ComponentFactory.createJTextField("172.17.1.27");
+		txt_From_IP = VPXComponentFactory.createJTextField("172.17.1.27");
 
 		txt_From_IP.setBounds(89, 11, 191, 23);
 
@@ -115,7 +115,7 @@ public class VPX_ScanWindow extends JDialog {
 
 		txt_From_IP.setColumns(10);
 
-		txt_To_IP = ComponentFactory.createJTextField("172.17.1.30");
+		txt_To_IP = VPXComponentFactory.createJTextField("172.17.1.30");
 
 		txt_To_IP.setColumns(10);
 
@@ -123,13 +123,13 @@ public class VPX_ScanWindow extends JDialog {
 
 		contentPanel.add(txt_To_IP);
 
-		JSeparator separator = ComponentFactory.createJSeparator();
+		JSeparator separator = VPXComponentFactory.createJSeparator();
 
 		separator.setBounds(0, 85, 329, 2);
 
 		contentPanel.add(separator);
 
-		JPanel buttonPane = ComponentFactory.createJPanel();
+		JPanel buttonPane = VPXComponentFactory.createJPanel();
 
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -139,7 +139,7 @@ public class VPX_ScanWindow extends JDialog {
 
 		buttonPane.add(okButton);
 
-		JButton cancelButton = ComponentFactory.createJButton(new CancelAction("Cancel"));
+		JButton cancelButton = VPXComponentFactory.createJButton(new CancelAction("Cancel"));
 
 		buttonPane.add(cancelButton);
 	}
@@ -298,11 +298,11 @@ public class VPX_ScanWindow extends JDialog {
 
 			contentPanel.setLayout(new MigLayout("", "[523.00px]", "[14px][][][][][]"));
 
-			lbl_Detecting_Processor = ComponentFactory.createJLabel("Detecting Processors");
+			lbl_Detecting_Processor = VPXComponentFactory.createJLabel("Detecting Processors");
 
 			contentPanel.add(lbl_Detecting_Processor, "cell 0 0 1 2");
 
-			lbl_Current_Scanning_IP = ComponentFactory.createJLabel("");
+			lbl_Current_Scanning_IP = VPXComponentFactory.createJLabel("");
 
 			contentPanel.add(lbl_Current_Scanning_IP, "cell 0 4,alignx left,aligny top");
 
@@ -314,13 +314,13 @@ public class VPX_ScanWindow extends JDialog {
 
 			contentPanel.add(progressBar, "cell 0 5,growx");
 
-			JPanel buttonPane = ComponentFactory.createJPanel();
+			JPanel buttonPane = VPXComponentFactory.createJPanel();
 
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
-			JButton cancelButton = ComponentFactory.createJButton("Cancel");
+			JButton cancelButton = VPXComponentFactory.createJButton("Cancel");
 
 			cancelButton.addActionListener(new ActionListener() {
 

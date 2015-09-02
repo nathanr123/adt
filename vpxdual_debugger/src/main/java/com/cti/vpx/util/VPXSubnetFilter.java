@@ -7,14 +7,14 @@ import java.net.UnknownHostException;
 /**
  * @author c3oe.de, based on snippets from Scott Plante, John Kugelmann
  */
-public class SubnetFilter {
+public class VPXSubnetFilter {
 	final private int bytesSubnetCount;
 	final private BigInteger bigMask;
 	final private BigInteger bigSubnetMasked;
 
 	
 	/** For use via format "192.168.0.0/24" or "2001:db8:85a3:880:0:0:0:0/57" */
-	public SubnetFilter(final InetAddress subnetAddress, final int bits) {
+	public VPXSubnetFilter(final InetAddress subnetAddress, final int bits) {
 		this.bytesSubnetCount = subnetAddress.getAddress().length; // 4 or 16
 		this.bigMask = BigInteger.valueOf(-1).shiftLeft(this.bytesSubnetCount * 8 - bits); // mask
 																							// =
@@ -27,7 +27,7 @@ public class SubnetFilter {
 	}
 
 	/** For use via format "192.168.0.0/255.255.255.0" or single address */
-	public SubnetFilter(final InetAddress subnetAddress, final InetAddress mask) {
+	public VPXSubnetFilter(final InetAddress subnetAddress, final InetAddress mask) {
 		this.bytesSubnetCount = subnetAddress.getAddress().length;
 		this.bigMask = null == mask ? BigInteger.valueOf(-1) : new BigInteger(mask.getAddress()); // no
 																									// mask
@@ -49,16 +49,16 @@ public class SubnetFilter {
 	 * @throws UnknownHostException
 	 *             thrown if unsupported subnet mask.
 	 */
-	public static SubnetFilter createInstance(final String subnetMask) {
+	public static VPXSubnetFilter createInstance(final String subnetMask) {
 
 		try {
 			final String[] stringArr = subnetMask.split("/");
 			if (2 > stringArr.length)
-				return new SubnetFilter(InetAddress.getByName(stringArr[0]), (InetAddress) null);
+				return new VPXSubnetFilter(InetAddress.getByName(stringArr[0]), (InetAddress) null);
 			else if (stringArr[1].contains(".") || stringArr[1].contains(":"))
-				return new SubnetFilter(InetAddress.getByName(stringArr[0]), InetAddress.getByName(stringArr[1]));
+				return new VPXSubnetFilter(InetAddress.getByName(stringArr[0]), InetAddress.getByName(stringArr[1]));
 			else
-				return new SubnetFilter(InetAddress.getByName(stringArr[0]), Integer.parseInt(stringArr[1]));
+				return new VPXSubnetFilter(InetAddress.getByName(stringArr[0]), Integer.parseInt(stringArr[1]));
 		} catch (Exception e) {
 			return null;
 		}
@@ -96,9 +96,9 @@ public class SubnetFilter {
 
 	@Override
 	final public boolean equals(Object obj) {
-		if (!(obj instanceof SubnetFilter))
+		if (!(obj instanceof VPXSubnetFilter))
 			return false;
-		final SubnetFilter other = (SubnetFilter) obj;
+		final VPXSubnetFilter other = (VPXSubnetFilter) obj;
 		return this.bigSubnetMasked.equals(other.bigSubnetMasked) && this.bigMask.equals(other.bigMask)
 				&& this.bytesSubnetCount == other.bytesSubnetCount;
 	}

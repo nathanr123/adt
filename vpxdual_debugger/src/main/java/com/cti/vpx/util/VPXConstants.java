@@ -17,6 +17,10 @@ public class VPXConstants {
 	 * Constant Values
 	 */
 
+	public final static String VPXROOT = "VPXSystem";
+	
+	public final static String VPXUNLIST = "Unlisted";
+	
 	public final static String WIN_OSNAME = "Windows";
 
 	public final static String WIN_CMD_BASE = "netsh interface show interface";

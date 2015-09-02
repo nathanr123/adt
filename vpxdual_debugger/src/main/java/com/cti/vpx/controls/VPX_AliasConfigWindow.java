@@ -34,8 +34,9 @@ import javax.swing.event.ListSelectionListener;
 import com.cti.vpx.model.AliasTableModel;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -219,37 +220,37 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		controlPanel.setLayout(null);
 
-		JButton btnAdd = ComponentFactory.createJButton(new AddAliasAction("Add"));
+		JButton btnAdd = VPXComponentFactory.createJButton(new AddAliasAction("Add"));
 
 		btnAdd.setBounds(10, 6, 116, 23);
 
 		controlPanel.add(btnAdd);
 
-		JButton btnDelete = ComponentFactory.createJButton(new DeleteAliasAction("Delete"));
+		JButton btnDelete = VPXComponentFactory.createJButton(new DeleteAliasAction("Delete"));
 
 		btnDelete.setBounds(10, 35, 116, 23);
 
 		controlPanel.add(btnDelete);
 
-		JButton btnUpdate = ComponentFactory.createJButton(new UpdateAliasAction("Update"));
+		JButton btnUpdate = VPXComponentFactory.createJButton(new UpdateAliasAction("Update"));
 
 		btnUpdate.setBounds(10, 64, 116, 23);
 
 		controlPanel.add(btnUpdate);
 
-		JButton btnClearAll = ComponentFactory.createJButton(new DeleteAliasFileAction("Clear All"));
+		JButton btnClearAll = VPXComponentFactory.createJButton(new DeleteAliasFileAction("Clear All"));
 
 		btnClearAll.setBounds(10, 93, 116, 23);
 
 		controlPanel.add(btnClearAll);
 
-		JButton btnReset = ComponentFactory.createJButton(new ResetAliasAction("Reset"));
+		JButton btnReset = VPXComponentFactory.createJButton(new ResetAliasAction("Reset"));
 
 		btnReset.setBounds(10, 122, 116, 23);
 
 		controlPanel.add(btnReset);
 
-		JButton btnSave = ComponentFactory.createJButton(new SaveAliasAction("Save"));
+		JButton btnSave = VPXComponentFactory.createJButton(new SaveAliasAction("Save"));
 
 		btnSave.setBounds(10, 154, 116, 23);
 
@@ -340,16 +341,16 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 	private void loadToolBar() {
 
-		JToolBar aliasToolbar = ComponentFactory.createJToolBar();
+		JToolBar aliasToolbar = VPXComponentFactory.createJToolBar();
 
 		aliasToolbar.setFloatable(false);
 
 		contentPane.add(aliasToolbar, BorderLayout.NORTH);
 
-		aliasToolbar.add(ComponentFactory.createJToolBarButton(new ImportAliasFileAction("Import",
+		aliasToolbar.add(VPXComponentFactory.createJToolBarButton(new ImportAliasFileAction("Import",
 				VPXConstants.Icons.ICON_DOWNLOAD)), null);
 
-		aliasToolbar.add(ComponentFactory.createJToolBarButton(new ExportAliasFileAction("Export",
+		aliasToolbar.add(VPXComponentFactory.createJToolBarButton(new ExportAliasFileAction("Export",
 				VPXConstants.Icons.ICON_UPLOAD)), null);
 
 	}
@@ -711,7 +712,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 			VPXUtilities.writeToXMLFile(aliasTableModel.getSubSystem());
 
-			VPXUtilities.setVPXSystem(VPXUtilities.readFromXMLFile());
+			VPXSessionManager.setVPXSystem(VPXUtilities.readFromXMLFile());
 
 			parent.updateProcessorTree();
 

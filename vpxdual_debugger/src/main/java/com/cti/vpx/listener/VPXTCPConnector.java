@@ -1,4 +1,4 @@
-package com.cti.vpx.Listener;
+package com.cti.vpx.listener;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

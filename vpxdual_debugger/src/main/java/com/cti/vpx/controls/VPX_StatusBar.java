@@ -11,7 +11,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.BevelBorder;
 
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -40,7 +40,7 @@ public class VPX_StatusBar extends JPanel {
     public VPX_StatusBar() {
 	setLayout(new BorderLayout());
 
-	statusLbl = ComponentFactory.createJLabel("");
+	statusLbl = VPXComponentFactory.createJLabel("");
 
 	add(statusLbl, BorderLayout.LINE_START);
 
@@ -57,7 +57,7 @@ public class VPX_StatusBar extends JPanel {
 
     private JPanel getMemoryPanel() {
 
-	JPanel memPanel = ComponentFactory.createJPanel();
+	JPanel memPanel = VPXComponentFactory.createJPanel();
 
 	memPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 

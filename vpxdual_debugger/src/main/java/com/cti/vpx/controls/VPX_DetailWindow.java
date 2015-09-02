@@ -22,10 +22,11 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_DetailPanel extends JDialog {
+public class VPX_DetailWindow extends JDialog {
 	/**
 	 * 
 	 */
@@ -41,7 +42,7 @@ public class VPX_DetailPanel extends JDialog {
 	 * Create the dialog.
 	 */
 
-	public VPX_DetailPanel(VPX_ETHWindow parnt, String path) {
+	public VPX_DetailWindow(VPX_ETHWindow parnt, String path) {
 
 		this.parent = parnt;
 
@@ -88,7 +89,7 @@ public class VPX_DetailPanel extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				VPX_DetailPanel.this.dispose();
+				VPX_DetailWindow.this.dispose();
 			}
 		});
 
@@ -117,15 +118,16 @@ public class VPX_DetailPanel extends JDialog {
 
 			setTitle("VPX System Details");
 
-			loadProperties(VPXUtilities.getVPXSystem());
+			loadProperties(VPXSessionManager.getVPXSystem());
 
 			parent.updateLog("Showing VPXSystem Details");
 
 		} else if (path.startsWith("<html>")) {
 
-			setTitle(VPXUtilities.getCurrentProcType() + " " + VPXUtilities.getCurrentProcessor() + " Details");
+			setTitle(VPXSessionManager.getCurrentProcType() + " " + VPXSessionManager.getCurrentProcessor()
+					+ " Details");
 
-			loadProperties(VPXUtilities.getCurrentProcessor(), VPXUtilities.getCurrentProcType());
+			loadProperties(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentProcType());
 
 		} else {
 
@@ -234,7 +236,7 @@ public class VPX_DetailPanel extends JDialog {
 
 		long dif = (cur - time) / 1000;
 
-		if (dif > (VPXUtilities.getCurrentPeriodicity() + VPXConstants.MAXRESPONSETIMEOUT)) {
+		if (dif > (VPXSessionManager.getCurrentPeriodicity() + VPXConstants.MAXRESPONSETIMEOUT)) {
 
 			return "Not Alive";
 		} else {
@@ -303,7 +305,7 @@ public class VPX_DetailPanel extends JDialog {
 
 		}
 
-		List<VPXSubSystem> subs = VPXUtilities.getVPXSystem().getSubsystem();
+		List<VPXSubSystem> subs = VPXSessionManager.getVPXSystem().getSubsystem();
 
 		for (Iterator<VPXSubSystem> iterator = subs.iterator(); iterator.hasNext();) {
 

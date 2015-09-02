@@ -20,20 +20,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import com.cti.vpx.Listener.VPXAdvertisementListener;
-import com.cti.vpx.Listener.VPXCommunicationListener;
-import com.cti.vpx.Listener.VPXMessageListener;
-import com.cti.vpx.Listener.VPXUDPListener;
-import com.cti.vpx.Listener.VPXUDPMonitor;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
+import com.cti.vpx.listener.VPXAdvertisementListener;
+import com.cti.vpx.listener.VPXCommunicationListener;
+import com.cti.vpx.listener.VPXMessageListener;
+import com.cti.vpx.listener.VPXUDPListener;
+import com.cti.vpx.listener.VPXUDPMonitor;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 
 public class GreetingClient implements VPXAdvertisementListener, VPXMessageListener, VPXCommunicationListener {
@@ -176,7 +177,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	public void setPeriodicityByUnicast(int period) {
 
-		VPXSystem sys = VPXUtilities.getVPXSystem();
+		VPXSystem sys = VPXSessionManager.getVPXSystem();
 
 		List<VPXSubSystem> subs = sys.getSubsystem();
 

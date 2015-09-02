@@ -35,11 +35,12 @@ import javax.swing.text.NumberFormatter;
 
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 import com.cti.vpx.view.VPX_UARTWindow;
 
-public class VPX_AppMode extends JFrame {
+public class VPX_AppModeWindow extends JFrame {
 
 	/**
 	 * 
@@ -106,7 +107,7 @@ public class VPX_AppMode extends JFrame {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					VPX_AppMode frame = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
+					VPX_AppModeWindow frame = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -119,7 +120,7 @@ public class VPX_AppMode extends JFrame {
 	 * Create the frame.
 	 */
 
-	public VPX_AppMode(List<NWInterface> nws, List<String> comms) {
+	public VPX_AppModeWindow(List<NWInterface> nws, List<String> comms) {
 
 		this.nwIFaces = nws;
 
@@ -135,7 +136,7 @@ public class VPX_AppMode extends JFrame {
 
 	}
 
-	public VPX_AppMode() {
+	public VPX_AppModeWindow() {
 
 		init();
 
@@ -243,7 +244,7 @@ public class VPX_AppMode extends JFrame {
 
 				JFileChooser jb = new JFileChooser();
 
-				int i = jb.showOpenDialog(VPX_AppMode.this);
+				int i = jb.showOpenDialog(VPX_AppModeWindow.this);
 
 				if (i == JFileChooser.APPROVE_OPTION) {
 
@@ -326,7 +327,7 @@ public class VPX_AppMode extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				VPX_AppMode.this.dispose();
+				VPX_AppModeWindow.this.dispose();
 
 			}
 		});
@@ -438,7 +439,7 @@ public class VPX_AppMode extends JFrame {
 			cmbNWIface.setSelectedIndex(0);
 		}
 
-		periodicitySpinnerModel.setValue(VPXUtilities.getCurrentPeriodicity());
+		periodicitySpinnerModel.setValue(VPXSessionManager.getCurrentPeriodicity());
 	}
 
 	private void loadCenterComponents() {
@@ -685,14 +686,14 @@ public class VPX_AppMode extends JFrame {
 
 						String msg = name + " is disabled.Please enable and continue!";
 
-						JOptionPane.showMessageDialog(VPX_AppMode.this, msg);
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, msg);
 
 					} else {
 
 						if (!nw.isConnected()) {
 							String msg = name + " is not connected.Please connect and continue!";
 
-							JOptionPane.showMessageDialog(VPX_AppMode.this, msg);
+							JOptionPane.showMessageDialog(VPX_AppModeWindow.this, msg);
 						}
 					}
 				}
@@ -805,9 +806,9 @@ public class VPX_AppMode extends JFrame {
 
 					}
 
-					VPXUtilities.setCurrentPeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
+					VPXSessionManager.setCurrentPeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
-					VPXUtilities.setCurrentIP(txtIPAddress.getText());
+					VPXSessionManager.setCurrentIP(txtIPAddress.getText());
 
 					try {
 						VPX_ETHWindow window = new VPX_ETHWindow();
@@ -823,7 +824,7 @@ public class VPX_AppMode extends JFrame {
 
 					if (!ip) {
 
-						JOptionPane.showMessageDialog(VPX_AppMode.this, "Given IP is not a valid.Please check",
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Given IP is not a valid.Please check",
 								"Error IP", JOptionPane.ERROR_MESSAGE);
 
 						txtIPAddress.requestFocus();
@@ -832,14 +833,14 @@ public class VPX_AppMode extends JFrame {
 					if (!sub) {
 
 						JOptionPane
-								.showMessageDialog(VPX_AppMode.this, "Given Subnet Mask is not a valid.Please check",
+								.showMessageDialog(VPX_AppModeWindow.this, "Given Subnet Mask is not a valid.Please check",
 										"Error Log", JOptionPane.ERROR_MESSAGE);
 
 						txtSubnet.requestFocus();
 					}
 					if (!gateway) {
 
-						JOptionPane.showMessageDialog(VPX_AppMode.this, "Given Gateway is not a valid.Please check",
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Given Gateway is not a valid.Please check",
 								"Error Log", JOptionPane.ERROR_MESSAGE);
 
 						txtGateway.requestFocus();
@@ -856,9 +857,9 @@ public class VPX_AppMode extends JFrame {
 
 			}
 
-			VPX_AppMode.this.dispose();
+			VPX_AppModeWindow.this.dispose();
 		} else {
-			JOptionPane.showMessageDialog(VPX_AppMode.this, "Please enter the valid log filename", "Error Log",
+			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please enter the valid log filename", "Error Log",
 					JOptionPane.ERROR_MESSAGE);
 
 			txtLogFileName.requestFocusInWindow();

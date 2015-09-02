@@ -1,4 +1,4 @@
-package com.cti.vpx.Listener;
+package com.cti.vpx.listener;
 
 import java.io.File;
 import java.net.DatagramPacket;
@@ -29,8 +29,9 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.SubnetFilter;
+import com.cti.vpx.util.VPXSubnetFilter;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -38,7 +39,7 @@ public class VPXUDPMonitor {
 
 	VPXUDPListener listener;
 
-	private static SubnetFilter subnet = null;
+	private static VPXSubnetFilter subnet = null;
 
 	private VPXCommunicationMonitor communicationMonitor;
 
@@ -72,7 +73,11 @@ public class VPXUDPMonitor {
 
 	private static boolean isFlashingStatred = false;
 
+	private VPXSystem vpxSystem;
+
 	public VPXUDPMonitor() throws Exception {
+
+		vpxSystem = VPXSessionManager.getVPXSystem();
 
 		createDefaultMonitors();
 	}
@@ -80,6 +85,8 @@ public class VPXUDPMonitor {
 	public VPXUDPMonitor(VPXUDPListener parent) throws Exception {
 
 		listener = parent;
+
+		vpxSystem = VPXSessionManager.getVPXSystem();
 
 		createDefaultMonitors();
 
@@ -111,7 +118,7 @@ public class VPXUDPMonitor {
 
 	public void applyFilterbySubnet(String subnetmask) {
 
-		subnet = SubnetFilter.createInstance(VPXUtilities.getCurrentIP() + "/" + subnetmask);
+		subnet = VPXSubnetFilter.createInstance(VPXSessionManager.getCurrentIP() + "/" + subnetmask);
 	}
 
 	public void clearFilterbySubnet() {
@@ -172,7 +179,7 @@ public class VPXUDPMonitor {
 
 	public void setPeriodicityByUnicast(int period) {
 
-		VPXSystem sys = VPXUtilities.getVPXSystem();
+		VPXSystem sys = VPXSessionManager.getVPXSystem();
 
 		List<VPXSubSystem> subs = sys.getSubsystem();
 
@@ -372,7 +379,7 @@ public class VPXUDPMonitor {
 
 		try {
 
-			PROCESSOR_LIST processor = VPXUtilities.getProcessorType(ip);
+			PROCESSOR_LIST processor = vpxSystem.getProcessorTypeByIP(ip);
 
 			msg = (processor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020MSGCommand() : new DSPMSGCommand();
 
@@ -937,7 +944,7 @@ public class VPXUDPMonitor {
 		try {
 			int i = 0;
 
-			VPXSystem sys = VPXUtilities.getVPXSystem();
+			VPXSystem sys = VPXSessionManager.getVPXSystem();
 
 			List<VPXSubSystem> subs = sys.getSubsystem();
 
@@ -1077,15 +1084,18 @@ public class VPXUDPMonitor {
 	// Parsing Advertisement Packets
 	private synchronized void parseAdvertisementPacket(String ip, String msg) {
 
-		if (subnet != null) {
+		if (msg.length() == 6) {
 
-			isipinRange = subnet.isInNet(ip);
+			if (subnet != null) {
 
-		}
+				isipinRange = subnet.isInNet(ip);
 
-		if (isipinRange) {
+			}
 
-			((VPXAdvertisementListener) listener).updateProcessorStatus(ip, msg);
+			if (isipinRange) {
+
+				((VPXAdvertisementListener) listener).updateProcessorStatus(ip, msg);
+			}
 		}
 
 	}
@@ -1111,7 +1121,7 @@ public class VPXUDPMonitor {
 
 		ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
 
-		if (VPXUtilities.getProcessorType(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
+		if (vpxSystem.getProcessorTypeByIP(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
 
 			msgCommand = new P2020ATPCommand();
 
@@ -1148,7 +1158,7 @@ public class VPXUDPMonitor {
 
 		ByteBuffer bf = ByteBuffer.allocate(msgCommand.size());
 
-		if (VPXUtilities.getProcessorType(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
+		if (vpxSystem.getProcessorTypeByIP(ip) == PROCESSOR_LIST.PROCESSOR_P2020) {
 
 			msgCommand = new P2020MSGCommand();
 

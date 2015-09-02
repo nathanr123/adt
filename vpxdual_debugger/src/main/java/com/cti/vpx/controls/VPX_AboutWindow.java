@@ -22,7 +22,7 @@ import com.cti.vpx.util.VPXUtilities;
 
 import javax.swing.ImageIcon;
 
-public class VPX_About_Dialog extends JDialog {
+public class VPX_AboutWindow extends JDialog {
 
 	/**
 	 * 
@@ -36,7 +36,7 @@ public class VPX_About_Dialog extends JDialog {
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			VPX_About_Dialog dialog = new VPX_About_Dialog();
+			VPX_AboutWindow dialog = new VPX_AboutWindow();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.showDialog();
 		} catch (Exception e) {
@@ -47,7 +47,7 @@ public class VPX_About_Dialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_About_Dialog() {
+	public VPX_AboutWindow() {
 
 		init();
 
@@ -119,7 +119,7 @@ public class VPX_About_Dialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				VPX_About_Dialog.this.dispose();
+				VPX_AboutWindow.this.dispose();
 
 			}
 		});

@@ -38,7 +38,7 @@ import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_FlashWizard extends JDialog {
+public class VPX_FlashWizardWindow extends JDialog {
 
 	/**
 	 * 
@@ -125,7 +125,7 @@ public class VPX_FlashWizard extends JDialog {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VPX_FlashWizard dialog = new VPX_FlashWizard();
+					VPX_FlashWizardWindow dialog = new VPX_FlashWizardWindow();
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
 				} catch (Exception e) {
@@ -138,7 +138,7 @@ public class VPX_FlashWizard extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_FlashWizard() {
+	public VPX_FlashWizardWindow() {
 
 		// this.parent = parnt;
 
@@ -156,7 +156,7 @@ public class VPX_FlashWizard extends JDialog {
 
 	}
 
-	public VPX_FlashWizard(VPX_ETHWindow parnt) {
+	public VPX_FlashWizardWindow(VPX_ETHWindow parnt) {
 
 		this.parent = parnt;
 
@@ -808,7 +808,7 @@ public class VPX_FlashWizard extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				VPX_FlashWizard.this.dispose();
+				VPX_FlashWizardWindow.this.dispose();
 
 			}
 		});

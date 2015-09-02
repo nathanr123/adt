@@ -1,7 +1,6 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -33,8 +32,9 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
@@ -86,7 +86,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private void loadComponents() {
 
-		JPanel console_Panel = ComponentFactory.createJPanel();
+		JPanel console_Panel = VPXComponentFactory.createJPanel();
 
 		add(console_Panel, BorderLayout.NORTH);
 
@@ -114,7 +114,9 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 			public void itemStateChanged(ItemEvent arg0) {
 
 				if (arg0.getSource().equals(cmbSubSystem)) {
+
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
 						loadProcessorsFilter();
 					}
 				}
@@ -175,6 +177,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 			}
 		});
+
 		filterPanel.add(btnEnableFilter);
 
 		JButton btnClear = new JButton("Clear");
@@ -205,7 +208,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		console_Panel.add(panel_1, BorderLayout.EAST);
 
-		JButton btn_Console_Clear = ComponentFactory.createJButton(new ClearAction("Clear"));
+		JButton btn_Console_Clear = VPXComponentFactory.createJButton(new ClearAction("Clear"));
 
 		panel_1.add(btn_Console_Clear);
 
@@ -215,7 +218,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		btn_Console_Clear.setPreferredSize(new Dimension(22, 22));
 
-		JButton btn_Console_Copy = ComponentFactory.createJButton(new CopyAction("Copy"));
+		JButton btn_Console_Copy = VPXComponentFactory.createJButton(new CopyAction("Copy"));
 
 		panel_1.add(btn_Console_Copy);
 
@@ -225,7 +228,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		btn_Console_Copy.setPreferredSize(new Dimension(22, 22));
 
-		JButton btn_Console_Save = ComponentFactory.createJButton(new SaveAction("Save"));
+		JButton btn_Console_Save = VPXComponentFactory.createJButton(new SaveAction("Save"));
 
 		panel_1.add(btn_Console_Save);
 
@@ -235,11 +238,11 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		btn_Console_Save.setPreferredSize(new Dimension(22, 22));
 
-		JScrollPane scrl_Console = ComponentFactory.createJScrollPane();
+		JScrollPane scrl_Console = VPXComponentFactory.createJScrollPane();
 
 		add(scrl_Console, BorderLayout.CENTER);
 
-		txtA_Console = ComponentFactory.createJTextArea();
+		txtA_Console = VPXComponentFactory.createJTextArea();
 
 		scrl_Console.setViewportView(txtA_Console);
 
@@ -249,7 +252,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private void loadFilters() {
 
-		vpxSystem = VPXUtilities.getVPXSystem();
+		vpxSystem = VPXSessionManager.getVPXSystem();
 
 		cmbSubSystem.removeAllItems();
 
@@ -268,7 +271,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		if (p.size() > 0) {
 
-			cmbSubSystem.addItem("Un listed");
+			cmbSubSystem.addItem(VPXConstants.VPXUNLIST);
 		}
 	}
 
@@ -278,15 +281,15 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		cmbProcessor.addItem("All Processors");
 
-		if ("Un listed".equals(cmbSubSystem.getSelectedItem().toString())) {
+		if (VPXConstants.VPXUNLIST.equals(cmbSubSystem.getSelectedItem().toString())) {
 
 			List<Processor> p = vpxSystem.getUnListed();
 
 			if (p.size() > 0) {
 
-				for (Iterator iterator = p.iterator(); iterator.hasNext();) {
+				for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
 
-					Processor processor = (Processor) iterator.next();
+					Processor processor = iterator.next();
 
 					cmbProcessor.addItem(processor.getiP_Addresses());
 				}
@@ -322,13 +325,13 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		cmbCores.removeAllItems();
 
-		if ("Un listed".equals(cmbSubSystem.getSelectedItem().toString())) {
+		if (VPXConstants.VPXUNLIST.equals(cmbSubSystem.getSelectedItem().toString())) {
 
 			List<Processor> s = vpxSystem.getUnListed();
 
-			for (Iterator iterator = s.iterator(); iterator.hasNext();) {
+			for (Iterator<Processor> iterator = s.iterator(); iterator.hasNext();) {
 
-				Processor processor = (Processor) iterator.next();
+				Processor processor = iterator.next();
 
 				if (processor.getiP_Addresses().equals(cmbProcessor.getSelectedItem().toString())) {
 
@@ -414,7 +417,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 				if (cmbSubSystem.getSelectedIndex() > 0) {
 
-					VPXSubSystem sub = VPXUtilities.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
+					VPXSubSystem sub = vpxSystem.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
 
 					ips.add(sub.getIpP2020());
 
@@ -467,7 +470,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 				if (cmbSubSystem.getSelectedIndex() > 0) {
 
-					VPXSubSystem sub = VPXUtilities.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
+					VPXSubSystem sub = vpxSystem.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
 
 					ips.add(sub.getIpP2020());
 

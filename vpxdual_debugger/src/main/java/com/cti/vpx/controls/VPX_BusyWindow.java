@@ -14,7 +14,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
 
-import com.cti.vpx.util.ComponentFactory;
+import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -90,12 +90,12 @@ public class VPX_BusyWindow extends JDialog {
 
 		contentPanel.setLayout(new MigLayout("", "[523.00px]", "[14px][][][][][]"));
 
-		lbl_Detecting_Processor = ComponentFactory.createJLabel("Detecting Processors");
+		lbl_Detecting_Processor = VPXComponentFactory.createJLabel("Detecting Processors");
 		lbl_Detecting_Processor.setText("Flashing File");
 
 		contentPanel.add(lbl_Detecting_Processor, "cell 0 0 1 2");
 		
-				lbl_Current_Scanning_IP = ComponentFactory.createJLabel("");
+				lbl_Current_Scanning_IP = VPXComponentFactory.createJLabel("");
 				
 						lbl_Current_Scanning_IP.setText(msg);
 						
@@ -109,7 +109,7 @@ public class VPX_BusyWindow extends JDialog {
 								
 										contentPanel.add(progressBar, "cell 0 3,growx");
 
-		JPanel buttonPane = ComponentFactory.createJPanel();
+		JPanel buttonPane = VPXComponentFactory.createJPanel();
 
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 

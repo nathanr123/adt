@@ -34,7 +34,7 @@ import javax.swing.border.TitledBorder;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
-public class VPX_Preference extends JDialog {
+public class VPX_PreferenceWindow extends JDialog {
 
 	/**
 	 * 
@@ -89,7 +89,7 @@ public class VPX_Preference extends JDialog {
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			VPX_Preference dialog = new VPX_Preference();
+			VPX_PreferenceWindow dialog = new VPX_PreferenceWindow();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.showPreferenceWindow();
 		} catch (Exception e) {
@@ -100,7 +100,7 @@ public class VPX_Preference extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_Preference() {
+	public VPX_PreferenceWindow() {
 		setTitle("Preferences");
 
 		init();
@@ -704,7 +704,7 @@ public class VPX_Preference extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				VPX_Preference.this.dispose();
+				VPX_PreferenceWindow.this.dispose();
 
 			}
 		});
@@ -770,7 +770,7 @@ public class VPX_Preference extends JDialog {
 
 			VPXUtilities.updateProperties(preferenceProperties);
 
-			JOptionPane.showMessageDialog(VPX_Preference.this,
+			JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
 					"Updated successfully.\nPlease restart the appliction to take effect");
 		}
 	}
@@ -795,10 +795,10 @@ public class VPX_Preference extends JDialog {
 
 			VPXUtilities.updateProperties(preferenceProperties);
 
-			JOptionPane.showMessageDialog(VPX_Preference.this,
+			JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
 					"Updated successfully.\nPlease restart the appliction to take effect");
 
-			VPX_Preference.this.dispose();
+			VPX_PreferenceWindow.this.dispose();
 		}
 	}
 }

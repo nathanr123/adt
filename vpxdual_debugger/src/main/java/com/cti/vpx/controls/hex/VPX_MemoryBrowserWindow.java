@@ -30,7 +30,7 @@ import net.miginfocom.swing.MigLayout;
 
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
@@ -575,7 +575,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	private void loadFilters() {
 
-		vpxSystem = VPXUtilities.getVPXSystem();
+		vpxSystem = VPXSessionManager.getVPXSystem();
 
 		cmbSubSystem.removeAllItems();
 
