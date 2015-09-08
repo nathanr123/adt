@@ -3,8 +3,6 @@
  */
 package com.cti.vpx.util;
 
-import gnu.io.CommPortIdentifier;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -35,6 +33,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,8 +48,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-import javolution.io.Struct.Enum32;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -68,6 +65,9 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.view.VPX_ETHWindow;
+
+import gnu.io.CommPortIdentifier;
+import javolution.io.Struct.Enum32;
 
 /**
  * @author nathanr_kamal
@@ -141,8 +141,6 @@ public class VPXUtilities {
 	public static DSPATPCommand createDSPCommand() {
 		return new DSPATPCommand();
 	}
-
-	
 
 	public static String friendlyTimeDiff(long different) {
 
@@ -291,21 +289,21 @@ public class VPXUtilities {
 
 		String[] split = ip.split("\\.");
 
-		return (Long.parseLong(split[0]) << 24 | Long.parseLong(split[1]) << 16 | Long.parseLong(split[2]) << 8 | Long
-				.parseLong(split[3]));
+		return (Long.parseLong(split[0]) << 24 | Long.parseLong(split[1]) << 16 | Long.parseLong(split[2]) << 8
+				| Long.parseLong(split[3]));
 
 	}
 
 	public static String getIPFromLong(final long ipaslong) {
 
-		return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff,
-				(ipaslong >>> 8) & 0xff, (ipaslong) & 0xff);
+		return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff, (ipaslong >>> 8) & 0xff,
+				(ipaslong) & 0xff);
 	}
 
 	public static void showPopup(String msg) {
 
-		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE,
-				JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION,
+				null, new Object[] {}, null);
 
 		final JDialog dialog = new JDialog();
 
@@ -357,7 +355,6 @@ public class VPXUtilities {
 
 		dialog.setVisible(true);
 	}
-
 
 	public static Map<Long, byte[]> divideArrayAsMap(byte[] source, int chunksize) {
 
@@ -551,8 +548,8 @@ public class VPXUtilities {
 			prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
 			prop.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(true));
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(true));
-			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, System.getProperty("user.dir") + "\\logger_"
-					+ getCurrentTime(3) + ".log");
+			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH,
+					System.getProperty("user.dir") + "\\logger_" + getCurrentTime(3) + ".log");
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, "2");
 			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
 			prop.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME, String.valueOf(true));
@@ -1184,7 +1181,6 @@ public class VPXUtilities {
 
 	}
 
-	
 	public static NWInterface getEthernetPort(String name) {
 
 		String s;
@@ -1272,7 +1268,55 @@ public class VPXUtilities {
 		return nw;
 	}
 
-	
+	public static Map<String, String> getMemoryAddressVariables(String filename) {
+
+		Map<String, String> memVars = new TreeMap<String, String>();
+
+		String str = readMapFile(filename);
+
+		String vars = str.substring(str.lastIndexOf("--------   ----"));
+
+		String[] varArray = vars.split("\n");
+
+		for (int i = 1; i < varArray.length-1; i++) {
+
+			if (!(varArray[i].trim().equals("--------   ----") && varArray[i].contains("symbols]"))) {
+
+				if (varArray[i].trim().length() > 0) {
+					
+					String[] var = varArray[i].trim().split("   ");
+					
+					memVars.put(var[1].trim(), var[0].trim());
+				}
+			}
+
+		}
+
+		return memVars;
+	}
+
+	public static String readMapFile(String filename) {
+		try {
+			final String CHARSET = "UTF-8";
+
+			final String DELIMITER = "symbols]";
+
+			File file = new File(filename);
+
+			@SuppressWarnings("resource")
+			Scanner scanner = new Scanner(file, CHARSET).useDelimiter(DELIMITER);
+
+			String content = null;
+
+			if (scanner.hasNext())
+				content = scanner.next();
+
+			return content;
+
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 	public static String readFile(String filename) {
 		try {
@@ -1344,8 +1388,8 @@ public class VPXUtilities {
 
 	public static void deleteAllGeneratedFilesAndFlders(String path, String deployFile, String cfgFile) {
 
-		deleteDeploymentFiles(path + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE, path + "/"
-				+ VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, false);
+		deleteDeploymentFiles(path + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE,
+				path + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE, false);
 
 		deleteDeploymentFiles("images", "", true);
 

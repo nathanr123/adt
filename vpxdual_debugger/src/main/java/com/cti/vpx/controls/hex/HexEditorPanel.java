@@ -159,7 +159,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	editor = new HexEditor();
 	editor.addHexEditorListener(this);
 	editor.addSelectionChangedListener(this);
-	// handleOpenFile("copy.gif");
+	handleOpenFile("D:\\test.bin");
 
 	add(editor);
 

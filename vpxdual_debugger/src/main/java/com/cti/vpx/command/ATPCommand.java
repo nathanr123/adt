@@ -90,6 +90,8 @@ public class ATPCommand extends Struct implements ATP {
 
 	public class MemoryInfo extends Struct {
 
+		//public final Unsigned32 memIndex = new Unsigned32();
+		
 		public final Unsigned32 address = new Unsigned32();
 
 		public final Unsigned32 length = new Unsigned32();

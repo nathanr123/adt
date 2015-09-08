@@ -493,8 +493,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		ProcMSGPanel = new JPanel();
 
-		ProcMSGPanel.setBorder(new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
+		ProcMSGPanel.setBorder(
+				new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		ProcMSGPanel.setPreferredSize(new Dimension(10, 200));
 
@@ -514,8 +514,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		UserMSGPanel = new JPanel();
 
-		UserMSGPanel.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
+		UserMSGPanel
+				.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
 
@@ -620,15 +620,15 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			if (cmbCores.getSelectedIndex() == 0) {
 
-				updateProcessorMessage(VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType()
-						+ " : \n", proc_From_Style);
+				updateProcessorMessage(VPXSessionManager.getCurrentSubSystem() + " "
+						+ VPXSessionManager.getCurrentProcType() + " : \n", proc_From_Style);
 
 				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
 
 			} else if (msg.startsWith((cmbCores.getSelectedIndex() - 1) + ":")) {
 
-				updateProcessorMessage(VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType()
-						+ " : \n", proc_From_Style);
+				updateProcessorMessage(VPXSessionManager.getCurrentSubSystem() + " "
+						+ VPXSessionManager.getCurrentProcType() + " : \n", proc_From_Style);
 
 				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
 			}
@@ -677,7 +677,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private void updateUserMessage(String msg) {
 
-		updateUserMessage(VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType() + " : \n",
+		updateUserMessage(
+				VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType() + " : \n",
 				proc_From_Style);
 
 		updateUserMessage("  " + msg + "\n\n", proc_Msg_Style);
@@ -920,8 +921,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	class SendMsgAction extends AbstractAction {
 
 		/**
-	 * 
-	 */
+		* 
+		*/
 		private static final long serialVersionUID = 1L;
 
 		public SendMsgAction(String name) {
@@ -938,13 +939,13 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			currentCommandIndex = cmdHistory.size();
 
-			if (str.equalsIgnoreCase("ls") || str.equalsIgnoreCase("help")  || str.equalsIgnoreCase("?")) {
+			if (str.equalsIgnoreCase("ls") || str.equalsIgnoreCase("help") || str.equalsIgnoreCase("?")) {
 
 				if (str.equalsIgnoreCase("ls")) {
 
 					showCommands();
 
-				} else if (str.equalsIgnoreCase("help")  || str.equalsIgnoreCase("?")) {
+				} else if (str.equalsIgnoreCase("help") || str.equalsIgnoreCase("?")) {
 
 					showHelp();
 				}
@@ -971,9 +972,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 						} else {
 
 							if (cmbCores.getSelectedIndex() > 0) {
-								parent.sendMessage(VPXSessionManager.getCurrentProcessor(), cmbCores.getSelectedIndex(),
-										txt_Msg_Send.getText());
-
+								
+								parent.sendMessage(VPXSessionManager.getCurrentProcessor(),
+										cmbCores.getSelectedIndex() - 1, txt_Msg_Send.getText());
+								
 								updateUserMessage(txt_Msg_Send.getText());
 
 								txt_Msg_Send.setText("");
@@ -986,8 +988,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 						}
 
 					} else {
-						JOptionPane
-								.showMessageDialog(parent, "invalid Arguments", "Message", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(parent, "invalid Arguments", "Message",
+								JOptionPane.ERROR_MESSAGE);
 
 						txt_Msg_Send.requestFocus();
 					}
@@ -1116,8 +1118,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		private void loadComponents() {
 
-			contentPanel.setBorder(new TitledBorder(null, "Command History", TitledBorder.LEADING, TitledBorder.TOP,
-					null, null));
+			contentPanel.setBorder(
+					new TitledBorder(null, "Command History", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 			getContentPane().add(contentPanel, BorderLayout.CENTER);
 

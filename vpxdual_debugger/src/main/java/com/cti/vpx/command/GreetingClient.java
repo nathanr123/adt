@@ -12,6 +12,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -149,6 +150,18 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		jp.add(jb3);
 
+		JButton jb4 = new JButton("Read Map file");
+
+		jb4.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				readFile();
+			}
+		});
+
+		jp.add(jb4);
+
 		f.getContentPane().setLayout(new BorderLayout());
 
 		f.getContentPane().add(new JScrollPane(jt));
@@ -172,6 +185,33 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+
+	}
+
+	public void readFile() {
+
+		Map<String, String> memVars = VPXUtilities.getMemoryAddressVariables("D:\\mapFiles\\hyperlink-edma.map");
+
+		Iterator<Map.Entry<String, String>> entries = memVars.entrySet().iterator();
+
+		System.out.println("Total Symbols : " + memVars.size());
+
+		System.out.println("Variable ----> Memory Address");
+
+		System.out.println("---------     ----------------");
+
+		while (entries.hasNext()) {
+
+			Map.Entry<String, String> entry = entries.next();
+
+			String key = entry.getKey();
+			
+			String value = entry.getValue();
+
+			System.out.println(key + " ----> " + value);
+		}
+
+		System.out.println("---------done----------------");
 
 	}
 
@@ -238,8 +278,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.periodicity.set(period);
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, VPXUtilities.getCurrentInterfaceAddress()
-					.getBroadcast(), VPXUDPListener.COMM_PORTNO);
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+					VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
@@ -259,8 +299,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg1.periodicity.set(period);
 
-			DatagramPacket packet1 = new DatagramPacket(buffer1, buffer1.length, VPXUtilities
-					.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO);
+			DatagramPacket packet1 = new DatagramPacket(buffer1, buffer1.length,
+					VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet1);
 
@@ -883,7 +923,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	@Override
 	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
 		bistWindow.updateTestProgress(pType, val);
-		
+
 	}
 
 }

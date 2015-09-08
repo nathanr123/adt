@@ -11,13 +11,16 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,13 +28,15 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-
-import net.miginfocom.swing.MigLayout;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXSessionManager;
+import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
@@ -50,11 +55,15 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JComboBox<String> cmbCores;
 	private JCheckBox chkAutoRefresh;
 	private JRadioButton radUseMap;
-	private JComboBox<String> cmbMemoryVariables;
+	private VPX_FilterComboBox cmbMemoryVariables;
 	private JRadioButton radUserAddress;
 	private JButton btnGo;
 	private JButton btnNewWindow;
 	private JButton btnClear;
+
+	private final JFileChooser fileDialog = new JFileChooser();
+
+	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Map Files", "map");
 
 	private MemoryViewFilter memoryFilter;
 
@@ -75,6 +84,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JLabel lblMapFile;
 
 	private JButton btnMapFileBrowse;
+	private Map<String, String> memVariables;
 
 	/**
 	 * Launch the application.
@@ -288,15 +298,54 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		btnMapFileBrowse = new JButton("Browse");
 
+		btnMapFileBrowse.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				fileDialog.addChoosableFileFilter(filterOut);
+
+				fileDialog.setAcceptAllFileFilterUsed(false);
+
+				int returnVal = fileDialog.showOpenDialog(null);
+
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+					File file = fileDialog.getSelectedFile();
+
+					loadMemoryVariables(file.getAbsolutePath());
+
+				}
+
+			}
+		});
+
 		btnMapFileBrowse.setEnabled(false);
 
 		mapPanel.add(btnMapFileBrowse, "cell 3 0,alignx left,aligny top");
 
-		cmbMemoryVariables = new JComboBox<String>();
+		cmbMemoryVariables = new VPX_FilterComboBox();
+
+		cmbMemoryVariables.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getSource().equals(cmbMemoryVariables)) {
+
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+
+						fillMemoryAddress();
+
+					}
+				}
+
+			}
+		});
 
 		cmbMemoryVariables.setEnabled(false);
 
-		cmbMemoryVariables.setPreferredSize(new Dimension(120, 20));
+		cmbMemoryVariables.setMinimumSize(new Dimension(250, 20));
 
 		mapPanel.add(cmbMemoryVariables, "cell 4 0,alignx left,aligny center");
 
@@ -409,6 +458,25 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		hexContentPanel.add(new HexEditorPanel(), BorderLayout.CENTER);
 
 		contentPane.add(hexContentPanel, BorderLayout.CENTER);
+	}
+
+	private void loadMemoryVariables(String fileName) {
+
+		cmbMemoryVariables.removeAllItems();
+
+		memVariables = VPXUtilities.getMemoryAddressVariables(fileName);
+
+		cmbMemoryVariables.addMemoryVariables(memVariables);
+
+		cmbMemoryVariables.setSelectedIndex(0);
+
+	}
+
+	private void fillMemoryAddress() {
+
+		if (memVariables.containsKey(cmbMemoryVariables.getSelectedItem().toString())) {
+			txtMemoryAddres.setText(memVariables.get(cmbMemoryVariables.getSelectedItem().toString()));
+		}
 	}
 
 	private void createFilters() {
