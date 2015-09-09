@@ -84,6 +84,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JLabel lblMapFile;
 
 	private JButton btnMapFileBrowse;
+	
 	private Map<String, String> memVariables;
 
 	/**

@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cti.vpx.controls.hex;
+package com.cti.vpx.controls.hex.groupmodel;
 
 import java.awt.Point;
 import java.io.IOException;
@@ -39,13 +39,16 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import com.cti.vpx.controls.hex.ByteBuffer;
+import com.cti.vpx.controls.hex.HexEditor;
+
 /**
  * The table model used by the <code>JTable</code> in the hex editor.
  *
  * @author Robert Futrell
  * @version 1.0
  */
-public class HexTableModel extends AbstractTableModel {
+public class Hex64 extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,8 +57,6 @@ public class HexTableModel extends AbstractTableModel {
 	private int bytesPerRow;
 	private UndoManager undoManager;
 	private String[] columnNames;
-	private byte[] bitBuf = new byte[16];
-	private char[] dumpColBuf;
 
 	/**
 	 * Cache of string values of "<code>0</code>"-"<code>ff</code>" for fast
@@ -77,7 +78,7 @@ public class HexTableModel extends AbstractTableModel {
 	 * @param msg
 	 *            The resource bundle for localizations.
 	 */
-	public HexTableModel(HexEditor editor, ResourceBundle msg) {
+	public Hex64(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
 		doc = new ByteBuffer(16);
@@ -85,23 +86,19 @@ public class HexTableModel extends AbstractTableModel {
 
 		undoManager = new UndoManager();
 
-		columnNames = new String[17];
+		columnNames = new String[16];
 		for (int i = 0; i < 16; i++) {
 			columnNames[i] = "+" + Integer.toHexString(i).toUpperCase();
 		}
-		columnNames[16] = msg.getString("AsciiDump");
-
-		dumpColBuf = new char[16];
-		Arrays.fill(dumpColBuf, ' ');
 
 		byteStrVals = new String[256];
 		for (int i = 0; i < byteStrVals.length; i++) {
-			byteStrVals[i] = Integer.toHexString(i);
+			byteStrVals[i] = Integer.toHexString(i).toUpperCase();
 		}
 
 		paddedLowerByteStrVals = new String[16];
 		for (int i = 0; i < paddedLowerByteStrVals.length; i++) {
-			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i);
+			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i).toUpperCase();
 		}
 
 	}
@@ -141,7 +138,7 @@ public class HexTableModel extends AbstractTableModel {
 	 * @return The number of columns to display.
 	 */
 	public int getColumnCount() {
-		return getBytesPerRow() + 1;
+		return getBytesPerRow();
 	}
 
 	public String getColumnName(int col) {
@@ -154,7 +151,7 @@ public class HexTableModel extends AbstractTableModel {
 	 * @return The number of rows to display.
 	 */
 	public int getRowCount() {
-		return doc.getSize() / bytesPerRow + (doc.getSize() % bytesPerRow > 0 ? 1 : 0);
+		return doc.getSize() / (bytesPerRow * 8) + (doc.getSize() % (bytesPerRow * 8) > 0 ? 1 : 0);
 	}
 
 	/**
@@ -169,30 +166,17 @@ public class HexTableModel extends AbstractTableModel {
 	 */
 	public Object getValueAt(int row, int col) {
 
-		if (col == bytesPerRow) {
-			// Get ascii dump of entire row
-			int pos = editor.cellToOffset(row, 0);
-			if (pos == -1) { // A cleared row (from deletions)
-				return "";
-			}
-			int count = doc.read(pos, bitBuf);
-			for (int i = 0; i < count; i++) {
-				char ch = (char) bitBuf[i];
-				if (ch < 0x20 || ch > 0x7e) {
-					ch = '.';
-				}
-				dumpColBuf[i] = ch;
-			}
-			return new String(dumpColBuf, 0, count);
-		}
-
 		int pos = editor.cellToOffset(row, col);
 		if (pos == -1) { // A cell that isn't part of the byte array
 			return "";
 		}
-		// & with 0xff to convert to unsigned
-		int b = doc.getByte(pos) & 0xff;
-		return (b < 0x10 && editor.getPadLowBytes()) ? paddedLowerByteStrVals[b] : byteStrVals[b];
+		byte[] b = doc.getByteByGroup(pos, 8);
+
+		return String.format("%02x%02x%02x%02x%02x%02x%02x%02x", b[7], b[6], b[5], b[4], b[3], b[2], b[1], b[0])
+				.toUpperCase();// (b
+		// <
+		// 0x10
+		// &&
 
 	}
 
@@ -263,6 +247,14 @@ public class HexTableModel extends AbstractTableModel {
 			editor.fireHexEditorEvent(offset, addCount, remCount);
 		}
 
+	}
+
+	public ByteBuffer getBytes() {
+		return doc;
+	}
+
+	public void setBytes(ByteBuffer buff) {
+		this.doc = buff;
 	}
 
 	public void setBytes(byte[] bytes) throws IOException {

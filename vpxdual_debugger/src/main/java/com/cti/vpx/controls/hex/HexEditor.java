@@ -36,13 +36,17 @@ import java.io.InputStream;
 import java.util.ResourceBundle;
 
 import javax.swing.Action;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.table.TableModel;
 
+import com.cti.vpx.controls.hex.groupmodel.Hex16;
+import com.cti.vpx.controls.hex.groupmodel.Hex32;
+import com.cti.vpx.controls.hex.groupmodel.Hex64;
+import com.cti.vpx.controls.hex.groupmodel.Hex8;
 import com.cti.vpx.util.VPXUtilities;
 
 /**
@@ -97,12 +101,32 @@ public class HexEditor extends JScrollPane {
 	 */
 	public static final String PROPERTY_SHOW_GRID = "showGrid";
 
+	public static final int HEX8 = 0;
+
+	public static final int HEX16 = 1;
+
+	public static final int HEX32 = 2;
+
+	public static final int HEX64 = 3;
+
+	public static final int UNSINGNEDINT16 = 4;
+
+	public static final int UNSINGNEDINT32 = 5;
+
+	public static final int SINGNEDINT16 = 6;
+
+	public static final int SINGNEDINT32 = 7;
+
+	public static final int UNSINGNEDFLOAT32 = 8;
+
 	private HexTable table;
 	private boolean alternateRowBG;
 	private boolean alternateColumnBG;
 	private boolean highlightSelectionInAsciiDump;
 	private Color highlightSelectionInAsciiDumpColor;
 	private boolean padLowBytes;
+
+	private ResourceBundle msg;
 
 	private static final TransferHandler DEFAULT_TRANSFER_HANDLER = new HexEditorTransferHandler();
 
@@ -117,33 +141,132 @@ public class HexEditor extends JScrollPane {
 
 		jp.setLayout(new BorderLayout());
 
-		ResourceBundle msg = VPXUtilities.getResourceBundle();
+		msg = VPXUtilities.getResourceBundle();
 
-		HexTableModel model = new HexTableModel(this, msg);
+		Hex8 model = new Hex8(this, msg);
 
 		table = new HexTable(this, model);
-		
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);		
-				
+
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
 		jp.add(table, BorderLayout.CENTER);
 
 		setViewportView(jp);
-		
+
 		setShowColumnHeader(true);
-		
+
 		setShowRowHeader(true);
 
 		setAlternateRowBG(false);
-		
+
 		setAlternateColumnBG(false);
-		
+
 		setHighlightSelectionInAsciiDump(true);
-		
+
 		setHighlightSelectionInAsciiDumpColor(new Color(255, 255, 192));
-		
+
 		setPadLowBytes(true);
 
 		setTransferHandler(DEFAULT_TRANSFER_HANDLER);
+
+	}
+
+	public void setHexModel(int mod) {
+
+		ByteBuffer bb = null;
+
+		TableModel mm = table.getModel();
+
+		if (mm instanceof Hex8) {
+
+			bb = ((Hex8) table.getModel()).getBytes();
+
+		} else if (mm instanceof Hex16) {
+
+			bb = ((Hex16) table.getModel()).getBytes();
+
+		} else if (mm instanceof Hex32) {
+
+			bb = ((Hex32) table.getModel()).getBytes();
+
+		} else if (mm instanceof Hex64) {
+
+			bb = ((Hex64) table.getModel()).getBytes();
+
+		}
+
+		switch (mod) {
+
+		case HEX8:
+
+			Hex8 hex8model = new Hex8(this, msg);
+
+			hex8model.setBytes(bb);
+
+			table.setModel(hex8model);
+
+			break;
+
+		case HEX16:
+
+			Hex16 hex16model = new Hex16(this, msg);
+
+			hex16model.setBytes(bb);
+
+			table.setModel(hex16model);
+
+			break;
+
+		case HEX32:
+
+			Hex32 hex32model = new Hex32(this, msg);
+
+			hex32model.setBytes(bb);
+
+			table.setModel(hex32model);
+
+			break;
+
+		case HEX64:
+
+			Hex64 hex64model = new Hex64(this, msg);
+
+			hex64model.setBytes(bb);
+
+			table.setModel(hex64model);
+
+			break;
+
+		case UNSINGNEDINT16:
+
+			// hex16model = new Hex8(this, msg);
+
+			break;
+
+		case UNSINGNEDINT32:
+
+			// hex16model = new Hex8(this, msg);
+
+			break;
+
+		case SINGNEDINT16:
+
+			// hex16model = new Hex8(this, msg);
+
+			break;
+
+		case SINGNEDINT32:
+
+			// hex16model = new Hex8(this, msg);
+
+			break;
+
+		case UNSINGNEDFLOAT32:
+
+			// hex16model = new Hex8(this, msg);
+
+			break;
+		}
 
 	}
 
@@ -241,7 +364,7 @@ public class HexEditor extends JScrollPane {
 	 * @param removed
 	 *            The number of bytes removed.
 	 */
-	protected void fireHexEditorEvent(int offset, int added, int removed) {
+	public void fireHexEditorEvent(int offset, int added, int removed) {
 		HexEditorEvent e = null;
 		// Guaranteed to return a non-null array
 		Object[] listeners = listenerList.getListenerList();
@@ -400,7 +523,7 @@ public class HexEditor extends JScrollPane {
 	public void open(byte[] bytes) throws IOException {
 		table.open(bytes);
 	}
-	
+
 	/**
 	 * Sets the contents in the hex editor to the contents of the specified
 	 * input stream.

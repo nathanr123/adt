@@ -26,7 +26,12 @@
  */
 package com.cti.vpx.controls.hex;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ByteBuffer {
 
@@ -101,6 +106,28 @@ public class ByteBuffer {
 
 	public byte getByte(int offset) {
 		return buffer[offset];
+	}
+
+	public byte[] getByteByGroup(int offset, int group) {
+
+		int j = offset * group;
+
+		byte[] b = new byte[group];
+
+		if (j < buffer.length) {
+
+			for (int i = 0; i < b.length; i++) {
+
+				if (j < buffer.length)
+					b[i] = (byte) (buffer[j] & 0xff);
+				else
+					b[i] = 0;
+
+				j++;
+			}
+
+		}
+		return b;
 	}
 
 	public int getSize() {

@@ -56,6 +56,8 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
+import com.cti.vpx.controls.hex.groupmodel.Hex8;
+
 /**
  * The table displaying the hex content of a file. This is the meat of the hex
  * viewer.
@@ -69,7 +71,7 @@ class HexTable extends JTable {
 	private static final long serialVersionUID = 1L;
 
 	private final HexEditor hexEditor;
-	private HexTableModel model;
+	private Hex8 model;
 	int leadSelectionIndex;
 	int anchorSelectionIndex;
 
@@ -83,7 +85,7 @@ class HexTable extends JTable {
 	 * @param model
 	 *            The table model to use.
 	 */
-	public HexTable(HexEditor hexEditor, HexTableModel model) {
+	public HexTable(HexEditor hexEditor, Hex8 model) {
 
 		super(model);
 		this.hexEditor = hexEditor;
@@ -392,7 +394,7 @@ class HexTable extends JTable {
 	public void open(String fileName) throws IOException {
 		model.setBytes(fileName); // Fires tableDataChanged event
 	}
-	
+
 	public void open(byte[] bytes) throws IOException {
 		model.setBytes(bytes); // Fires tableDataChanged event
 	}
@@ -411,11 +413,24 @@ class HexTable extends JTable {
 	}
 
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+
 		Object value = getValueAt(row, column);
+
 		boolean isSelected = isCellSelected(row, column);
+
 		boolean hasFocus = cellToOffset(row, column) == leadSelectionIndex;
 
-		return renderer.getTableCellRendererComponent(this, value, isSelected, hasFocus, row, column);
+		Component component = renderer.getTableCellRendererComponent(this, value, isSelected, hasFocus, row, column);
+
+		int rendererWidth = component.getPreferredSize().width;
+
+		TableColumn tableColumn = getColumnModel().getColumn(column);
+
+		tableColumn.setPreferredWidth(
+				Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+
+		return component;
+
 	}
 
 	protected void processKeyEvent(java.awt.event.KeyEvent e) {
