@@ -170,13 +170,10 @@ public class Hex32 extends AbstractTableModel {
 			return "";
 		}
 		// & with 0xff to convert to unsigned
-		byte[] b = doc.getByteByGroup(pos, 4);
+		byte[] b = doc.getByteByGroup(pos, 4,true);
 
-		return String.format("%02x%02x%02x%02x", b[3], b[2], b[1], b[0]).toUpperCase();// (b
-																						// <
-		// 0x10
-		// &&
-
+		return String.format("%02x%02x%02x%02x", b[0], b[1], b[2], b[3]).toUpperCase();// (b
+	
 	}
 
 	/**

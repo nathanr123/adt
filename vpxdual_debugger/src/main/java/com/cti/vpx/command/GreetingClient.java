@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -161,6 +162,18 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		});
 
 		jp.add(jb4);
+		
+		JButton jb5 = new JButton("Read Memory");
+
+		jb5.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				readMemory();
+			}
+		});
+
+		jp.add(jb5);
 
 		f.getContentPane().setLayout(new BorderLayout());
 
@@ -188,6 +201,50 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	}
 
+	public void readMemory() {
+	
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+			
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_MEMORY);
+
+			msg.params.memoryinfo.address.set(0xA0000000);
+			msg.params.memoryinfo.length.set(1024);
+			msg.params.memoryinfo.memIndex.set(0);
+			// msg.command_msg.set("temp1");
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			jt.append("Message Sent\n");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		//long value = new BigInteger("A000000", 16).intValue();
+		//System.out.println(value);
+	}
+	
+	
 	public void readFile() {
 
 		Map<String, String> memVars = VPXUtilities.getMemoryAddressVariables("D:\\mapFiles\\hyperlink-edma.map");

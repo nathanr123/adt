@@ -72,8 +72,8 @@ import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.util.VPXSessionManager;
 
-public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertisementListener, VPXMessageListener,
-		VPXCommunicationListener {
+public class VPX_ETHWindow extends JFrame
+		implements WindowListener, VPXAdvertisementListener, VPXMessageListener, VPXCommunicationListener {
 
 	/**
 	 * 
@@ -503,8 +503,10 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 		// Window Menus
 		vpx_Menu_Window_MemoryBrowser = VPXComponentFactory
 
-		.createJMenuItem(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
-				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ", VPXConstants.Icons.ICON_MEMORY);
+		.createJMenuItem(
+				rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+						+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ",
+				VPXConstants.Icons.ICON_MEMORY);
 
 		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
 
@@ -1092,8 +1094,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
-		vpx_Right_SplitPane.setDividerLocation(((int) VPXUtilities.getScreenHeight() / 2 + (int) VPXUtilities
-				.getScreenHeight() / 7));
+		vpx_Right_SplitPane.setDividerLocation(
+				((int) VPXUtilities.getScreenHeight() / 2 + (int) VPXUtilities.getScreenHeight() / 7));
 
 		vpx_Right_SplitPane.setDividerSize(2);
 
@@ -1295,8 +1297,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 			File file = fileDialog.getSelectedFile();
 
-			vpx_Content_Tabbed_Pane_Right
-					.addTab("Log File - " + file.getAbsolutePath(), new VPX_LogFileViewPanel(file));
+			vpx_Content_Tabbed_Pane_Right.addTab("Log File - " + file.getAbsolutePath(),
+					new VPX_LogFileViewPanel(file));
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -1475,8 +1477,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 				if (i == -1) {
 
-					vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility", new JScrollPane(new VPX_MADPanel(
-							VPX_ETHWindow.this)));
+					vpx_Content_Tabbed_Pane_Right.addTab("Mad Utility",
+							new JScrollPane(new VPX_MADPanel(VPX_ETHWindow.this)));
 
 					vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -1595,7 +1597,8 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 
 		updateLog("Asking Super user password for VLAN Configuration");
 
-		if (VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD).equals(paswordWindow.getPasword())) {
+		if (VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD)
+				.equals(paswordWindow.getPasword())) {
 
 			// addTab("VLAN", new JScrollPane(new
 			// VPX_P2020ConfigurationPanel(tab)));
@@ -1837,6 +1840,35 @@ public class VPX_ETHWindow extends JFrame implements WindowListener, VPXAdvertis
 	@Override
 	public void sendCommand(ATPCommand command) {
 		// TODO Auto-generated method stub
+
+	}
+
+	public void loadMemory(MemoryViewFilter filter) {
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				udpMonitor.readMemory(filter);
+
+			}
+		});
+
+		th.start();
+
+	}
+
+	public void populateMemory(int memID, byte[] buffer) {
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				memoryBrowserWindow[memID].setBytes(buffer);
+				memoryBrowserWindow[memID].setVisible(true);
+
+			}
+		});
+
+		th.start();
 
 	}
 

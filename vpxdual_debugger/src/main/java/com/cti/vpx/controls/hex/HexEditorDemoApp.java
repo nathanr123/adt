@@ -45,9 +45,11 @@ public class HexEditorDemoApp extends JFrame {
 	/**
 	 * Constructor.
 	 */
+	HexEditorPanel cp;
+	
 	public HexEditorDemoApp() {
 
-		HexEditorPanel cp = new HexEditorPanel();
+		cp = new HexEditorPanel();
 
 		setContentPane(cp);
 		setTitle("HexEditor Demo Application");
@@ -55,6 +57,10 @@ public class HexEditorDemoApp extends JFrame {
 		getToolkit().setDynamicLayout(true);
 		pack();
 
+	}
+	
+	public void setBytes(byte[] buf){
+		cp.setBytes(buf);
 	}
 
 	/**

@@ -228,7 +228,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		formatBytes = new JComboBox<String>(
 				new DefaultComboBoxModel<String>(new String[] { "8 Bit Hex", "16 Bit Hex", "32 Bit Hex", "64 Bit Hex",
-						"16 Bit Signed", "32 Bit Signed", "16 Bit Unsigned", "32 Bit Unsigned", "64 Bit Floating" }));
+						"16 Bit Signed", "32 Bit Signed", "16 Bit Unsigned", "32 Bit Unsigned", "32 Bit Floating" }));
 
 		formatBytes.addItemListener(new ItemListener() {
 
@@ -374,6 +374,14 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		}
 	}
 
+	
+	public void setBytes(byte[] buffer){
+		try {
+			editor.open(buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Opens a file. Displays an error dialog if the file cannot be opened.
 	 *

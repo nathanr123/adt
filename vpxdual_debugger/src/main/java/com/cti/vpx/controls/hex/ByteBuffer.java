@@ -108,7 +108,7 @@ public class ByteBuffer {
 		return buffer[offset];
 	}
 
-	public byte[] getByteByGroup(int offset, int group) {
+	public byte[] getByteByGroup(int offset, int group, boolean isunSigned) {
 
 		int j = offset * group;
 
@@ -116,12 +116,14 @@ public class ByteBuffer {
 
 		if (j < buffer.length) {
 
-			for (int i = 0; i < b.length; i++) {
+			for (int i = b.length - 1; i >= 0; i--) {
 
-				if (j < buffer.length)
-					b[i] = (byte) (buffer[j] & 0xff);
-				else
-					b[i] = 0;
+				if (j < buffer.length) {
+					if (isunSigned)
+						b[i] = (byte) (buffer[j] & 0xff);
+					else
+						b[i] = (byte) (buffer[j]);
+				}
 
 				j++;
 			}

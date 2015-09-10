@@ -2,6 +2,8 @@ package com.cti.vpx.controls.hex;
 
 public class MemoryViewFilter {
 
+	private int memoryBrowserID;
+
 	private String subsystem;
 
 	private String processor;
@@ -157,6 +159,14 @@ public class MemoryViewFilter {
 
 	public void setMemoryStride(String memoryStride) {
 		this.memoryStride = memoryStride;
+	}
+
+	public int getMemoryBrowserID() {
+		return memoryBrowserID;
+	}
+
+	public void setMemoryBrowserID(int memoryBrowserID) {
+		this.memoryBrowserID = memoryBrowserID;
 	}
 
 }

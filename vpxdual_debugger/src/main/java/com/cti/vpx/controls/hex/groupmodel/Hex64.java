@@ -170,9 +170,9 @@ public class Hex64 extends AbstractTableModel {
 		if (pos == -1) { // A cell that isn't part of the byte array
 			return "";
 		}
-		byte[] b = doc.getByteByGroup(pos, 8);
+		byte[] b = doc.getByteByGroup(pos, 8, true);
 
-		return String.format("%02x%02x%02x%02x%02x%02x%02x%02x", b[7], b[6], b[5], b[4], b[3], b[2], b[1], b[0])
+		return String.format("%02x%02x%02x%02x%02x%02x%02x%02x", b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7])
 				.toUpperCase();// (b
 		// <
 		// 0x10

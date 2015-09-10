@@ -30,8 +30,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -84,8 +86,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JLabel lblMapFile;
 
 	private JButton btnMapFileBrowse;
-	
+
 	private Map<String, String> memVariables;
+	private HexEditorPanel hexPanel;
 
 	/**
 	 * Launch the application.
@@ -425,6 +428,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 				createFilters();
 
+				parent.loadMemory(memoryFilter);
+
 			}
 		});
 
@@ -456,7 +461,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		hexContentPanel.setLayout(new BorderLayout());
 
-		hexContentPanel.add(new HexEditorPanel(), BorderLayout.CENTER);
+		hexPanel = new HexEditorPanel();
+
+		hexContentPanel.add(hexPanel, BorderLayout.CENTER);
 
 		contentPane.add(hexContentPanel, BorderLayout.CENTER);
 	}
@@ -528,6 +535,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		filter.setMemoryLength(txtMemoryLength.getText());
 
 		filter.setMemoryStride(txtMemoryStride.getText());
+
+		filter.setMemoryBrowserID(memoryBrowserID);
 
 	}
 
@@ -648,27 +657,39 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		cmbSubSystem.removeAllItems();
 
-		cmbSubSystem.addItem("All Susb Systems");
+		cmbSubSystem.addItem("Select SubSystem");
 
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+		if (subsystem.size() > 0) {
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+			for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
 
-			cmbSubSystem.addItem(vpxSubSystem.getSubSystem());
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				cmbSubSystem.addItem(vpxSubSystem.getSubSystem());
+			}
+		}
+
+		List<Processor> unlist = vpxSystem.getUnListed();
+
+		if (unlist.size() > 0) {
+
+			cmbSubSystem.addItem(VPXConstants.VPXUNLIST);
 		}
 	}
 
 	private void loadProcessorsFilter() {
 
-		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
-
 		cmbProcessor.removeAllItems();
 
-		cmbProcessor.addItem("All Processors");
+		cmbProcessor.addItem("Select Processor");
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+		boolean isFound = false;
+
+		List<VPXSubSystem> s = vpxSystem.getSubsystem();
+
+		for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
 
 			VPXSubSystem vpxSubSystem = iterator.next();
 
@@ -683,6 +704,22 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 				cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
 
 				break;
+
+			}
+
+		}
+
+		if (!isFound) {
+
+			curProcFilter = null;
+
+			List<Processor> p = vpxSystem.getUnListed();
+
+			for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+				Processor processor = iterator.next();
+
+				cmbProcessor.addItem(processor.getiP_Addresses());
 			}
 
 		}
@@ -691,6 +728,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private void loadCoresFilter() {
 
 		cmbCores.removeAllItems();
+
+		cmbCores.addItem("Select Core");
 
 		if (curProcFilter != null) {
 
@@ -709,6 +748,31 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 				}
 
 				cmbCores.setSelectedIndex(0);
+			}
+		} else {
+			if (cmbSubSystem.getSelectedItem().toString().equals(VPXConstants.VPXUNLIST)) {
+				List<Processor> s = vpxSystem.getUnListed();
+				if (s.size() > 0) {
+					for (Iterator<Processor> iterator = s.iterator(); iterator.hasNext();) {
+						Processor processor = iterator.next();
+						if (processor.getName().contains("P2020")) {
+							cmbCores.setEnabled(false);
+
+							break;
+						} else {
+							cmbCores.setEnabled(true);
+
+							cmbCores.addItem("All Cores");
+
+							for (int i = 0; i < 8; i++) {
+								cmbCores.addItem(String.format("Core %s", i));
+							}
+
+							cmbCores.setSelectedIndex(0);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -773,6 +837,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void setBytes(byte[] buf) {
+		hexPanel.setBytes(buf);
 	}
 
 }

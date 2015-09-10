@@ -1,6 +1,7 @@
 package com.cti.vpx.listener;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -23,6 +24,8 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.command.P2020MSGCommand;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
+import com.cti.vpx.controls.hex.HexEditorDemoApp;
+import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
@@ -748,6 +751,86 @@ public class VPXUDPMonitor {
 
 	}
 
+	public void readMemory(MemoryViewFilter filter) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_MEMORY);
+
+			String str = filter.getMemoryAddress();
+
+			if (str.startsWith("0x") || str.startsWith("0X")) {
+
+				str = str.substring(2, str.length());
+			}
+
+			//new BigInteger(str, 16).intValue()
+			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
+
+			msg.params.memoryinfo.length.set(Integer.valueOf(filter.getMemoryLength()));
+
+			msg.params.memoryinfo.memIndex.set(filter.getMemoryBrowserID());
+			// msg.command_msg.set("temp1");
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+					InetAddress.getByName(filter.getProcessor()), VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			((VPX_ETHWindow) listener).updateLog("Memory Read from IP : " + filter.getProcessor() + " Address : "
+					+ filter.getMemoryAddress() + " Length : " + filter.getMemoryLength());
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void populateMemory(String ip, ATPCommand msg) {
+
+		System.out.println(msg.params.flash_info.totalnoofpackets);
+
+		System.out.println(msg.params.flash_info.currentpacket);
+
+		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+
+		for (int i = 0; i < b.length; i++) {
+
+			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+			System.out.print(String.format("%02x ", b[i]));
+			if (((i + 1) % 16) == 0) {
+				System.out.println();
+			}
+		}
+
+		//((VPX_ETHWindow) listener).populateMemory((int) msg.params.memoryinfo.memIndex.get(), b);
+		
+		
+		 
+		HexEditorDemoApp hd = new HexEditorDemoApp();
+
+		hd.setBytes(b);
+		hd.setVisible(true);
+		
+	}
+
 	public void populateBISTResult(String ip, ATPCommand msg) {
 
 		if (bist != null) {
@@ -849,8 +932,8 @@ public class VPXUDPMonitor {
 
 				bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
 
-				bist.setResultTestDuration(VPXUtilities.getCurrentTime(2,
-						System.currentTimeMillis() - bist.getStartTime()));
+				bist.setResultTestDuration(
+						VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
 
 				((VPXCommunicationListener) listener).updateBIST(bist);
 			}
@@ -1073,7 +1156,7 @@ public class VPXUDPMonitor {
 				break;
 
 			case ATP.MSG_TYPE_MEMORY:
-
+				populateMemory(ip, msgCommand);
 				break;
 			}
 
@@ -1296,8 +1379,8 @@ public class VPXUDPMonitor {
 
 					advertisementSocket.receive(advertisementPacket);
 
-					parseAdvertisementPacket(advertisementPacket.getAddress().getHostAddress(), new String(
-							advertisementPacket.getData(), 0, advertisementPacket.getLength()));
+					parseAdvertisementPacket(advertisementPacket.getAddress().getHostAddress(),
+							new String(advertisementPacket.getData(), 0, advertisementPacket.getLength()));
 
 					Thread.sleep(500);
 				} catch (Exception e) {

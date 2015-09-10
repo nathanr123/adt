@@ -43,10 +43,15 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.table.TableModel;
 
+import com.cti.vpx.controls.hex.groupmodel.Floating32;
 import com.cti.vpx.controls.hex.groupmodel.Hex16;
 import com.cti.vpx.controls.hex.groupmodel.Hex32;
 import com.cti.vpx.controls.hex.groupmodel.Hex64;
 import com.cti.vpx.controls.hex.groupmodel.Hex8;
+import com.cti.vpx.controls.hex.groupmodel.SignedInt16;
+import com.cti.vpx.controls.hex.groupmodel.SignedInt32;
+import com.cti.vpx.controls.hex.groupmodel.UnSignedInt16;
+import com.cti.vpx.controls.hex.groupmodel.UnSignedInt32;
 import com.cti.vpx.util.VPXUtilities;
 
 /**
@@ -101,6 +106,10 @@ public class HexEditor extends JScrollPane {
 	 */
 	public static final String PROPERTY_SHOW_GRID = "showGrid";
 
+	/*
+	 * "8 Bit Hex" "16 Bit Hex" "32 Bit Hex" "64 Bit Hex" "16 Bit Signed",
+	 * "32 Bit Signed" "16 Bit Unsigned" "32 Bit Unsigned" "32 Bit Floating"
+	 */
 	public static final int HEX8 = 0;
 
 	public static final int HEX16 = 1;
@@ -109,13 +118,13 @@ public class HexEditor extends JScrollPane {
 
 	public static final int HEX64 = 3;
 
-	public static final int UNSINGNEDINT16 = 4;
+	public static final int SINGNEDINT16 = 4;
 
-	public static final int UNSINGNEDINT32 = 5;
+	public static final int SINGNEDINT32 = 5;
 
-	public static final int SINGNEDINT16 = 6;
+	public static final int UNSINGNEDINT16 = 6;
 
-	public static final int SINGNEDINT32 = 7;
+	public static final int UNSINGNEDINT32 = 7;
 
 	public static final int UNSINGNEDFLOAT32 = 8;
 
@@ -173,27 +182,7 @@ public class HexEditor extends JScrollPane {
 
 	public void setHexModel(int mod) {
 
-		ByteBuffer bb = null;
-
-		TableModel mm = table.getModel();
-
-		if (mm instanceof Hex8) {
-
-			bb = ((Hex8) table.getModel()).getBytes();
-
-		} else if (mm instanceof Hex16) {
-
-			bb = ((Hex16) table.getModel()).getBytes();
-
-		} else if (mm instanceof Hex32) {
-
-			bb = ((Hex32) table.getModel()).getBytes();
-
-		} else if (mm instanceof Hex64) {
-
-			bb = ((Hex64) table.getModel()).getBytes();
-
-		}
+		ByteBuffer bb = getByteBuffer(table.getModel());
 
 		switch (mod) {
 
@@ -239,34 +228,100 @@ public class HexEditor extends JScrollPane {
 
 		case UNSINGNEDINT16:
 
-			// hex16model = new Hex8(this, msg);
+			UnSignedInt16 unsigned16model = new UnSignedInt16(this, msg);
+
+			unsigned16model.setBytes(bb);
+
+			table.setModel(unsigned16model);
 
 			break;
 
 		case UNSINGNEDINT32:
 
-			// hex16model = new Hex8(this, msg);
+			UnSignedInt32 unsigned32model = new UnSignedInt32(this, msg);
+
+			unsigned32model.setBytes(bb);
+
+			table.setModel(unsigned32model);
 
 			break;
 
 		case SINGNEDINT16:
 
-			// hex16model = new Hex8(this, msg);
+			SignedInt16 signed16model = new SignedInt16(this, msg);
+
+			signed16model.setBytes(bb);
+
+			table.setModel(signed16model);
 
 			break;
 
 		case SINGNEDINT32:
 
-			// hex16model = new Hex8(this, msg);
+			SignedInt32 signed32model = new SignedInt32(this, msg);
+
+			signed32model.setBytes(bb);
+
+			table.setModel(signed32model);
 
 			break;
 
 		case UNSINGNEDFLOAT32:
 
-			// hex16model = new Hex8(this, msg);
+			Floating32 floating32model = new Floating32(this, msg);
+
+			floating32model.setBytes(bb);
+
+			table.setModel(floating32model);
 
 			break;
 		}
+
+	}
+
+	private ByteBuffer getByteBuffer(TableModel model) {
+
+		ByteBuffer bb = null;
+
+		if (model instanceof Hex8) {
+
+			bb = ((Hex8) table.getModel()).getBytes();
+
+		} else if (model instanceof Hex16) {
+
+			bb = ((Hex16) table.getModel()).getBytes();
+
+		} else if (model instanceof Hex32) {
+
+			bb = ((Hex32) table.getModel()).getBytes();
+
+		} else if (model instanceof Hex64) {
+
+			bb = ((Hex64) table.getModel()).getBytes();
+
+		} else if (model instanceof SignedInt16) {
+
+			bb = ((SignedInt16) table.getModel()).getBytes();
+
+		} else if (model instanceof SignedInt32) {
+
+			bb = ((SignedInt32) table.getModel()).getBytes();
+
+		} else if (model instanceof UnSignedInt16) {
+
+			bb = ((UnSignedInt16) table.getModel()).getBytes();
+
+		} else if (model instanceof UnSignedInt32) {
+
+			bb = ((UnSignedInt32) table.getModel()).getBytes();
+
+		} else if (model instanceof Floating32) {
+
+			bb = ((Floating32) table.getModel()).getBytes();
+
+		}
+
+		return bb;
 
 	}
 

@@ -29,6 +29,7 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -47,7 +48,7 @@ import com.cti.vpx.controls.hex.HexEditor;
  * @author Robert Futrell
  * @version 1.0
  */
-public class Hex16 extends AbstractTableModel {
+public class UnSignedInt32 extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -77,7 +78,7 @@ public class Hex16 extends AbstractTableModel {
 	 * @param msg
 	 *            The resource bundle for localizations.
 	 */
-	public Hex16(HexEditor editor, ResourceBundle msg) {
+	public UnSignedInt32(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
 		doc = new ByteBuffer(16);
@@ -92,12 +93,12 @@ public class Hex16 extends AbstractTableModel {
 
 		byteStrVals = new String[256];
 		for (int i = 0; i < byteStrVals.length; i++) {
-			byteStrVals[i] = Integer.toHexString(i).toUpperCase();
+			byteStrVals[i] = Integer.toHexString(i);
 		}
 
 		paddedLowerByteStrVals = new String[16];
 		for (int i = 0; i < paddedLowerByteStrVals.length; i++) {
-			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i).toUpperCase();
+			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i);
 		}
 
 	}
@@ -150,7 +151,7 @@ public class Hex16 extends AbstractTableModel {
 	 * @return The number of rows to display.
 	 */
 	public int getRowCount() {
-		return doc.getSize() / (bytesPerRow * 2) + (doc.getSize() % (bytesPerRow * 2) > 0 ? 1 : 0);
+		return doc.getSize() / (bytesPerRow * 4) + (doc.getSize() % (bytesPerRow * 4) > 0 ? 1 : 0);
 	}
 
 	/**
@@ -170,11 +171,9 @@ public class Hex16 extends AbstractTableModel {
 			return "";
 		}
 		// & with 0xff to convert to unsigned
+		byte[] b = doc.getByteByGroup(pos, 4,true);
 
-		byte[] b = doc.getByteByGroup(pos, 2,true);
-
-		return String.format("%02x%02x", b[0], b[1]).toUpperCase();// (b < 0x10
-																	// &&
+		return new BigInteger(b).intValue();
 
 	}
 
