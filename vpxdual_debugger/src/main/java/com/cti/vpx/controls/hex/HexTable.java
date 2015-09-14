@@ -49,6 +49,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -56,7 +57,15 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
+import com.cti.vpx.controls.hex.groupmodel.Floating32;
+import com.cti.vpx.controls.hex.groupmodel.Hex16;
+import com.cti.vpx.controls.hex.groupmodel.Hex32;
+import com.cti.vpx.controls.hex.groupmodel.Hex64;
 import com.cti.vpx.controls.hex.groupmodel.Hex8;
+import com.cti.vpx.controls.hex.groupmodel.SignedInt16;
+import com.cti.vpx.controls.hex.groupmodel.SignedInt32;
+import com.cti.vpx.controls.hex.groupmodel.UnSignedInt16;
+import com.cti.vpx.controls.hex.groupmodel.UnSignedInt32;
 
 /**
  * The table displaying the hex content of a file. This is the meat of the hex
@@ -97,7 +106,7 @@ class HexTable extends JTable {
 		setCellSelectionEnabled(true);
 		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		setDefaultEditor(Object.class, new CellEditor());
-		setDefaultRenderer(Object.class, new CellRenderer());
+		// setDefaultRenderer(Object.class, new CellRenderer());
 		getTableHeader().setReorderingAllowed(false);
 		setShowGrid(false);
 
@@ -149,15 +158,133 @@ class HexTable extends JTable {
 			return 0;
 		}
 		if (row == getRowCount() - 1) {
+			
 			int lastRowCount = model.getByteCount() % 16;
+			
 			if (lastRowCount == 0) {
 				lastRowCount = 16;
 			}
-			if (lastRowCount < 16) { // Last row's not entirely full
-				return Math.min(col, (model.getByteCount() % 16) - 1);
+			
+			if (lastRowCount < 17) { // Last row's not entirely full
+				return col;//Math.min(col, (model.getByteCount() % 16) - 1);
 			}
 		}
-		return Math.min(col, getColumnCount() - 1 - 1);
+		
+		return Math.min(col, getColumnCount() - 1);
+	}
+
+	private int getCurrentColCount(int row, int col) {
+
+		int i = -1;
+
+		int cols = 0;
+
+		TableModel model = getModel();
+
+		if (model instanceof Hex8) {
+			cols = 15;
+
+		} else if (model instanceof Hex16) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((Hex16) model).getBytes().getSize() - (row * (((Hex16) model).getBytesPerRow() * 2)));
+
+				if (i > 0)
+					cols = i / 2;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof Hex32) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((Hex32) model).getBytes().getSize() - (row * (((Hex32) model).getBytesPerRow() * 4)));
+
+				if (i > 0)
+					cols = i / 4;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof Hex64) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((Hex64) model).getBytes().getSize() - (row * (((Hex64) model).getBytesPerRow() * 8)));
+
+				if (i > 0)
+					cols = i / 8;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof SignedInt16) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((SignedInt16) model).getBytes().getSize() - (row * (((SignedInt16) model).getBytesPerRow() * 2)));
+
+				if (i > 0)
+					cols = i / 2;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof SignedInt32) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((SignedInt32) model).getBytes().getSize() - (row * (((SignedInt32) model).getBytesPerRow() * 4)));
+
+				if (i > 0)
+					cols = i / 4;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof UnSignedInt16) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((UnSignedInt16) model).getBytes().getSize()
+						- (row * (((UnSignedInt16) model).getBytesPerRow() * 2)));
+
+				if (i > 0)
+					cols = i / 2;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof UnSignedInt32) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((UnSignedInt32) model).getBytes().getSize()
+						- (row * (((UnSignedInt32) model).getBytesPerRow() * 4)));
+
+				if (i > 0)
+					cols = i / 4;
+			} else {
+				cols = 15;
+			}
+
+		} else if (model instanceof Floating32) {
+
+			if (row == (getRowCount() - 1)) {
+
+				i = (((Floating32) model).getBytes().getSize() - (row * (((Floating32) model).getBytesPerRow() * 4)));
+
+				if (i > 0)
+					cols = i / 4;
+			} else {
+				cols = 15;
+			}
+
+		}
+
+		return cols;
 	}
 
 	/**
@@ -176,14 +303,16 @@ class HexTable extends JTable {
 	public int cellToOffset(int row, int col) {
 		// Check row and column individually to prevent them being invalid
 		// values but still pointing to a valid offset in the buffer.
-		if (row < 0 || row >= getRowCount() || col < 0 || col > 15) { // Don't
-																		// include
-																		// last
-																		// column
-																		// (ascii
-																		// dump)
+		if (row < 0 || row >= getRowCount() || col < 0 || col > getCurrentColCount(row, col)) { // Don't
+			// include
+			// last
+			// column
+			// (ascii
+			// dump)
+
 			return -1;
 		}
+
 		int offs = row * 16 + col;
 		return (offs >= 0 && offs < model.getByteCount()) ? offs : -1;
 	}
@@ -246,7 +375,7 @@ class HexTable extends JTable {
 	 */
 	public void changeSelectionByOffset(int offset, boolean extend) {
 		offset = Math.max(0, offset);
-		offset = Math.min(offset, model.getByteCount() - 1);
+		offset = Math.min(offset, model.getByteCount()-1);
 		int row = offset / 16;
 		int col = offset % 16;
 		changeSelection(row, col, false, extend);
@@ -351,7 +480,7 @@ class HexTable extends JTable {
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		return cellToOffset(row, col) > -1;
+		return false;// cellToOffset(row, col) > -1;
 	}
 
 	public boolean isCellSelected(int row, int col) {

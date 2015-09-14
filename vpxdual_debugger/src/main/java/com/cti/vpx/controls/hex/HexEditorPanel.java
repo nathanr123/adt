@@ -180,7 +180,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		if (source == colHeaderCB) {
 			editor.setShowColumnHeader(colHeaderCB.isSelected());
 		} else if (source == rowHeaderCB) {
-			editor.setShowRowHeader(rowHeaderCB.isSelected());
+			editor.setShowRowHeader(0,rowHeaderCB.isSelected());
 		} else if (source == showGridCB) {
 			editor.setShowGrid(showGridCB.isSelected());
 		} else if (source == altColBGCB) {
@@ -189,8 +189,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			editor.setAlternateRowBG(altRowBGCB.isSelected());
 		} else if (source == highlightAsciiSelCB) {
 			editor.setHighlightSelectionInAsciiDump(highlightAsciiSelCB.isSelected());
-		} else if (source == highlightAsciiSelCombo) {
-			editor.setHighlightSelectionInAsciiDumpColor((Color) highlightAsciiSelCombo.getSelectedItem());
 		} else if (source == lowBytePaddingCB) {
 			editor.setPadLowBytes(lowBytePaddingCB.isSelected());
 		}
@@ -374,14 +372,15 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		}
 	}
 
-	
-	public void setBytes(byte[] buffer){
+	public void setBytes(int startAddress,byte[] buffer) {
 		try {
 			editor.open(buffer);
+			editor.setShowRowHeader(startAddress, true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Opens a file. Displays an error dialog if the file cannot be opened.
 	 *
@@ -554,6 +553,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			init();
 
 			loadComponents();
+
+			pack();
+
 			centerFrame();
 		}
 
@@ -646,7 +648,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
 			gbc_lblNewLabel.gridx = 1;
 			gbc_lblNewLabel.gridy = 4;
-			contentPanel.add(lblNewLabel, gbc_lblNewLabel);
+			// contentPanel.add(lblNewLabel, gbc_lblNewLabel);
 
 			highlightAsciiSelCombo = new JComboBox<Color>();
 			highlightAsciiSelCombo.setRenderer(new ColorCellRenderer());
@@ -658,7 +660,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
 			gbc_comboBox.gridx = 3;
 			gbc_comboBox.gridy = 4;
-			contentPanel.add(highlightAsciiSelCombo, gbc_comboBox);
+			// contentPanel.add(highlightAsciiSelCombo, gbc_comboBox);
 
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));

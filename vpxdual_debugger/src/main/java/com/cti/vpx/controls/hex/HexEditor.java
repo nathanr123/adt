@@ -129,10 +129,15 @@ public class HexEditor extends JScrollPane {
 	public static final int UNSINGNEDFLOAT32 = 8;
 
 	private HexTable table;
+
 	private boolean alternateRowBG;
+
 	private boolean alternateColumnBG;
+
 	private boolean highlightSelectionInAsciiDump;
+
 	private Color highlightSelectionInAsciiDumpColor;
+
 	private boolean padLowBytes;
 
 	private ResourceBundle msg;
@@ -164,13 +169,11 @@ public class HexEditor extends JScrollPane {
 
 		setShowColumnHeader(true);
 
-		setShowRowHeader(true);
+		setShowRowHeader(0,true);
 
 		setAlternateRowBG(false);
 
 		setAlternateColumnBG(false);
-
-		setHighlightSelectionInAsciiDump(true);
 
 		setHighlightSelectionInAsciiDumpColor(new Color(255, 255, 192));
 
@@ -277,6 +280,7 @@ public class HexEditor extends JScrollPane {
 			break;
 		}
 
+		setShowRowHeader(0,true);
 	}
 
 	private ByteBuffer getByteBuffer(TableModel model) {
@@ -829,8 +833,8 @@ public class HexEditor extends JScrollPane {
 	 *            Whether to show the table row header.
 	 * @see #setShowColumnHeader(boolean)
 	 */
-	public void setShowRowHeader(boolean show) {
-		setRowHeaderView(show ? new HexEditorRowHeader(table) : null);
+	public void setShowRowHeader(int startAddress, boolean show) {
+		setRowHeaderView(show ? new HexEditorRowHeader(startAddress, table) : null);
 	}
 
 	/**

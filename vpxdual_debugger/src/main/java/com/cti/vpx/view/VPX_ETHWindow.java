@@ -1383,11 +1383,11 @@ public class VPX_ETHWindow extends JFrame
 
 				MemoryViewFilter m = new MemoryViewFilter();
 
-				m.setSubsystem("Sub1");
+				m.setSubsystem(VPXConstants.VPXUNLIST);
 
-				m.setProcessor("192.168.0.102");
+				m.setProcessor("172.17.10.130");
 
-				m.setCore("Core 3");
+				m.setCore("Core 0");
 
 				m.setAutoRefresh(true);
 
@@ -1405,7 +1405,7 @@ public class VPX_ETHWindow extends JFrame
 
 				m.setDirectMemory(true);
 
-				m.setMemoryAddress("0XFF00000");
+				m.setMemoryAddress("0xA0000000");
 
 				openMemoryBrowser(m);
 
@@ -1857,12 +1857,12 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void populateMemory(int memID, byte[] buffer) {
+	public void populateMemory(int memID,int startAddress, byte[] buffer) {
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				memoryBrowserWindow[memID].setBytes(buffer);
+				memoryBrowserWindow[memID].setBytes(startAddress,buffer);
 				memoryBrowserWindow[memID].setVisible(true);
 
 			}

@@ -59,8 +59,8 @@ public class HexEditorDemoApp extends JFrame {
 
 	}
 	
-	public void setBytes(byte[] buf){
-		cp.setBytes(buf);
+	public void setBytes(int startAddress,byte[] buf){
+		cp.setBytes(startAddress,buf);
 	}
 
 	/**

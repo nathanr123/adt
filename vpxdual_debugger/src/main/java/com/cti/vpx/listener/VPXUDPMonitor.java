@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.swing.SwingWorker;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
@@ -32,9 +33,9 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.VPXSubnetFilter;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXSessionManager;
+import com.cti.vpx.util.VPXSubnetFilter;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -77,6 +78,8 @@ public class VPXUDPMonitor {
 	private static boolean isFlashingStatred = false;
 
 	private VPXSystem vpxSystem;
+
+	private byte[] bf;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -318,7 +321,7 @@ public class VPXUDPMonitor {
 			} else
 				ip = ips;
 
-			PROCESSOR_LIST procesor = getProcType(ip);// VPXUtilities.getProcessorType(ip);
+			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(ip);// VPXUtilities.getProcessorType(ip);
 
 			String recvip = getProcIP(ip);
 
@@ -345,26 +348,6 @@ public class VPXUDPMonitor {
 			e.printStackTrace();
 		}
 
-	}
-
-	private PROCESSOR_LIST getProcType(String ip) {
-
-		PROCESSOR_LIST proc = PROCESSOR_LIST.PROCESSOR_P2020;
-
-		if (ip.contains("P2020")) {
-
-			proc = PROCESSOR_LIST.PROCESSOR_P2020;
-
-		} else if (ip.contains("DSP1")) {
-
-			proc = PROCESSOR_LIST.PROCESSOR_DSP1;
-
-		} else if (ip.contains("DSP2")) {
-
-			proc = PROCESSOR_LIST.PROCESSOR_DSP2;
-		}
-
-		return proc;
 	}
 
 	private String getProcIP(String ip) {
@@ -758,7 +741,9 @@ public class VPXUDPMonitor {
 		try {
 			datagramSocket = new DatagramSocket();
 
-			DSPATPCommand msg = new DSPATPCommand();
+			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(filter.getProcessor());// VPXUtilities.getProcessorType(ip);
+
+			ATPCommand msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
@@ -779,7 +764,7 @@ public class VPXUDPMonitor {
 				str = str.substring(2, str.length());
 			}
 
-			//new BigInteger(str, 16).intValue()
+			// new BigInteger(str, 16).intValue()
 			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
 
 			msg.params.memoryinfo.length.set(Integer.valueOf(filter.getMemoryLength()));
@@ -792,8 +777,10 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			((VPX_ETHWindow) listener).updateLog("Memory Read from IP : " + filter.getProcessor() + " Address : "
-					+ filter.getMemoryAddress() + " Length : " + filter.getMemoryLength());
+			// ((VPX_ETHWindow) listener).updateLog("Memory Read from IP : " +
+			// filter.getProcessor() + " Address : "
+			// + filter.getMemoryAddress() + " Length : " +
+			// filter.getMemoryLength());
 
 		} catch (Exception e) {
 
@@ -804,9 +791,7 @@ public class VPXUDPMonitor {
 
 	public void populateMemory(String ip, ATPCommand msg) {
 
-		System.out.println(msg.params.flash_info.totalnoofpackets);
-
-		System.out.println(msg.params.flash_info.currentpacket);
+		boolean isComplete = false;
 
 		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
@@ -814,21 +799,51 @@ public class VPXUDPMonitor {
 
 			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-			System.out.print(String.format("%02x ", b[i]));
-			if (((i + 1) % 16) == 0) {
-				System.out.println();
-			}
+			/*
+			System.out.print(String.format("%02x ", msg.params.memoryinfo.buffer[i].get()));
+
+			if (i > 0) {
+				if ((i % 16) == 0) {
+					System.out.println();
+				}
+			}*/
 		}
 
-		//((VPX_ETHWindow) listener).populateMemory((int) msg.params.memoryinfo.memIndex.get(), b);
-		
-		
-		 
-		HexEditorDemoApp hd = new HexEditorDemoApp();
+		if (msg.params.flash_info.totalnoofpackets.get() > 1) {
 
-		hd.setBytes(b);
-		hd.setVisible(true);
-		
+			if (msg.params.flash_info.currentpacket.get() == 1) {
+
+				bf = ArrayUtils.addAll(b);
+
+			} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+
+				bf = ArrayUtils.addAll(bf, b);
+
+				isComplete = true;
+			}
+
+		} else {
+
+			bf = ArrayUtils.addAll(b);
+
+			isComplete = true;
+		}
+
+		if (isComplete) {
+
+			byte[] bfs = new byte[(int) msg.params.memoryinfo.length.get()];
+
+			System.arraycopy(bf, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+
+			((VPX_ETHWindow) listener).populateMemory((int) msg.params.memoryinfo.memIndex.get(),
+					(int) msg.params.memoryinfo.address.get(), bfs);
+
+			// HexEditorDemoApp hd = new HexEditorDemoApp();
+
+			// hd.setBytes((int) msg.params.memoryinfo.address.get(),bfs);
+
+			// hd.setVisible(true);
+		}
 	}
 
 	public void populateBISTResult(String ip, ATPCommand msg) {

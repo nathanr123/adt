@@ -88,6 +88,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JButton btnMapFileBrowse;
 
 	private Map<String, String> memVariables;
+
 	private HexEditorPanel hexPanel;
 
 	/**
@@ -839,8 +840,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	}
 
-	public void setBytes(byte[] buf) {
-		hexPanel.setBytes(buf);
+	public void setBytes(int startAddress, byte[] buf) {
+		hexPanel.setBytes(startAddress, buf);
 	}
 
 }

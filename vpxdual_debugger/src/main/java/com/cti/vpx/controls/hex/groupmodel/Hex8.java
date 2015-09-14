@@ -56,7 +56,6 @@ public class Hex8 extends AbstractTableModel {
 	private int bytesPerRow;
 	private UndoManager undoManager;
 	private String[] columnNames;
-	private byte[] bitBuf = new byte[16];
 
 	/**
 	 * Cache of string values of "<code>0</code>"-"<code>ff</code>" for fast
@@ -138,6 +137,7 @@ public class Hex8 extends AbstractTableModel {
 	 * @return The number of columns to display.
 	 */
 	public int getColumnCount() {
+	
 		return getBytesPerRow();
 	}
 
@@ -251,6 +251,7 @@ public class Hex8 extends AbstractTableModel {
 	}
 
 	public void setBytes(ByteBuffer buff) {
+		this.doc = null;				
 		this.doc = buff;
 	}
 

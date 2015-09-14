@@ -25,6 +25,7 @@ import javax.swing.JTextArea;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
+import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.listener.VPXAdvertisementListener;
 import com.cti.vpx.listener.VPXCommunicationListener;
 import com.cti.vpx.listener.VPXMessageListener;
@@ -202,8 +203,17 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	}
 
 	public void readMemory() {
+		
+		MemoryViewFilter m = new MemoryViewFilter();
+		
+		m.setMemoryAddress("0x90000000");
+		m.setMemoryLength("1135");
+		m.setProcessor("172.17.10.140");
+		m.setMemoryBrowserID(0);
+		
+		udp.readMemory(m);
 	
-
+/*
 		DatagramSocket datagramSocket;
 
 		try {
@@ -222,9 +232,21 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			msg.msgID.set(ATP.MSG_ID_GET);
 
 			msg.msgType.set(ATP.MSG_TYPE_MEMORY);
+			
+			
+			String str = "0xA0000000";
 
-			msg.params.memoryinfo.address.set(0xA0000000);
-			msg.params.memoryinfo.length.set(1024);
+			if (str.startsWith("0x") || str.startsWith("0X")) {
+
+				str = str.substring(2, str.length());
+			}
+
+			//new BigInteger(str, 16).intValue()
+			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
+
+
+//			msg.params.memoryinfo.address.set(0xA0000000);
+			msg.params.memoryinfo.length.set(1023);
 			msg.params.memoryinfo.memIndex.set(0);
 			// msg.command_msg.set("temp1");
 
@@ -242,6 +264,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		//long value = new BigInteger("A000000", 16).intValue();
 		//System.out.println(value);
+		
+		*/
 	}
 	
 	
@@ -510,7 +534,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		 * e.printStackTrace(); }
 		 */
 
-		sendPeriodicity("172.17.10.130", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
+		sendPeriodicity("172.17.10.140", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
 
 	}
 

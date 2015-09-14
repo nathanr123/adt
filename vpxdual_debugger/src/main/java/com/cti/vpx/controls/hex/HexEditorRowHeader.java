@@ -26,13 +26,17 @@
  */
 package com.cti.vpx.controls.hex;
 
-
 import java.awt.Component;
 import java.awt.Graphics;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -42,7 +46,7 @@ import javax.swing.event.TableModelListener;
  * @author Robert Futrell
  * @version 1.0
  */
-class HexEditorRowHeader extends JList implements TableModelListener {
+class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -57,9 +61,9 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 	 * @param table
 	 *            The table displaying the hex content.
 	 */
-	public HexEditorRowHeader(HexTable table) {
+	public HexEditorRowHeader(int startAddress, HexTable table) {
 		this.table = table;
-		model = new RowHeaderListModel();
+		model = new RowHeaderListModel(startAddress);
 		setModel(model);
 		setFocusable(false);
 		setFont(table.getFont());
@@ -69,6 +73,10 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		syncRowCount(); // Initialize to initial size of table.
 		table.getModel().addTableModelListener(this);
+	}
+
+	public HexEditorRowHeader(HexTable table) {
+		this(0, table);
 	}
 
 	public void addSelectionInterval(int anchor, int lead) {
@@ -137,14 +145,21 @@ class HexEditorRowHeader extends JList implements TableModelListener {
 	 * @author Robert Futrell
 	 * @version 1.0
 	 */
-	private static class RowHeaderListModel extends AbstractListModel {
+	private static class RowHeaderListModel extends AbstractListModel<Object> {
 
 		private static final long serialVersionUID = 1L;
 
+		private int start = 0;
+
 		private int size;
 
+		public RowHeaderListModel(int startAddress) {
+
+			this.start = startAddress;
+		}
+
 		public Object getElementAt(int index) {
-			return "0x" + Integer.toHexString(index * 16);
+			return "0x" + String.format("%08x", (start + (index * 16))).toUpperCase();
 		}
 
 		public int getSize() {

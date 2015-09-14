@@ -171,10 +171,11 @@ public class Hex16 extends AbstractTableModel {
 		}
 		// & with 0xff to convert to unsigned
 
-		byte[] b = doc.getByteByGroup(pos, 2,true);
+		byte[] b = doc.getByteByGroup(pos, 2, true);
 
-		return String.format("%02x%02x", b[0], b[1]).toUpperCase();// (b < 0x10
-																	// &&
+		String str = String.format("%02x%02x", b[0], b[1]).toUpperCase();
+
+		return str;
 
 	}
 
