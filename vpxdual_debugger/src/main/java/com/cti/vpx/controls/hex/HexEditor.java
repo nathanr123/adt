@@ -128,6 +128,8 @@ public class HexEditor extends JScrollPane {
 
 	public static final int UNSINGNEDFLOAT32 = 8;
 
+	public int currentMode = HEX8;
+
 	private HexTable table;
 
 	private boolean alternateRowBG;
@@ -142,6 +144,10 @@ public class HexEditor extends JScrollPane {
 
 	private ResourceBundle msg;
 
+	HexEditorRowHeader rowHeader;
+
+	HexEditorPanel parent;
+
 	private static final TransferHandler DEFAULT_TRANSFER_HANDLER = new HexEditorTransferHandler();
 
 	static final int DUMP_COLUMN_WIDTH = 200;
@@ -149,7 +155,9 @@ public class HexEditor extends JScrollPane {
 	/**
 	 * Creates a new <code>HexEditor</code> component.
 	 */
-	public HexEditor() {
+	public HexEditor(HexEditorPanel parentPanel) {
+
+		this.parent = parentPanel;
 
 		JPanel jp = new JPanel();
 
@@ -159,7 +167,7 @@ public class HexEditor extends JScrollPane {
 
 		Hex8 model = new Hex8(this, msg);
 
-		table = new HexTable(this, model);
+		table = new HexTable(parentPanel, this, model);
 
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -169,7 +177,7 @@ public class HexEditor extends JScrollPane {
 
 		setShowColumnHeader(true);
 
-		setShowRowHeader(0,true);
+		setShowRowHeader(0, true);
 
 		setAlternateRowBG(false);
 
@@ -197,6 +205,8 @@ public class HexEditor extends JScrollPane {
 
 			table.setModel(hex8model);
 
+			currentMode = HEX8;
+
 			break;
 
 		case HEX16:
@@ -206,6 +216,8 @@ public class HexEditor extends JScrollPane {
 			hex16model.setBytes(bb);
 
 			table.setModel(hex16model);
+
+			currentMode = HEX16;
 
 			break;
 
@@ -217,6 +229,8 @@ public class HexEditor extends JScrollPane {
 
 			table.setModel(hex32model);
 
+			currentMode = HEX32;
+
 			break;
 
 		case HEX64:
@@ -226,6 +240,8 @@ public class HexEditor extends JScrollPane {
 			hex64model.setBytes(bb);
 
 			table.setModel(hex64model);
+
+			currentMode = HEX64;
 
 			break;
 
@@ -237,6 +253,8 @@ public class HexEditor extends JScrollPane {
 
 			table.setModel(unsigned16model);
 
+			currentMode = UNSINGNEDINT16;
+
 			break;
 
 		case UNSINGNEDINT32:
@@ -246,6 +264,8 @@ public class HexEditor extends JScrollPane {
 			unsigned32model.setBytes(bb);
 
 			table.setModel(unsigned32model);
+
+			currentMode = UNSINGNEDINT32;
 
 			break;
 
@@ -257,6 +277,8 @@ public class HexEditor extends JScrollPane {
 
 			table.setModel(signed16model);
 
+			currentMode = SINGNEDINT16;
+
 			break;
 
 		case SINGNEDINT32:
@@ -266,6 +288,8 @@ public class HexEditor extends JScrollPane {
 			signed32model.setBytes(bb);
 
 			table.setModel(signed32model);
+
+			currentMode = SINGNEDINT32;
 
 			break;
 
@@ -277,10 +301,12 @@ public class HexEditor extends JScrollPane {
 
 			table.setModel(floating32model);
 
+			currentMode = UNSINGNEDFLOAT32;
+
 			break;
 		}
 
-		setShowRowHeader(0,true);
+		setShowRowHeader(0, true);
 	}
 
 	private ByteBuffer getByteBuffer(TableModel model) {
@@ -327,6 +353,10 @@ public class HexEditor extends JScrollPane {
 
 		return bb;
 
+	}
+
+	public int getCurrentModel() {
+		return this.currentMode;
 	}
 
 	/**
@@ -834,7 +864,14 @@ public class HexEditor extends JScrollPane {
 	 * @see #setShowColumnHeader(boolean)
 	 */
 	public void setShowRowHeader(int startAddress, boolean show) {
-		setRowHeaderView(show ? new HexEditorRowHeader(startAddress, table) : null);
+
+		rowHeader = show ? new HexEditorRowHeader(startAddress, table) : null;
+
+		setRowHeaderView(rowHeader);
+	}
+
+	public HexEditorRowHeader getHexEditorRowHeader() {
+		return rowHeader;
 	}
 
 	/**

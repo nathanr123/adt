@@ -35,16 +35,24 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -57,6 +65,7 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
+import com.cti.vpx.controls.hex.HexEditorRowHeader.RowHeaderListModel;
 import com.cti.vpx.controls.hex.groupmodel.Floating32;
 import com.cti.vpx.controls.hex.groupmodel.Hex16;
 import com.cti.vpx.controls.hex.groupmodel.Hex32;
@@ -66,6 +75,9 @@ import com.cti.vpx.controls.hex.groupmodel.SignedInt16;
 import com.cti.vpx.controls.hex.groupmodel.SignedInt32;
 import com.cti.vpx.controls.hex.groupmodel.UnSignedInt16;
 import com.cti.vpx.controls.hex.groupmodel.UnSignedInt32;
+import com.cti.vpx.util.VPXComponentFactory;
+import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXUtilities;
 
 /**
  * The table displaying the hex content of a file. This is the meat of the hex
@@ -84,7 +96,13 @@ class HexTable extends JTable {
 	int leadSelectionIndex;
 	int anchorSelectionIndex;
 
+	private ResourceBundle rBundle = VPXUtilities.getResourceBundle();
+
+	private final JPopupMenu vpx_Hex_ContextMenu = new JPopupMenu();
+
 	private static final Color ANTERNATING_CELL_COLOR = new Color(240, 240, 240);
+
+	private HexEditorPanel parent;
 
 	/**
 	 * Creates a new table to display hex data.
@@ -94,6 +112,14 @@ class HexTable extends JTable {
 	 * @param model
 	 *            The table model to use.
 	 */
+
+	public HexTable(HexEditorPanel parnt, HexEditor hexEditor, Hex8 model) {
+
+		this(hexEditor, model);
+
+		this.parent = parnt;
+	}
+
 	public HexTable(HexEditor hexEditor, Hex8 model) {
 
 		super(model);
@@ -128,6 +154,10 @@ class HexTable extends JTable {
 
 		anchorSelectionIndex = leadSelectionIndex = 0;
 
+		createPopupMenu();
+
+		setComponentPopupMenu(vpx_Hex_ContextMenu);
+
 	}
 
 	/**
@@ -158,18 +188,18 @@ class HexTable extends JTable {
 			return 0;
 		}
 		if (row == getRowCount() - 1) {
-			
+
 			int lastRowCount = model.getByteCount() % 16;
-			
+
 			if (lastRowCount == 0) {
 				lastRowCount = 16;
 			}
-			
+
 			if (lastRowCount < 17) { // Last row's not entirely full
-				return col;//Math.min(col, (model.getByteCount() % 16) - 1);
+				return col;// Math.min(col, (model.getByteCount() % 16) - 1);
 			}
 		}
-		
+
 		return Math.min(col, getColumnCount() - 1);
 	}
 
@@ -287,6 +317,177 @@ class HexTable extends JTable {
 		return cols;
 	}
 
+	private void createPopupMenu() {
+
+		JMenuItem vpx_Hex_Cxt_LoadMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Load"),
+				VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Hex_Cxt_LoadMemory.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				parent.doOpenAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_FillMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Fill"),
+				VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Hex_Cxt_FillMemory.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_SetMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Set"),
+				VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Hex_Cxt_SetMemory.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Save = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Name"),
+				VPXConstants.Icons.ICON_SAVE);
+
+		vpx_Hex_Cxt_Save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doDumpAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Cut = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Cut.Name"),
+				VPXConstants.Icons.ICON_CUT);
+
+		vpx_Hex_Cxt_Cut.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doCutAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Copy = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Copy.Name"),
+				VPXConstants.Icons.ICON_COPY);
+
+		vpx_Hex_Cxt_Copy.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doCopyAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Paste = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Paste.Name"),
+				VPXConstants.Icons.ICON_PASTE);
+
+		vpx_Hex_Cxt_Paste.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doPasteAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Delete = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Delete.Name"),
+				VPXConstants.Icons.ICON_DELETE_EXIT);
+
+		vpx_Hex_Cxt_Delete.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doDeleteAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Undo = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Undo.Name"),
+				VPXConstants.Icons.ICON_UNDO);
+
+		vpx_Hex_Cxt_Undo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doUndoAction();
+
+			}
+		});
+
+		JMenuItem vpx_Hex_Cxt_Redo = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Redo.Name"),
+				VPXConstants.Icons.ICON_REDO);
+
+		vpx_Hex_Cxt_Redo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doRedoAction();
+
+			}
+		});
+		JMenuItem vpx_Hex_Cxt_Settings = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Settings.Name"),
+				VPXConstants.Icons.ICON_SETTINGS);
+
+		vpx_Hex_Cxt_Settings.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doSettingsAction();
+
+			}
+		});
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_LoadMemory);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_FillMemory);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_SetMemory);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Save);
+
+		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Cut);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Copy);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Paste);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Delete);
+
+		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Redo);
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Undo);
+
+		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Settings);
+
+	}
+
 	/**
 	 * Returns the offset into the bytes being edited represented at the
 	 * specified cell in the table, if any.
@@ -375,7 +576,7 @@ class HexTable extends JTable {
 	 */
 	public void changeSelectionByOffset(int offset, boolean extend) {
 		offset = Math.max(0, offset);
-		offset = Math.min(offset, model.getByteCount()-1);
+		offset = Math.min(offset, model.getByteCount() - 1);
 		int row = offset / 16;
 		int col = offset % 16;
 		changeSelection(row, col, false, extend);
@@ -555,6 +756,39 @@ class HexTable extends JTable {
 
 		TableColumn tableColumn = getColumnModel().getColumn(column);
 
+		HexEditor scrollPane = (HexEditor) SwingUtilities.getAncestorOfClass(JScrollPane.class, HexTable.this);
+
+		RowHeaderListModel c = scrollPane.getHexEditorRowHeader().getRowHeaderModel();
+
+		int cols = 0;
+
+		int model = scrollPane.getCurrentModel();
+
+		if (model == HexEditor.HEX8) {
+
+			cols = column;
+		}
+		if (model == HexEditor.HEX16 || model == HexEditor.SINGNEDINT16 || model == HexEditor.UNSINGNEDINT16) {
+
+			cols = column * 2;
+
+		} else if (model == HexEditor.HEX32 || model == HexEditor.SINGNEDINT32 || model == HexEditor.UNSINGNEDINT32
+				|| model == HexEditor.UNSINGNEDFLOAT32) {
+
+			cols = column * 4;
+
+		} else if (model == HexEditor.HEX64) {
+
+			cols = column * 8;
+		}
+
+		((JComponent) component).setToolTipText(String.format("<html>Address : %s<br>Value : %s</html>",
+
+		String.format("%08x", (Integer.decode(c.getElementAt(row).toString()) + cols)).toUpperCase(),
+				value.toString().toUpperCase())); // For
+		// all
+		// format
+
 		tableColumn.setPreferredWidth(
 				Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
 
@@ -564,7 +798,6 @@ class HexTable extends JTable {
 
 	protected void processKeyEvent(java.awt.event.KeyEvent e) {
 
-		// TODO: Convert into Actions and put into InputMap/ActionMap?
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:

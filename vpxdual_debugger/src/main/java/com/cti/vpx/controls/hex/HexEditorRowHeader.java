@@ -114,6 +114,10 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 		syncRowCount();
 	}
 
+	public RowHeaderListModel getRowHeaderModel() {
+		return model;
+	}
+
 	/**
 	 * Renders the cells of the row header.
 	 *
@@ -130,7 +134,7 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected,
 				boolean hasFocus) {
-			// Never paint cells as "selected."
+			// Never paint cells as "selected."		
 			super.getListCellRendererComponent(list, value, index, false, hasFocus);
 			setBorder(CELL_BORDER);
 			// setBackground(table.getBackground());
@@ -145,7 +149,7 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 	 * @author Robert Futrell
 	 * @version 1.0
 	 */
-	private static class RowHeaderListModel extends AbstractListModel<Object> {
+	public class RowHeaderListModel extends AbstractListModel<Object> {
 
 		private static final long serialVersionUID = 1L;
 

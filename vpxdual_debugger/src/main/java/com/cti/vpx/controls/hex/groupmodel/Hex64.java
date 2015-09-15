@@ -88,7 +88,7 @@ public class Hex64 extends AbstractTableModel {
 
 		columnNames = new String[16];
 		for (int i = 0; i < 16; i++) {
-			columnNames[i] = "+" + Integer.toHexString(i).toUpperCase();
+			columnNames[i] = Integer.toHexString(i).toUpperCase();
 		}
 
 		byteStrVals = new String[256];

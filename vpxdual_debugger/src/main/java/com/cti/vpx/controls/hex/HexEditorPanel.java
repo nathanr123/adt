@@ -73,6 +73,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.util.VPXConstants;
@@ -113,10 +114,19 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private Action undoAction;
 	private Action redoAction;
 	private Action settingsAction;
+	private DumpAction dumpAction;
+
+	private JButton btnOpenAction;
+	private JButton btnDumpAction;
+	private JButton btnCutAction;
+	private JButton btnCopyAction;
+	private JButton btnPasteAction;
+	private JButton btnDeleteAction;
+	private JButton btnUndoAction;
+	private JButton btnRedoAction;
+	private JButton btnSettingsAction;
 
 	private ConfigPanel settingsPanel;
-
-	private DumpAction dumpAction;
 
 	private static final ResourceBundle msg = VPXUtilities.getResourceBundle();
 
@@ -158,7 +168,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		add(temp, BorderLayout.SOUTH);
 
 		// Add the editor after infoField as it listens to byte changes.
-		editor = new HexEditor();
+		editor = new HexEditor(this);
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
 		handleOpenFile("D:\\test.bin");
@@ -180,7 +190,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		if (source == colHeaderCB) {
 			editor.setShowColumnHeader(colHeaderCB.isSelected());
 		} else if (source == rowHeaderCB) {
-			editor.setShowRowHeader(0,rowHeaderCB.isSelected());
+			editor.setShowRowHeader(0, rowHeaderCB.isSelected());
 		} else if (source == showGridCB) {
 			editor.setShowGrid(showGridCB.isSelected());
 		} else if (source == altColBGCB) {
@@ -202,14 +212,23 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 *            The resource bundle used to localize the actions.
 	 */
 	private void createActions(ResourceBundle msg) {
+
 		openAction = new OpenAction();
+
 		cutAction = new CutAction();
+
 		copyAction = new CopyAction();
+
 		pasteAction = new PasteAction();
+
 		deleteAction = new DeleteAction();
+
 		undoAction = new UndoAction();
+
 		redoAction = new RedoAction();
+
 		settingsAction = new SettingsAction();
+
 		dumpAction = new DumpAction();
 	}
 
@@ -244,24 +263,34 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		formatBytes.setMaximumSize(new Dimension(200, 25));
 
 		toolbar.add(formatBytes);
-		toolbar.addSeparator();
-
-		toolbar.add(createToolBarButton(openAction));
-		toolbar.add(createToolBarButton(dumpAction));
-		toolbar.addSeparator();
-
-		toolbar.add(createToolBarButton(cutAction));
-		toolbar.add(createToolBarButton(copyAction));
-		toolbar.add(createToolBarButton(pasteAction));
-		toolbar.add(createToolBarButton(deleteAction));
-		toolbar.addSeparator();
-
-		toolbar.add(createToolBarButton(undoAction));
-		toolbar.add(createToolBarButton(redoAction));
 
 		toolbar.addSeparator();
 
-		toolbar.add(createToolBarButton(settingsAction));
+		createToolBarButton();
+
+		toolbar.add(btnOpenAction);
+
+		toolbar.add(btnDumpAction);
+
+		toolbar.addSeparator();
+
+		toolbar.add(btnCutAction);
+
+		toolbar.add(btnCopyAction);
+
+		toolbar.add(btnPasteAction);
+
+		toolbar.add(btnDeleteAction);
+
+		toolbar.addSeparator();
+
+		toolbar.add(btnUndoAction);
+
+		toolbar.add(btnRedoAction);
+
+		toolbar.addSeparator();
+
+		toolbar.add(btnSettingsAction);
 
 		return toolbar;
 
@@ -279,10 +308,35 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 *            The action.
 	 * @return The button.
 	 */
-	private JButton createToolBarButton(Action a) {
-		JButton b = new JButton(a);
-		b.setText(null);
-		return b;
+	private void createToolBarButton() {
+
+		btnOpenAction = new JButton(openAction);
+		btnOpenAction.setText(null);
+
+		btnDumpAction = new JButton(dumpAction);
+		btnDumpAction.setText(null);
+
+		btnCutAction = new JButton(cutAction);
+		btnCutAction.setText(null);
+
+		btnCopyAction = new JButton(copyAction);
+		btnCopyAction.setText(null);
+
+		btnPasteAction = new JButton(pasteAction);
+		btnPasteAction.setText(null);
+
+		btnDeleteAction = new JButton(deleteAction);
+		btnDeleteAction.setText(null);
+
+		btnUndoAction = new JButton(undoAction);
+		btnUndoAction.setText(null);
+
+		btnRedoAction = new JButton(redoAction);
+		btnRedoAction.setText(null);
+
+		btnSettingsAction = new JButton(settingsAction);
+		btnSettingsAction.setText(null);
+
 	}
 
 	private void showSettingsDialog() {
@@ -321,6 +375,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	public void doOpen() {
 		int rc = getFileChooser("Select file to Open").showOpenDialog(this);
 
+		
+		
 		if (rc == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
 			handleOpenFile(file.getAbsolutePath());
@@ -334,9 +390,18 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 * @return The file chooser.
 	 */
 	private JFileChooser getFileChooser(String title) {
+		
+		FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files","dat");
+		FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files","bin");
+		FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files","out");
+		
 		if (chooser == null) {
 			chooser = new JFileChooser();
 		}
+		chooser.setAcceptAllFileFilterUsed(false);
+		chooser.addChoosableFileFilter(filterOut);
+		chooser.addChoosableFileFilter(filterBin);
+		chooser.addChoosableFileFilter(filterDat);
 		chooser.setDialogTitle(title);
 		return chooser;
 	}
@@ -372,7 +437,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		}
 	}
 
-	public void setBytes(int startAddress,byte[] buffer) {
+	public void setBytes(int startAddress, byte[] buffer) {
 		try {
 			editor.open(buffer);
 			editor.setShowRowHeader(startAddress, true);
@@ -936,6 +1001,51 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			return VPXConstants.Icons.ICON_UNDO_NAME;
 		}
 
+	}
+
+	public void doOpenAction() {
+
+		doOpen();
+	}
+
+	public void doDumpAction() {
+
+		btnDumpAction.doClick();
+	}
+
+	public void doCutAction() {
+
+		btnCutAction.doClick();
+	}
+
+	public void doCopyAction() {
+
+		btnCopyAction.doClick();
+	}
+
+	public void doPasteAction() {
+
+		btnPasteAction.doClick();
+	}
+
+	public void doDeleteAction() {
+
+		btnDeleteAction.doClick();
+	}
+
+	public void doUndoAction() {
+
+		btnUndoAction.doClick();
+	}
+
+	public void doRedoAction() {
+
+		btnRedoAction.doClick();
+	}
+
+	public void doSettingsAction() {
+
+		btnSettingsAction.doClick();
 	}
 
 }
