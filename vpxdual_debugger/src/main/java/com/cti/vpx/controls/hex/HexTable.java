@@ -40,6 +40,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ResourceBundle;
@@ -123,29 +125,50 @@ class HexTable extends JTable {
 	public HexTable(HexEditor hexEditor, Hex8 model) {
 
 		super(model);
+
 		this.hexEditor = hexEditor;
+
 		this.model = model;
+
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
+
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
 		setFont(new Font("Monospaced", Font.PLAIN, 14));
+
 		// setRowHeight(28);
+
 		setCellSelectionEnabled(true);
+
 		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
 		setDefaultEditor(Object.class, new CellEditor());
+
 		// setDefaultRenderer(Object.class, new CellRenderer());
+
 		getTableHeader().setReorderingAllowed(false);
+
 		setShowGrid(false);
 
 		FontMetrics fm = getFontMetrics(getFont());
+
 		Font headerFont = UIManager.getFont("TableHeader.font");
+
 		FontMetrics headerFM = hexEditor.getFontMetrics(headerFont);
+
 		int w = fm.stringWidth("wwww"); // cell contents, 0-255
+
 		w = Math.max(w, headerFM.stringWidth("+999"));
+
 		for (int i = 0; i < getColumnCount(); i++) {
+
 			TableColumn column = getColumnModel().getColumn(i);
+
 			if (i < 16) {
+
 				column.setPreferredWidth(w);
 			} else {
+
 				column.setPreferredWidth(HexEditor.DUMP_COLUMN_WIDTH);
 			}
 		}
@@ -158,6 +181,28 @@ class HexTable extends JTable {
 
 		setComponentPopupMenu(vpx_Hex_ContextMenu);
 
+		addMouseListener(new MouseAdapter() {
+
+			public void mousePressed(MouseEvent me) {
+
+				if (me.getClickCount() == 2) {
+
+					JTable table = (JTable) me.getSource();
+
+					Point p = me.getPoint();
+
+					int row = table.rowAtPoint(p);
+
+					long address = VPXUtilities.getIntValue(
+							hexEditor.getHexEditorRowHeader().getRowHeaderModel().getElementAt(row).toString());
+
+					int col = table.columnAtPoint(p);
+
+					parent.doSetMemory(address + col, getValueAt(row, col).toString(), "");
+
+				}
+			}
+		});
 	}
 
 	/**
@@ -338,23 +383,24 @@ class HexTable extends JTable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				parent.doFillMemory();
 
 			}
 		});
 
-		JMenuItem vpx_Hex_Cxt_SetMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Set"),
-				VPXConstants.Icons.ICON_EMPTY);
-
-		vpx_Hex_Cxt_SetMemory.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
+		/*
+		 * JMenuItem vpx_Hex_Cxt_SetMemory =
+		 * VPXComponentFactory.createJMenuItem(rBundle.getString(
+		 * "Action.Dump.Set"), VPXConstants.Icons.ICON_EMPTY);
+		 * 
+		 * vpx_Hex_Cxt_SetMemory.addActionListener(new ActionListener() {
+		 * 
+		 * @Override public void actionPerformed(ActionEvent e) {
+		 * 
+		 * //parent.doSetMemory();
+		 * 
+		 * } });
+		 */
 		JMenuItem vpx_Hex_Cxt_Save = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Name"),
 				VPXConstants.Icons.ICON_SAVE);
 
@@ -462,7 +508,7 @@ class HexTable extends JTable {
 
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_FillMemory);
 
-		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_SetMemory);
+		// vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_SetMemory);
 
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Save);
 
@@ -784,10 +830,8 @@ class HexTable extends JTable {
 
 		((JComponent) component).setToolTipText(String.format("<html>Address : %s<br>Value : %s</html>",
 
-		String.format("%08x", (Integer.decode(c.getElementAt(row).toString()) + cols)).toUpperCase(),
-				value.toString().toUpperCase())); // For
-		// all
-		// format
+		String.format("%08x", (Long.decode(c.getElementAt(row).toString()) + cols)).toUpperCase(),
+				value.toString().toUpperCase())); // For all format
 
 		tableColumn.setPreferredWidth(
 				Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));

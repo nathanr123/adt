@@ -863,7 +863,7 @@ public class HexEditor extends JScrollPane {
 	 *            Whether to show the table row header.
 	 * @see #setShowColumnHeader(boolean)
 	 */
-	public void setShowRowHeader(int startAddress, boolean show) {
+	public void setShowRowHeader(long startAddress, boolean show) {
 
 		rowHeader = show ? new HexEditorRowHeader(startAddress, table) : null;
 

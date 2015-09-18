@@ -75,8 +75,9 @@ import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.controls.hex.groupmodel.Hex8;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXUtilities;
 
 ;
 
@@ -125,7 +126,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private JButton btnUndoAction;
 	private JButton btnRedoAction;
 	private JButton btnSettingsAction;
-
+	
+	private VPX_MemorySetWindow memStFillWindow = new VPX_MemorySetWindow(this);
+	
+	private VPX_MemoryLoadWindow memoryLoadWindow = new VPX_MemoryLoadWindow(this);
+	
 	private ConfigPanel settingsPanel;
 
 	private static final ResourceBundle msg = VPXUtilities.getResourceBundle();
@@ -171,7 +176,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		editor = new HexEditor(this);
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
-		handleOpenFile("D:\\test.bin");
+		handleOpenFile("D:\\test.bin", "0x0000000");
 
 		add(editor);
 
@@ -373,13 +378,23 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 * Prompts the user for a file to open, and opens it.
 	 */
 	public void doOpen() {
-		int rc = getFileChooser("Select file to Open").showOpenDialog(this);
 
-		
-		
-		if (rc == JFileChooser.APPROVE_OPTION) {
-			File file = chooser.getSelectedFile();
-			handleOpenFile(file.getAbsolutePath());
+		File file = null;
+
+		String startAddress = "0x0000000";
+
+		int rc = memoryLoadWindow.showLoadMemoryWinow();// getFileChooser("Select
+														// file
+		// to
+		// Open").showOpenDialog(this);
+
+		if (rc == 1) {// JFileChooser.APPROVE_OPTION) {
+
+			file = new File(memoryLoadWindow.getFileName());// chooser.getSelectedFile();
+
+			startAddress = (memoryLoadWindow.isStartAddress() ? memoryLoadWindow.getStartAddress() : "0x0000000");
+
+			handleOpenFile(file.getAbsolutePath(), startAddress);
 		}
 	}
 
@@ -390,11 +405,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 * @return The file chooser.
 	 */
 	private JFileChooser getFileChooser(String title) {
-		
-		FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files","dat");
-		FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files","bin");
-		FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files","out");
-		
+
+		FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files", "dat");
+		FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
+		FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+
 		if (chooser == null) {
 			chooser = new JFileChooser();
 		}
@@ -452,7 +467,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	 * @param fileName
 	 *            The file to open.
 	 */
-	private void handleOpenFile(String fileName) {
+	private void handleOpenFile(String fileName, String startAddress) {
 		// Check jar first to prevent Applet AccessControlException
 		ClassLoader cl = this.getClass().getClassLoader();
 		InputStream in = cl.getResourceAsStream(fileName);
@@ -463,6 +478,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				File file = new File(fileName);
 				if (file.isFile()) { // e.g. in Eclipse debugger
 					editor.open(fileName);
+
+					editor.setShowRowHeader(VPXUtilities.getIntValue(startAddress), true);
 				} else { // In a jar
 					throw new IOException("Resource not found: " + fileName);
 				}
@@ -999,6 +1016,58 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		protected String getIconKey() {
 			return VPXConstants.Icons.ICON_UNDO_NAME;
+		}
+
+	}
+
+	public void doSetMemory(long address, String currentValue, String defaultSize) {
+
+		memStFillWindow.setMode(VPX_MemorySetWindow.SETMEMORY);
+
+		memStFillWindow.setAddress(address);
+
+		memStFillWindow.setCurrentValue(currentValue);
+
+		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
+
+		memStFillWindow.showFillMemoryWinow();
+	}
+
+	public void doFillMemory() {
+
+		memStFillWindow.setMode(VPX_MemorySetWindow.FILLMEMORY);
+
+		memStFillWindow.setStartAddr(editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress());
+
+		memStFillWindow.setTotalLength(((Hex8) editor.getTable().getModel()).getByteCount());
+
+		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
+
+		int rc = memStFillWindow.showFillMemoryWinow();
+
+		if (rc == 1) {
+
+			Point p = null;
+
+			long start = editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress();
+
+			((Hex8) editor.getTable().getModel()).getByteCount();
+
+			long start1 = VPXUtilities.getIntValue(memStFillWindow.getStartAddress());
+
+			int offset = (int) (start1 - start);
+
+			long length = Long.parseLong(memStFillWindow.getLength());
+
+			for (int i = offset; i < (offset + length); i++) {
+
+				p = editor.offsetToCell(i);
+
+				Hex8 t = (Hex8) editor.getTable().getModel();
+
+				t.setValueAt(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
+
+			}
 		}
 
 	}

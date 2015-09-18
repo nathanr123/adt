@@ -2,38 +2,73 @@ package com.cti.vpx.controls.hex;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-import net.miginfocom.swing.MigLayout;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
-public class VPX_MemorySetWindow extends JDialog {
+import com.cti.vpx.util.VPXUtilities;
+
+import net.miginfocom.swing.MigLayout;
+
+public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -883334257865770538L;
 
+	public static final int SETMEMORY = 0;
+
+	public static final int FILLMEMORY = 1;
+
 	private final JPanel contentPanel = new JPanel();
 
-	private JTextField txtCurrentAddress;
+	private JTextField txtStartAddress;
 
-	private JTextField txtCurrentValue;
+	private JTextField txtLengthValue;
 
-	private JTextField txtNewValue;
+	private JTextField txtDataValue;
 
 	private JTextField txtTypeSize;
+
+	private int currentMode = FILLMEMORY;
+
+	private JLabel lblAddress;
+
+	private JLabel lblLengthValue;
+
+	private JLabel lblDataValue;
+
+	private int retValue = 1;
+
+	private String startAddress;
+
+	private String length;
+
+	private String data;
+
+	private long startAddrVal;
+
+	private long totalLength;
+
+	private JButton btnSetMemoryValue;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		try {
-			VPX_MemorySetWindow dialog = new VPX_MemorySetWindow("0xA0000000", "6B", "8-Bit Hex");
+			VPX_MemorySetWindow dialog = new VPX_MemorySetWindow(VPX_MemorySetWindow.SETMEMORY, "0xA0000000", "6B",
+					"8-Bit Hex");
 
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
@@ -45,16 +80,27 @@ public class VPX_MemorySetWindow extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public VPX_MemorySetWindow() {
+	public VPX_MemorySetWindow(HexEditorPanel prnt) {
 
-		this("", "", "");
+		this(FILLMEMORY, "", "", "");
+
+		setLocationRelativeTo(prnt);
 	}
 
-	public VPX_MemorySetWindow(String address, String value, String type) {
+	public VPX_MemorySetWindow(int mode) {
+
+		this(mode, "", "", "");
+	}
+
+	public VPX_MemorySetWindow(int mode, String address, String value, String type) {
+
+		this.currentMode = mode;
 
 		init();
 
 		loadComponents();
+
+		loadmodeProerties();
 
 		setValues(address, value, type);
 	}
@@ -62,6 +108,8 @@ public class VPX_MemorySetWindow extends JDialog {
 	private void init() {
 
 		setResizable(false);
+
+		setModal(true);
 
 		setTitle("Fill Value");
 
@@ -76,11 +124,15 @@ public class VPX_MemorySetWindow extends JDialog {
 		contentPanel.setLayout(
 				new MigLayout("", "[101.00px,fill][][grow]", "[14px,grow,fill][grow,fill][grow,fill][grow,fill]"));
 
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+		addWindowListener(this);
+
 	}
 
 	private void loadComponents() {
 
-		JLabel lblAddress = new JLabel("Address");
+		lblAddress = new JLabel("Start Address");
 
 		contentPanel.add(lblAddress, "cell 0 0");
 
@@ -88,31 +140,31 @@ public class VPX_MemorySetWindow extends JDialog {
 
 		contentPanel.add(lblNewLabel_1, "cell 1 0,alignx trailing");
 
-		txtCurrentAddress = new JTextField();
+		txtStartAddress = new JTextField();
 
-		contentPanel.add(txtCurrentAddress, "cell 2 0,growx");
+		contentPanel.add(txtStartAddress, "cell 2 0,growx");
 
-		txtCurrentAddress.setColumns(10);
+		txtStartAddress.setColumns(10);
 
-		JLabel lblCurrentValue = new JLabel("Current Value");
+		lblLengthValue = new JLabel("Length");
 
-		contentPanel.add(lblCurrentValue, "cell 0 1");
+		contentPanel.add(lblLengthValue, "cell 0 1");
 
-		txtCurrentValue = new JTextField();
+		txtLengthValue = new JTextField();
 
-		txtCurrentValue.setColumns(10);
+		txtLengthValue.setColumns(10);
 
-		contentPanel.add(txtCurrentValue, "cell 2 1,growx");
+		contentPanel.add(txtLengthValue, "cell 2 1,growx");
 
-		JLabel lblNewValue = new JLabel("New Value");
+		lblDataValue = new JLabel("Data Value");
 
-		contentPanel.add(lblNewValue, "cell 0 2");
+		contentPanel.add(lblDataValue, "cell 0 2");
 
-		txtNewValue = new JTextField();
+		txtDataValue = new JTextField();
 
-		txtNewValue.setColumns(10);
+		txtDataValue.setColumns(10);
 
-		contentPanel.add(txtNewValue, "cell 2 2,growx");
+		contentPanel.add(txtDataValue, "cell 2 2,growx");
 
 		JLabel lblTypeSize = new JLabel("Type Size");
 
@@ -132,15 +184,66 @@ public class VPX_MemorySetWindow extends JDialog {
 
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
-		JButton btnSetMemoryValue = new JButton("OK");
+		btnSetMemoryValue = new JButton("Fill");
 
-		btnSetMemoryValue.setActionCommand("OK");
+		btnSetMemoryValue.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				startAddress = txtStartAddress.getText().trim();
+
+				length = txtLengthValue.getText().trim();
+
+				boolean validStAddr = isValidAddress(startAddress);
+
+				boolean validLen = isValidLength(length);
+
+				if (validLen && validStAddr) {
+
+					data = txtDataValue.getText().trim();
+
+					dispose();
+				} else {
+					if (!validStAddr && !validLen) {
+
+						retValue = 1;
+
+						JOptionPane.showMessageDialog(VPX_MemorySetWindow.this, "Please enter valid detail", "Error",
+								JOptionPane.ERROR_MESSAGE);
+
+					} else if (!validStAddr) {
+
+						JOptionPane.showMessageDialog(VPX_MemorySetWindow.this, "Please enter valid start address",
+								"Error", JOptionPane.ERROR_MESSAGE);
+
+					} else if (!validLen) {
+
+						JOptionPane.showMessageDialog(VPX_MemorySetWindow.this, "Please enter valid length", "Error",
+								JOptionPane.ERROR_MESSAGE);
+
+					}
+				}
+
+			}
+		});
+
+		btnSetMemoryValue.setActionCommand("Fill");
 
 		buttonPane.add(btnSetMemoryValue);
 
 		getRootPane().setDefaultButton(btnSetMemoryValue);
 
 		JButton btnCancel = new JButton("Cancel");
+
+		btnCancel.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				retValue = 0;
+
+				dispose();
+			}
+		});
 
 		btnCancel.setActionCommand("Cancel");
 
@@ -150,17 +253,173 @@ public class VPX_MemorySetWindow extends JDialog {
 
 	public void setValues(String address, String value, String type) {
 
-		txtCurrentAddress.setText(address);
+		txtStartAddress.setText(address);
 
-		txtCurrentValue.setText(value);
+		txtLengthValue.setText(value);
 
-		txtNewValue.setText("");
+		txtDataValue.setText("");
 
 		txtTypeSize.setText(type);
 	}
 
-	public String getNewValue() {
+	private void loadmodeProerties() {
 
-		return "";
+		if (currentMode == FILLMEMORY) {
+
+			lblAddress.setText("Start Address");
+
+			lblLengthValue.setText("Length");
+
+			btnSetMemoryValue.setText("Fill");
+
+			txtStartAddress.setEditable(true);
+
+			txtLengthValue.setEditable(true);
+
+			txtStartAddress.setText("");
+
+			txtLengthValue.setText("");
+
+			setTitle("Fill Memory");
+
+		} else if (currentMode == SETMEMORY) {
+
+			lblAddress.setText("Address");
+
+			txtStartAddress.setEditable(false);
+
+			txtLengthValue.setEditable(false);
+
+			lblLengthValue.setText("Current Value");
+
+			btnSetMemoryValue.setText("Set");
+
+			setTitle("Set Memory");
+		}
+
 	}
+
+	public void setTypeSize(String typeSize) {
+
+		txtTypeSize.setText(typeSize);
+	}
+
+	public int showFillMemoryWinow() {
+
+		setVisible(true);
+
+		return retValue;
+	}
+
+	public String getStartAddress() {
+		return startAddress;
+	}
+
+	public String getLength() {
+		return length;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setStartAddr(long start) {
+
+		this.startAddrVal = start;
+
+	}
+
+	public void setCurrentValue(String currValue) {
+
+		this.length = currValue;
+
+		txtLengthValue.setText(currValue);
+	}
+
+	public void setAddress(long start) {
+
+		this.startAddrVal = start;
+
+		txtStartAddress.setText(String.format("0x%08x", start).toUpperCase());
+	}
+
+	public void setTotalLength(long length) {
+
+		this.totalLength = length;
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+
+		retValue = 0;
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private boolean isValidAddress(String addr) {
+
+		long st = VPXUtilities.getIntValue(startAddress);
+
+		if (st < startAddrVal) {
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean isValidLength(String length) {
+
+		long len = VPXUtilities.getIntValue(length);
+
+		if ((len + startAddrVal) > totalLength) {
+
+			return false;
+		}
+
+		return true;
+	}
+
+	public void setMode(int mode) {
+
+		this.currentMode = mode;
+
+		loadmodeProerties();
+	}
+
 }

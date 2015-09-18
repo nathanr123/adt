@@ -46,7 +46,7 @@ import javax.swing.event.TableModelListener;
  * @author Robert Futrell
  * @version 1.0
  */
-class HexEditorRowHeader extends JList<Object> implements TableModelListener {
+class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,21 +61,34 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 	 * @param table
 	 *            The table displaying the hex content.
 	 */
-	public HexEditorRowHeader(int startAddress, HexTable table) {
+	public HexEditorRowHeader(long startAddress, HexTable table) {
+
 		this.table = table;
+		
 		model = new RowHeaderListModel(startAddress);
+		
 		setModel(model);
+		
 		setFocusable(false);
+		
 		setFont(table.getFont());
+		
+		
 		setFixedCellHeight(table.getRowHeight());
+		
 		setCellRenderer(new CellRenderer());
+		
 		setBorder(new RowHeaderBorder());
+		
 		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		
 		syncRowCount(); // Initialize to initial size of table.
+		
 		table.getModel().addTableModelListener(this);
 	}
 
 	public HexEditorRowHeader(HexTable table) {
+		
 		this(0, table);
 	}
 
@@ -134,7 +147,7 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected,
 				boolean hasFocus) {
-			// Never paint cells as "selected."		
+			// Never paint cells as "selected."
 			super.getListCellRendererComponent(list, value, index, false, hasFocus);
 			setBorder(CELL_BORDER);
 			// setBackground(table.getBackground());
@@ -153,11 +166,11 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 
 		private static final long serialVersionUID = 1L;
 
-		private int start = 0;
+		private long start = 0;
 
 		private int size;
 
-		public RowHeaderListModel(int startAddress) {
+		public RowHeaderListModel(long startAddress) {
 
 			this.start = startAddress;
 		}
@@ -181,6 +194,12 @@ class HexEditorRowHeader extends JList<Object> implements TableModelListener {
 			}
 		}
 
+		public long getStartAddress() {
+			
+			System.out.println(start);
+			
+			return start;
+		}
 	}
 
 	/**

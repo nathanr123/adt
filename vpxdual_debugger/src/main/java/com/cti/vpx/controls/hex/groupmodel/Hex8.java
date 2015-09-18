@@ -317,7 +317,7 @@ public class Hex8 extends AbstractTableModel {
 			doc.setByte(offset, b);
 			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
 			fireTableCellUpdated(row, col);
-			fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
+		//	fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
 			editor.fireHexEditorEvent(offset, 1, 1);
 		}
 	}

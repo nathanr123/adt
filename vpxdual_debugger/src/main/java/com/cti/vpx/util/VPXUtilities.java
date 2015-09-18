@@ -863,6 +863,25 @@ public class VPXUtilities {
 		return version;
 	}
 
+	public static long getIntValue(String value) {
+
+		try {
+
+			String val = value;
+
+			if (value.startsWith("0x") || value.startsWith("0X")) {
+
+				val = value.substring(2);
+			}
+
+			return Long.parseLong(val, 16);// new BigInteger(val).intValue();
+
+		} catch (Exception e) {
+
+			return 0;
+		}
+	}
+
 	/**
 	 * Use Streams when you are dealing with raw data, binary data
 	 * 
@@ -1278,14 +1297,14 @@ public class VPXUtilities {
 
 		String[] varArray = vars.split("\n");
 
-		for (int i = 1; i < varArray.length-1; i++) {
+		for (int i = 1; i < varArray.length - 1; i++) {
 
 			if (!(varArray[i].trim().equals("--------   ----") && varArray[i].contains("symbols]"))) {
 
 				if (varArray[i].trim().length() > 0) {
-					
+
 					String[] var = varArray[i].trim().split("   ");
-					
+
 					memVars.put(var[1].trim(), var[0].trim());
 				}
 			}
