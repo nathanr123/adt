@@ -18,12 +18,16 @@ public class VPXConstants {
 	 */
 
 	public final static String VPXROOT = "VPXSystem";
-	
+
 	public final static String VPXUNLIST = "Unlisted";
-	
+
 	public final static String WIN_OSNAME = "Windows";
 
+	public final static String LINUX_OSNAME = "Linux";
+
 	public final static String WIN_CMD_BASE = "netsh interface show interface";
+	
+	public final static String LINUX_CMD_BASE = "";
 
 	public static final String RESOURCENAME = "VPX_Dual_adt";
 
@@ -96,7 +100,7 @@ public class VPXConstants {
 	public static final int MAX_MEMORY_BROWSER = 4;
 
 	public static final int MAX_MEMORY_PLOT = 3;
-	
+
 	public static final int MAX_PROCESSOR = 3;
 
 	/*

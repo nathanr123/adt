@@ -397,7 +397,7 @@ public class VPXUtilities {
 
 		try {
 
-			return new ImageIcon(System.getProperty("user.dir") + "\\image\\" + name).getImage();
+			return new ImageIcon(System.getProperty("user.dir") + "/image/" + name).getImage();
 
 		} catch (Exception ioe) {
 
@@ -1006,36 +1006,43 @@ public class VPXUtilities {
 
 		try {
 
-			String cmd = "netsh interface IP show addresses \"" + lanName + "\"";
+			String os = System.getProperty("os.name");
 
-			Process proc = Runtime.getRuntime().exec(cmd);
+			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+				String cmd = "netsh interface IP show addresses \"" + lanName + "\"";
 
-			while ((s = stdInput.readLine()) != null) {
+				Process proc = Runtime.getRuntime().exec(cmd);
 
-				if (s.contains("IP Address:") && (!isAlreadyIPDone)) {
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-					ipAddress = s.split(":")[1].trim();
+				while ((s = stdInput.readLine()) != null) {
 
-					isAlreadyIPDone = true;
+					if (s.contains("IP Address:") && (!isAlreadyIPDone)) {
+
+						ipAddress = s.split(":")[1].trim();
+
+						isAlreadyIPDone = true;
+					}
+
+					if (s.contains("Subnet") && (!isAlreadySubDone)) {
+
+						subnet = (s.split(":")[1].trim());
+
+						String d = subnet.split(" ")[2].trim();
+
+						subnet = d.substring(0, d.length() - 1);
+
+						isAlreadyIPDone = true;
+					}
+					if (s.contains("Default")) {
+
+						gateway = s.split(":")[1].trim();
+
+					}
+
 				}
-
-				if (s.contains("Subnet") && (!isAlreadySubDone)) {
-
-					subnet = (s.split(":")[1].trim());
-
-					String d = subnet.split(" ")[2].trim();
-
-					subnet = d.substring(0, d.length() - 1);
-
-					isAlreadyIPDone = true;
-				}
-				if (s.contains("Default")) {
-
-					gateway = s.split(":")[1].trim();
-
-				}
+			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
 			}
 		} catch (Exception e) {
@@ -1117,7 +1124,10 @@ public class VPXUtilities {
 					j++;
 				}
 
+			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
+
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1129,29 +1139,36 @@ public class VPXUtilities {
 
 		try {
 
-			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+			String os = System.getProperty("os.name");
 
-			while (e.hasMoreElements()) {
+			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
 
-				NetworkInterface currentNetwordInterface = e.nextElement();
+				Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 
-				if (currentNetwordInterface.isLoopback() || !currentNetwordInterface.isUp())
-					continue;
+				while (e.hasMoreElements()) {
 
-				List<InterfaceAddress> ls = currentNetwordInterface.getInterfaceAddresses();
+					NetworkInterface currentNetwordInterface = e.nextElement();
 
-				for (Iterator<InterfaceAddress> iterator = ls.iterator(); iterator.hasNext();) {
+					if (currentNetwordInterface.isLoopback() || !currentNetwordInterface.isUp())
+						continue;
 
-					InterfaceAddress interfaceAddress = iterator.next();
+					List<InterfaceAddress> ls = currentNetwordInterface.getInterfaceAddresses();
 
-					if (interfaceAddress.getAddress().getHostAddress().equals(ip)) {
+					for (Iterator<InterfaceAddress> iterator = ls.iterator(); iterator.hasNext();) {
 
-						currentInterfaceAddress = interfaceAddress;
+						InterfaceAddress interfaceAddress = iterator.next();
 
-						break;
+						if (interfaceAddress.getAddress().getHostAddress().equals(ip)) {
+
+							currentInterfaceAddress = interfaceAddress;
+
+							break;
+						}
+
 					}
-
 				}
+			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
+
 			}
 		} catch (Exception e) {
 		}
@@ -1166,27 +1183,33 @@ public class VPXUtilities {
 	public static boolean setEthernetPort(String lan, String ip, String subnet, String gateway) {
 
 		try {
+			String os = System.getProperty("os.name");
 
-			String cmd = VPXConstants.RUNASADMIN + "netsh interface ip set address \"" + lan
+			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
 
-			+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
+				String cmd = VPXConstants.RUNASADMIN + "netsh interface ip set address \"" + lan
 
-			Process pp = Runtime.getRuntime().exec(cmd);
+				+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pp.getInputStream()));
+				Process pp = Runtime.getRuntime().exec(cmd);
 
-			String s = "";
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(pp.getInputStream()));
 
-			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
+				String s = "";
+
+				while ((s = stdInput.readLine()) != null) {
+					System.out.println(s);
+				}
+
+				BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
+
+				while ((s = stderr.readLine()) != null) {
+
+				}
+
+			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
+
 			}
-
-			BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
-
-			while ((s = stderr.readLine()) != null) {
-
-			}
-
 			// setCurrentIP(ip);
 
 			return true;
@@ -1278,6 +1301,8 @@ public class VPXUtilities {
 
 					j++;
 				}
+
+			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
 			}
 		} catch (Exception e) {

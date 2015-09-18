@@ -176,7 +176,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		editor = new HexEditor(this);
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
-		handleOpenFile("D:\\test.bin", "0x0000000");
+		//handleOpenFile("D:\\test.bin", "0x0000000");
 
 		add(editor);
 

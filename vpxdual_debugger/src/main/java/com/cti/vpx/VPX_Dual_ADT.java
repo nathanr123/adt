@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
@@ -28,23 +29,21 @@ public class VPX_Dual_ADT {
 						new VPX_SplashWindow();
 
 					} else {
-//						VPX_AppMode window = new VPX_AppMode(VPXUtilities.getEthernetPorts(), VPXUtilities
-	//							.getSerialPorts());
+						VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
 
-					 VPX_ETHWindow window = new VPX_ETHWindow();
+						// VPX_ETHWindow window = new VPX_ETHWindow();
 
-					//	window.showWindow();
+						window.showWindow();
 
 					}
 
 				} catch (Exception e) {
-					
-					JOptionPane.showMessageDialog(null,
-							e.getMessage(),
-							"Opening Application", JOptionPane.ERROR_MESSAGE);
+
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Opening Application",
+							JOptionPane.ERROR_MESSAGE);
 
 					e.printStackTrace();
-					
+
 					System.exit(0);
 				}
 			}
