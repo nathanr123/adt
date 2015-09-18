@@ -1857,7 +1857,7 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void populateMemory(int memID,int startAddress, byte[] buffer) {
+	public void populateMemory(int memID,long startAddress, byte[] buffer) {
 		Thread th = new Thread(new Runnable() {
 
 			@Override

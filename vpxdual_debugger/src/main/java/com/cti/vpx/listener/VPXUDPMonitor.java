@@ -836,7 +836,7 @@ public class VPXUDPMonitor {
 			System.arraycopy(bf, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
 
 			((VPX_ETHWindow) listener).populateMemory((int) msg.params.memoryinfo.memIndex.get(),
-					(int) msg.params.memoryinfo.address.get(), bfs);
+					msg.params.memoryinfo.address.get(), bfs);
 
 			// HexEditorDemoApp hd = new HexEditorDemoApp();
 

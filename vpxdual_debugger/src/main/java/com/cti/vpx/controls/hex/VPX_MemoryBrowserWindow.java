@@ -840,7 +840,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	}
 
-	public void setBytes(int startAddress, byte[] buf) {
+	public void setBytes(long startAddress, byte[] buf) {
 		hexPanel.setBytes(startAddress, buf);
 	}
 

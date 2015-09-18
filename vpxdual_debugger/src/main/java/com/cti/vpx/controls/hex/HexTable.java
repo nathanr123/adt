@@ -81,6 +81,8 @@ import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
+
 /**
  * The table displaying the hex content of a file. This is the meat of the hex
  * viewer.

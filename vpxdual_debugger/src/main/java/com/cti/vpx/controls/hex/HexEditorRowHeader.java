@@ -64,31 +64,30 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 	public HexEditorRowHeader(long startAddress, HexTable table) {
 
 		this.table = table;
-		
+
 		model = new RowHeaderListModel(startAddress);
-		
+
 		setModel(model);
-		
+
 		setFocusable(false);
-		
+
 		setFont(table.getFont());
-		
-		
+
 		setFixedCellHeight(table.getRowHeight());
-		
+
 		setCellRenderer(new CellRenderer());
-		
+
 		setBorder(new RowHeaderBorder());
-		
+
 		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		
+
 		syncRowCount(); // Initialize to initial size of table.
-		
+
 		table.getModel().addTableModelListener(this);
 	}
 
 	public HexEditorRowHeader(HexTable table) {
-		
+
 		this(0, table);
 	}
 
@@ -173,6 +172,7 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 		public RowHeaderListModel(long startAddress) {
 
 			this.start = startAddress;
+
 		}
 
 		public Object getElementAt(int index) {
@@ -195,9 +195,9 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 		}
 
 		public long getStartAddress() {
-			
+
 			System.out.println(start);
-			
+
 			return start;
 		}
 	}

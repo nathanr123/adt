@@ -176,7 +176,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		editor = new HexEditor(this);
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
-		//handleOpenFile("D:\\test.bin", "0x0000000");
+		handleOpenFile("D:\\test.bin", "0x0000000");
 
 		add(editor);
 
@@ -452,7 +452,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		}
 	}
 
-	public void setBytes(int startAddress, byte[] buffer) {
+	public void setBytes(long startAddress, byte[] buffer) {
 		try {
 			editor.open(buffer);
 			editor.setShowRowHeader(startAddress, true);

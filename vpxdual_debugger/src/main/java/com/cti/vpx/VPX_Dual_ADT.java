@@ -29,11 +29,11 @@ public class VPX_Dual_ADT {
 						new VPX_SplashWindow();
 
 					} else {
-						VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
+						//VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
 
-						// VPX_ETHWindow window = new VPX_ETHWindow();
-
-						window.showWindow();
+						//window.showWindow();
+						
+						VPX_ETHWindow window = new VPX_ETHWindow();
 
 					}
 
