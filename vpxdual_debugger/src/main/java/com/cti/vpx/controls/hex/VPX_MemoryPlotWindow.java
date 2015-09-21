@@ -540,8 +540,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1FilterPanel.add(plot1MemoryAddressPanel);
 
-		plot1MemoryAddressPanel.setLayout(new MigLayout("",
-				"[109px][46px][206px,grow,fill][46px][126px][46px,right][126px]", "[23px]"));
+		plot1MemoryAddressPanel.setLayout(
+				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][46px,right][126px]", "[23px]"));
 
 		radPlot1UserAddress = new JRadioButton("Use Direct Memory Address");
 
@@ -602,9 +602,11 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1MemoryFilter = new MemoryViewFilter();
 
-		plot1MemoryFilter.setSubsystem(cmbPlot1SubSystem.getSelectedItem().toString());
+		if (cmbPlot1SubSystem.getItemCount() > 0)
+			plot1MemoryFilter.setSubsystem(cmbPlot1SubSystem.getSelectedItem().toString());
 
-		plot1MemoryFilter.setProcessor(cmbPlot1Processor.getSelectedItem().toString());
+		if (cmbPlot1Processor.getItemCount() > 0)
+			plot1MemoryFilter.setProcessor(cmbPlot1Processor.getSelectedItem().toString());
 
 		if (cmbPlot1Cores.getItemCount() > 0) {
 			plot1MemoryFilter.setCore(cmbPlot1Cores.getSelectedItem().toString());
@@ -1078,10 +1080,11 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		plot2MemoryFilter = null;
 
 		plot2MemoryFilter = new MemoryViewFilter();
+		if (cmbPlot2SubSystem.getItemCount() > 0)
+			plot2MemoryFilter.setSubsystem(cmbPlot2SubSystem.getSelectedItem().toString());
 
-		plot2MemoryFilter.setSubsystem(cmbPlot2SubSystem.getSelectedItem().toString());
-
-		plot2MemoryFilter.setProcessor(cmbPlot2Processor.getSelectedItem().toString());
+		if (cmbPlot2Processor.getItemCount() > 0)
+			plot2MemoryFilter.setProcessor(cmbPlot2Processor.getSelectedItem().toString());
 
 		if (cmbPlot2Cores.getItemCount() > 0) {
 

@@ -66,6 +66,12 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 	private VPXSubSystem currentSubSystem = null;
 
 	private VPXSystem sub;
+	private JButton btnAdd;
+	private JButton btnDelete;
+	private JButton btnUpdate;
+	private JButton btnClearAll;
+	private JButton btnReset;
+	private JButton btnSave;
 
 	/**
 	 * Launch the application.
@@ -118,7 +124,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 	private void init() {
 
 		setTitle("Alias Configuration");
-		
+
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setResizable(false);
@@ -220,37 +226,37 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		controlPanel.setLayout(null);
 
-		JButton btnAdd = VPXComponentFactory.createJButton(new AddAliasAction("Add"));
+		btnAdd = VPXComponentFactory.createJButton(new AddAliasAction("Add"));
 
 		btnAdd.setBounds(10, 6, 116, 23);
 
 		controlPanel.add(btnAdd);
 
-		JButton btnDelete = VPXComponentFactory.createJButton(new DeleteAliasAction("Delete"));
+		btnDelete = VPXComponentFactory.createJButton(new DeleteAliasAction("Delete"));
 
 		btnDelete.setBounds(10, 35, 116, 23);
 
 		controlPanel.add(btnDelete);
 
-		JButton btnUpdate = VPXComponentFactory.createJButton(new UpdateAliasAction("Update"));
+		btnUpdate = VPXComponentFactory.createJButton(new UpdateAliasAction("Update"));
 
 		btnUpdate.setBounds(10, 64, 116, 23);
 
 		controlPanel.add(btnUpdate);
 
-		JButton btnClearAll = VPXComponentFactory.createJButton(new DeleteAliasFileAction("Clear All"));
+		btnClearAll = VPXComponentFactory.createJButton(new DeleteAliasFileAction("Clear All"));
 
 		btnClearAll.setBounds(10, 93, 116, 23);
 
 		controlPanel.add(btnClearAll);
 
-		JButton btnReset = VPXComponentFactory.createJButton(new ResetAliasAction("Reset"));
+		btnReset = VPXComponentFactory.createJButton(new ResetAliasAction("Reset"));
 
 		btnReset.setBounds(10, 122, 116, 23);
 
 		controlPanel.add(btnReset);
 
-		JButton btnSave = VPXComponentFactory.createJButton(new SaveAliasAction("Save"));
+		btnSave = VPXComponentFactory.createJButton(new SaveAliasAction("Save"));
 
 		btnSave.setBounds(10, 154, 116, 23);
 
@@ -296,10 +302,12 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 					if (str.length() > 0) {
 						int i = Integer.parseInt(str);
 
-						currentSubSystem = new VPXSubSystem(Integer
-								.valueOf(aliasTableModel.getValueAt(i, 0).toString()), aliasTableModel.getValueAt(i, 1)
-								.toString(), aliasTableModel.getValueAt(i, 2).toString(), aliasTableModel.getValueAt(i,
-								3).toString(), aliasTableModel.getValueAt(i, 4).toString());
+						currentSubSystem = new VPXSubSystem(
+								Integer.valueOf(aliasTableModel.getValueAt(i, 0).toString()),
+								aliasTableModel.getValueAt(i, 1).toString(),
+								aliasTableModel.getValueAt(i, 2).toString(),
+								aliasTableModel.getValueAt(i, 3).toString(),
+								aliasTableModel.getValueAt(i, 4).toString());
 
 						loadAliasDetail();
 					}
@@ -347,11 +355,11 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		contentPane.add(aliasToolbar, BorderLayout.NORTH);
 
-		aliasToolbar.add(VPXComponentFactory.createJToolBarButton(new ImportAliasFileAction("Import",
-				VPXConstants.Icons.ICON_DOWNLOAD)), null);
+		aliasToolbar.add(VPXComponentFactory
+				.createJToolBarButton(new ImportAliasFileAction("Import", VPXConstants.Icons.ICON_DOWNLOAD)), null);
 
-		aliasToolbar.add(VPXComponentFactory.createJToolBarButton(new ExportAliasFileAction("Export",
-				VPXConstants.Icons.ICON_UPLOAD)), null);
+		aliasToolbar.add(VPXComponentFactory
+				.createJToolBarButton(new ExportAliasFileAction("Export", VPXConstants.Icons.ICON_UPLOAD)), null);
 
 	}
 
@@ -362,6 +370,66 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		if (sub != null) {
 
 			aliasTableModel.addSubSystem(sub.getSubsystem());
+		}
+	}
+
+	private void loadSubsystemEditable(String subsystem) {
+
+		if (subsystem.length() > 0) {
+
+			currentSubSystem = sub.getSubSystemByName(subsystem);
+
+			loadAliasDetail();
+
+			txtAliasName.setEditable(true);
+
+			txtP2020.setEditable(false);
+
+			txtDSP1.setEditable(false);
+
+			txtDSP2.setEditable(false);
+
+			btnAdd.setEnabled(false);
+
+			btnDelete.setEnabled(false);
+
+			btnUpdate.setEnabled(true);
+
+			btnClearAll.setEnabled(false);
+
+			btnReset.setEnabled(false);
+
+			btnSave.setEnabled(true);
+
+		} else {
+
+			txtAliasName.setText("");
+
+			txtP2020.setText("");
+
+			txtDSP1.setText("");
+
+			txtDSP2.setText("");
+
+			txtAliasName.setEditable(true);
+
+			txtP2020.setEditable(true);
+
+			txtDSP1.setEditable(true);
+
+			txtDSP2.setEditable(true);
+
+			btnAdd.setEnabled(true);
+
+			btnDelete.setEnabled(true);
+
+			btnUpdate.setEnabled(true);
+
+			btnClearAll.setEnabled(true);
+
+			btnReset.setEnabled(true);
+
+			btnSave.setEnabled(true);
 		}
 	}
 
@@ -436,13 +504,14 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 					if (aliasTableModel.modifySubSystem(currentSubSystem)) {
 
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
-								+ " updated successfully!");
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
+								currentSubSystem.getSubSystem() + " updated successfully!");
 
 						parent.updateLog("Alias Configuration modified");
 					} else {
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in modifying "
-								+ currentSubSystem.getSubSystem(), "Updating", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
+								"Error in modifying " + currentSubSystem.getSubSystem(), "Updating",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 
@@ -450,8 +519,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 					if (aliasTableModel.addSubSystem(currentSubSystem)) {
 
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, currentSubSystem.getSubSystem()
-								+ " added successfully!");
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
+								currentSubSystem.getSubSystem() + " added successfully!");
 
 						parent.updateLog("Alias Configuration Subsystem added");
 					} else {
@@ -539,6 +608,54 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		}
 
 		return ret;
+	}
+
+	public void deleteSelectedSubSystem(String subSystem) {
+
+		currentSubSystem = sub.getSubSystemByName(subSystem);
+
+		if (currentSubSystem != null)
+
+			if (aliasTableModel.deleteSubSystem(currentSubSystem.getId())) {
+
+				VPXUtilities.writeToXMLFile(aliasTableModel.getSubSystem());
+
+				VPXSessionManager.setVPXSystem(VPXUtilities.readFromXMLFile());
+
+				parent.updateProcessorTree();
+				
+				parent.updateLog(subSystem + " deleted ");
+
+				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
+						currentSubSystem.getSubSystem() + " deleted successfully!");
+				currentSubSystem = null;
+				
+				
+			} else {
+				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting " + subSystem, "Deletion",
+						JOptionPane.ERROR_MESSAGE);
+			}
+
+	}
+
+	public void showAliasWindow() {
+
+		loadAliasFile();
+
+		loadSubsystemEditable("");
+
+		setVisible(true);
+
+	}
+
+	public void showAliasWindow(String subSystemName) {
+
+		loadAliasFile();
+
+		loadSubsystemEditable(subSystemName);
+
+		setVisible(true);
+
 	}
 
 	private void centerFrame() {

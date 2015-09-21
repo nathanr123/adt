@@ -45,6 +45,8 @@ public class FixedSizeNumberLabel extends FixedSizeLabel
 	{
 		if (oFormat!=null)
 		{
+			
+			//String.format("%x ",(Long.parseLong(String.valueOf(l), 16) & 0x0ff))
 			setText(oFormat.format(d) + oSuffix);
 		}
 		else

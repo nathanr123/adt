@@ -16,6 +16,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -69,10 +70,23 @@ public class VPXComponentFactory {
 		return item;
 	}
 
+	public static JCheckBoxMenuItem createJCheckBoxMenuItem(String name) {
+
+		JCheckBoxMenuItem item = new JCheckBoxMenuItem(name);
+
+		Dimension d = item.getPreferredSize();
+
+		d.width = 250;
+
+		item.setPreferredSize(d);
+
+		return item;
+	}
+
 	public static JMenuItem createJMenuItem(String name, Icon icon) {
 
 		JMenuItem item = new JMenuItem(name, icon);
-	
+
 		Dimension d = item.getPreferredSize();
 
 		d.width = 250;

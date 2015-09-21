@@ -1827,19 +1827,10 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	// Communication Listener
-	@Override
-	public void updateCommand(ATPCommand command) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
-	public void sendCommand(ATPCommand command) {
-		// TODO Auto-generated method stub
+	public void readMemory(MemoryViewFilter filter) {
 
-	}
-
-	public void loadMemory(MemoryViewFilter filter) {
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -1853,6 +1844,19 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	@Override
+	public void readPlot(MemoryViewFilter filter) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void populatePlot(int plotID, long startAddress, byte[] buffer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void populateMemory(int memID, long startAddress, byte[] buffer) {
 		Thread th = new Thread(new Runnable() {
 

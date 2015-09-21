@@ -1,6 +1,7 @@
 package com.cti.vpx.listener;
 
 import com.cti.vpx.command.ATPCommand;
+import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 
@@ -10,14 +11,19 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
  */
 public interface VPXCommunicationListener extends VPXUDPListener {
 
-	public void updateCommand(ATPCommand command);
-
 	public void updateExit(int val);
 
 	public void updateTestProgress(PROCESSOR_LIST pType, int val);
 
 	public void updateBIST(BIST bist);
 
-	public void sendCommand(ATPCommand command);
+	public void readMemory(MemoryViewFilter filter);
+
+	public void readPlot(MemoryViewFilter filter);
+
+	public void populateMemory(int memID, long startAddress, byte[] buffer);
+
+	public void populatePlot(int plotID, long startAddress, byte[] buffer);
+
 
 }

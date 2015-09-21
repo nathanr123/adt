@@ -8,6 +8,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -29,6 +30,7 @@ public class VPX_AboutWindow extends JDialog {
 	 */
 	private static final long serialVersionUID = 9125929546574219659L;
 	private final JPanel contentPanel = new JPanel();
+	private ResourceBundle rBundle;
 
 	/**
 	 * Launch the application.
@@ -58,6 +60,8 @@ public class VPX_AboutWindow extends JDialog {
 	}
 
 	private void init() {
+		
+		rBundle = VPXUtilities.getResourceBundle();
 
 		setResizable(false);
 
@@ -86,14 +90,14 @@ public class VPX_AboutWindow extends JDialog {
 		lblNewLabel.setIcon(VPXConstants.Icons.ICON_CORNET_BIG);
 		contentPanel.add(lblNewLabel);
 
-		JLabel lblNewLabel_1 = new JLabel("VPX Dual Application Debugger Tool");
+		JLabel lblNewLabel_1 = new JLabel(rBundle.getString("App.title.name"));
 		lblNewLabel_1.setBounds(70, 11, 249, 17);
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.LEFT);
 		lblNewLabel_1.setVerticalAlignment(SwingConstants.TOP);
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 14));
 		contentPanel.add(lblNewLabel_1);
 
-		JLabel lblNewLabel_2 = new JLabel("Version: 1.0");
+		JLabel lblNewLabel_2 = new JLabel("Version : "+rBundle.getString("App.title.version"));
 		lblNewLabel_2.setBounds(70, 39, 249, 14);
 		contentPanel.add(lblNewLabel_2);
 

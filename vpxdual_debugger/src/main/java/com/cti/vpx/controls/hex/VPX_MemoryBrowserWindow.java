@@ -441,7 +441,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 				createFilters();
 
-				parent.loadMemory(memoryFilter);
+				parent.readMemory(memoryFilter);
 
 			}
 		});

@@ -2,11 +2,21 @@ package com.peralex.example;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import com.peralex.utilities.ui.graphs.lineGraph.MultiLineGraph;
+import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
+
 import com.peralex.utilities.ui.graphs.lineGraph.GeneratedLineData;
+import com.peralex.utilities.ui.graphs.lineGraph.MultiLineGraph;
 
 /**
  *
@@ -33,45 +43,79 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 		initComponents();
 
 		lineGraph = new MultiLineGraph();
-		lineGraph.setGridXMinMax(0, 100);
-		lineGraph.setGridYMinMax(-20, 20);
+
 		lineGraph.setFrameLimitingEnabled(true);
 		lineGraph.setGridVisible(true);
 		lineGraph.setZoomEnabled(true);
 
 		graphWrapper = new com.peralex.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
-		//graphWrapper.setTitle("Multiple Line Graph");
-		graphWrapper.setAxisTitlesAndUnits("X", "Data", "Y", "Time");
+		// graphWrapper.setTitle("Multiple Line Graph");
+		graphWrapper.setAxisTitlesAndUnits("X", "Time", "Y", "Data");
 
 		graphPanel.add(graphWrapper, BorderLayout.CENTER);
 
+		lineGraph.setGridXMinMax(0, 100);
+		lineGraph.setGridYMinMax(0, 1024);
 		lineGraph.setLineColor(LINE_1, Color.RED);
 		line1ColorComboBox.setSelectedItem("Red");
 		lineGraph.setLineColor(LINE_2, Color.GREEN);
 		line2ColorComboBox.setSelectedItem("Green");
 
 		line1Data = new GeneratedLineData(0, 0, 0, new float[0]);
-		line1Data.setXValues(0, 100, 100);
-		final float[] yValues1 = new float[100];
-		line1Data.setYValues(yValues1);
 
 		line2Data = new GeneratedLineData(0, 0, 0, new float[0]);
-		line2Data.setXValues(0, 100, 100);
-		final float[] yValues2 = new float[100];
-		line2Data.setYValues(yValues2);
 
-		dataTimer = new javax.swing.Timer(500, new ActionListener() {
+		dataTimer = new javax.swing.Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				final int noPoints = (Integer) noXPointsSpinner.getValue();
-				for (int i = 0; i < noPoints; i++) {
-					yValues1[i] = (float) (Math.random() * 10) - 10;
-					yValues2[i] = (float) (Math.random() * 10);
-				}
+
+				float[] floats = getFile("D:\\test.bin");
+				line1Data.setXValues(0, floats.length, floats.length);
+				final float[] yValues1 = new float[floats.length];
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+				line1Data.setYValues(yValues1);
+
+				floats = getFile("D:\\test.bin");
+				line2Data.setXValues(0, floats.length, floats.length);
+				final float[] yValues2 = new float[floats.length];
+				line2Data.setYValues(yValues2);
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
 				lineGraph.setGraphData(LINE_1, line1Data);
 				lineGraph.setGraphData(LINE_2, line2Data);
+
 			}
 		});
+
 		dataTimer.start();
+	}
+
+	public float[] getFile(String fileName) {
+		float[] f = null;
+		try {
+			Path path = Paths.get(fileName);
+
+			byte[] data = Files.readAllBytes(path);
+
+			f = toFloatArray(data);
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		return f;
+
+	}
+
+	private static float[] toFloatArray(byte[] bytes) {
+
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		FloatBuffer fb = buffer.asFloatBuffer();
+
+		float[] floatArray = new float[fb.limit()];
+		fb.get(floatArray);
+
+		return floatArray;
 	}
 
 	/**
@@ -249,7 +293,7 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(4, 13, 0, 0);
 		controlPanel.add(jLabel5, gridBagConstraints);
 
-		noXPointsSpinner.setModel(new javax.swing.SpinnerNumberModel(100, 1, 5000, 1));
+		noXPointsSpinner.setModel(new javax.swing.SpinnerNumberModel(1024, 1, 5000, 1));
 		noXPointsSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 			public void stateChanged(javax.swing.event.ChangeEvent evt) {
 				noXPointsSpinnerStateChanged(evt);

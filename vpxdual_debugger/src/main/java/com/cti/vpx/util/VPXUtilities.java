@@ -1044,13 +1044,77 @@ public class VPXUtilities {
 				}
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
+				String[] cmd = { "/bin/sh", "-c", "ifconfig " + lanName };
+
+				Process proc = Runtime.getRuntime().exec(cmd);
+
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+				while ((s = stdInput.readLine()) != null) {
+
+					if (s.trim().startsWith("inet addr")) {
+
+						String[] detail = s.trim().split(" ");
+
+						for (int i = 0; i < detail.length; i++) {
+
+							if (detail[i].length() > 0) {
+
+								if (detail[i].startsWith("addr:")) {
+
+									ipAddress = detail[i].trim().split(":")[1].trim();
+
+								} else if (detail[i].startsWith("Mask:")) {
+
+									subnet = detail[i].trim().split(":")[1].trim();
+								}
+							}
+						}
+
+					}
+
+				}
+
+				String[] cmd1 = { "/bin/sh", "-c", "route -e | grep " + lanName };
+
+				proc = Runtime.getRuntime().exec(cmd1);
+
+				stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+				while ((s = stdInput.readLine()) != null) {
+
+					if (s.startsWith("default")) {
+
+						int j = 0;
+
+						String[] detail = s.trim().split(" ");
+
+						for (int i = 0; i < detail.length; i++) {
+
+							if (detail[i].length() > 0) {
+								if (j == 1) {
+									gateway = detail[i].trim();
+									break;
+								}
+
+								j++;
+							}
+
+						}
+					}
+
+				}
+
 			}
 		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
+
 		ipAddress = (ipAddress != null) ? ipAddress : " ";
+
 		subnet = (subnet != null) ? subnet : " ";
+
 		gateway = (gateway != null) ? gateway : " ";
 
 		return ipAddress + "," + subnet + "," + gateway;
@@ -1112,10 +1176,6 @@ public class VPXUtilities {
 						break;
 					case 3:
 						ifs.setName(string);
-						// String[] sss = getNetworkSettings(string).split(",");
-						// ifs.addIPAddress(sss[0]);
-						// ifs.setSubnet(sss[1]);
-						// ifs.setGateWay(sss[2]);
 						nwIfaces.add(ifs);
 						j = -1;
 						break;
@@ -1126,6 +1186,58 @@ public class VPXUtilities {
 
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
+				String[] cmd = { "/bin/sh", "-c", VPXConstants.LINUX_CMD_BASE };
+
+				Process p = Runtime.getRuntime().exec(cmd);
+
+				BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+				// reading output stream of the command
+
+				while ((s = inputStream.readLine()) != null) {
+
+					nwIface.add(s);
+
+				}
+				s = null;
+
+				inputStream.close();
+
+				NWInterface ifs = null;
+
+				for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
+
+					String[] string = iterator.next().split(":");
+
+					if (string[0].trim().length() > 0) {
+
+						ifs = null;
+
+						ifs = new NWInterface();
+
+						ifs.setName(string[0].trim());
+
+						String state = string[1].trim().split(" ")[1].trim();
+
+						if (state.contains("up") || state.contains("UP")) {
+
+							ifs.setEnabled(true);
+
+							ifs.setConnected(true);
+
+							ifs.setDedicated(true);
+						} else {
+							ifs.setEnabled(false);
+
+							ifs.setConnected(false);
+
+							ifs.setDedicated(false);
+						}
+
+						nwIfaces.add(ifs);
+
+					}
+				}
 			}
 
 		} catch (Exception e) {
@@ -1141,7 +1253,7 @@ public class VPXUtilities {
 
 			String os = System.getProperty("os.name");
 
-			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
+			if (os.startsWith(VPXConstants.WIN_OSNAME) || os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
 				Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 
@@ -1167,8 +1279,6 @@ public class VPXUtilities {
 
 					}
 				}
-			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
-
 			}
 		} catch (Exception e) {
 		}
@@ -1193,24 +1303,69 @@ public class VPXUtilities {
 
 				Process pp = Runtime.getRuntime().exec(cmd);
 
-				BufferedReader stdInput = new BufferedReader(new InputStreamReader(pp.getInputStream()));
-
-				String s = "";
-
-				while ((s = stdInput.readLine()) != null) {
-					System.out.println(s);
-				}
-
-				BufferedReader stderr = new BufferedReader(new InputStreamReader(pp.getErrorStream()));
-
-				while ((s = stderr.readLine()) != null) {
-
-				}
+				/*
+				 * BufferedReader stdInput = new BufferedReader(new
+				 * InputStreamReader(pp.getInputStream()));
+				 * 
+				 * String s = "";
+				 * 
+				 * while ((s = stdInput.readLine()) != null) {
+				 * System.out.println(s); }
+				 * 
+				 * BufferedReader stderr = new BufferedReader(new
+				 * InputStreamReader(pp.getErrorStream()));
+				 * 
+				 * while ((s = stderr.readLine()) != null) {
+				 * 
+				 * System.out.println(s);
+				 * 
+				 * }
+				 */
 
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
+				String password = VPXLinuxCommand.getPasswdForRoot();
+
+				String cmd = String.format("sudo ifconfig %s %s netmask %s up", lan, ip, subnet);
+
+				Process pp = VPXLinuxCommand.runFromRoot(cmd, password);
+
+				/*
+				 * BufferedReader stdInput = new BufferedReader(new
+				 * InputStreamReader(pp.getInputStream()));
+				 * 
+				 * String s = "";
+				 * 
+				 * while ((s = stdInput.readLine()) != null) {
+				 * System.out.println(s); }
+				 * 
+				 * BufferedReader stderr = new BufferedReader(new
+				 * InputStreamReader(pp.getErrorStream()));
+				 * 
+				 * while ((s = stderr.readLine()) != null) {
+				 * 
+				 * System.out.println(s);
+				 * 
+				 * }
+				 */
+				cmd = String.format("sudo ip route replace default via %s", gateway);
+
+				pp = VPXLinuxCommand.runFromRoot(cmd, password);
+
+				/*
+				 * stdInput = new BufferedReader(new
+				 * InputStreamReader(pp.getInputStream()));
+				 * 
+				 * while ((s = stdInput.readLine()) != null) {
+				 * System.out.println(s); }
+				 * 
+				 * stderr = new BufferedReader(new
+				 * InputStreamReader(pp.getErrorStream()));
+				 * 
+				 * while ((s = stderr.readLine()) != null) {
+				 * System.out.println(s); }
+				 */
 			}
-			// setCurrentIP(ip);
 
 			return true;
 
@@ -1303,6 +1458,69 @@ public class VPXUtilities {
 				}
 
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
+
+				String[] cmd = { "/bin/sh", "-c", VPXConstants.LINUX_CMD_BASE };
+
+				Process p = Runtime.getRuntime().exec(cmd);
+
+				BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+				// reading output stream of the command
+
+				while ((s = inputStream.readLine()) != null) {
+
+					nwIface.add(s);
+
+				}
+				s = null;
+
+				inputStream.close();
+
+				NWInterface ifs = null;
+
+				for (Iterator<String> iterator = nwIface.iterator(); iterator.hasNext();) {
+
+					String[] string = iterator.next().split(":");
+
+					if (string[0].trim().length() > 0 && string[0].trim().equals(name)) {
+
+						ifs = null;
+
+						ifs = new NWInterface();
+
+						ifs.setName(string[0].trim());
+
+						String state = string[1].trim().split(" ")[1].trim();
+
+						if (state.contains("up") || state.contains("UP")) {
+
+							ifs.setEnabled(true);
+
+							ifs.setConnected(true);
+
+							ifs.setDedicated(true);
+
+							String[] sss = getNetworkSettings(string[0].trim()).split(",");
+
+							ifs.addIPAddress(sss[0]);
+
+							ifs.setSubnet(sss[1]);
+
+							ifs.setGateWay(sss[2]);
+
+						} else {
+							ifs.setEnabled(false);
+
+							ifs.setConnected(false);
+
+							ifs.setDedicated(false);
+						}
+
+						nw = ifs;
+
+						break;
+					}
+				}
 
 			}
 		} catch (Exception e) {

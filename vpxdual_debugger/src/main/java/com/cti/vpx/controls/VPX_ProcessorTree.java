@@ -22,6 +22,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -278,16 +279,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		this.system = VPXSessionManager.getVPXSystem();
 
 		loadSystemRootNode();
-
-		for (int i = 0; i < getRowCount(); i++) {
-
-			expandRow(i);
-		}
 	}
 
 	public boolean isSubSystemsAvailable() {
 
-		return (system.getSubsystem().size() > 0);
+		return (this.system.getSubsystem().size() > 0);
 	}
 
 	public void updateProcessorResponse(String ip, String res) {
@@ -532,7 +528,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		systemRootNode.removeAllChildren();
 
-		List<VPXSubSystem> subSystems = system.getSubsystem();
+		List<VPXSubSystem> subSystems = this.system.getSubsystem();
 
 		if (subSystems != null) {
 
@@ -578,7 +574,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		}
 
-		// refresh();
+		refresh();
 
 	}
 
@@ -802,8 +798,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void nodePopupEvent(MouseEvent e) {
 
-		System.out.println("Came Here");
-
 		int x = e.getX();
 
 		int y = e.getY();
@@ -877,7 +871,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				parent.showAliasConfig();
+				parent.showAliasConfig("");
 
 			}
 		});
@@ -1083,6 +1077,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
+				VPX_ProcessorNode nd = (VPX_ProcessorNode) getSelectionModel().getSelectionPath()
+						.getLastPathComponent();
+
+				parent.showAliasConfig(nd.getNodeName());
+
 			}
 		});
 
@@ -1092,6 +1091,19 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
+				VPX_ProcessorNode nd = (VPX_ProcessorNode) getSelectionModel().getSelectionPath()
+						.getLastPathComponent();
+
+				int result = JOptionPane.showConfirmDialog(parent,
+						String.format("Are yousure you want to remove subsystem \'%s\' from the VPXSystem?",
+								nd.getNodeName()),
+						"Confirmation", JOptionPane.YES_NO_OPTION);
+
+				if (result == JOptionPane.YES_OPTION) {
+
+					parent.deleteSubSystem(nd.getNodeName());
+				}
 
 			}
 		});
@@ -1230,9 +1242,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
-				vpx_contextMenu.add(vpx_Cxt_SubSystem);
+				if (!node.getNodeName().trim().equals(VPXConstants.VPXUNLIST)) {
+					vpx_contextMenu.add(vpx_Cxt_SubSystem);
 
-				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
+					vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
+
+				}
 
 				vpx_contextMenu.add(vpx_Cxt_Refresh);
 
@@ -1281,7 +1296,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 			}
 		} else {
-			
+
 			// To Do
 			vpx_contextMenu.add(vpx_Cxt_SubSystem);
 		}

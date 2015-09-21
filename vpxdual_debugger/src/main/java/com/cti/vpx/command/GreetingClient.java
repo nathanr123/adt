@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
-import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -71,13 +70,13 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		f.setBounds(10, 10, 500, 500);
+		f.setBounds(10, 10, 800, 500);
 
 		JPanel jp = new JPanel();
 
 		jt = new JTextArea();
 
-		jp.setPreferredSize(new Dimension(500, 50));
+		jp.setPreferredSize(new Dimension(500, 250));
 
 		JButton jb = new JButton("Send Command");
 
@@ -163,7 +162,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		});
 
 		jp.add(jb4);
-		
+
 		JButton jb5 = new JButton("Read Memory");
 
 		jb5.addActionListener(new ActionListener() {
@@ -175,6 +174,18 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		});
 
 		jp.add(jb5);
+
+		JButton jb6 = new JButton("Set Memory");
+
+		jb6.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setMemory();
+			}
+		});
+
+		jp.add(jb6);
 
 		f.getContentPane().setLayout(new BorderLayout());
 
@@ -202,18 +213,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	}
 
-	public void readMemory() {
-		
-		MemoryViewFilter m = new MemoryViewFilter();
-		
-		m.setMemoryAddress("0x90000000");
-		m.setMemoryLength("1135");
-		m.setProcessor("172.17.10.140");
-		m.setMemoryBrowserID(0);
-		
-		udp.readMemory(m);
-	
-/*
+	public void setMemory() {
+
 		DatagramSocket datagramSocket;
 
 		try {
@@ -226,31 +227,22 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			ByteBuffer bf = ByteBuffer.wrap(buffer);
 
 			bf.order(msg.byteOrder());
-			
+
 			msg.setByteBuffer(bf, 0);
 
-			msg.msgID.set(ATP.MSG_ID_GET);
+			msg.msgID.set(ATP.MSG_ID_SET);
 
 			msg.msgType.set(ATP.MSG_TYPE_MEMORY);
-			
-			
-			String str = "0xA0000000";
 
-			if (str.startsWith("0x") || str.startsWith("0X")) {
+			msg.params.memoryinfo.address.set(0xA0000000);
 
-				str = str.substring(2, str.length());
-			}
+			msg.params.memoryinfo.length.set(1);
 
-			//new BigInteger(str, 16).intValue()
-			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
-
-
-//			msg.params.memoryinfo.address.set(0xA0000000);
-			msg.params.memoryinfo.length.set(1023);
 			msg.params.memoryinfo.memIndex.set(0);
-			// msg.command_msg.set("temp1");
 
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
+			msg.params.memoryinfo.newvalue.set(10);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.140"),
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
@@ -262,13 +254,72 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			e.printStackTrace();
 		}
 
-		//long value = new BigInteger("A000000", 16).intValue();
-		//System.out.println(value);
-		
-		*/
 	}
-	
-	
+
+	public void readMemory() {
+
+		MemoryViewFilter m = new MemoryViewFilter();
+
+		m.setMemoryAddress("0x90000000");
+		m.setMemoryLength("1135");
+		m.setProcessor("172.17.10.140");
+		m.setMemoryBrowserID(0);
+
+		udp.readMemory(m);
+
+		/*
+		 * DatagramSocket datagramSocket;
+		 * 
+		 * try { datagramSocket = new DatagramSocket();
+		 * 
+		 * DSPATPCommand msg = new DSPATPCommand();
+		 * 
+		 * byte[] buffer = new byte[msg.size()];
+		 * 
+		 * ByteBuffer bf = ByteBuffer.wrap(buffer);
+		 * 
+		 * bf.order(msg.byteOrder());
+		 * 
+		 * msg.setByteBuffer(bf, 0);
+		 * 
+		 * msg.msgID.set(ATP.MSG_ID_GET);
+		 * 
+		 * msg.msgType.set(ATP.MSG_TYPE_MEMORY);
+		 * 
+		 * 
+		 * String str = "0xA0000000";
+		 * 
+		 * if (str.startsWith("0x") || str.startsWith("0X")) {
+		 * 
+		 * str = str.substring(2, str.length()); }
+		 * 
+		 * //new BigInteger(str, 16).intValue()
+		 * msg.params.memoryinfo.address.set(new BigInteger(str,
+		 * 16).intValue());
+		 * 
+		 * 
+		 * // msg.params.memoryinfo.address.set(0xA0000000);
+		 * msg.params.memoryinfo.length.set(1023);
+		 * msg.params.memoryinfo.memIndex.set(0); //
+		 * msg.command_msg.set("temp1");
+		 * 
+		 * DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+		 * InetAddress.getByName("172.17.10.130"), VPXUDPListener.COMM_PORTNO);
+		 * 
+		 * datagramSocket.send(packet);
+		 * 
+		 * jt.append("Message Sent\n");
+		 * 
+		 * } catch (Exception e) {
+		 * 
+		 * e.printStackTrace(); }
+		 * 
+		 * //long value = new BigInteger("A000000", 16).intValue();
+		 * //System.out.println(value);
+		 * 
+		 */
+	}
+
 	public void readFile() {
 
 		Map<String, String> memVars = VPXUtilities.getMemoryAddressVariables("D:\\mapFiles\\hyperlink-edma.map");
@@ -286,7 +337,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			Map.Entry<String, String> entry = entries.next();
 
 			String key = entry.getKey();
-			
+
 			String value = entry.getValue();
 
 			System.out.println(key + " ----> " + value);
@@ -928,18 +979,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	}
 
-	@Override
-	public void updateCommand(ATPCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendCommand(ATPCommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
+	
 	@Override
 	public void updateMessage(String ip, String msg) {
 		// TODO Auto-generated method stub
@@ -1005,6 +1045,30 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
 		bistWindow.updateTestProgress(pType, val);
 
+	}
+
+	@Override
+	public void readMemory(MemoryViewFilter filter) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void readPlot(MemoryViewFilter filter) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void populateMemory(int memID, long startAddress, byte[] buffer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void populatePlot(int plotID, long startAddress, byte[] buffer) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
