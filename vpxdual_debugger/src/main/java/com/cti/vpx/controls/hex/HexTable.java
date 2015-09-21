@@ -47,12 +47,15 @@ import java.io.InputStream;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -81,8 +84,6 @@ import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
-
 /**
  * The table displaying the hex content of a file. This is the meat of the hex
  * viewer.
@@ -99,14 +100,35 @@ class HexTable extends JTable {
 	private Hex8 model;
 	int leadSelectionIndex;
 	int anchorSelectionIndex;
+	private int currRow;
+	private long currAddress;
+	private int currCol;
 
 	private ResourceBundle rBundle = VPXUtilities.getResourceBundle();
 
 	private final JPopupMenu vpx_Hex_ContextMenu = new JPopupMenu();
 
-	private static final Color ANTERNATING_CELL_COLOR = new Color(240, 240, 240);
+	private static final Color ANTERNATING_CELL_COLOR =new Color(224, 224, 255);
 
 	private HexEditorPanel parent;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_Hex8;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_Hex16;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_Hex32;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_Hex64;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_SignedInt16;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_SignedInt32;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_UnSignedInt16;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_UnSignedInt32;
+
+	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_Floating32;
 
 	/**
 	 * Creates a new table to display hex data.
@@ -146,7 +168,7 @@ class HexTable extends JTable {
 
 		setDefaultEditor(Object.class, new CellEditor());
 
-		// setDefaultRenderer(Object.class, new CellRenderer());
+		setDefaultRenderer(Object.class, new CellRenderer());
 
 		getTableHeader().setReorderingAllowed(false);
 
@@ -181,30 +203,42 @@ class HexTable extends JTable {
 
 		createPopupMenu();
 
-		setComponentPopupMenu(vpx_Hex_ContextMenu);
-
 		addMouseListener(new MouseAdapter() {
 
 			public void mousePressed(MouseEvent me) {
 
-				if (me.getClickCount() == 2) {
+			}
 
-					JTable table = (JTable) me.getSource();
+			@Override
+			public void mouseReleased(MouseEvent me) {
 
-					Point p = me.getPoint();
+				JTable table = (JTable) me.getSource();
 
-					int row = table.rowAtPoint(p);
+				Point p = me.getPoint();
 
-					long address = VPXUtilities.getIntValue(
-							hexEditor.getHexEditorRowHeader().getRowHeaderModel().getElementAt(row).toString());
+				currRow = table.rowAtPoint(p);
 
-					int col = table.columnAtPoint(p);
+				currAddress = VPXUtilities.getValue(
+						hexEditor.getHexEditorRowHeader().getRowHeaderModel().getElementAt(currRow).toString());
 
-					parent.doSetMemory(address + col, getValueAt(row, col).toString(), "");
+				currCol = table.columnAtPoint(p);
+
+				if (me.isPopupTrigger()) { // if the event shows the menu
+					vpx_Hex_ContextMenu.show(table, me.getX(), me.getY()); // and
+																			// show
+																			// the
+																			// menu
+				} else if (me.getClickCount() == 2) {
+
+					parent.doSetMemory(currAddress + currCol, getValueAt(currRow, currCol).toString(), "");
 
 				}
 			}
 		});
+	}
+
+	public HexEditor getHexEditor() {
+		return this.hexEditor;
 	}
 
 	/**
@@ -390,19 +424,19 @@ class HexTable extends JTable {
 			}
 		});
 
-		/*
-		 * JMenuItem vpx_Hex_Cxt_SetMemory =
-		 * VPXComponentFactory.createJMenuItem(rBundle.getString(
-		 * "Action.Dump.Set"), VPXConstants.Icons.ICON_EMPTY);
-		 * 
-		 * vpx_Hex_Cxt_SetMemory.addActionListener(new ActionListener() {
-		 * 
-		 * @Override public void actionPerformed(ActionEvent e) {
-		 * 
-		 * //parent.doSetMemory();
-		 * 
-		 * } });
-		 */
+		JMenuItem vpx_Hex_Cxt_SetMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Set"),
+				VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Hex_Cxt_SetMemory.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doSetMemory(currAddress + currCol, getValueAt(currRow, currCol).toString(), "");
+
+			}
+		});
+
 		JMenuItem vpx_Hex_Cxt_Save = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Name"),
 				VPXConstants.Icons.ICON_SAVE);
 
@@ -416,8 +450,179 @@ class HexTable extends JTable {
 			}
 		});
 
+		JMenu vpx_Hex_Cxt_GroupMenu = VPXComponentFactory.createJMenu(rBundle.getString("Action.Group.GroupAs"));
+
+		vpx_Hex_Cxt_GrpAs_Hex8 = VPXComponentFactory.createJCheckBoxMenuItem(rBundle.getString("Action.Group.Hex8"));
+
+		vpx_Hex_Cxt_GrpAs_Hex8.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_Hex8.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.HEX8);
+
+				setCheckedSelectedFormat(HexEditor.HEX8);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_Hex16 = VPXComponentFactory.createJCheckBoxMenuItem(rBundle.getString("Action.Group.Hex16"));
+
+		vpx_Hex_Cxt_GrpAs_Hex16.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_Hex16.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.HEX16);
+
+				setCheckedSelectedFormat(HexEditor.HEX16);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_Hex32 = VPXComponentFactory.createJCheckBoxMenuItem(rBundle.getString("Action.Group.Hex32"));
+
+		vpx_Hex_Cxt_GrpAs_Hex32.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_Hex32.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.HEX32);
+
+				setCheckedSelectedFormat(HexEditor.HEX32);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_Hex64 = VPXComponentFactory.createJCheckBoxMenuItem(rBundle.getString("Action.Group.Hex64"));
+
+		vpx_Hex_Cxt_GrpAs_Hex64.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_4, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_Hex64.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.HEX64);
+
+				setCheckedSelectedFormat(HexEditor.HEX64);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_SignedInt16 = VPXComponentFactory
+				.createJCheckBoxMenuItem(rBundle.getString("Action.Group.SignedInt16"));
+
+		vpx_Hex_Cxt_GrpAs_SignedInt16.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_5, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_SignedInt16.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.SINGNEDINT16);
+
+				setCheckedSelectedFormat(HexEditor.SINGNEDINT16);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_SignedInt32 = VPXComponentFactory
+				.createJCheckBoxMenuItem(rBundle.getString("Action.Group.SignedInt32"));
+
+		vpx_Hex_Cxt_GrpAs_SignedInt32.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_6, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_SignedInt32.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.SINGNEDINT32);
+
+				setCheckedSelectedFormat(HexEditor.SINGNEDINT32);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_UnSignedInt16 = VPXComponentFactory
+				.createJCheckBoxMenuItem(rBundle.getString("Action.Group.UnSignedInt16"));
+
+		vpx_Hex_Cxt_GrpAs_UnSignedInt16.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_7, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_UnSignedInt16.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.UNSINGNEDINT16);
+
+				setCheckedSelectedFormat(HexEditor.UNSINGNEDINT16);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_UnSignedInt32 = VPXComponentFactory
+				.createJCheckBoxMenuItem(rBundle.getString("Action.Group.UnSignedInt32"));
+
+		vpx_Hex_Cxt_GrpAs_UnSignedInt32.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_8, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_UnSignedInt32.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.UNSINGNEDINT32);
+
+				setCheckedSelectedFormat(HexEditor.UNSINGNEDINT32);
+
+			}
+		});
+
+		vpx_Hex_Cxt_GrpAs_Floating32 = VPXComponentFactory
+				.createJCheckBoxMenuItem(rBundle.getString("Action.Group.Floating32"));
+
+		vpx_Hex_Cxt_GrpAs_Floating32.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_9, ActionEvent.CTRL_MASK));
+
+		vpx_Hex_Cxt_GrpAs_Floating32.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.doFormatSelectionAction(HexEditor.UNSINGNEDFLOAT32);
+
+				setCheckedSelectedFormat(HexEditor.UNSINGNEDFLOAT32);
+
+			}
+		});
+
+		setCheckedSelectedFormat(HexEditor.HEX8);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_Hex8);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_Hex16);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_Hex32);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_Hex64);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_SignedInt16);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_SignedInt32);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_UnSignedInt16);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_UnSignedInt32);
+
+		vpx_Hex_Cxt_GroupMenu.add(vpx_Hex_Cxt_GrpAs_Floating32);
+
 		JMenuItem vpx_Hex_Cxt_Cut = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Cut.Name"),
-				VPXConstants.Icons.ICON_CUT);
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Hex_Cxt_Cut.addActionListener(new ActionListener() {
 
@@ -510,9 +715,13 @@ class HexTable extends JTable {
 
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_FillMemory);
 
-		// vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_SetMemory);
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_SetMemory);
 
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Save);
+
+		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_GroupMenu);
 
 		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
 
@@ -534,6 +743,54 @@ class HexTable extends JTable {
 
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Settings);
 
+	}
+
+	public void setCheckedSelectedFormat(int format) {
+
+		if (format == HexEditor.HEX8)
+			vpx_Hex_Cxt_GrpAs_Hex8.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_Hex8.setSelected(false);
+
+		if (format == HexEditor.HEX16)
+			vpx_Hex_Cxt_GrpAs_Hex16.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_Hex16.setSelected(false);
+
+		if (format == HexEditor.HEX32)
+			vpx_Hex_Cxt_GrpAs_Hex32.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_Hex32.setSelected(false);
+
+		if (format == HexEditor.HEX64)
+			vpx_Hex_Cxt_GrpAs_Hex64.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_Hex64.setSelected(false);
+
+		if (format == HexEditor.SINGNEDINT16)
+			vpx_Hex_Cxt_GrpAs_SignedInt16.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_SignedInt16.setSelected(false);
+
+		if (format == HexEditor.SINGNEDINT32)
+			vpx_Hex_Cxt_GrpAs_SignedInt32.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_SignedInt32.setSelected(false);
+
+		if (format == HexEditor.UNSINGNEDINT16)
+			vpx_Hex_Cxt_GrpAs_UnSignedInt16.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_UnSignedInt16.setSelected(false);
+
+		if (format == HexEditor.UNSINGNEDINT32)
+			vpx_Hex_Cxt_GrpAs_UnSignedInt32.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_UnSignedInt32.setSelected(false);
+
+		if (format == HexEditor.UNSINGNEDFLOAT32)
+			vpx_Hex_Cxt_GrpAs_Floating32.setSelected(true);
+		else
+			vpx_Hex_Cxt_GrpAs_Floating32.setSelected(false);
 	}
 
 	/**
@@ -732,7 +989,7 @@ class HexTable extends JTable {
 		return false;// cellToOffset(row, col) > -1;
 	}
 
-	public boolean isCellSelected(int row, int col) {
+	public boolean isCellSelected1(int row, int col) {
 		int offset = cellToOffset(row, col);
 		if (offset == -1) { // "Ascii dump" column
 			return false;
@@ -800,13 +1057,13 @@ class HexTable extends JTable {
 
 		Component component = renderer.getTableCellRendererComponent(this, value, isSelected, hasFocus, row, column);
 
+	//	component.setForeground(Color.RED);
+		
 		int rendererWidth = component.getPreferredSize().width;
 
 		TableColumn tableColumn = getColumnModel().getColumn(column);
-
+		
 		HexEditor scrollPane = (HexEditor) SwingUtilities.getAncestorOfClass(JScrollPane.class, HexTable.this);
-
-		RowHeaderListModel c = scrollPane.getHexEditorRowHeader().getRowHeaderModel();
 
 		int cols = 0;
 
@@ -830,11 +1087,20 @@ class HexTable extends JTable {
 			cols = column * 8;
 		}
 
-		((JComponent) component).setToolTipText(String.format("<html>Address : %s<br>Value : %s</html>",
+		HexEditorRowHeader hexRowHeader = scrollPane.getHexEditorRowHeader();
 
-		String.format("%08x", (Long.decode(c.getElementAt(row).toString()) + cols)).toUpperCase(),
-				value.toString().toUpperCase())); // For all format
+		if (hexRowHeader != null) {
 
+			RowHeaderListModel c = hexRowHeader.getRowHeaderModel();
+
+			if (c != null) {
+				((JComponent) component).setToolTipText(String.format("<html>Address : %s<br>External : %s</html>",
+
+				("0x" + String.format("%08x", (Long.decode(c.getElementAt(row).toString()) + cols)).toUpperCase()),
+						value.toString().toUpperCase())); // For all format
+			}
+		}
+		
 		tableColumn.setPreferredWidth(
 				Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
 
@@ -845,58 +1111,110 @@ class HexTable extends JTable {
 	protected void processKeyEvent(java.awt.event.KeyEvent e) {
 
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_LEFT:
-				boolean extend = e.isShiftDown();
-				int offs = Math.max(leadSelectionIndex - 1, 0);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_RIGHT:
-				extend = e.isShiftDown();
-				offs = Math.min(leadSelectionIndex + 1, model.getByteCount() - 1);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_UP:
-				extend = e.isShiftDown();
-				offs = Math.max(leadSelectionIndex - 16, 0);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_DOWN:
-				extend = e.isShiftDown();
-				offs = Math.min(leadSelectionIndex + 16, model.getByteCount() - 1);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_PAGE_DOWN:
-				extend = e.isShiftDown();
-				int visibleRowCount = getVisibleRect().height / getRowHeight();
-				offs = Math.min(leadSelectionIndex + visibleRowCount * 16, model.getByteCount() - 1);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_PAGE_UP:
-				extend = e.isShiftDown();
-				visibleRowCount = getVisibleRect().height / getRowHeight();
-				offs = Math.max(leadSelectionIndex - visibleRowCount * 16, 0);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_HOME:
-				extend = e.isShiftDown();
-				offs = (leadSelectionIndex / 16) * 16;
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
-			case KeyEvent.VK_END:
-				extend = e.isShiftDown();
-				offs = (leadSelectionIndex / 16) * 16 + 15;
-				offs = Math.min(offs, model.getByteCount() - 1);
-				changeSelectionByOffset(offs, extend);
-				e.consume();
-				break;
+
+			if (!e.isControlDown()) {
+
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_LEFT:
+					boolean extend = e.isShiftDown();
+					int offs = Math.max(leadSelectionIndex - 1, 0);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_RIGHT:
+					extend = e.isShiftDown();
+					offs = Math.min(leadSelectionIndex + 1, model.getByteCount() - 1);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_UP:
+					extend = e.isShiftDown();
+					offs = Math.max(leadSelectionIndex - 16, 0);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_DOWN:
+					extend = e.isShiftDown();
+					offs = Math.min(leadSelectionIndex + 16, model.getByteCount() - 1);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_PAGE_DOWN:
+					extend = e.isShiftDown();
+					int visibleRowCount = getVisibleRect().height / getRowHeight();
+					offs = Math.min(leadSelectionIndex + visibleRowCount * 16, model.getByteCount() - 1);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_PAGE_UP:
+					extend = e.isShiftDown();
+					visibleRowCount = getVisibleRect().height / getRowHeight();
+					offs = Math.max(leadSelectionIndex - visibleRowCount * 16, 0);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_HOME:
+					extend = e.isShiftDown();
+					offs = (leadSelectionIndex / 16) * 16;
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				case KeyEvent.VK_END:
+					extend = e.isShiftDown();
+					offs = (leadSelectionIndex / 16) * 16 + 15;
+					offs = Math.min(offs, model.getByteCount() - 1);
+					changeSelectionByOffset(offs, extend);
+					e.consume();
+					break;
+				}
+			} else if (e.isControlDown()) {
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_1:
+					vpx_Hex_Cxt_GrpAs_Hex8.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_2:
+					vpx_Hex_Cxt_GrpAs_Hex16.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_3:
+					vpx_Hex_Cxt_GrpAs_Hex32.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_4:
+					vpx_Hex_Cxt_GrpAs_Hex64.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_5:
+					vpx_Hex_Cxt_GrpAs_SignedInt16.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_6:
+					vpx_Hex_Cxt_GrpAs_SignedInt32.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_7:
+					vpx_Hex_Cxt_GrpAs_UnSignedInt16.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_8:
+					vpx_Hex_Cxt_GrpAs_UnSignedInt32.doClick();
+					e.consume();
+					break;
+
+				case KeyEvent.VK_9:
+					vpx_Hex_Cxt_GrpAs_Floating32.doClick();
+					e.consume();
+					break;
+
+				}
 			}
 		}
 
@@ -1056,7 +1374,7 @@ class HexTable extends JTable {
 			}
 			return super.stopCellEditing();
 		}
-
+		
 	}
 
 	/**
@@ -1098,7 +1416,7 @@ class HexTable extends JTable {
 					highlight.setLocation(start, end);
 				}
 				boolean colorBG = hexEditor.getAlternateRowBG() && (row & 1) > 0;
-				setBackground(colorBG ? ANTERNATING_CELL_COLOR : table.getBackground());
+				setBackground(colorBG ? ANTERNATING_CELL_COLOR : ANTERNATING_CELL_COLOR);
 			} else {
 				if (!selected) {
 					if ((hexEditor.getAlternateRowBG() && (row & 1) > 0)

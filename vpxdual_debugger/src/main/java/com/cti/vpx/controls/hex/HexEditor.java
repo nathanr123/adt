@@ -306,7 +306,9 @@ public class HexEditor extends JScrollPane {
 			break;
 		}
 
-		setShowRowHeader(0, true);
+		table.setCheckedSelectedFormat(currentMode);
+		
+		setShowRowHeader(getHexEditorRowHeader().getRowHeaderModel().getStartAddress(), true);
 	}
 
 	private ByteBuffer getByteBuffer(TableModel model) {

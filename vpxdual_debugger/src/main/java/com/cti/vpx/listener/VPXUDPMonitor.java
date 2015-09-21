@@ -25,7 +25,6 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.command.P2020MSGCommand;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
-import com.cti.vpx.controls.hex.HexEditorDemoApp;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.FileBytesToSend;
@@ -79,7 +78,14 @@ public class VPXUDPMonitor {
 
 	private VPXSystem vpxSystem;
 
-	private byte[] bf;
+	private byte[] memBuff0;
+	private byte[] memBuff1;
+	private byte[] memBuff2;
+	private byte[] memBuff3;
+
+	private byte[] plotBuff0;
+	private byte[] plotBuff1;
+	private byte[] plotBuff2;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -793,38 +799,53 @@ public class VPXUDPMonitor {
 
 		boolean isComplete = false;
 
+		int index = (int) msg.params.memoryinfo.memIndex.get();
+
 		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
 		for (int i = 0; i < b.length; i++) {
 
 			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-			/*
-			System.out.print(String.format("%02x ", msg.params.memoryinfo.buffer[i].get()));
-
-			if (i > 0) {
-				if ((i % 16) == 0) {
-					System.out.println();
-				}
-			}*/
 		}
 
 		if (msg.params.flash_info.totalnoofpackets.get() > 1) {
 
 			if (msg.params.flash_info.currentpacket.get() == 1) {
 
-				bf = ArrayUtils.addAll(b);
+				if (index == 0)
+					memBuff0 = ArrayUtils.addAll(b);
+				else if (index == 1)
+					memBuff1 = ArrayUtils.addAll(b);
+				else if (index == 2)
+					memBuff2 = ArrayUtils.addAll(b);
+				else if (index == 3)
+					memBuff3 = ArrayUtils.addAll(b);
 
 			} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
 
-				bf = ArrayUtils.addAll(bf, b);
+				if (index == 0)
+					memBuff0 = ArrayUtils.addAll(memBuff0, b);
+				else if (index == 1)
+					memBuff1 = ArrayUtils.addAll(memBuff1, b);
+				else if (index == 2)
+					memBuff1 = ArrayUtils.addAll(memBuff1, b);
+				else if (index == 3)
+					memBuff1 = ArrayUtils.addAll(memBuff1, b);
 
 				isComplete = true;
 			}
 
 		} else {
 
-			bf = ArrayUtils.addAll(b);
+			if (index == 0)
+				memBuff0 = ArrayUtils.addAll(b);
+			else if (index == 1)
+				memBuff1 = ArrayUtils.addAll(b);
+			else if (index == 2)
+				memBuff2 = ArrayUtils.addAll(b);
+			else if (index == 3)
+				memBuff3 = ArrayUtils.addAll(b);
 
 			isComplete = true;
 		}
@@ -833,10 +854,16 @@ public class VPXUDPMonitor {
 
 			byte[] bfs = new byte[(int) msg.params.memoryinfo.length.get()];
 
-			System.arraycopy(bf, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+			if (index == 0)
+				System.arraycopy(memBuff0, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+			else if (index == 1)
+				System.arraycopy(memBuff1, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+			else if (index == 2)
+				System.arraycopy(memBuff2, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+			else if (index == 3)
+				System.arraycopy(memBuff3, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
 
-			((VPX_ETHWindow) listener).populateMemory((int) msg.params.memoryinfo.memIndex.get(),
-					msg.params.memoryinfo.address.get(), bfs);
+			((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
 
 			// HexEditorDemoApp hd = new HexEditorDemoApp();
 
@@ -846,6 +873,79 @@ public class VPXUDPMonitor {
 		}
 	}
 
+	
+	public void populatePlot(String ip, ATPCommand msg) {
+
+		boolean isComplete = false;
+
+		int index = (int) msg.params.memoryinfo.memIndex.get();
+
+		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+
+		for (int i = 0; i < b.length; i++) {
+
+			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+		}
+
+		if (msg.params.flash_info.totalnoofpackets.get() > 1) {
+
+			if (msg.params.flash_info.currentpacket.get() == 1) {
+
+				if (index == 0)
+					plotBuff0 = ArrayUtils.addAll(b);
+				else if (index == 1)
+					plotBuff1 = ArrayUtils.addAll(b);
+				else if (index == 2)
+					plotBuff2 = ArrayUtils.addAll(b);
+			
+
+			} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+
+				if (index == 0)
+					plotBuff0 = ArrayUtils.addAll(memBuff0, b);
+				else if (index == 1)
+					plotBuff1 = ArrayUtils.addAll(memBuff1, b);
+				else if (index == 2)
+					plotBuff2 = ArrayUtils.addAll(memBuff1, b);
+			
+				isComplete = true;
+			}
+
+		} else {
+
+			if (index == 0)
+				plotBuff0 = ArrayUtils.addAll(b);
+			else if (index == 1)
+				plotBuff1 = ArrayUtils.addAll(b);
+			else if (index == 2)
+				plotBuff2 = ArrayUtils.addAll(b);
+			
+			isComplete = true;
+		}
+
+		if (isComplete) {
+
+			byte[] bfs = new byte[(int) msg.params.memoryinfo.length.get()];
+
+			if (index == 0)
+				System.arraycopy(plotBuff0, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+			else if (index == 1)
+				System.arraycopy(plotBuff1, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+			else if (index == 2)
+				System.arraycopy(plotBuff2, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+		
+
+			((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
+
+			// HexEditorDemoApp hd = new HexEditorDemoApp();
+
+			// hd.setBytes((int) msg.params.memoryinfo.address.get(),bfs);
+
+			// hd.setVisible(true);
+		}
+	}
+	
 	public void populateBISTResult(String ip, ATPCommand msg) {
 
 		if (bist != null) {
@@ -1171,7 +1271,9 @@ public class VPXUDPMonitor {
 				break;
 
 			case ATP.MSG_TYPE_MEMORY:
+				
 				populateMemory(ip, msgCommand);
+				
 				break;
 			}
 

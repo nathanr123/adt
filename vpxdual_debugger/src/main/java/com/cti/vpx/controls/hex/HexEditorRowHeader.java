@@ -40,6 +40,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import org.apache.poi.hssf.record.GutsRecord;
+
 /**
  * Header of the hex table; displays address of the first byte on the row.
  *
@@ -52,6 +54,8 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 
 	private HexTable table;
 	private RowHeaderListModel model;
+	private int currentFormat = HexEditor.HEX8;
+	private int currentGroup = HexEditor.HEX8;
 
 	private static final Border CELL_BORDER = BorderFactory.createEmptyBorder(0, 5, 0, 5);
 
@@ -64,6 +68,8 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 	public HexEditorRowHeader(long startAddress, HexTable table) {
 
 		this.table = table;
+
+		setCurrentFormat();
 
 		model = new RowHeaderListModel(startAddress);
 
@@ -176,7 +182,8 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 		}
 
 		public Object getElementAt(int index) {
-			return "0x" + String.format("%08x", (start + (index * 16))).toUpperCase();
+
+			return "0x" + String.format("%08x", ((start) + ((index * currentGroup) * 16))).toUpperCase();
 		}
 
 		public int getSize() {
@@ -195,8 +202,6 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 		}
 
 		public long getStartAddress() {
-
-			System.out.println(start);
 
 			return start;
 		}
@@ -226,6 +231,50 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 			g.drawLine(x, y, x, y + height);
 		}
 
+	}
+
+	private void getGroupAddress() {
+
+		switch (currentFormat) {
+
+		case HexEditor.HEX8:
+
+			currentGroup = 1;
+
+			break;
+
+		case HexEditor.HEX16:
+		case HexEditor.SINGNEDINT16:
+		case HexEditor.UNSINGNEDINT16:
+
+			currentGroup = 2;
+
+			break;
+
+		case HexEditor.HEX32:
+		case HexEditor.SINGNEDINT32:
+		case HexEditor.UNSINGNEDINT32:
+		case HexEditor.UNSINGNEDFLOAT32:
+
+			currentGroup = 4;
+
+			break;
+
+		case HexEditor.HEX64:
+
+			currentGroup = 8;
+
+			break;
+
+		}
+
+	}
+
+	private void setCurrentFormat() {
+
+		currentFormat = table.getHexEditor().getCurrentModel();
+
+		getGroupAddress();
 	}
 
 }

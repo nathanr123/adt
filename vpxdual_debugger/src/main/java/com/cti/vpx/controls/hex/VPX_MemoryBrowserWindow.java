@@ -21,14 +21,18 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.NumberFormatter;
 
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
@@ -47,7 +51,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = -2851744765165677816L;
 	private JPanel contentPane;
-	private JTextField txtAutoRefresh;
+	private JSpinner spinAutoRefresh;
 	private JTextField txtMapFilePath;
 	private JTextField txtMemoryAddres;
 	private JTextField txtMemoryLength;
@@ -62,6 +66,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JButton btnGo;
 	private JButton btnNewWindow;
 	private JButton btnClear;
+
+	private SpinnerNumberModel periodicitySpinnerModel;
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
@@ -243,19 +249,25 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			public void actionPerformed(ActionEvent e) {
 
-				txtAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+				spinAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
 			}
 		});
 
+		chkAutoRefresh.setSelected(false);
+
 		subSystemPanel.add(chkAutoRefresh, "cell 6 0,alignx center,aligny top");
 
-		txtAutoRefresh = new JTextField();
+		periodicitySpinnerModel = new SpinnerNumberModel(1, 1, 10, 1);
 
-		txtAutoRefresh.setEnabled(false);
+		spinAutoRefresh = new JSpinner(periodicitySpinnerModel);
 
-		subSystemPanel.add(txtAutoRefresh, "cell 7 0,alignx left,aligny center");
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinAutoRefresh.getEditor()).getTextField();
 
-		txtAutoRefresh.setColumns(10);
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
+		spinAutoRefresh.setEnabled(false);
+
+		subSystemPanel.add(spinAutoRefresh, "cell 7 0,growx,aligny center");
 
 		JLabel lblMins = new JLabel("Mins");
 
@@ -443,9 +455,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				createFilters(true);
+				// createFilters(true);
 
-				parent.openMemoryBrowser(filter);
+				parent.openMemoryBrowser(null);
 
 			}
 		});
@@ -515,7 +527,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		filter.setAutoRefresh(chkAutoRefresh.isSelected());
 
-		filter.setTimeinterval(Integer.parseInt(txtAutoRefresh.getText().trim()));
+		filter.setTimeinterval(Integer.parseInt(spinAutoRefresh.getValue().toString().trim()));
 
 		filter.setUseMapFile(radUseMap.isSelected());
 
@@ -598,57 +610,60 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	private void applyFilters() {
 
-		for (int i = 0; i < cmbSubSystem.getItemCount(); i++) {
+		if (memoryFilter != null) {
 
-			if (memoryFilter.getSubsystem().equals(cmbSubSystem.getItemAt(i))) {
+			for (int i = 0; i < cmbSubSystem.getItemCount(); i++) {
 
-				cmbSubSystem.setSelectedIndex(i);
+				if (memoryFilter.getSubsystem().equals(cmbSubSystem.getItemAt(i))) {
 
-				break;
+					cmbSubSystem.setSelectedIndex(i);
+
+					break;
+				}
 			}
-		}
 
-		for (int i = 0; i < cmbProcessor.getItemCount(); i++) {
+			for (int i = 0; i < cmbProcessor.getItemCount(); i++) {
 
-			if (memoryFilter.getProcessor().equals(cmbProcessor.getItemAt(i))) {
+				if (memoryFilter.getProcessor().equals(cmbProcessor.getItemAt(i))) {
 
-				cmbProcessor.setSelectedIndex(i);
+					cmbProcessor.setSelectedIndex(i);
 
-				break;
+					break;
+				}
 			}
-		}
 
-		for (int i = 0; i < cmbCores.getItemCount(); i++) {
+			for (int i = 0; i < cmbCores.getItemCount(); i++) {
 
-			if (memoryFilter.getCore().equals(cmbCores.getItemAt(i))) {
+				if (memoryFilter.getCore().equals(cmbCores.getItemAt(i))) {
 
-				cmbCores.setSelectedIndex(i);
+					cmbCores.setSelectedIndex(i);
 
-				break;
+					break;
+				}
 			}
+
+			chkAutoRefresh.setSelected(memoryFilter.isAutoRefresh());
+
+			spinAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+
+			spinAutoRefresh.setValue(memoryFilter.getTimeinterval());
+
+			radUseMap.setSelected(memoryFilter.isUseMapFile());
+
+			radUserAddress.setSelected(memoryFilter.isDirectMemory());
+
+			txtMapFilePath.setText(memoryFilter.getMapPath());
+
+			cmbMemoryVariables.setSelectedItem(memoryFilter.getMemoryName());
+
+			txtMemoryAddres.setText(memoryFilter.getMemoryAddress());
+
+			txtMemoryLength.setText(memoryFilter.getMemoryLength());
+
+			txtMemoryStride.setText(memoryFilter.getMemoryStride());
+
+			enableMemoryFields();
 		}
-
-		chkAutoRefresh.setSelected(memoryFilter.isAutoRefresh());
-
-		txtAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
-
-		txtAutoRefresh.setText(memoryFilter.getTimeinterval() + "");
-
-		radUseMap.setSelected(memoryFilter.isUseMapFile());
-
-		radUserAddress.setSelected(memoryFilter.isDirectMemory());
-
-		txtMapFilePath.setText(memoryFilter.getMapPath());
-
-		cmbMemoryVariables.setSelectedItem(memoryFilter.getMemoryName());
-
-		txtMemoryAddres.setText(memoryFilter.getMemoryAddress());
-
-		txtMemoryLength.setText(memoryFilter.getMemoryLength());
-
-		txtMemoryStride.setText(memoryFilter.getMemoryStride());
-
-		enableMemoryFields();
 
 	}
 
@@ -698,7 +713,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 				curProcFilter = vpxSubSystem;
 
-				cmbProcessor.addItem(vpxSubSystem.getIpP2020());
+				// cmbProcessor.addItem(vpxSubSystem.getIpP2020());
 
 				cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
 
@@ -720,7 +735,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 				Processor processor = iterator.next();
 
-				cmbProcessor.addItem(processor.getiP_Addresses());
+				if (!processor.getName().contains("P2020")) {
+
+					cmbProcessor.addItem(processor.getiP_Addresses());
+				}
 			}
 
 		}

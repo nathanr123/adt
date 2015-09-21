@@ -86,9 +86,9 @@ public class VPX_ETHWindow extends JFrame
 
 	private static final VPX_AboutWindow aboutDialog = new VPX_AboutWindow();
 
-	private static VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
+	private VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
 
-	private static VPX_BISTResultWindow bistWindow = new VPX_BISTResultWindow();
+	private VPX_BISTResultWindow bistWindow = new VPX_BISTResultWindow();
 
 	private ResourceBundle rBundle;
 
@@ -145,9 +145,11 @@ public class VPX_ETHWindow extends JFrame
 
 	private JMenuItem vpx_Menu_Tools_Prefrences;
 
-	private JMenuItem vpx_Menu_Tools_Console;
+	private JMenu vpx_Menu_Tools_ShowView;
 
-	private JMenuItem vpx_Menu_Tools_Log;
+	private JMenuItem vpx_Menu_Tools_ShowView_Console;
+
+	private JMenuItem vpx_Menu_Tools_ShowView_Log;
 
 	// Help Menu Items
 	private JMenuItem vpx_Menu_Help_Help;
@@ -417,6 +419,8 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_Tool = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Tools"));
 
+		vpx_Menu_Tools_ShowView = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Tools.ShowView"));
+
 		vpx_Menu_Help = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Help"));
 
 		// Creating MenuItems
@@ -430,7 +434,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				showAliasConfig();
+				showAliasConfig("");
 
 			}
 		});
@@ -684,10 +688,10 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		vpx_Menu_Tools_Console = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Console"),
+		vpx_Menu_Tools_ShowView_Console = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Console"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
-		vpx_Menu_Tools_Console.addActionListener(new ActionListener() {
+		vpx_Menu_Tools_ShowView_Console.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -697,10 +701,10 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		vpx_Menu_Tools_Log = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Log"),
+		vpx_Menu_Tools_ShowView_Log = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Log"),
 				VPXUtilities.getEmptyIcon(14, 14));
 
-		vpx_Menu_Tools_Log.addActionListener(new ActionListener() {
+		vpx_Menu_Tools_ShowView_Log.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -800,9 +804,11 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_Tool.add(VPXComponentFactory.createJSeparator());
 
-		vpx_Menu_Tool.add(vpx_Menu_Tools_Console);
+		vpx_Menu_Tools_ShowView.add(vpx_Menu_Tools_ShowView_Console);
 
-		vpx_Menu_Tool.add(vpx_Menu_Tools_Log);
+		vpx_Menu_Tools_ShowView.add(vpx_Menu_Tools_ShowView_Log);
+
+		vpx_Menu_Tool.add(vpx_Menu_Tools_ShowView);
 
 		vpx_Menu_Tool.add(VPXComponentFactory.createJSeparator());
 
@@ -1306,14 +1312,30 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void showAliasConfig() {
+	public void showAliasConfig(String subsystem) {
 
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				new VPX_AliasConfigWindow(VPX_ETHWindow.this).setVisible(true);
+				new VPX_AliasConfigWindow(VPX_ETHWindow.this).showAliasWindow(subsystem);
+
+			}
+		});
+
+		th.start();
+
+	}
+
+	public void deleteSubSystem(String subsystem) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				new VPX_AliasConfigWindow(VPX_ETHWindow.this).deleteSelectedSubSystem(subsystem);
 
 			}
 		});
@@ -1381,33 +1403,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				MemoryViewFilter m = new MemoryViewFilter();
-
-				m.setSubsystem(VPXConstants.VPXUNLIST);
-
-				m.setProcessor("172.17.10.130");
-
-				m.setCore("Core 0");
-
-				m.setAutoRefresh(true);
-
-				m.setTimeinterval(10);
-
-				m.setUseMapFile(false);
-
-				m.setMapPath("C:\\temp.map");
-
-				m.setMemoryName("memory X");
-
-				m.setMemoryLength(10 + "");
-
-				m.setMemoryStride(10 + "");
-
-				m.setDirectMemory(true);
-
-				m.setMemoryAddress("0xA0000000");
-
-				openMemoryBrowser(m);
+				openMemoryBrowser(null);
 
 			}
 		});
@@ -1857,12 +1853,12 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void populateMemory(int memID,long startAddress, byte[] buffer) {
+	public void populateMemory(int memID, long startAddress, byte[] buffer) {
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				memoryBrowserWindow[memID].setBytes(startAddress,buffer);
+				memoryBrowserWindow[memID].setBytes(startAddress, buffer);
 				memoryBrowserWindow[memID].setVisible(true);
 
 			}

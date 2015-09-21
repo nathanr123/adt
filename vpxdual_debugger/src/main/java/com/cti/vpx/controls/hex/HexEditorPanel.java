@@ -75,7 +75,15 @@ import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.controls.hex.groupmodel.Floating32;
+import com.cti.vpx.controls.hex.groupmodel.Hex16;
+import com.cti.vpx.controls.hex.groupmodel.Hex32;
+import com.cti.vpx.controls.hex.groupmodel.Hex64;
 import com.cti.vpx.controls.hex.groupmodel.Hex8;
+import com.cti.vpx.controls.hex.groupmodel.SignedInt16;
+import com.cti.vpx.controls.hex.groupmodel.SignedInt32;
+import com.cti.vpx.controls.hex.groupmodel.UnSignedInt16;
+import com.cti.vpx.controls.hex.groupmodel.UnSignedInt32;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -126,11 +134,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private JButton btnUndoAction;
 	private JButton btnRedoAction;
 	private JButton btnSettingsAction;
-	
+
 	private VPX_MemorySetWindow memStFillWindow = new VPX_MemorySetWindow(this);
-	
+
 	private VPX_MemoryLoadWindow memoryLoadWindow = new VPX_MemoryLoadWindow(this);
-	
+
 	private ConfigPanel settingsPanel;
 
 	private static final ResourceBundle msg = VPXUtilities.getResourceBundle();
@@ -479,7 +487,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				if (file.isFile()) { // e.g. in Eclipse debugger
 					editor.open(fileName);
 
-					editor.setShowRowHeader(VPXUtilities.getIntValue(startAddress), true);
+					editor.setShowRowHeader(VPXUtilities.getValue(startAddress), true);
 				} else { // In a jar
 					throw new IOException("Resource not found: " + fileName);
 				}
@@ -677,7 +685,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_chckbxNewCheckBox_1.insets = new Insets(0, 0, 5, 0);
 			gbc_chckbxNewCheckBox_1.gridx = 3;
 			gbc_chckbxNewCheckBox_1.gridy = 0;
-			contentPanel.add(rowHeaderCB, gbc_chckbxNewCheckBox_1);
+			//contentPanel.add(rowHeaderCB, gbc_chckbxNewCheckBox_1);
 
 			showGridCB = new JCheckBox(msg.getString("GridLinesCB"), false);
 			showGridCB.addActionListener(HexEditorPanel.this);
@@ -722,7 +730,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_chckbxNewCheckBox_6.insets = new Insets(0, 0, 5, 5);
 			gbc_chckbxNewCheckBox_6.gridx = 1;
 			gbc_chckbxNewCheckBox_6.gridy = 3;
-			contentPanel.add(highlightAsciiSelCB, gbc_chckbxNewCheckBox_6);
+			//contentPanel.add(highlightAsciiSelCB, gbc_chckbxNewCheckBox_6);
 
 			JLabel lblNewLabel = new JLabel("  Selection Color");
 			GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
@@ -1020,6 +1028,95 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	}
 
+	private long getDocLength() {
+
+		long retValue = 0;
+
+		if (formatBytes.getSelectedIndex() == HexEditor.HEX8) {
+
+			retValue = ((Hex8) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX16) {
+
+			retValue = ((Hex16) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX32) {
+
+			retValue = ((Hex32) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX64) {
+
+			retValue = ((Hex64) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
+
+			retValue = ((SignedInt16) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
+
+			retValue = ((SignedInt32) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
+
+			retValue = ((UnSignedInt16) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
+
+			retValue = ((UnSignedInt32) editor.getTable().getModel()).getByteCount();
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
+
+			retValue = ((Floating32) editor.getTable().getModel()).getByteCount();
+
+		}
+
+		return retValue;
+	}
+
+	private void setValue(String data, int row, int col) throws Exception {
+
+		String d = data;//Long.toHexString(Long.decode(data)).toUpperCase();
+
+		if (formatBytes.getSelectedIndex() == HexEditor.HEX8) {
+
+			((Hex8) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX16) {
+
+			((Hex16) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX32) {
+
+			((Hex32) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX64) {
+
+			((Hex64) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
+
+			((SignedInt16) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
+
+			((SignedInt32) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
+
+			((UnSignedInt16) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
+
+			((UnSignedInt32) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
+
+			((Floating32) editor.getTable().getModel()).setValueAt(d, row, col);
+
+		}
+
+	}
+
 	public void doSetMemory(long address, String currentValue, String defaultSize) {
 
 		memStFillWindow.setMode(VPX_MemorySetWindow.SETMEMORY);
@@ -1027,19 +1124,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		memStFillWindow.setAddress(address);
 
 		memStFillWindow.setCurrentValue(currentValue);
-
-		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
-
-		memStFillWindow.showFillMemoryWinow();
-	}
-
-	public void doFillMemory() {
-
-		memStFillWindow.setMode(VPX_MemorySetWindow.FILLMEMORY);
-
-		memStFillWindow.setStartAddr(editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress());
-
-		memStFillWindow.setTotalLength(((Hex8) editor.getTable().getModel()).getByteCount());
 
 		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
 
@@ -1051,23 +1135,63 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			long start = editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress();
 
-			((Hex8) editor.getTable().getModel()).getByteCount();
+			long start1 = VPXUtilities.getValue(memStFillWindow.getAddress());
 
-			long start1 = VPXUtilities.getIntValue(memStFillWindow.getStartAddress());
+			int offset = (int) (start1 - start);
+
+			p = editor.offsetToCell(offset);
+
+			try {
+
+				setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(this, "Please enter valid value.", "Valid value",
+						JOptionPane.ERROR_MESSAGE);
+			}
+
+		}
+
+	}
+
+	public void doFillMemory() {
+
+		memStFillWindow.setMode(VPX_MemorySetWindow.FILLMEMORY);
+
+		memStFillWindow.setStartAddr(editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress());
+
+		memStFillWindow.setTotalLength(getDocLength());
+
+		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
+
+		int rc = memStFillWindow.showFillMemoryWinow();
+
+		if (rc == 1) {
+
+			Point p = null;
+
+			long start = editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress();
+
+			long start1 = VPXUtilities.getValue(memStFillWindow.getStartAddress());
 
 			int offset = (int) (start1 - start);
 
 			long length = Long.parseLong(memStFillWindow.getLength());
 
-			for (int i = offset; i < (offset + length); i++) {
+			try {
 
-				p = editor.offsetToCell(i);
+				for (int i = offset; i < (offset + length); i++) {
 
-				Hex8 t = (Hex8) editor.getTable().getModel();
+					p = editor.offsetToCell(i);
 
-				t.setValueAt(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
+					setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
 
+				}
+
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(this, "Please enter valid value.", "Valid value",
+						JOptionPane.ERROR_MESSAGE);
 			}
+
 		}
 
 	}
@@ -1080,6 +1204,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	public void doDumpAction() {
 
 		btnDumpAction.doClick();
+	}
+
+	public void doFormatSelectionAction(int index) {
+
+		formatBytes.setSelectedIndex(index);
 	}
 
 	public void doCutAction() {

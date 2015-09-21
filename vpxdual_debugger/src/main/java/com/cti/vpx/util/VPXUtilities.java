@@ -863,7 +863,7 @@ public class VPXUtilities {
 		return version;
 	}
 
-	public static long getIntValue(String value) {
+	public static long getValue(String value) {
 
 		try {
 

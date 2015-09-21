@@ -5,6 +5,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,12 +24,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.File;
-import java.math.BigInteger;
-import java.awt.event.ActionEvent;
 
 public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
@@ -56,6 +55,8 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 	FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
 
 	FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	private JTextField txtLengthBytes;
+	private JTextField txtLengthWords;
 
 	/**
 	 * Launch the application.
@@ -100,7 +101,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 		init();
 
 		loadComponents();
-		
+
 		setLocationRelativeTo(prnt);
 
 	}
@@ -113,7 +114,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-		setBounds(100, 100, 630, 276);
+		setBounds(100, 100, 642, 322);
 
 		getContentPane().setLayout(new BorderLayout());
 
@@ -162,15 +163,15 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 		contentPanel.add(panelCenter, BorderLayout.CENTER);
 
-		panelCenter.setLayout(new MigLayout("", "[right][][grow]", "[][][][][][]"));
+		panelCenter.setLayout(new MigLayout("", "[right][][grow]", "[grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill]"));
 
 		JLabel lblFile = new JLabel("File");
 
-		panelCenter.add(lblFile, "cell 0 1");
+		panelCenter.add(lblFile, "cell 0 0");
 
 		txtFileName = new JTextField();
 
-		panelCenter.add(txtFileName, "cell 2 1,growx");
+		panelCenter.add(txtFileName, "cell 2 0,growx");
 
 		txtFileName.setColumns(10);
 
@@ -186,12 +187,19 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 					txtFileName.setText(fileDialog.getSelectedFile().getAbsolutePath());
 
+					txtLengthBytes.setText("0x" + Long.toHexString(fileDialog.getSelectedFile().length()).toUpperCase());
+					
+					txtLengthWords.setText("0x" + Long.toHexString(fileDialog.getSelectedFile().length() / 4).toUpperCase());
 				}
 
 			}
 		});
 
-		panelCenter.add(btnBrowse, "cell 2 2,alignx right");
+		panelCenter.add(btnBrowse, "cell 2 1,alignx right");
+
+		JLabel lblNote = new JLabel("Note: Select a file containing the memory data to be loaded");
+		lblNote.setFont(new Font("Tahoma", Font.BOLD, 11));
+		panelCenter.add(lblNote, "cell 2 2");
 
 		JCheckBox chkStartAddress = new JCheckBox("Start Address");
 
@@ -210,28 +218,49 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 				lblStartAddress.setEnabled(chkStartAddress.isSelected());
 			}
 		});
-		
-		JLabel lblNewLabel = new JLabel("Note: Select a file containing the memory data to be loaded");
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-		panelCenter.add(lblNewLabel, "cell 2 3");
 
-		panelCenter.add(chkStartAddress, "cell 0 4");
+		JLabel lblLength = new JLabel("Length");
+		panelCenter.add(lblLength, "cell 0 4");
+
+		txtLengthBytes = new JTextField();
+	
+		txtLengthBytes.setEditable(false);
+		
+		txtLengthBytes.setColumns(10);
+		
+		panelCenter.add(txtLengthBytes, "flowx,cell 2 4,growx");
+
+		panelCenter.add(chkStartAddress, "cell 0 6");
 
 		lblStartAddress = new JLabel("Address");
 
-		panelCenter.add(lblStartAddress, "cell 0 5");
+		panelCenter.add(lblStartAddress, "cell 0 7");
 
 		txtStartAddress = new JTextField();
 
 		txtStartAddress.setText("0xA0000000");
 
-		panelCenter.add(txtStartAddress, "flowx,cell 2 5,growx");
+		panelCenter.add(txtStartAddress, "flowx,cell 2 7,growx");
 
 		txtStartAddress.setColumns(10);
 
-		JLabel lblNewLabel_2 = new JLabel("");
+		JLabel lblNewLabel_2 = new JLabel("                                                         ");
 
-		panelCenter.add(lblNewLabel_2, "cell 2 5,growx");
+		panelCenter.add(lblNewLabel_2, "cell 2 7,growx");
+		
+		JLabel lblInBytes = new JLabel("Memory Bytes   (or)   ");
+		panelCenter.add(lblInBytes, "cell 2 4");
+		
+		txtLengthWords = new JTextField();
+		
+		txtLengthWords.setEditable(false);
+		
+		txtLengthWords.setColumns(10);
+		
+		panelCenter.add(txtLengthWords, "cell 2 4,growx");
+		
+		JLabel lblInWords = new JLabel("Memory Words");
+		panelCenter.add(lblInWords, "cell 2 4");
 
 		JPanel panelControls = new JPanel();
 
@@ -387,10 +416,10 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 			}
 
 			Long.parseLong(val, 16);
-			
+
 			return true;
 		} catch (Exception e) {
-			
+
 			return false;
 
 		}
