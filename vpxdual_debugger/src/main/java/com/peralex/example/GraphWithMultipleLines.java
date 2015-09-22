@@ -50,12 +50,12 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 
 		graphWrapper = new com.peralex.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
 		// graphWrapper.setTitle("Multiple Line Graph");
-		graphWrapper.setAxisTitlesAndUnits("X", "Time", "Y", "Data");
+		graphWrapper.setAxisTitlesAndUnits("X", "Address", "Y", "Data");
 
 		graphPanel.add(graphWrapper, BorderLayout.CENTER);
 
-		lineGraph.setGridXMinMax(0, 100);
-		lineGraph.setGridYMinMax(0, 1024);
+		lineGraph.setGridXMinMax(0, 1024);
+		lineGraph.setGridYMinMax(0, 255);
 		lineGraph.setLineColor(LINE_1, Color.RED);
 		line1ColorComboBox.setSelectedItem("Red");
 		lineGraph.setLineColor(LINE_2, Color.GREEN);
@@ -73,16 +73,19 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 				final float[] yValues1 = new float[floats.length];
 				System.arraycopy(floats, 0, yValues1, 0, floats.length);
 				line1Data.setYValues(yValues1);
+				
+				lineGraph.setGraphData(LINE_1, line1Data);
 
+				/*
 				floats = getFile("D:\\test.bin");
 				line2Data.setXValues(0, floats.length, floats.length);
 				final float[] yValues2 = new float[floats.length];
 				line2Data.setYValues(yValues2);
 				System.arraycopy(floats, 0, yValues2, 0, floats.length);
 
-				lineGraph.setGraphData(LINE_1, line1Data);
+				
 				lineGraph.setGraphData(LINE_2, line2Data);
-
+				*/	
 			}
 		});
 

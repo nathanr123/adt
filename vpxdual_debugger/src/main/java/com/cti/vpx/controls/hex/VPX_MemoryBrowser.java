@@ -153,11 +153,11 @@ public class VPX_MemoryBrowser extends JPanel {
 	}
 	
 	private void createHexPanel() {
-		hexPanel = new HexEditorPanel();
+		hexPanel = new HexEditorPanel(null);
 	}
 
 	private HexEditorPanel getHexPanel() {
-		return new HexEditorPanel();
+		return new HexEditorPanel(null);
 	}
 
 	private class NewTabAction extends AbstractAction {

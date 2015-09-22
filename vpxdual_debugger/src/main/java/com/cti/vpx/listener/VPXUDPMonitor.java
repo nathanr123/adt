@@ -1,6 +1,8 @@
 package com.cti.vpx.listener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -76,13 +78,19 @@ public class VPXUDPMonitor {
 
 	private static boolean isFlashingStatred = false;
 
+	private static boolean isLoingMemoryStatred = false;
+
 	private VPXSystem vpxSystem;
 
-	private byte[] memBuff0;
-	private byte[] memBuff1;
-	private byte[] memBuff2;
-	private byte[] memBuff3;
+	ByteArrayOutputStream memBuff0 = new ByteArrayOutputStream();
+	ByteArrayOutputStream memBuff1 = new ByteArrayOutputStream();
+	ByteArrayOutputStream memBuff2 = new ByteArrayOutputStream();
+	ByteArrayOutputStream memBuff3 = new ByteArrayOutputStream();
 
+	/*
+	 * private byte[] memBuff0; private byte[] memBuff1; private byte[]
+	 * memBuff2; private byte[] memBuff3;
+	 */
 	private byte[] plotBuff0;
 	private byte[] plotBuff1;
 	private byte[] plotBuff2;
@@ -615,8 +623,160 @@ public class VPXUDPMonitor {
 		}
 	}
 
-	public void sendCommandToProcessor(String ip, ATP cmd) {
+	// loading file to memory
 
+	public void sendMemoryFile(VPX_FlashProgressWindow parentDialog, String filename, long address, String ip) {
+
+		try {
+
+			File f = new File(filename);
+
+			size = FileUtils.sizeOf(f);
+
+			filestoSend = FileUtils.readFileToByteArray(f);
+
+			Map<Long, byte[]> t = VPXUtilities.divideArrayAsMap(filestoSend, ATP.DEFAULTBUFFERSIZE);
+
+			fb = new FileBytesToSend(size, t);
+
+			byte b[] = new byte[ATP.DEFAULTBUFFERSIZE];
+
+			long len = (filestoSend.length > b.length) ? b.length : filestoSend.length;
+
+			for (int i = 0; i < len; i++) {
+				b[i] = filestoSend[i];
+			}
+
+			this.dialog = parentDialog;
+
+			isLoingMemoryStatred = true;
+
+			sendMemoryFileToProcessor(ip, address, FileUtils.sizeOf(f), fb.getBytePacket(0));
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
+
+	public void sendMemoryFileToProcessor(String ip, long address, long size, byte[] sendBuffer) {
+		try {
+
+			int length = sendBuffer.length;
+			
+			ATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_LOADMEMORY);
+
+			msg.params.memoryinfo.address.set(address);
+
+			tot = (int) (size / ATP.DEFAULTBUFFERSIZE);
+
+			int rem = (int) (size % ATP.DEFAULTBUFFERSIZE);
+
+			if (rem > 0)
+				tot++;
+
+			//msg.params.memoryinfo.byteZero.set(sendBuffer[0]);
+
+			for (int i = 0; i < sendBuffer.length; i++) {
+
+				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
+
+			}			
+
+			msg.params.flash_info.totalnoofpackets.set(tot);
+
+			msg.params.flash_info.totalfilesize.set(size);
+
+			msg.params.flash_info.currentpacket.set(0);
+			msg.params.memoryinfo.byteZero.set(sendBuffer[0]);
+			
+			msg.params.memoryinfo.length.set(length);
+			dialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
+
+			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void sendMemoryFileNextPacket(String ip, ATPCommand msg) {
+
+		int currPacket = (int) msg.params.flash_info.currentpacket.get();
+
+		currPacket++;
+
+		if (currPacket < tot) {
+			try {
+
+				byte[] buffer = new byte[msg.size()];
+
+				ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+				bf.order(msg.byteOrder());
+
+				msg.setByteBuffer(bf, 0);
+
+				msg.msgID.set(ATP.MSG_ID_SET);
+
+				msg.msgType.set(ATP.MSG_TYPE_LOADMEMORY);
+
+				start = currPacket * 1024;
+
+				end = start + 1024;
+
+				if (end > filestoSend.length) {
+					end = filestoSend.length;
+				}
+
+				byte[] bb = fb.getBytePacket(currPacket);
+
+				if (bb != null) {
+
+					msg.params.memoryinfo.byteZero.set(bb[0]);
+
+					for (int i = 0; i < bb.length; i++) {
+
+						msg.params.memoryinfo.buffer[i].set(bb[i]);
+
+					}
+					dialog.updatePackets(size, tot, currPacket, bb.length, bb.length);
+
+					msg.params.memoryinfo.length.set(bb.length);
+				} else {
+					dialog.updatePackets(size, tot, currPacket, 0, 0);
+				}
+
+				msg.params.flash_info.totalnoofpackets.set(tot);
+
+				msg.params.flash_info.totalfilesize.set(size);
+
+				msg.params.flash_info.currentpacket.set(currPacket);
+
+				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+
+				System.out.println(msg.params.memoryinfo.length.get());
+				;
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void send(byte[] buffer, String ip, int port, boolean isBroadCast) {
@@ -797,83 +957,101 @@ public class VPXUDPMonitor {
 
 	public void populateMemory(String ip, ATPCommand msg) {
 
-		boolean isComplete = false;
+		try {
+			boolean isComplete = false;
 
-		int index = (int) msg.params.memoryinfo.memIndex.get();
+			int index = (int) msg.params.memoryinfo.memIndex.get();
 
-		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
-		for (int i = 0; i < b.length; i++) {
+			for (int i = 0; i < b.length; i++) {
 
-			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-		}
+			}
 
-		if (msg.params.flash_info.totalnoofpackets.get() > 1) {
+			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
 
-			if (msg.params.flash_info.currentpacket.get() == 1) {
+				if (msg.params.flash_info.currentpacket.get() == 1) {
 
-				if (index == 0)
-					memBuff0 = ArrayUtils.addAll(b);
-				else if (index == 1)
-					memBuff1 = ArrayUtils.addAll(b);
+					if (index == 0) {
+						memBuff0.write(b);
+					} else if (index == 1)
+						memBuff1.write(b);
+					else if (index == 2)
+						memBuff2.write(b);
+					else if (index == 3)
+						memBuff3.write(b);
+
+					isComplete = false;
+
+				} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+
+					if (index == 0) {
+						memBuff0.write(b);
+					} else if (index == 1)
+						memBuff1.write(b);
+					else if (index == 2)
+						memBuff2.write(b);
+					else if (index == 3)
+						memBuff3.write(b);
+
+					isComplete = true;
+				} else {
+
+					if (index == 0) {
+						memBuff0.write(b);
+					} else if (index == 1)
+						memBuff1.write(b);
+					else if (index == 2)
+						memBuff2.write(b);
+					else if (index == 3)
+						memBuff3.write(b);
+
+					isComplete = false;
+				}
+
+			} else {
+
+				if (index == 0) {
+					memBuff0.write(b);
+				} else if (index == 1)
+					memBuff1.write(b);
 				else if (index == 2)
-					memBuff2 = ArrayUtils.addAll(b);
+					memBuff2.write(b);
 				else if (index == 3)
-					memBuff3 = ArrayUtils.addAll(b);
-
-			} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
-
-				if (index == 0)
-					memBuff0 = ArrayUtils.addAll(memBuff0, b);
-				else if (index == 1)
-					memBuff1 = ArrayUtils.addAll(memBuff1, b);
-				else if (index == 2)
-					memBuff1 = ArrayUtils.addAll(memBuff1, b);
-				else if (index == 3)
-					memBuff1 = ArrayUtils.addAll(memBuff1, b);
+					memBuff3.write(b);
 
 				isComplete = true;
 			}
 
-		} else {
+			if (isComplete) {
 
-			if (index == 0)
-				memBuff0 = ArrayUtils.addAll(b);
-			else if (index == 1)
-				memBuff1 = ArrayUtils.addAll(b);
-			else if (index == 2)
-				memBuff2 = ArrayUtils.addAll(b);
-			else if (index == 3)
-				memBuff3 = ArrayUtils.addAll(b);
+				byte[] bfs = null;// new byte[(int)
+									// msg.params.memoryinfo.length.get()];
 
-			isComplete = true;
-		}
+				if (index == 0) {
+					bfs = memBuff0.toByteArray();
+				} else if (index == 1)
+					bfs = memBuff1.toByteArray();
+				else if (index == 2)
+					bfs = memBuff2.toByteArray();
+				else if (index == 3)
+					bfs = memBuff3.toByteArray();
 
-		if (isComplete) {
+				((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
 
-			byte[] bfs = new byte[(int) msg.params.memoryinfo.length.get()];
+				// HexEditorDemoApp hd = new HexEditorDemoApp();
 
-			if (index == 0)
-				System.arraycopy(memBuff0, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
-			else if (index == 1)
-				System.arraycopy(memBuff1, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
-			else if (index == 2)
-				System.arraycopy(memBuff2, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
-			else if (index == 3)
-				System.arraycopy(memBuff3, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+				// hd.setBytes((int) msg.params.memoryinfo.address.get(),bfs);
 
-			((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
+				// hd.setVisible(true);
+			}
+		} catch (Exception e) {
 
-			// HexEditorDemoApp hd = new HexEditorDemoApp();
-
-			// hd.setBytes((int) msg.params.memoryinfo.address.get(),bfs);
-
-			// hd.setVisible(true);
 		}
 	}
 
-	
 	public void populatePlot(String ip, ATPCommand msg) {
 
 		boolean isComplete = false;
@@ -898,17 +1076,16 @@ public class VPXUDPMonitor {
 					plotBuff1 = ArrayUtils.addAll(b);
 				else if (index == 2)
 					plotBuff2 = ArrayUtils.addAll(b);
-			
 
 			} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
 
 				if (index == 0)
-					plotBuff0 = ArrayUtils.addAll(memBuff0, b);
+					plotBuff0 = ArrayUtils.addAll(plotBuff0, b);
 				else if (index == 1)
-					plotBuff1 = ArrayUtils.addAll(memBuff1, b);
+					plotBuff1 = ArrayUtils.addAll(plotBuff1, b);
 				else if (index == 2)
-					plotBuff2 = ArrayUtils.addAll(memBuff1, b);
-			
+					plotBuff2 = ArrayUtils.addAll(plotBuff2, b);
+
 				isComplete = true;
 			}
 
@@ -920,7 +1097,7 @@ public class VPXUDPMonitor {
 				plotBuff1 = ArrayUtils.addAll(b);
 			else if (index == 2)
 				plotBuff2 = ArrayUtils.addAll(b);
-			
+
 			isComplete = true;
 		}
 
@@ -934,7 +1111,6 @@ public class VPXUDPMonitor {
 				System.arraycopy(plotBuff1, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
 			else if (index == 2)
 				System.arraycopy(plotBuff2, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
-		
 
 			((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
 
@@ -945,7 +1121,7 @@ public class VPXUDPMonitor {
 			// hd.setVisible(true);
 		}
 	}
-	
+
 	public void populateBISTResult(String ip, ATPCommand msg) {
 
 		if (bist != null) {
@@ -1243,7 +1419,28 @@ public class VPXUDPMonitor {
 				dialog.doneFlash();
 
 				break;
+
 			case ATP.MSG_TYPE_MEMORY:
+
+				break;
+
+			case ATP.MSG_TYPE_LOADMEMORY:
+
+				break;
+
+			case ATP.MSG_TYPE_LOADMEMORY_ACK:
+
+				if (isLoingMemoryStatred) {
+
+					sendMemoryFileNextPacket(ip, msgCommand);
+
+				}
+
+				break;
+
+			case ATP.MSG_TYPE_LOADMEMORY_DONE:
+
+				dialog.closeLoadMemory();
 
 				break;
 			}
@@ -1271,9 +1468,9 @@ public class VPXUDPMonitor {
 				break;
 
 			case ATP.MSG_TYPE_MEMORY:
-				
+
 				populateMemory(ip, msgCommand);
-				
+
 				break;
 			}
 

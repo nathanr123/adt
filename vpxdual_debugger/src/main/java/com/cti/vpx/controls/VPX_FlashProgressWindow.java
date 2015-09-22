@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -14,9 +13,9 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import net.miginfocom.swing.MigLayout;
-
 import com.cti.vpx.util.VPXUtilities;
+
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
@@ -24,6 +23,11 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -7250292684798353091L;
+
+	public static final int ETHFLASH = 0;
+
+	public static final int MEMLOAD = 1;
+
 	private JLabel lblTotalFileSizeVal;
 	private JLabel lblTotalPacketsVal;
 	private JLabel lblPacketsSentVal;
@@ -43,6 +47,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	private JLabel lblBytesRemainingVal;
 	private JLabel lblBytesTotalVal;
 	private JLabel lblCurrentBytesVal;
+
+	private int currentMode = ETHFLASH;
 
 	/**
 	 * Launch the application.
@@ -72,7 +78,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	private void init() {
 
 		setTitle("Flash Out File");
-		
+
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -109,8 +115,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		JPanel detailPanel = new JPanel();
 
-		detailPanel.setBorder(new TitledBorder(null, "Flashing Detail", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
+		detailPanel.setBorder(
+				new TitledBorder(null, "Flashing Detail", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		detailPanel.setPreferredSize(new Dimension(25, 10));
 
 		getContentPane().add(detailPanel, BorderLayout.CENTER);
@@ -205,6 +211,11 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		detailPanel.add(lblElapsedTimeVal, "cell 2 4,aligny center");
 	}
 
+	public void setMode(int mode) {
+
+		this.currentMode = mode;
+	}
+
 	public void updatePackets(long size, long totpkt, long curpacket, long bytesRcvd, long currBufferSize) {
 
 		long cur = curpacket;
@@ -244,7 +255,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		lblPacketsRemainingVal.setText("" + remain);
 
-		if (remain == 0) {
+		if (remain == 0 && (currentMode == ETHFLASH)) {
 			progressFileSent.setString("done!");
 			try {
 				Thread.sleep(100);
@@ -260,9 +271,17 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	public void doneFlash() {
 
 		isFlashingStatred = false;
-		
+
 		JOptionPane.showMessageDialog(VPX_FlashProgressWindow.this, "Flash Completed");
 
+		VPX_FlashProgressWindow.this.dispose();
+
+	}
+
+	public void closeLoadMemory() {
+
+		isFlashingStatred = false;
+		
 		VPX_FlashProgressWindow.this.dispose();
 
 	}
@@ -284,8 +303,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 				while (isFlashingStatred) {
 					try {
 
-						lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(2,
-								(System.currentTimeMillis() - starttime)));
+						lblElapsedTimeVal
+								.setText(VPXUtilities.getCurrentTime(2, (System.currentTimeMillis() - starttime)));
 
 						Thread.sleep(1000);
 					} catch (Exception e) {
@@ -322,7 +341,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 			isFlashingStatred = false;
 
-			parent.interruptFlash();
+			if (parent != null)
+				parent.interruptFlash();
 
 			VPX_FlashProgressWindow.this.dispose();
 		}

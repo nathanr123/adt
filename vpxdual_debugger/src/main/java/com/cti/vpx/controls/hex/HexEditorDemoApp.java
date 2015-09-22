@@ -49,7 +49,7 @@ public class HexEditorDemoApp extends JFrame {
 	
 	public HexEditorDemoApp() {
 
-		cp = new HexEditorPanel();
+		cp = new HexEditorPanel(null);
 
 		setContentPane(cp);
 		setTitle("HexEditor Demo Application");

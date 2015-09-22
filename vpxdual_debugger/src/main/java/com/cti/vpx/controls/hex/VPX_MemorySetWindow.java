@@ -423,42 +423,30 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 	private boolean isValidLength(String length) {
 
-		String s = length;
+		boolean retVal = true;
+		try {
 
-		long len = 0;
+			Long.valueOf(length);
 
-		if (currentMode == FILLMEMORY) {
-
-			if (!length.startsWith("0x") || !length.startsWith("0X")) {
-				s = "0x" + length;
-			}
-
-			len = Long.decode(s);
-
-			long start = VPXUtilities.getValue(startAddress);
-
-			if ((len + (start - startAddrVal)) > Long.valueOf(String.valueOf(totalLength), 16)) {
-
-				return false;
-			}
+			retVal = true;
+		} catch (Exception e) {
+			retVal = false;
 		}
 
-		return true;
+		return retVal;
 	}
 
 	private boolean isValidData(String data) {
 
 		return true;/*
-		try {
-			Long.toHexString(Long.decode(data)).toUpperCase();
-
-			return true;
-
-		} catch (Exception e) {
-
-			return false;
-		}
-*/
+					 * try { Long.toHexString(Long.decode(data)).toUpperCase();
+					 * 
+					 * return true;
+					 * 
+					 * } catch (Exception e) {
+					 * 
+					 * return false; }
+					 */
 	}
 
 	public void setMode(int mode) {

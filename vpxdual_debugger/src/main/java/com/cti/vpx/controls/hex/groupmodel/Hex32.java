@@ -52,7 +52,7 @@ public class Hex32 extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	private HexEditor editor;
-	private ByteBuffer doc;
+	private ByteBuffer doc = new ByteBuffer(0);
 	private int bytesPerRow;
 	private UndoManager undoManager;
 	private String[] columnNames;
@@ -80,7 +80,7 @@ public class Hex32 extends AbstractTableModel {
 	public Hex32(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
-		doc = new ByteBuffer(16);
+	//	doc = new ByteBuffer(16);
 		bytesPerRow = 16;
 
 		undoManager = new UndoManager();
@@ -90,6 +90,7 @@ public class Hex32 extends AbstractTableModel {
 			columnNames[i] =Integer.toHexString(i).toUpperCase();
 		}
 
+		/*
 		byteStrVals = new String[256];
 		for (int i = 0; i < byteStrVals.length; i++) {
 			byteStrVals[i] = Integer.toHexString(i);
@@ -99,7 +100,7 @@ public class Hex32 extends AbstractTableModel {
 		for (int i = 0; i < paddedLowerByteStrVals.length; i++) {
 			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i);
 		}
-
+*/
 	}
 
 	/**

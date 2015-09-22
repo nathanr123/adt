@@ -75,6 +75,8 @@ import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.controls.VPX_EthernetFlashPanel;
+import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.controls.hex.groupmodel.Floating32;
 import com.cti.vpx.controls.hex.groupmodel.Hex16;
 import com.cti.vpx.controls.hex.groupmodel.Hex32;
@@ -135,6 +137,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private JButton btnRedoAction;
 	private JButton btnSettingsAction;
 
+	private VPX_MemoryBrowserWindow memoryWindow;
+
 	private VPX_MemorySetWindow memStFillWindow = new VPX_MemorySetWindow(this);
 
 	private VPX_MemoryLoadWindow memoryLoadWindow = new VPX_MemoryLoadWindow(this);
@@ -146,7 +150,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	/**
 	 * Constructor.
 	 */
-	public HexEditorPanel() {
+	public HexEditorPanel(VPX_MemoryBrowserWindow memWindow) {
+
+		this.memoryWindow = memWindow;
 
 		setLayout(new BorderLayout());
 
@@ -184,7 +190,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		editor = new HexEditor(this);
 		editor.addHexEditorListener(this);
 		editor.addSelectionChangedListener(this);
-		handleOpenFile("D:\\test.bin", "0x0000000");
+		// handleOpenFile("D:\\test.bin", "0x0000000");
 
 		add(editor);
 
@@ -398,9 +404,18 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		if (rc == 1) {// JFileChooser.APPROVE_OPTION) {
 
+			VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(null);
+
+			dialog.setMode(VPX_FlashProgressWindow.MEMLOAD);
+
+			dialog.setVisible(true);
+
 			file = new File(memoryLoadWindow.getFileName());// chooser.getSelectedFile();
 
 			startAddress = (memoryLoadWindow.isStartAddress() ? memoryLoadWindow.getStartAddress() : "0x0000000");
+
+			VPXUtilities.getParent().sendMemoryFile(memoryWindow.getSelectedProcessor(), memoryLoadWindow.getFileName(),
+					VPXUtilities.getValue(startAddress), dialog);
 
 			handleOpenFile(file.getAbsolutePath(), startAddress);
 		}
@@ -685,7 +700,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_chckbxNewCheckBox_1.insets = new Insets(0, 0, 5, 0);
 			gbc_chckbxNewCheckBox_1.gridx = 3;
 			gbc_chckbxNewCheckBox_1.gridy = 0;
-			//contentPanel.add(rowHeaderCB, gbc_chckbxNewCheckBox_1);
+			// contentPanel.add(rowHeaderCB, gbc_chckbxNewCheckBox_1);
 
 			showGridCB = new JCheckBox(msg.getString("GridLinesCB"), false);
 			showGridCB.addActionListener(HexEditorPanel.this);
@@ -730,7 +745,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_chckbxNewCheckBox_6.insets = new Insets(0, 0, 5, 5);
 			gbc_chckbxNewCheckBox_6.gridx = 1;
 			gbc_chckbxNewCheckBox_6.gridy = 3;
-			//contentPanel.add(highlightAsciiSelCB, gbc_chckbxNewCheckBox_6);
+			// contentPanel.add(highlightAsciiSelCB, gbc_chckbxNewCheckBox_6);
 
 			JLabel lblNewLabel = new JLabel("  Selection Color");
 			GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
@@ -1075,7 +1090,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	private void setValue(String data, int row, int col) throws Exception {
 
-		String d = data;//Long.toHexString(Long.decode(data)).toUpperCase();
+		String d = data;// Long.toHexString(Long.decode(data)).toUpperCase();
 
 		if (formatBytes.getSelectedIndex() == HexEditor.HEX8) {
 

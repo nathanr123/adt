@@ -52,7 +52,7 @@ public class Hex8 extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	private HexEditor editor;
-	private ByteBuffer doc;
+	private ByteBuffer doc = new ByteBuffer(0);
 	private int bytesPerRow;
 	private UndoManager undoManager;
 	private String[] columnNames;
@@ -80,7 +80,7 @@ public class Hex8 extends AbstractTableModel {
 	public Hex8(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
-		doc = new ByteBuffer(16);
+		//doc = new ByteBuffer(16);
 		bytesPerRow = 16;
 
 		undoManager = new UndoManager();

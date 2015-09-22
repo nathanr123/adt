@@ -1948,6 +1948,12 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void sendMemoryFile(String ip, String filename, long startAddress, VPX_FlashProgressWindow flashingWindow) {
+
+		udpMonitor.sendMemoryFile(flashingWindow, filename, startAddress, ip);
+
+	}
+
 	// Advertisement Listener
 	@Override
 	public void updateProcessorStatus(String ip, String msg) {

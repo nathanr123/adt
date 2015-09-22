@@ -198,6 +198,10 @@ public class VPXUtilities {
 		parent = prnt;
 	}
 
+	public static VPX_ETHWindow getParent() {
+		return parent;
+	}
+
 	public static void updateLog(String log) {
 		parent.updateLog(log);
 	}

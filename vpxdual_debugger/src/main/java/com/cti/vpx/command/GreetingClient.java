@@ -236,11 +236,13 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.params.memoryinfo.address.set(0xA0000000);
 
+			msg.params.memoryinfo.byteZero.set(2);
+
 			msg.params.memoryinfo.length.set(1);
 
 			msg.params.memoryinfo.memIndex.set(0);
 
-			msg.params.memoryinfo.newvalue.set(10);
+			msg.params.memoryinfo.newvalue.set(0x12345678);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.140"),
 					VPXUDPListener.COMM_PORTNO);
@@ -979,7 +981,6 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	}
 
-	
 	@Override
 	public void updateMessage(String ip, String msg) {
 		// TODO Auto-generated method stub
@@ -1050,25 +1051,25 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	@Override
 	public void readMemory(MemoryViewFilter filter) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void readPlot(MemoryViewFilter filter) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void populateMemory(int memID, long startAddress, byte[] buffer) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void populatePlot(int plotID, long startAddress, byte[] buffer) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

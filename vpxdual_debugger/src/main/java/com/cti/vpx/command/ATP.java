@@ -30,6 +30,13 @@ public interface ATP {
 
 	public static final int MSG_TYPE_PLOT = 0xC9;
 
+	public static final int MSG_TYPE_LOADMEMORY = 0xCA;
+
+	public static final int MSG_TYPE_LOADMEMORY_ACK = 0xCB;
+	
+	public static final int MSG_TYPE_LOADMEMORY_DONE = 0xCC;
+
+
 	// Result
 	public static final int TEST_RESULT_PASS = 0x01;
 
@@ -39,6 +46,13 @@ public interface ATP {
 	public static final int FLASH_DEVICE_NAND = 0x01;
 
 	public static final int FLASH_DEVICE_NOR = 0x02;
+
+	// Type Size
+	public static final int DATA_TYPE_SIZE_BIT8 = 0x00;
+
+	public static final int DATA_TYPE_SIZE_BIT16 = 0x01;
+
+	public static final int DATA_TYPE_SIZE_BIT32 = 0x02;
 
 	// Enums
 	public enum PROCESSOR_TYPE {

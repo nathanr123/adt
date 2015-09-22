@@ -474,7 +474,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		hexContentPanel.setLayout(new BorderLayout());
 
-		hexPanel = new HexEditorPanel();
+		hexPanel = new HexEditorPanel(this);
 
 		hexContentPanel.add(hexPanel, BorderLayout.CENTER);
 
@@ -814,6 +814,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	public void setParent(VPX_ETHWindow prnt) {
 		this.parent = prnt;
+	}
+
+	public String getSelectedProcessor() {
+		return cmbProcessor.getSelectedItem().toString();
 	}
 
 	@Override

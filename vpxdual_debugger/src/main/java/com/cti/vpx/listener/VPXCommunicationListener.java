@@ -1,6 +1,5 @@
 package com.cti.vpx.listener;
 
-import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
