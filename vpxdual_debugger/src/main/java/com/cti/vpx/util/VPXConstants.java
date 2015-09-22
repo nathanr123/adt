@@ -66,6 +66,8 @@ public class VPXConstants {
 	public static final int DSP1AVAILBLE = -3;
 
 	public static final int DSP2AVAILBLE = -4;
+	
+	public static final int SUBNAMEUNLIST = -5;
 
 	public static final int MAXRESPONSETIMEOUT = 5;
 
@@ -202,7 +204,7 @@ public class VPXConstants {
 
 		public static final String ICON_UPLOAD_NAME = "upload.png";
 
-		public static final String ICON_CLEAR_NAME = "clear2.png";
+		public static final String ICON_CLEAR_NAME = "clear.gif";
 
 		public static final String ICON_DOWNLOADOUT_NAME = "download1.png";
 
@@ -216,7 +218,7 @@ public class VPXConstants {
 
 		public static final String ICON_REFRESH_NAME = "refresh.png";
 
-		public static final String ICON_MEMORY_NAME = "memory.png";
+		public static final String ICON_MEMORY_NAME = "memory2.gif";
 
 		public static final String ICON_MAD_NAME = "mad.png";
 

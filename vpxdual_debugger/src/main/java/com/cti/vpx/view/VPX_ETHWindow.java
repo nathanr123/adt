@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -29,10 +30,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
@@ -69,8 +70,8 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
-import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.util.VPXSessionManager;
+import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_ETHWindow extends JFrame
 		implements WindowListener, VPXAdvertisementListener, VPXMessageListener, VPXCommunicationListener {
@@ -548,7 +549,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Window_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Window_Amplitude.addActionListener(new ActionListener() {
 
@@ -560,7 +561,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 		vpx_Menu_Window_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Window_Waterfall.addActionListener(new ActionListener() {
 
@@ -625,7 +626,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Window_P2020Config = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.P2020Config"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Window_P2020Config.addActionListener(new ActionListener() {
 
@@ -638,7 +639,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Window_ChangeIP = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.ChangeIP"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Window_ChangeIP.addActionListener(new ActionListener() {
 
@@ -652,7 +653,7 @@ public class VPX_ETHWindow extends JFrame
 		// Tools Menus
 
 		vpx_Menu_Tools_ChangePWD = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.ChangePWD"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Tools_ChangePWD.addActionListener(new ActionListener() {
 
@@ -665,7 +666,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Tools_ChangePeriod = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Periodicity"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Tools_ChangePeriod.addActionListener(new ActionListener() {
 
@@ -677,7 +678,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 		vpx_Menu_Tools_Prefrences = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Preferences"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_SETTINGS);
 
 		vpx_Menu_Tools_Prefrences.addActionListener(new ActionListener() {
 
@@ -689,7 +690,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Tools_ShowView_Console = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Console"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Tools_ShowView_Console.addActionListener(new ActionListener() {
 
@@ -702,7 +703,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Tools_ShowView_Log = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Tool.Log"),
-				VPXUtilities.getEmptyIcon(14, 14));
+				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Tools_ShowView_Log.addActionListener(new ActionListener() {
 
@@ -740,6 +741,49 @@ public class VPX_ETHWindow extends JFrame
 
 			}
 		});
+
+		// Shorcuts
+
+		// File Menu Items
+		vpx_Menu_File_AliasConfig.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_File_SubnetFilter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_File_OpenLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_File_Detail.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
+
+		vpx_Menu_File_Refresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+
+		vpx_Menu_File_Exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
+
+		// Window Menu Items
+		// vpx_Menu_Window_MemoryBrowser.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
+		// ActionEvent.CTRL_MASK));
+
+		// vpx_Menu_Window_MemoryPlot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
+		// ActionEvent.CTRL_MASK));
+
+		vpx_Menu_Window_MAD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_Window_FlashWizard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK));
+
+		// Tools Menu Items
+		vpx_Menu_Tools_ChangePWD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_Tools_ChangePeriod.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_Tools_Prefrences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_Tools_ShowView_Console.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
+
+		vpx_Menu_Tools_ShowView_Log.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
+
+		// Help Menu Items
+		vpx_Menu_Help_Help.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+
+		vpx_Menu_Help_About.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, ActionEvent.CTRL_MASK));
+
 		// Adding
 
 		// Adding Menus

@@ -471,6 +471,13 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 				switch (val) {
 
+				case VPXConstants.SUBNAMEUNLIST:
+
+					msg = String.format("Sub System name should not be \'%s\'\nIt is reserved!.",
+							VPXConstants.VPXUNLIST);
+
+					break;
+
 				case VPXConstants.SUBNAMEAVAILBLE:
 
 					msg = "Sub System name is already availble.\nPlease enter new name!.";
@@ -498,6 +505,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg, "Validation", JOptionPane.ERROR_MESSAGE);
 
+				return;
+
 			} else {
 
 				if (ismodify) {
@@ -512,6 +521,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
 								"Error in modifying " + currentSubSystem.getSubSystem(), "Updating",
 								JOptionPane.ERROR_MESSAGE);
+
+						return;
 					}
 				}
 
@@ -527,6 +538,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
 								"Error in adding " + currentSubSystem.getSubSystem(), "Adding",
 								JOptionPane.ERROR_MESSAGE);
+
+						return;
 					}
 				}
 			}
@@ -553,6 +566,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 			}
 
 			JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg, "Validation", JOptionPane.ERROR_MESSAGE);
+
+			return;
 		}
 
 		currentSubSystem = null;
@@ -574,39 +589,45 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		int ret = VPXConstants.SUBSYSTEMAVAILBLE;
 
-		List<VPXSubSystem> curList = aliasTableModel.getSubSystem().getSubsystem();
+		if (currentSubSystem.getSubSystem().equals(VPXConstants.VPXUNLIST)) {
 
-		for (Iterator<VPXSubSystem> iterator = curList.iterator(); iterator.hasNext();) {
+			ret = VPXConstants.SUBNAMEUNLIST;
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+		} else {
 
-			if (vpxSubSystem.getId() != currentSubSystem.getId()) {
+			List<VPXSubSystem> curList = aliasTableModel.getSubSystem().getSubsystem();
 
-				if (currentSubSystem.getSubSystem().equals(vpxSubSystem.getSubSystem())) {
+			for (Iterator<VPXSubSystem> iterator = curList.iterator(); iterator.hasNext();) {
 
-					ret = VPXConstants.SUBNAMEAVAILBLE;
+				VPXSubSystem vpxSubSystem = iterator.next();
 
-				} else if (currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpP2020())
-						|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP1())
-						|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP2())) {
+				if (vpxSubSystem.getId() != currentSubSystem.getId()) {
 
-					ret = VPXConstants.P2020AVAILBLE;
+					if (currentSubSystem.getSubSystem().equals(vpxSubSystem.getSubSystem())) {
 
-				} else if (currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpP2020())
-						|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP1())
-						|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP2())) {
+						ret = VPXConstants.SUBNAMEAVAILBLE;
 
-					ret = VPXConstants.DSP1AVAILBLE;
+					} else if (currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpP2020())
+							|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP1())
+							|| currentSubSystem.getIpP2020().equals(vpxSubSystem.getIpDSP2())) {
 
-				} else if (currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpP2020())
-						|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP1())
-						|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP2())) {
+						ret = VPXConstants.P2020AVAILBLE;
 
-					ret = VPXConstants.DSP2AVAILBLE;
+					} else if (currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpP2020())
+							|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP1())
+							|| currentSubSystem.getIpDSP1().equals(vpxSubSystem.getIpDSP2())) {
+
+						ret = VPXConstants.DSP1AVAILBLE;
+
+					} else if (currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpP2020())
+							|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP1())
+							|| currentSubSystem.getIpDSP2().equals(vpxSubSystem.getIpDSP2())) {
+
+						ret = VPXConstants.DSP2AVAILBLE;
+					}
 				}
 			}
 		}
-
 		return ret;
 	}
 
@@ -623,14 +644,13 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 				VPXSessionManager.setVPXSystem(VPXUtilities.readFromXMLFile());
 
 				parent.updateProcessorTree();
-				
+
 				parent.updateLog(subSystem + " deleted ");
 
 				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
 						currentSubSystem.getSubSystem() + " deleted successfully!");
 				currentSubSystem = null;
-				
-				
+
 			} else {
 				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting " + subSystem, "Deletion",
 						JOptionPane.ERROR_MESSAGE);
