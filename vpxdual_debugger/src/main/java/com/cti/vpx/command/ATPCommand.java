@@ -21,10 +21,6 @@ public class ATPCommand extends Struct implements ATP {
 
 	public final MSGParamaenters params = inner(new MSGParamaenters());
 
-	public ATPCommand() {
-
-	}
-
 	public class TestInfo extends Struct {
 
 		// DSP
@@ -103,19 +99,22 @@ public class ATPCommand extends Struct implements ATP {
 		public final Unsigned32 byteZero = new Unsigned32();
 
 		public final Unsigned8 buffer[] = array(new Unsigned8[DEFAULTBUFFERSIZE]);
+		
+		public final Unsigned32 totalfilesize = new Unsigned32();
+
+		public final Unsigned32 totalnoofpackets = new Unsigned32();
+
+		public final Unsigned32 currentpacket = new Unsigned32();
 
 	}
 
-	public class MSGParamaenters extends Union {
+	public class MSGParamaenters extends Struct {
 
-		public TestInfo testinfo = inner(new TestInfo());
+		public final TestInfo testinfo = inner(new TestInfo());
 
 		public final FlashInfo flash_info = inner(new FlashInfo());
 
 		public final MemoryInfo memoryinfo = inner(new MemoryInfo());
-
-		public MSGParamaenters() {
-		}
 	}
 
 	@Override

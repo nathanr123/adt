@@ -91,6 +91,8 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_BISTResultWindow bistWindow = new VPX_BISTResultWindow();
 
+	private VPX_DetailWindow detail = new VPX_DetailWindow(VPX_ETHWindow.this);
+
 	private ResourceBundle rBundle;
 
 	private JMenuBar vpx_MenuBar;
@@ -1395,9 +1397,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				VPX_DetailWindow detail = new VPX_DetailWindow(VPX_ETHWindow.this, VPXSystem.class.getSimpleName());
-
-				detail.setVisible(true);
+				detail.showDetailWindow();
 
 			}
 		});

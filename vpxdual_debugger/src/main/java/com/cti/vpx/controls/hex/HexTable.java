@@ -108,7 +108,7 @@ class HexTable extends JTable {
 
 	private final JPopupMenu vpx_Hex_ContextMenu = new JPopupMenu();
 
-	private static final Color ANTERNATING_CELL_COLOR =new Color(224, 224, 255);
+	private static final Color ANTERNATING_CELL_COLOR = new Color(224, 224, 255);
 
 	private HexEditorPanel parent;
 
@@ -164,11 +164,13 @@ class HexTable extends JTable {
 
 		setCellSelectionEnabled(true);
 
-		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		
+		setRowSelectionAllowed(true);
 
-		setDefaultEditor(Object.class, new CellEditor());
+		//setDefaultEditor(Object.class, new CellEditor());
 
-		setDefaultRenderer(Object.class, new CellRenderer());
+		//setDefaultRenderer(Object.class, new CellRenderer());
 
 		getTableHeader().setReorderingAllowed(false);
 
@@ -204,10 +206,6 @@ class HexTable extends JTable {
 		createPopupMenu();
 
 		addMouseListener(new MouseAdapter() {
-
-			public void mousePressed(MouseEvent me) {
-
-			}
 
 			@Override
 			public void mouseReleased(MouseEvent me) {
@@ -989,7 +987,7 @@ class HexTable extends JTable {
 		return false;// cellToOffset(row, col) > -1;
 	}
 
-	public boolean isCellSelected1(int row, int col) {
+	public boolean isCellSelected(int row, int col) {
 		int offset = cellToOffset(row, col);
 		if (offset == -1) { // "Ascii dump" column
 			return false;
@@ -1057,12 +1055,12 @@ class HexTable extends JTable {
 
 		Component component = renderer.getTableCellRendererComponent(this, value, isSelected, hasFocus, row, column);
 
-	//	component.setForeground(Color.RED);
-		
+		// component.setForeground(Color.RED);
+
 		int rendererWidth = component.getPreferredSize().width;
 
 		TableColumn tableColumn = getColumnModel().getColumn(column);
-		
+
 		HexEditor scrollPane = (HexEditor) SwingUtilities.getAncestorOfClass(JScrollPane.class, HexTable.this);
 
 		int cols = 0;
@@ -1100,7 +1098,7 @@ class HexTable extends JTable {
 						value.toString().toUpperCase())); // For all format
 			}
 		}
-		
+
 		tableColumn.setPreferredWidth(
 				Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
 
@@ -1374,7 +1372,7 @@ class HexTable extends JTable {
 			}
 			return super.stopCellEditing();
 		}
-		
+
 	}
 
 	/**
@@ -1404,25 +1402,42 @@ class HexTable extends JTable {
 			super.getTableCellRendererComponent(table, value, selected, focus, row, column);
 
 			highlight.setLocation(-1, -1);
+
 			if (column == table.getColumnCount() - 1 && // "Ascii dump"
 					hexEditor.getHighlightSelectionInAsciiDump()) {
+
 				int selStart = getSmallestSelectionIndex();
+
 				int selEnd = getLargestSelectionIndex();
+
 				int b1 = row * 16;
+
 				int b2 = b1 + 15;
+
 				if (selStart <= b2 && selEnd >= b1) {
+
 					int start = Math.max(selStart, b1) - b1;
+
 					int end = Math.min(selEnd, b2) - b1;
+
 					highlight.setLocation(start, end);
 				}
+
 				boolean colorBG = hexEditor.getAlternateRowBG() && (row & 1) > 0;
+
 				setBackground(colorBG ? ANTERNATING_CELL_COLOR : ANTERNATING_CELL_COLOR);
+
 			} else {
+
 				if (!selected) {
+
 					if ((hexEditor.getAlternateRowBG() && (row & 1) > 0)
 							^ (hexEditor.getAlternateColumnBG() && (column & 1) > 0)) {
+
 						setBackground(ANTERNATING_CELL_COLOR);
+
 					} else {
+
 						setBackground(table.getBackground());
 					}
 				}
@@ -1435,22 +1450,33 @@ class HexTable extends JTable {
 		protected void paintComponent(Graphics g) {
 
 			g.setColor(getBackground());
+
 			g.fillRect(0, 0, getWidth(), getHeight());
 
 			if (highlight.x > -1) {
+
 				int w = getFontMetrics(HexTable.this.getFont()).charWidth('w');
+
 				g.setColor(hexEditor.getHighlightSelectionInAsciiDumpColor());
+
 				int x = getInsets().left + highlight.x * w;
+
 				g.fillRect(x, 0, (highlight.y - highlight.x + 1) * w, getRowHeight());
 			}
 
 			g.setColor(getForeground());
+
 			int x = 2;
+
 			String text = getText();
+
 			// not padding low bytes, and this one is in range 00-0f.
+
 			if (text.length() == 1) {
+
 				x += g.getFontMetrics().charWidth('w');
 			}
+
 			g.drawString(text, x, 11);
 
 		}

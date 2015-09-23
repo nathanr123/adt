@@ -11,11 +11,6 @@ import java.nio.ByteOrder;
  */
 public class P2020ATPCommand extends ATPCommand {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6737875272065675523L;
-
 	@Override
 	public ByteOrder byteOrder() {
 		return ATP.BYTEORDER_P2020;

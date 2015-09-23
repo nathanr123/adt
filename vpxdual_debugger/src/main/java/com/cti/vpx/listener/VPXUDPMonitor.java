@@ -687,7 +687,7 @@ public class VPXUDPMonitor {
 			if (rem > 0)
 				tot++;
 
-			//msg.params.memoryinfo.byteZero.set(sendBuffer[0]);
+			msg.params.memoryinfo.byteZero.set(sendBuffer[0]);
 
 			for (int i = 0; i < sendBuffer.length; i++) {
 
@@ -695,14 +695,14 @@ public class VPXUDPMonitor {
 
 			}			
 
-			msg.params.flash_info.totalnoofpackets.set(tot);
+			msg.params.memoryinfo.totalnoofpackets.set(tot);
 
-			msg.params.flash_info.totalfilesize.set(size);
+			msg.params.memoryinfo.totalfilesize.set(size);
 
-			msg.params.flash_info.currentpacket.set(0);
-			msg.params.memoryinfo.byteZero.set(sendBuffer[0]);
+			msg.params.memoryinfo.currentpacket.set(0);
 			
 			msg.params.memoryinfo.length.set(length);
+			
 			dialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
 
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
@@ -716,7 +716,7 @@ public class VPXUDPMonitor {
 
 	public void sendMemoryFileNextPacket(String ip, ATPCommand msg) {
 
-		int currPacket = (int) msg.params.flash_info.currentpacket.get();
+		int currPacket = (int) msg.params.memoryinfo.currentpacket.get();
 
 		currPacket++;
 
@@ -761,16 +761,13 @@ public class VPXUDPMonitor {
 					dialog.updatePackets(size, tot, currPacket, 0, 0);
 				}
 
-				msg.params.flash_info.totalnoofpackets.set(tot);
+				msg.params.memoryinfo.totalnoofpackets.set(tot);
 
-				msg.params.flash_info.totalfilesize.set(size);
+				msg.params.memoryinfo.totalfilesize.set(size);
 
-				msg.params.flash_info.currentpacket.set(currPacket);
+				msg.params.memoryinfo.currentpacket.set(currPacket);
 
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
-
-				System.out.println(msg.params.memoryinfo.length.get());
-				;
 
 			} catch (Exception e) {
 

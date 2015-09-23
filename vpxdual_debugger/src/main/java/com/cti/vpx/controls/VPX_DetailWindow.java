@@ -7,6 +7,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,7 +28,7 @@ import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_DetailWindow extends JDialog {
+public class VPX_DetailWindow extends JDialog implements WindowListener {
 	/**
 	 * 
 	 */
@@ -35,6 +37,8 @@ public class VPX_DetailWindow extends JDialog {
 	private JTable tbl_Property;
 
 	private DefaultTableModel tbl_Property_Model;
+
+	private boolean isRunning = false;
 
 	private VPX_ETHWindow parent;
 
@@ -55,6 +59,21 @@ public class VPX_DetailWindow extends JDialog {
 		pack();
 
 		centerFrame();
+
+	}
+
+	public VPX_DetailWindow(VPX_ETHWindow parnt) {
+
+		this.parent = parnt;
+
+		init();
+
+		loadComponents();
+
+		pack();
+
+		centerFrame();
+
 	}
 
 	private void init() {
@@ -66,6 +85,8 @@ public class VPX_DetailWindow extends JDialog {
 		setAlwaysOnTop(true);
 
 		setIconImage(VPXUtilities.getAppIcon());
+
+		addWindowListener(this);
 
 		setModal(true);
 	}
@@ -112,6 +133,22 @@ public class VPX_DetailWindow extends JDialog {
 		scrollPane.setViewportView(tbl_Property);
 	}
 
+	public void showDetailWindow() {
+
+		parent.updateLog("Showing VPXSystem Details");
+
+		loadProperties(VPXSystem.class.getSimpleName());
+
+		isRunning = true;
+
+		Thread th = new Thread(new ProcessorStatusMonitor());
+
+		th.start();
+
+		setVisible(true);
+
+	}
+
 	private void loadProperties(String path) {
 
 		if (path.startsWith(VPXSystem.class.getSimpleName())) {
@@ -119,8 +156,6 @@ public class VPX_DetailWindow extends JDialog {
 			setTitle("VPX System Details");
 
 			loadProperties(VPXSessionManager.getVPXSystem());
-
-			parent.updateLog("Showing VPXSystem Details");
 
 		} else if (path.startsWith("<html>")) {
 
@@ -378,4 +413,71 @@ public class VPX_DetailWindow extends JDialog {
 		setLocation(dx, dy);
 	}
 
+	class ProcessorStatusMonitor implements Runnable {
+
+		public ProcessorStatusMonitor() {
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void run() {
+
+			while (isRunning) {
+
+				try {
+
+					loadProperties(VPXSystem.class.getSimpleName());
+
+					Thread.sleep(5000);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		isRunning = false;
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
 }

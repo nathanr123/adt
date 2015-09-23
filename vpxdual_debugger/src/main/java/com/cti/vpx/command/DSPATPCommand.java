@@ -11,11 +11,6 @@ import java.nio.ByteOrder;
  */
 public class DSPATPCommand extends ATPCommand {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -9159745143361625196L;
-
 	public DSPATPCommand() {
 		super();
 	}
