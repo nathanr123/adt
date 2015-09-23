@@ -410,7 +410,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 		if (currentMode == FILLMEMORY) {
 
-			long address = VPXUtilities.getValue(addr);
+			long address =(VPXUtilities.getValue(addr) == -1)?0:VPXUtilities.getValue(addr);
 
 			if ((address < startAddrVal) || (address > (startAddrVal + totalLength))) {
 

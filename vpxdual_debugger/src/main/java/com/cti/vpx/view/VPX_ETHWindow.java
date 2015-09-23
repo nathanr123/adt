@@ -1906,8 +1906,13 @@ public class VPX_ETHWindow extends JFrame
 
 			@Override
 			public void run() {
-				memoryBrowserWindow[memID].setBytes(startAddress, buffer);
-				memoryBrowserWindow[memID].setVisible(true);
+
+			//	if (memoryBrowserWindow[memID].isVisible()) {
+					
+					memoryBrowserWindow[memID].setBytes(startAddress, buffer);
+					
+					memoryBrowserWindow[memID].setVisible(true);
+			//	}
 
 			}
 		});

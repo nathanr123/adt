@@ -75,7 +75,6 @@ import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.controls.VPX_EthernetFlashPanel;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.controls.hex.groupmodel.Floating32;
 import com.cti.vpx.controls.hex.groupmodel.Hex16;
@@ -397,10 +396,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		String startAddress = "0x0000000";
 
-		int rc = memoryLoadWindow.showLoadMemoryWinow();// getFileChooser("Select
-														// file
-		// to
-		// Open").showOpenDialog(this);
+		int rc = memoryLoadWindow.showLoadMemoryWinow(memoryWindow.getSelectedProcessor());
 
 		if (rc == 1) {// JFileChooser.APPROVE_OPTION) {
 
@@ -415,10 +411,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			startAddress = (memoryLoadWindow.isStartAddress() ? memoryLoadWindow.getStartAddress() : "0x0000000");
 
 			VPXUtilities.getParent().sendMemoryFile(memoryWindow.getSelectedProcessor(), memoryLoadWindow.getFileName(),
-					VPXUtilities.getValue(startAddress), dialog);
+					(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress), dialog);
 
 			handleOpenFile(file.getAbsolutePath(), startAddress);
 		}
+
 	}
 
 	/**
@@ -502,7 +499,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				if (file.isFile()) { // e.g. in Eclipse debugger
 					editor.open(fileName);
 
-					editor.setShowRowHeader(VPXUtilities.getValue(startAddress), true);
+					editor.setShowRowHeader(
+							(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress),
+							true);
 				} else { // In a jar
 					throw new IOException("Resource not found: " + fileName);
 				}
@@ -1150,7 +1149,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			long start = editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress();
 
-			long start1 = VPXUtilities.getValue(memStFillWindow.getAddress());
+			long start1 = (VPXUtilities.getValue(memStFillWindow.getAddress()) == -1) ? 0
+					: VPXUtilities.getValue(memStFillWindow.getAddress());
 
 			int offset = (int) (start1 - start);
 
@@ -1186,7 +1186,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			long start = editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress();
 
-			long start1 = VPXUtilities.getValue(memStFillWindow.getStartAddress());
+			long start1 = (VPXUtilities.getValue(memStFillWindow.getAddress()) == -1) ? 0
+					: VPXUtilities.getValue(memStFillWindow.getAddress());
 
 			int offset = (int) (start1 - start);
 

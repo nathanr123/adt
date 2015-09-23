@@ -95,16 +95,16 @@ public class ATPCommand extends Struct implements ATP {
 		public final Unsigned32 stride = new Unsigned32();
 
 		public final Unsigned32 newvalue = new Unsigned32();
+		
+		//public final Unsigned32 totalfilesize = new Unsigned32();
+
+		//public final Unsigned32 totalnoofpackets = new Unsigned32();
+
+		//public final Unsigned32 currentpacket = new Unsigned32();
 
 		public final Unsigned32 byteZero = new Unsigned32();
 
 		public final Unsigned8 buffer[] = array(new Unsigned8[DEFAULTBUFFERSIZE]);
-		
-		public final Unsigned32 totalfilesize = new Unsigned32();
-
-		public final Unsigned32 totalnoofpackets = new Unsigned32();
-
-		public final Unsigned32 currentpacket = new Unsigned32();
 
 	}
 

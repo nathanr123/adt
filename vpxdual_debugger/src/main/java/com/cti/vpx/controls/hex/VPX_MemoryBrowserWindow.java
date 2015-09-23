@@ -1,6 +1,7 @@
 package com.cti.vpx.controls.hex;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -20,20 +21,24 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -85,7 +90,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	private VPXSystem vpxSystem;
 
-	private VPXSubSystem curProcFilter;
+	private Thread autoRefreshThread = null;
+
+	private int currentThreadSleepTime;
+
+	// private VPXSubSystem curProcFilter;
 
 	private JLabel lblAddress;
 
@@ -96,6 +105,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private Map<String, String> memVariables;
 
 	private HexEditorPanel hexPanel;
+
+	private boolean isAutoRefresh = false;
+
+	private JDialog dialog;
 
 	/**
 	 * Launch the application.
@@ -216,6 +229,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		subSystemPanel.add(lblProcessors, "cell 2 0,alignx center,aligny center");
 
 		cmbProcessor = new JComboBox<String>();
+
 		cmbProcessor.addItemListener(new ItemListener() {
 
 			@Override
@@ -395,6 +409,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(lblAddress, "cell 1 0,alignx left,aligny center");
 
 		txtMemoryAddres = new JTextField();
+		txtMemoryAddres.setText("0xA0000000");
 
 		txtMemoryAddres.setPreferredSize(new Dimension(20, 20));
 
@@ -407,6 +422,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(lblLength, "cell 3 0,alignx left,aligny center");
 
 		txtMemoryLength = new JTextField();
+		txtMemoryLength.setText("2048");
 
 		txtMemoryLength.setPreferredSize(new Dimension(20, 20));
 
@@ -415,10 +431,12 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(txtMemoryLength, "cell 4 0,alignx left,aligny center");
 
 		JLabel lblStride = new JLabel("Stride");
+		lblStride.setVisible(false);
 
 		memoryAddressPanel.add(lblStride, "cell 5 0,alignx left,aligny center");
 
 		txtMemoryStride = new JTextField();
+		txtMemoryStride.setVisible(false);
 
 		txtMemoryStride.setPreferredSize(new Dimension(20, 20));
 
@@ -439,9 +457,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				createFilters();
-
-				parent.readMemory(memoryFilter);
+				doReadMemory();
 
 			}
 		});
@@ -701,47 +717,49 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		cmbProcessor.addItem("Select Processor");
 
-		boolean isFound = false;
+		if (cmbSubSystem.getSelectedIndex() > 0) {
 
-		List<VPXSubSystem> s = vpxSystem.getSubsystem();
+			VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
 
-		for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
+			List<VPXSubSystem> s = vpxSystem.getSubsystem();
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+			for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
 
-			if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
+				VPXSubSystem vpxSubSystem = iterator.next();
 
-				curProcFilter = vpxSubSystem;
+				if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
 
-				// cmbProcessor.addItem(vpxSubSystem.getIpP2020());
+					curProcFilter = vpxSubSystem;
 
-				cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
+					// cmbProcessor.addItem(vpxSubSystem.getIpP2020());
 
-				cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
+					cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
 
-				break;
+					cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
 
-			}
+					break;
 
-		}
-
-		if (!isFound) {
-
-			curProcFilter = null;
-
-			List<Processor> p = vpxSystem.getUnListed();
-
-			for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
-
-				Processor processor = iterator.next();
-
-				if (!processor.getName().contains("P2020")) {
-
-					cmbProcessor.addItem(processor.getiP_Addresses());
 				}
+
 			}
 
+			if (curProcFilter == null) {
+
+				List<Processor> p = vpxSystem.getUnListed();
+
+				for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+					Processor processor = iterator.next();
+
+					if (!processor.getName().contains("P2020")) {
+
+						cmbProcessor.addItem(processor.getiP_Addresses());
+					}
+				}
+
+			}
 		}
+
 	}
 
 	private void loadCoresFilter() {
@@ -750,50 +768,71 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		cmbCores.addItem("Select Core");
 
-		if (curProcFilter != null) {
+		if (cmbSubSystem.getSelectedIndex() > 0 && cmbProcessor.getSelectedIndex() > 0) {
 
-			if (cmbProcessor.getSelectedItem().toString().equals(curProcFilter.getIpP2020())) {
+			String subSystem = cmbSubSystem.getSelectedItem().toString();
 
-				cmbCores.setEnabled(false);
+			String proc = cmbProcessor.getSelectedItem().toString();
+
+			if (subSystem.equals(VPXConstants.VPXUNLIST)) {
+
+				List<Processor> s = vpxSystem.getUnListed();
+
+				if (s.size() > 0) {
+
+					for (Iterator<Processor> iterator = s.iterator(); iterator.hasNext();) {
+
+						Processor processor = iterator.next();
+
+						if (processor.getiP_Addresses().equals(proc)) {
+
+							if (processor.getName().contains("P2020")) {
+
+								cmbCores.setEnabled(false);
+
+								break;
+
+							} else {
+
+								cmbCores.setEnabled(true);
+
+								for (int i = 0; i < 8; i++) {
+									cmbCores.addItem(String.format("Core %s", i));
+								}
+
+								cmbCores.setSelectedIndex(0);
+
+								break;
+							}
+
+						}
+
+					}
+				}
 
 			} else {
 
-				cmbCores.setEnabled(true);
+				VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(subSystem);
 
-				cmbCores.addItem("All Cores");
+				if (proc.equals(curProcFilter.getIpP2020())) {
 
-				for (int i = 0; i < 8; i++) {
-					cmbCores.addItem(String.format("Core %s", i));
-				}
+					cmbCores.setEnabled(false);
 
-				cmbCores.setSelectedIndex(0);
-			}
-		} else {
-			if (cmbSubSystem.getSelectedItem().toString().equals(VPXConstants.VPXUNLIST)) {
-				List<Processor> s = vpxSystem.getUnListed();
-				if (s.size() > 0) {
-					for (Iterator<Processor> iterator = s.iterator(); iterator.hasNext();) {
-						Processor processor = iterator.next();
-						if (processor.getName().contains("P2020")) {
-							cmbCores.setEnabled(false);
+				} else {
 
-							break;
-						} else {
-							cmbCores.setEnabled(true);
+					cmbCores.setEnabled(true);
 
-							cmbCores.addItem("All Cores");
-
-							for (int i = 0; i < 8; i++) {
-								cmbCores.addItem(String.format("Core %s", i));
-							}
-
-							cmbCores.setSelectedIndex(0);
-							break;
-						}
+					for (int i = 0; i < 8; i++) {
+						cmbCores.addItem(String.format("Core %s", i));
 					}
+
+					cmbCores.setSelectedIndex(0);
 				}
+
 			}
+
 		}
+
 	}
 
 	public MemoryViewFilter getMemoryFilter() {
@@ -820,6 +859,149 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		return cmbProcessor.getSelectedItem().toString();
 	}
 
+	private void doReadMemory() {
+
+		boolean isSelectedProcessorValid = isSelectedProcessorValid();
+
+		boolean isSelectedCoreValid = isSelectedCoreValid();
+
+		boolean isAddressValid = isAddressValid();
+
+		boolean isLengthValid = isLengthValid();
+
+		if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid && isLengthValid) {
+
+			createFilters();
+
+			parent.readMemory(memoryFilter);
+
+			
+			Thread th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					showLoadProcessingWindow("Memory loading...");
+
+				}
+			});
+
+			th.start();
+
+		} else {
+			if (!isSelectedProcessorValid) {
+
+				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, "Please select processor", "Validation",
+						JOptionPane.ERROR_MESSAGE);
+
+			} else if (!isSelectedCoreValid) {
+
+				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, "Please select core", "Validation",
+						JOptionPane.ERROR_MESSAGE);
+
+			} else if (!isAddressValid) {
+
+				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, "Addres is invalid.\nEnter valid address!.",
+						"Validation", JOptionPane.ERROR_MESSAGE);
+
+			} else if (!isLengthValid) {
+
+				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, "Length is invalid.\nEnter valid length!.",
+						"Validation", JOptionPane.ERROR_MESSAGE);
+
+			}
+		}
+
+		if (chkAutoRefresh.isSelected()) {
+
+			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * 10* 1000;
+
+			isAutoRefresh = true;
+			
+			startAutoRefreshThread();
+
+		} else {
+
+			isAutoRefresh = false;
+		}
+	}
+
+	private void startAutoRefreshThread() {
+
+		if (autoRefreshThread == null) {
+
+			autoRefreshThread = null;
+
+			autoRefreshThread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					while (isAutoRefresh) {
+
+						try {
+
+							parent.readMemory(memoryFilter);
+
+							System.out.println("Thread Reading");
+
+							Thread.sleep(currentThreadSleepTime);
+
+						} catch (Exception e) {
+							
+							e.printStackTrace();
+
+						}
+
+					}
+
+				}
+			});
+
+			autoRefreshThread.start();
+		}
+
+	}
+
+	private boolean isSelectedProcessorValid() {
+		return cmbProcessor.getSelectedIndex() > 0;
+	}
+
+	private boolean isSelectedCoreValid() {
+		return cmbCores.getSelectedIndex() > 0;
+	}
+
+	private boolean isAddressValid() {
+
+		long address = VPXUtilities.getValue(txtMemoryAddres.getText().trim());
+
+		if (address == -1)
+			return false;
+
+		return true;
+	}
+
+	private boolean isLengthValid() {
+		boolean retval = false;
+
+		try {
+
+			int val = Integer.valueOf(txtMemoryLength.getText().trim());
+
+			if (val > 0 && val <= (ATP.DEFAULTBUFFERSIZE * 10)) {
+
+				retval = true;
+
+			}
+
+		} catch (Exception e) {
+			retval = false;
+		}
+
+		return retval;
+	}
+
+	// Windows Listener
+
 	@Override
 	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
@@ -828,7 +1010,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
+
+		isAutoRefresh = false;
+		
+		closeLoadProcessingWindow();
 
 	}
 
@@ -863,7 +1048,45 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	}
 
 	public void setBytes(long startAddress, byte[] buf) {
+
+		closeLoadProcessingWindow();
+
 		hexPanel.setBytes(startAddress, buf);
 	}
 
+	private void showLoadProcessingWindow(String msg) {
+
+		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION,
+				null, new Object[] {}, null);
+
+		dialog = null;
+
+		dialog = new JDialog();
+
+		dialog.setLocationRelativeTo(VPX_MemoryBrowserWindow.this);
+
+		dialog.setTitle("Message");
+
+		dialog.setModal(false);
+
+		dialog.setUndecorated(true);
+
+		dialog.setContentPane(optionPane);
+
+		optionPane.setBorder(new LineBorder(Color.GRAY));
+
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+		dialog.setAlwaysOnTop(true);
+
+		dialog.setSize(new Dimension(450, 100));
+
+		dialog.setVisible(true);
+	}
+
+	private void closeLoadProcessingWindow() {
+		
+		if (dialog != null)
+			dialog.dispose();
+	}
 }

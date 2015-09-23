@@ -2,7 +2,6 @@ package com.cti.vpx.listener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -663,8 +662,8 @@ public class VPXUDPMonitor {
 		try {
 
 			int length = sendBuffer.length;
-			
-			ATPCommand msg = new DSPATPCommand();
+
+			DSPATPCommand msg = new DSPATPCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
@@ -693,17 +692,29 @@ public class VPXUDPMonitor {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
 
-			}			
+				System.out.print(String.format("%02x ", sendBuffer[i]));
 
-			msg.params.memoryinfo.totalnoofpackets.set(tot);
+				if ((i % 16) == 0) {
+					System.out.println();
+				}
 
-			msg.params.memoryinfo.totalfilesize.set(size);
+			}
 
-			msg.params.memoryinfo.currentpacket.set(0);
-			
+			msg.params.flash_info.totalnoofpackets.set(tot);
+
+			msg.params.flash_info.totalfilesize.set(size);
+
+			msg.params.flash_info.currentpacket.set(0);
+
 			msg.params.memoryinfo.length.set(length);
-			
+
 			dialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
+
+			System.out.println(
+					String.format("Address : %d File Size : %d Total Packets : %d Current Packet : %d Packet Size : %d",
+							msg.params.memoryinfo.address.get(), msg.params.flash_info.totalfilesize.get(),
+							msg.params.flash_info.totalnoofpackets.get(), msg.params.flash_info.currentpacket.get(),
+							msg.params.memoryinfo.length.get()));
 
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
@@ -716,7 +727,7 @@ public class VPXUDPMonitor {
 
 	public void sendMemoryFileNextPacket(String ip, ATPCommand msg) {
 
-		int currPacket = (int) msg.params.memoryinfo.currentpacket.get();
+		int currPacket = (int) msg.params.flash_info.currentpacket.get();
 
 		currPacket++;
 
@@ -749,25 +760,39 @@ public class VPXUDPMonitor {
 
 					msg.params.memoryinfo.byteZero.set(bb[0]);
 
+					System.out.println();
 					for (int i = 0; i < bb.length; i++) {
 
 						msg.params.memoryinfo.buffer[i].set(bb[i]);
+
+						System.out.print(String.format("%02x ", bb[i]));
+
+						if (((i + 1) % 16) == 0) {
+							System.out.println();
+						}
 
 					}
 					dialog.updatePackets(size, tot, currPacket, bb.length, bb.length);
 
 					msg.params.memoryinfo.length.set(bb.length);
+
 				} else {
 					dialog.updatePackets(size, tot, currPacket, 0, 0);
 				}
 
-				msg.params.memoryinfo.totalnoofpackets.set(tot);
+				msg.params.flash_info.totalnoofpackets.set(tot);
 
-				msg.params.memoryinfo.totalfilesize.set(size);
+				msg.params.flash_info.totalfilesize.set(size);
 
-				msg.params.memoryinfo.currentpacket.set(currPacket);
+				msg.params.flash_info.currentpacket.set(currPacket);
 
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+
+				System.out.println(String.format(
+						"Address : %d File Size : %d Total Packets : %d Current Packet : %d Packet Size : %d",
+						msg.params.memoryinfo.address.get(), msg.params.flash_info.totalfilesize.get(),
+						msg.params.flash_info.totalnoofpackets.get(), msg.params.flash_info.currentpacket.get(),
+						msg.params.memoryinfo.length.get()));
 
 			} catch (Exception e) {
 
@@ -961,10 +986,17 @@ public class VPXUDPMonitor {
 
 			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
+			
 			for (int i = 0; i < b.length; i++) {
-
+				
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
+				/*
+				 * System.out.print(String.format("%02x ",
+				 * msg.params.memoryinfo.buffer[i].get()));
+				 * 
+				 * if((i+1) % 16 == 0){ System.out.println(); }
+				 */
 			}
 
 			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
@@ -1022,6 +1054,11 @@ public class VPXUDPMonitor {
 				isComplete = true;
 			}
 
+			
+			System.out.println(String.format("Total Packets %d curr %d leng %d isComplete ",
+					msg.params.flash_info.totalnoofpackets.get(), msg.params.flash_info.currentpacket.get(),
+					msg.params.memoryinfo.length.get())+isComplete);
+			
 			if (isComplete) {
 
 				byte[] bfs = null;// new byte[(int)
@@ -1036,7 +1073,11 @@ public class VPXUDPMonitor {
 				else if (index == 3)
 					bfs = memBuff3.toByteArray();
 
-				((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
+				byte[] bb = new byte[(int) msg.params.memoryinfo.length.get()];
+
+				System.arraycopy(bfs, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
+
+				((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bb);
 
 				// HexEditorDemoApp hd = new HexEditorDemoApp();
 
@@ -1045,7 +1086,7 @@ public class VPXUDPMonitor {
 				// hd.setVisible(true);
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 

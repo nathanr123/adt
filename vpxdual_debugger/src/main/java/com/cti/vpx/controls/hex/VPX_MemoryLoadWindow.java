@@ -58,6 +58,8 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 	private JTextField txtLengthBytes;
 	private JTextField txtLengthWords;
 
+	private String currentProcessor;
+
 	/**
 	 * Launch the application.
 	 */
@@ -71,7 +73,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 					VPX_MemoryLoadWindow dialog = new VPX_MemoryLoadWindow(null);
 
-					int i = dialog.showLoadMemoryWinow();
+					int i = dialog.showLoadMemoryWinow("");
 
 					if (i == 1) {
 						System.out.println(i);
@@ -163,7 +165,8 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 		contentPanel.add(panelCenter, BorderLayout.CENTER);
 
-		panelCenter.setLayout(new MigLayout("", "[right][][grow]", "[grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill]"));
+		panelCenter.setLayout(new MigLayout("", "[right][][grow]",
+				"[grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill]"));
 
 		JLabel lblFile = new JLabel("File");
 
@@ -187,9 +190,11 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 					txtFileName.setText(fileDialog.getSelectedFile().getAbsolutePath());
 
-					txtLengthBytes.setText("0x" + Long.toHexString(fileDialog.getSelectedFile().length()).toUpperCase());
-					
-					txtLengthWords.setText("0x" + Long.toHexString(fileDialog.getSelectedFile().length() / 4).toUpperCase());
+					txtLengthBytes
+							.setText("0x" + Long.toHexString(fileDialog.getSelectedFile().length()).toUpperCase());
+
+					txtLengthWords
+							.setText("0x" + Long.toHexString(fileDialog.getSelectedFile().length() / 4).toUpperCase());
 				}
 
 			}
@@ -223,11 +228,11 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 		panelCenter.add(lblLength, "cell 0 4");
 
 		txtLengthBytes = new JTextField();
-	
+
 		txtLengthBytes.setEditable(false);
-		
+
 		txtLengthBytes.setColumns(10);
-		
+
 		panelCenter.add(txtLengthBytes, "flowx,cell 2 4,growx");
 
 		panelCenter.add(chkStartAddress, "cell 0 6");
@@ -247,18 +252,18 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 		JLabel lblNewLabel_2 = new JLabel("                                                         ");
 
 		panelCenter.add(lblNewLabel_2, "cell 2 7,growx");
-		
+
 		JLabel lblInBytes = new JLabel("Memory Bytes   (or)   ");
 		panelCenter.add(lblInBytes, "cell 2 4");
-		
+
 		txtLengthWords = new JTextField();
-		
+
 		txtLengthWords.setEditable(false);
-		
+
 		txtLengthWords.setColumns(10);
-		
+
 		panelCenter.add(txtLengthWords, "cell 2 4,growx");
-		
+
 		JLabel lblInWords = new JLabel("Memory Words");
 		panelCenter.add(lblInWords, "cell 2 4");
 
@@ -276,39 +281,46 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 			public void actionPerformed(ActionEvent e) {
 
-				fileName = txtFileName.getText().trim();
+				if (!currentProcessor.equals("Select Processor")) {
 
-				startAddress = txtStartAddress.getText().trim();
+					fileName = txtFileName.getText().trim();
 
-				boolean validFile = isValidFileName(fileName);
+					startAddress = txtStartAddress.getText().trim();
 
-				boolean validValue = isValidValue(startAddress);
+					boolean validFile = isValidFileName(fileName);
 
-				if (validFile && validValue) {
+					boolean validValue = isValidValue(startAddress);
 
-					retValue = 1;
+					if (validFile && validValue) {
 
-					dispose();
+						retValue = 1;
+
+						dispose();
+
+					} else {
+						if (!validFile && !validValue) {
+
+							JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please enter valid detail",
+									"Error", JOptionPane.ERROR_MESSAGE);
+
+						} else if (!validFile) {
+
+							JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please enter valid file", "Error",
+									JOptionPane.ERROR_MESSAGE);
+
+						} else if (!validValue) {
+
+							JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please enter valid start address",
+									"Error", JOptionPane.ERROR_MESSAGE);
+
+						}
+					}
 
 				} else {
-					if (!validFile && !validValue) {
+					JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please select processor", "Validation",
+							JOptionPane.ERROR_MESSAGE);
 
-						JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please enter valid detail", "Error",
-								JOptionPane.ERROR_MESSAGE);
-
-					} else if (!validFile) {
-
-						JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please enter valid file", "Error",
-								JOptionPane.ERROR_MESSAGE);
-
-					} else if (!validValue) {
-
-						JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please enter valid start address",
-								"Error", JOptionPane.ERROR_MESSAGE);
-
-					}
 				}
-
 			}
 		});
 
@@ -336,8 +348,10 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 	}
 
-	public int showLoadMemoryWinow() {
+	public int showLoadMemoryWinow(String processor) {
 
+		this.currentProcessor = processor;
+		
 		setVisible(true);
 
 		return retValue;

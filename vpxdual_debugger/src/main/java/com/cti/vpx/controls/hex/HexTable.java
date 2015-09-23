@@ -165,12 +165,12 @@ class HexTable extends JTable {
 		setCellSelectionEnabled(true);
 
 		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		
+
 		setRowSelectionAllowed(true);
 
-		//setDefaultEditor(Object.class, new CellEditor());
+		// setDefaultEditor(Object.class, new CellEditor());
 
-		//setDefaultRenderer(Object.class, new CellRenderer());
+		// setDefaultRenderer(Object.class, new CellRenderer());
 
 		getTableHeader().setReorderingAllowed(false);
 
@@ -216,8 +216,8 @@ class HexTable extends JTable {
 
 				currRow = table.rowAtPoint(p);
 
-				currAddress = VPXUtilities.getValue(
-						hexEditor.getHexEditorRowHeader().getRowHeaderModel().getElementAt(currRow).toString());
+				String addr = hexEditor.getHexEditorRowHeader().getRowHeaderModel().getElementAt(currRow).toString();
+				currAddress = (VPXUtilities.getValue(addr) == -1) ? 0 : VPXUtilities.getValue(addr);
 
 				currCol = table.columnAtPoint(p);
 
@@ -1025,11 +1025,86 @@ class HexTable extends JTable {
 	 *             If an IO error occurs.
 	 */
 	public void open(String fileName) throws IOException {
-		model.setBytes(fileName); // Fires tableDataChanged event
+
+		TableModel model = getModel();
+
+		if (model instanceof Hex8) {
+
+			((Hex8) model).setBytes(fileName);
+
+		} else if (model instanceof Hex16) {
+			((Hex16) model).setBytes(fileName);
+
+		} else if (model instanceof Hex32) {
+			((Hex32) model).setBytes(fileName);
+
+		} else if (model instanceof Hex64) {
+
+			((Hex64) model).setBytes(fileName);
+
+		} else if (model instanceof SignedInt16) {
+
+			((SignedInt16) model).setBytes(fileName);
+
+		} else if (model instanceof SignedInt32) {
+
+			((SignedInt32) model).setBytes(fileName);
+
+		} else if (model instanceof UnSignedInt16) {
+			((UnSignedInt16) model).setBytes(fileName);
+
+		} else if (model instanceof UnSignedInt32) {
+
+			((UnSignedInt32) model).setBytes(fileName);
+
+		} else if (model instanceof Floating32) {
+
+			((Floating32) model).setBytes(fileName);
+
+		}
+
+		// model.setBytes(fileName); // Fires tableDataChanged event
 	}
 
 	public void open(byte[] bytes) throws IOException {
-		model.setBytes(bytes); // Fires tableDataChanged event
+
+		TableModel model = getModel();
+
+		if (model instanceof Hex8) {
+
+			((Hex8) model).setBytes(bytes);
+
+		} else if (model instanceof Hex16) {
+			((Hex16) model).setBytes(bytes);
+
+		} else if (model instanceof Hex32) {
+			((Hex32) model).setBytes(bytes);
+
+		} else if (model instanceof Hex64) {
+
+			((Hex64) model).setBytes(bytes);
+
+		} else if (model instanceof SignedInt16) {
+
+			((SignedInt16) model).setBytes(bytes);
+
+		} else if (model instanceof SignedInt32) {
+
+			((SignedInt32) model).setBytes(bytes);
+
+		} else if (model instanceof UnSignedInt16) {
+			((UnSignedInt16) model).setBytes(bytes);
+
+		} else if (model instanceof UnSignedInt32) {
+
+			((UnSignedInt32) model).setBytes(bytes);
+
+		} else if (model instanceof Floating32) {
+
+			((Floating32) model).setBytes(bytes);
+		}
+
+		// model.setBytes(bytes); // Fires tableDataChanged event
 	}
 
 	/**

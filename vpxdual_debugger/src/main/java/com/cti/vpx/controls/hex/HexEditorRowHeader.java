@@ -27,6 +27,7 @@
 package com.cti.vpx.controls.hex;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.AbstractListModel;
@@ -39,8 +40,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
-import org.apache.poi.hssf.record.GutsRecord;
 
 /**
  * Header of the hex table; displays address of the first byte on the row.
