@@ -29,6 +29,7 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -38,6 +39,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.hex.ByteBuffer;
 import com.cti.vpx.controls.hex.HexEditor;
 
@@ -69,6 +71,8 @@ public class Hex32 extends AbstractTableModel {
 	 */
 	private String[] byteStrVals;
 
+	private BigInteger bi;
+
 	/**
 	 * Creates the model.
 	 *
@@ -80,27 +84,24 @@ public class Hex32 extends AbstractTableModel {
 	public Hex32(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
-	//	doc = new ByteBuffer(16);
+		// doc = new ByteBuffer(16);
 		bytesPerRow = 16;
 
 		undoManager = new UndoManager();
 
 		columnNames = new String[16];
 		for (int i = 0; i < 16; i++) {
-			columnNames[i] =Integer.toHexString(i).toUpperCase();
+			columnNames[i] = Integer.toHexString(i).toUpperCase();
 		}
 
 		/*
-		byteStrVals = new String[256];
-		for (int i = 0; i < byteStrVals.length; i++) {
-			byteStrVals[i] = Integer.toHexString(i);
-		}
-
-		paddedLowerByteStrVals = new String[16];
-		for (int i = 0; i < paddedLowerByteStrVals.length; i++) {
-			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i);
-		}
-*/
+		 * byteStrVals = new String[256]; for (int i = 0; i <
+		 * byteStrVals.length; i++) { byteStrVals[i] = Integer.toHexString(i); }
+		 * 
+		 * paddedLowerByteStrVals = new String[16]; for (int i = 0; i <
+		 * paddedLowerByteStrVals.length; i++) { paddedLowerByteStrVals[i] = "0"
+		 * + Integer.toHexString(i); }
+		 */
 	}
 
 	/**
@@ -171,10 +172,10 @@ public class Hex32 extends AbstractTableModel {
 			return "";
 		}
 		// & with 0xff to convert to unsigned
-		byte[] b = doc.getByteByGroup(pos, 4,true);
+		byte[] b = doc.getByteByGroup(pos, 4, true);
 
 		return String.format("%02x%02x%02x%02x", b[0], b[1], b[2], b[3]).toUpperCase();// (b
-	
+
 	}
 
 	/**
@@ -306,19 +307,30 @@ public class Hex32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		byte b = (byte) Integer.parseInt((String) value, 16);
-		int offset = editor.cellToOffset(row, col);
-		if (offset > -1) { // i.e., not col 17...
-			byte old = doc.getByte(offset);
-			if (old == b) {
-				return;
-			}
-			doc.setByte(offset, b);
-			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
-			fireTableCellUpdated(row, col);
-			fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
-			editor.fireHexEditorEvent(offset, 1, 1);
-		}
+
+		String val = String.format("%08x", Integer.parseInt(value.toString(), 16));
+
+		byte[] bArr = new byte[4];
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		int offset = editor.cellToOffset(row, col) * 4;
+
+		replaceBytes(offset, 4, bArr);
+		
+		bi = new BigInteger(bArr);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, bi.longValue());
+
+		fireTableCellUpdated(row, col);
+
+		editor.fireHexEditorEvent(offset, 4, 4);
 	}
 
 	/**

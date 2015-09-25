@@ -316,6 +316,8 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 	public int showFillMemoryWinow() {
 
+		txtDataValue.setText("");
+
 		setVisible(true);
 
 		return retValue;
@@ -410,7 +412,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 		if (currentMode == FILLMEMORY) {
 
-			long address =(VPXUtilities.getValue(addr) == -1)?0:VPXUtilities.getValue(addr);
+			long address = (VPXUtilities.getValue(addr) == -1) ? 0 : VPXUtilities.getValue(addr);
 
 			if ((address < startAddrVal) || (address > (startAddrVal + totalLength))) {
 
@@ -423,30 +425,29 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 	private boolean isValidLength(String length) {
 
-		boolean retVal = true;
-		try {
-
-			Long.valueOf(length);
-
-			retVal = true;
-		} catch (Exception e) {
-			retVal = false;
-		}
-
-		return retVal;
+		return true;
+		/*
+		 * boolean retVal = true; try {
+		 * 
+		 * Long.valueOf(length);
+		 * 
+		 * retVal = true; } catch (Exception e) { retVal = false; }
+		 * 
+		 * return retVal;
+		 */
 	}
 
 	private boolean isValidData(String data) {
 
-		return true;/*
-					 * try { Long.toHexString(Long.decode(data)).toUpperCase();
-					 * 
-					 * return true;
-					 * 
-					 * } catch (Exception e) {
-					 * 
-					 * return false; }
-					 */
+		try {
+			Long.toHexString(Long.decode(data)).toUpperCase();
+
+			return true;
+
+		} catch (Exception e) {
+			return false;
+		}
+
 	}
 
 	public void setMode(int mode) {

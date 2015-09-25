@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -75,7 +76,6 @@ import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.controls.hex.groupmodel.Floating32;
 import com.cti.vpx.controls.hex.groupmodel.Hex16;
 import com.cti.vpx.controls.hex.groupmodel.Hex32;
@@ -102,38 +102,67 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private static final long serialVersionUID = 1L;
 
 	private HexEditor editor;
+
 	private JFileChooser chooser;
+
 	private JCheckBox colHeaderCB;
+
 	private JComboBox<String> formatBytes;
+
 	private JCheckBox rowHeaderCB;
+
 	private JCheckBox showGridCB;
+
 	private JCheckBox altRowBGCB;
+
 	private JCheckBox altColBGCB;
+
 	private JCheckBox highlightAsciiSelCB;
+
 	private JComboBox<Color> highlightAsciiSelCombo;
+
 	private JCheckBox lowBytePaddingCB;
+
 	private JTextField infoField;
+
 	private JTextField selField;
+
 	private JTextField sizeField;
 
 	private Action openAction;
+
 	private Action cutAction;
+
 	private Action copyAction;
+
 	private Action pasteAction;
+
 	private Action deleteAction;
+
 	private Action undoAction;
+
 	private Action redoAction;
+
 	private Action settingsAction;
+
 	private DumpAction dumpAction;
 
 	private JButton btnOpenAction;
+
 	private JButton btnDumpAction;
+
 	private JButton btnCutAction;
+
 	private JButton btnCopyAction;
+
 	private JButton btnPasteAction;
+
 	private JButton btnDeleteAction;
+
 	private JButton btnUndoAction;
+
 	private JButton btnRedoAction;
+
 	private JButton btnSettingsAction;
 
 	private VPX_MemoryBrowserWindow memoryWindow;
@@ -147,6 +176,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private static final ResourceBundle msg = VPXUtilities.getResourceBundle();
 
 	/**
+	 * 
 	 * Constructor.
 	 */
 	public HexEditorPanel(VPX_MemoryBrowserWindow memWindow) {
@@ -162,34 +192,50 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		JPanel temp = new JPanel(new BorderLayout());
 
 		infoField = new JTextField();
+
 		infoField.setEditable(false);
+
 		infoField.setBorder(
 				BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), infoField.getBorder()));
 
 		selField = new JTextField(30);
+
 		selField.setEditable(false);
+
 		selField.setBorder(
 				BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5), selField.getBorder()));
 
 		sizeField = new JTextField(15);
+
 		sizeField.setEditable(false);
+
 		sizeField.setBorder(
 				BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5), sizeField.getBorder()));
 
 		JPanel temp2 = new JPanel(new BorderLayout());
+
 		JPanel temp3 = new JPanel(new BorderLayout());
+
 		temp2.add(infoField);
+
 		temp3.add(selField, BorderLayout.LINE_START);
+
 		temp3.add(sizeField, BorderLayout.LINE_END);
+
 		temp2.add(temp3, BorderLayout.LINE_END);
+
 		temp.add(temp2, BorderLayout.SOUTH);
+
 		add(temp, BorderLayout.SOUTH);
 
 		// Add the editor after infoField as it listens to byte changes.
 		editor = new HexEditor(this);
+
 		editor.addHexEditorListener(this);
+
 		editor.addSelectionChangedListener(this);
-		// handleOpenFile("D:\\test.bin", "0x0000000");
+
+		//handleOpenFile("D:\\test1.bin", "0x0000000");
 
 		add(editor);
 
@@ -206,19 +252,33 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		Object source = e.getSource();
 
 		if (source == colHeaderCB) {
+
 			editor.setShowColumnHeader(colHeaderCB.isSelected());
+
 		} else if (source == rowHeaderCB) {
+
 			editor.setShowRowHeader(0, rowHeaderCB.isSelected());
+
 		} else if (source == showGridCB) {
+
 			editor.setShowGrid(showGridCB.isSelected());
+
 		} else if (source == altColBGCB) {
+
 			editor.setAlternateColumnBG(altColBGCB.isSelected());
+
 		} else if (source == altRowBGCB) {
+
 			editor.setAlternateRowBG(altRowBGCB.isSelected());
+
 		} else if (source == highlightAsciiSelCB) {
+
 			editor.setHighlightSelectionInAsciiDump(highlightAsciiSelCB.isSelected());
+
 		} else if (source == lowBytePaddingCB) {
+
 			editor.setPadLowBytes(lowBytePaddingCB.isSelected());
+
 		}
 
 	}
@@ -271,7 +331,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			public void itemStateChanged(ItemEvent e) {
 
 				if (e.getSource().equals(formatBytes)) {
+
 					if (e.getStateChange() == ItemEvent.SELECTED) {
+
 						loadGroupingModel();
 					}
 				}
@@ -302,11 +364,11 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		toolbar.addSeparator();
 
-		toolbar.add(btnUndoAction);
+		// toolbar.add(btnUndoAction);
 
-		toolbar.add(btnRedoAction);
+		// toolbar.add(btnRedoAction);
 
-		toolbar.addSeparator();
+		// toolbar.addSeparator();
 
 		toolbar.add(btnSettingsAction);
 
@@ -317,6 +379,10 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private void loadGroupingModel() {
 
 		editor.setHexModel(formatBytes.getSelectedIndex());
+	}
+
+	public HexEditor getHexEditor() {
+		return this.editor;
 	}
 
 	/**
@@ -354,6 +420,12 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		btnSettingsAction = new JButton(settingsAction);
 		btnSettingsAction.setText(null);
+
+	}
+
+	public VPX_MemoryBrowserWindow getMemoryWindow() {
+
+		return this.memoryWindow;
 
 	}
 
@@ -396,13 +468,12 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		String startAddress = "0x0000000";
 
-		int rc = memoryLoadWindow.showLoadMemoryWinow(memoryWindow.getSelectedProcessor());
+		int rc = memoryLoadWindow.showLoadMemoryWinow(memoryWindow.getSelectedProcessor(),
+				memoryWindow.getSelectedCore());
 
 		if (rc == 1) {// JFileChooser.APPROVE_OPTION) {
 
-			VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(null);
-
-			dialog.setMode(VPX_FlashProgressWindow.MEMLOAD);
+			VPX_MemoryLoadProgressWindow dialog = new VPX_MemoryLoadProgressWindow(memoryWindow);
 
 			dialog.setVisible(true);
 
@@ -427,35 +498,51 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	private JFileChooser getFileChooser(String title) {
 
 		FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files", "dat");
+
 		FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
+
 		FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
 
 		if (chooser == null) {
+
 			chooser = new JFileChooser();
 		}
+
 		chooser.setAcceptAllFileFilterUsed(false);
+
 		chooser.addChoosableFileFilter(filterOut);
+
 		chooser.addChoosableFileFilter(filterBin);
+
 		chooser.addChoosableFileFilter(filterDat);
+
 		chooser.setDialogTitle(title);
+
 		return chooser;
 	}
 
 	private String getInfoString(String key, int offs, int param) {
+
 		String text = msg.getString(key);
+
 		text = MessageFormat.format(text, new Object[] { new Integer(offs), new Integer(param) });
+
 		return text;
 	}
 
 	private String getInfoString(String key, int offs, int param1, int param2) {
+
 		String text = msg.getString(key);
+
 		text = MessageFormat.format(text, new Object[] { new Integer(offs), new Integer(param1), new Integer(param2) });
+
 		return text;
 	}
 
 	public void handleRecievedBuffer(byte[] bytes) {
 
 		try {
+
 			if (bytes.length > 0) { // In a jar
 				editor.open(bytes);
 
@@ -1160,6 +1247,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 				setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
 			} catch (Exception e) {
+
+				e.printStackTrace();
+
 				JOptionPane.showMessageDialog(this, "Please enter valid value.", "Valid value",
 						JOptionPane.ERROR_MESSAGE);
 			}
@@ -1198,6 +1288,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				for (int i = offset; i < (offset + length); i++) {
 
 					p = editor.offsetToCell(i);
+
+					memoryWindow.setMemory(start1, editor.getCurrentModel(), (int) length,
+							new BigInteger(memStFillWindow.getData().getBytes()).longValue());
 
 					setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
 

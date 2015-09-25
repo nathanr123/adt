@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -81,7 +80,7 @@ public class Hex64 extends AbstractTableModel {
 	public Hex64(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
-		//doc = new ByteBuffer(16);
+		// doc = new ByteBuffer(16);
 		bytesPerRow = 16;
 
 		undoManager = new UndoManager();
@@ -92,16 +91,14 @@ public class Hex64 extends AbstractTableModel {
 		}
 
 		/*
-		byteStrVals = new String[256];
-		for (int i = 0; i < byteStrVals.length; i++) {
-			byteStrVals[i] = Integer.toHexString(i).toUpperCase();
-		}
-
-		paddedLowerByteStrVals = new String[16];
-		for (int i = 0; i < paddedLowerByteStrVals.length; i++) {
-			paddedLowerByteStrVals[i] = "0" + Integer.toHexString(i).toUpperCase();
-		}
-*/
+		 * byteStrVals = new String[256]; for (int i = 0; i <
+		 * byteStrVals.length; i++) { byteStrVals[i] =
+		 * Integer.toHexString(i).toUpperCase(); }
+		 * 
+		 * paddedLowerByteStrVals = new String[16]; for (int i = 0; i <
+		 * paddedLowerByteStrVals.length; i++) { paddedLowerByteStrVals[i] = "0"
+		 * + Integer.toHexString(i).toUpperCase(); }
+		 */
 	}
 
 	/**
@@ -310,19 +307,36 @@ public class Hex64 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		byte b = (byte) Integer.parseInt((String) value, 16);
-		int offset = editor.cellToOffset(row, col);
-		if (offset > -1) { // i.e., not col 17...
-			byte old = doc.getByte(offset);
-			if (old == b) {
-				return;
-			}
-			doc.setByte(offset, b);
-			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
-			fireTableCellUpdated(row, col);
-			fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
-			editor.fireHexEditorEvent(offset, 1, 1);
-		}
+
+		String val = String.format("%016x", Long.parseLong(value.toString(), 16));
+
+		byte[] bArr = new byte[8];
+
+		bArr[7] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[6] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[5] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[4] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(8, 10), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(10, 12), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(12, 14), 16);
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(14, 16), 16);
+
+		int offset = editor.cellToOffset(row, col) * 8;
+
+		replaceBytes(offset, 8, bArr);
+
+		//this.editor.getMemoryWindow().setMemory();
+		
+		fireTableCellUpdated(row, col);
+
+		editor.fireHexEditorEvent(offset, 8, 8);
 	}
 
 	/**

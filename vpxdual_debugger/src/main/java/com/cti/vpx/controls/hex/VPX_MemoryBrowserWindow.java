@@ -55,21 +55,37 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -2851744765165677816L;
+
 	private JPanel contentPane;
+
 	private JSpinner spinAutoRefresh;
+
 	private JTextField txtMapFilePath;
+
 	private JTextField txtMemoryAddres;
+
 	private JTextField txtMemoryLength;
+
 	private JTextField txtMemoryStride;
+
 	private JComboBox<String> cmbSubSystem;
+
 	private JComboBox<String> cmbProcessor;
+
 	private JComboBox<String> cmbCores;
+
 	private JCheckBox chkAutoRefresh;
+
 	private JRadioButton radUseMap;
+
 	private VPX_FilterComboBox cmbMemoryVariables;
+
 	private JRadioButton radUserAddress;
+
 	private JButton btnGo;
+
 	private JButton btnNewWindow;
+
 	private JButton btnClear;
 
 	private SpinnerNumberModel periodicitySpinnerModel;
@@ -93,8 +109,6 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private Thread autoRefreshThread = null;
 
 	private int currentThreadSleepTime;
-
-	// private VPXSubSystem curProcFilter;
 
 	private JLabel lblAddress;
 
@@ -158,7 +172,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	private void init() {
 
-		setTitle("Memory Browser " + memoryBrowserID);
+		setTitle("Memory Browser " + (memoryBrowserID + 1));
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -213,7 +227,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 			public void itemStateChanged(ItemEvent arg0) {
 
 				if (arg0.getSource().equals(cmbSubSystem)) {
+
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
 						loadProcessorsFilter();
 					}
 				}
@@ -236,7 +252,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 			public void itemStateChanged(ItemEvent arg0) {
 
 				if (arg0.getSource().equals(cmbProcessor)) {
+
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
 						loadCoresFilter();
 					}
 				}
@@ -409,6 +427,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(lblAddress, "cell 1 0,alignx left,aligny center");
 
 		txtMemoryAddres = new JTextField();
+
 		txtMemoryAddres.setText("0xA0000000");
 
 		txtMemoryAddres.setPreferredSize(new Dimension(20, 20));
@@ -422,7 +441,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(lblLength, "cell 3 0,alignx left,aligny center");
 
 		txtMemoryLength = new JTextField();
-		txtMemoryLength.setText("2048");
+
+		txtMemoryLength.setText("100");
 
 		txtMemoryLength.setPreferredSize(new Dimension(20, 20));
 
@@ -512,6 +532,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private void fillMemoryAddress() {
 
 		if (memVariables.containsKey(cmbMemoryVariables.getSelectedItem().toString())) {
+
 			txtMemoryAddres.setText(memVariables.get(cmbMemoryVariables.getSelectedItem().toString()));
 		}
 	}
@@ -535,9 +556,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		filter.setProcessor(cmbProcessor.getSelectedItem().toString());
 
 		if (cmbCores.getItemCount() > 0) {
+
 			filter.setCore(cmbCores.getSelectedItem().toString());
 
 		} else {
+
 			filter.setCore("");
 		}
 
@@ -859,6 +882,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		return cmbProcessor.getSelectedItem().toString();
 	}
 
+	public String getSelectedCore() {
+		return cmbCores.getSelectedItem().toString();
+	}
+
 	private void doReadMemory() {
 
 		boolean isSelectedProcessorValid = isSelectedProcessorValid();
@@ -875,11 +902,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			parent.readMemory(memoryFilter);
 
-			
 			Thread th = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
+
 					showLoadProcessingWindow("Memory loading...");
 
 				}
@@ -905,7 +932,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			} else if (!isLengthValid) {
 
-				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, "Length is invalid.\nEnter valid length!.",
+				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
+						"Length is invalid.\nEnter valid length( between 1 to " + (ATP.DEFAULTBUFFERSIZE * 10) + " )!.",
 						"Validation", JOptionPane.ERROR_MESSAGE);
 
 			}
@@ -913,10 +941,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		if (chkAutoRefresh.isSelected()) {
 
-			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * 10* 1000;
+			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * 5 * 1000;
 
 			isAutoRefresh = true;
-			
+
 			startAutoRefreshThread();
 
 		} else {
@@ -942,12 +970,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 							parent.readMemory(memoryFilter);
 
-							System.out.println("Thread Reading");
-
 							Thread.sleep(currentThreadSleepTime);
 
 						} catch (Exception e) {
-							
+
 							e.printStackTrace();
 
 						}
@@ -1012,7 +1038,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	public void windowClosing(WindowEvent e) {
 
 		isAutoRefresh = false;
-		
+
 		closeLoadProcessingWindow();
 
 	}
@@ -1045,6 +1071,14 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void setMemory(long fromAddress, int typeSize, int length, long newValue) {
+
+		long addr = hexPanel.getHexEditor().getHexEditorRowHeader().getRowHeaderModel().getStartAddress() + fromAddress;
+
+		parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID,
+				typeSize, length, newValue);
 	}
 
 	public void setBytes(long startAddress, byte[] buf) {
@@ -1085,8 +1119,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	}
 
 	private void closeLoadProcessingWindow() {
-		
+
 		if (dialog != null)
+
 			dialog.dispose();
 	}
 }

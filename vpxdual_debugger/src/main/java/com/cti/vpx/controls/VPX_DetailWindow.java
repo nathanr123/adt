@@ -1,6 +1,8 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
@@ -17,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
@@ -124,6 +127,8 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property = new JTable();
 
+		tbl_Property.setDefaultRenderer(Object.class, new CellRenderer());
+
 		tbl_Property.setRowHeight(20);
 
 		tbl_Property_Model = new DefaultTableModel(new String[] { "Property", "Value" }, 0);
@@ -175,6 +180,8 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		setTitle("VPX System Details");
 
+		tbl_Property_Model.getDataVector().removeAllElements();
+		
 		tbl_Property_Model.addRow(new String[] { "System Name", sys.getName() });
 
 		List<VPXSubSystem> subSystems = sys.getSubsystem();
@@ -480,4 +487,34 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 		// TODO Auto-generated method stub
 
 	}
+
+	private class CellRenderer extends DefaultTableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		public CellRenderer() {
+		}
+
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus,
+				int row, int column) {
+
+			String s = table.getModel().getValueAt(row, column).toString();
+			
+		//	System.out.println(s);
+			
+		//	System.out.println(value.toString());
+			
+			if (s.equals("Not Alive")) {
+				setForeground(Color.red);
+			} else if (s.equals("Alive")) {
+				setForeground(Color.GREEN.darker());
+			}else{
+				setForeground(Color.BLACK);
+			}
+
+			return super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+
+		}
+	}
+
 }

@@ -173,7 +173,7 @@ public class Floating32 extends AbstractTableModel {
 		// & with 0xff to convert to unsigned
 		byte[] b = doc.getByteByGroup(pos, 4, true);
 
-		return String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat()).replaceAll("E", "E+");
+		return String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat());
 
 	}
 
@@ -306,19 +306,26 @@ public class Floating32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		byte b = (byte) Integer.parseInt((String) value, 16);
-		int offset = editor.cellToOffset(row, col);
-		if (offset > -1) { // i.e., not col 17...
-			byte old = doc.getByte(offset);
-			if (old == b) {
-				return;
-			}
-			doc.setByte(offset, b);
-			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
-			fireTableCellUpdated(row, col);
-			fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
-			editor.fireHexEditorEvent(offset, 1, 1);
-		}
+		
+		String val = Float.toHexString(Float.parseFloat(value.toString()));
+
+		byte[] bArr = new byte[4];
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		int offset = editor.cellToOffset(row, col) * 4;
+
+		replaceBytes(offset, 4, bArr);
+
+		fireTableCellUpdated(row, col);
+
+		editor.fireHexEditorEvent(offset, 4, 4);		
 	}
 
 	/**

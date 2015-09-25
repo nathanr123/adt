@@ -59,6 +59,7 @@ import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
+import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.listener.VPXAdvertisementListener;
@@ -67,7 +68,6 @@ import com.cti.vpx.listener.VPXMessageListener;
 import com.cti.vpx.listener.VPXUDPMonitor;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
-import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXSessionManager;
@@ -1888,6 +1888,22 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void setMemoryValue(String ip, int core, long fromAddress, int memindex, int typeSize, int length,
+			long newValue) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				udpMonitor.setMemory(ip, core, fromAddress, memindex, typeSize, length, newValue);
+
+			}
+		});
+
+		th.start();
+	}
+
 	@Override
 	public void readPlot(MemoryViewFilter filter) {
 		// TODO Auto-generated method stub
@@ -1906,13 +1922,18 @@ public class VPX_ETHWindow extends JFrame
 
 			@Override
 			public void run() {
+				try {
 
-			//	if (memoryBrowserWindow[memID].isVisible()) {
-					
-					memoryBrowserWindow[memID].setBytes(startAddress, buffer);
-					
-					memoryBrowserWindow[memID].setVisible(true);
-			//	}
+					if (memoryBrowserWindow[memID].isVisible()) {
+
+						memoryBrowserWindow[memID].setBytes(startAddress, buffer);
+
+						memoryBrowserWindow[memID].setVisible(true);
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
 			}
 		});
@@ -1953,7 +1974,8 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void sendMemoryFile(String ip, String filename, long startAddress, VPX_FlashProgressWindow flashingWindow) {
+	public void sendMemoryFile(String ip, String filename, long startAddress,
+			VPX_MemoryLoadProgressWindow flashingWindow) {
 
 		udpMonitor.sendMemoryFile(flashingWindow, filename, startAddress, ip);
 

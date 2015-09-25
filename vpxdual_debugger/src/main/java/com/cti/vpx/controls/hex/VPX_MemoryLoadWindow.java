@@ -60,6 +60,8 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 	private String currentProcessor;
 
+	private String currentCore;
+
 	/**
 	 * Launch the application.
 	 */
@@ -73,7 +75,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 					VPX_MemoryLoadWindow dialog = new VPX_MemoryLoadWindow(null);
 
-					int i = dialog.showLoadMemoryWinow("");
+					int i = dialog.showLoadMemoryWinow("", "");
 
 					if (i == 1) {
 						System.out.println(i);
@@ -281,7 +283,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 			public void actionPerformed(ActionEvent e) {
 
-				if (!currentProcessor.equals("Select Processor")) {
+				if (!currentProcessor.equals("Select Processor") && !currentCore.equals("Select Core")) {
 
 					fileName = txtFileName.getText().trim();
 
@@ -317,8 +319,17 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 					}
 
 				} else {
-					JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please select processor", "Validation",
-							JOptionPane.ERROR_MESSAGE);
+					if (currentProcessor.equals("Select Processor")) {
+
+						JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please select processor",
+								"Validation", JOptionPane.ERROR_MESSAGE);
+
+					} else if (currentCore.equals("Select Core")) {
+
+						JOptionPane.showMessageDialog(VPX_MemoryLoadWindow.this, "Please select core",
+								"Validation", JOptionPane.ERROR_MESSAGE);
+
+					}
 
 				}
 			}
@@ -348,10 +359,12 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 	}
 
-	public int showLoadMemoryWinow(String processor) {
+	public int showLoadMemoryWinow(String processor, String core) {
 
 		this.currentProcessor = processor;
-		
+
+		this.currentCore = core;
+
 		setVisible(true);
 
 		return retValue;

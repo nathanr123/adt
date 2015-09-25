@@ -39,8 +39,13 @@ public class ByteBuffer {
 	 * The byte buffer that contains the document content.
 	 */
 	private byte[] buffer;
+	
+	private int length;
 
 	public ByteBuffer(int size) {
+		
+		this.length = size;
+		
 		buffer = new byte[size];
 	}
 
@@ -54,6 +59,9 @@ public class ByteBuffer {
 		if (size < 0) { // Probably never happens.
 			throw new IOException("Negative file length: " + size);
 		}
+		
+		this.length = size;
+		
 		buffer = new byte[size];
 
 		if (size > 0) {
@@ -87,6 +95,8 @@ public class ByteBuffer {
 			baos.write(buffer, 0, count);
 		}
 		buffer = baos.toByteArray();
+		
+		this.length = buffer.length;
 	}
 
 	/**
@@ -102,6 +112,8 @@ public class ByteBuffer {
 		buffer = new byte[bytes.length]; // Use as a temporary buffer.
 
 		System.arraycopy(bytes, 0, buffer, 0, bytes.length);
+		
+		this.length = bytes.length;
 	}
 
 	public byte getByte(int offset) {
@@ -142,20 +154,23 @@ public class ByteBuffer {
 		buf2[offset] = b;
 		System.arraycopy(buffer, offset, buf2, offset + 1, buffer.length - offset);
 		buffer = buf2;
+		this.length= buffer.length;
 	}
 
 	public void insertBytes(int offs, byte[] b) {
+		
+		int replaceLength = this.length - buffer.length;
 
 		if (b == null || b.length == 0) {
 			return;
 		}
 
-		byte[] buf2 = new byte[buffer.length + b.length];
+		byte[] buf2 = new byte[this.length];
 		System.arraycopy(buffer, 0, buf2, 0, offs);
-		System.arraycopy(b, 0, buf2, offs, b.length);
-		System.arraycopy(buffer, offs, buf2, offs + b.length, buffer.length - offs);
+		System.arraycopy(b, 0, buf2, offs,replaceLength);
+		System.arraycopy(buffer, offs, buf2, offs + replaceLength, buffer.length - offs);
 		buffer = buf2;
-
+		this.length = buffer.length;
 	}
 
 	public int read(int offset, byte[] buf) {
@@ -172,12 +187,25 @@ public class ByteBuffer {
 	}
 
 	public void remove(int offset, int len, byte[] removed) {
+		int length = len;
+
 		if (removed != null) {
-			System.arraycopy(buffer, offset, removed, 0, len);
+
+			if (offset + len > buffer.length) {
+				length = buffer.length - offset;
+
+			}
+
+			System.arraycopy(buffer, offset, removed, 0, length);
+
 		}
-		byte[] buf = new byte[buffer.length - len];
+
+		byte[] buf = new byte[buffer.length - length];
+
 		System.arraycopy(buffer, 0, buf, 0, offset);
-		System.arraycopy(buffer, offset + len, buf, offset, buf.length - offset);
+
+		System.arraycopy(buffer, offset + length, buf, offset, buf.length - offset);
+
 		buffer = buf;
 	}
 

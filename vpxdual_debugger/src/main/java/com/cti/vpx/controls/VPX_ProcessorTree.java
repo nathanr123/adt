@@ -110,6 +110,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private VPX_ProcessorNode unlist;
 
+	private JMenuItem vpx_Cxt_New;
+
+	private JMenuItem vpx_Cxt_Reload;
+
 	/**
 	 * 
 	 */
@@ -614,10 +618,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		}
 
-		// updateUI();
-
-		// refresh();
-
 	}
 
 	public void refreshProcessorsStatus() {
@@ -902,6 +902,19 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
+		vpx_Cxt_Reload = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Reload"),
+				VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Cxt_Reload.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				refreshProcessorTree();
+
+			}
+		});
+
 		// Window Menus
 		vpx_Cxt_MemoryBrowser = VPXComponentFactory
 
@@ -1061,16 +1074,22 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		vpx_Cxt_SubSystem = VPXComponentFactory.createJMenu("Sub System");
 
-		vpx_Cxt_SubSystem.addActionListener(new ActionListener() {
+		vpx_Cxt_New = VPXComponentFactory.createJMenuItem("Create New SubSystem");
+
+		vpx_Cxt_New.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+
+				VPX_ProcessorNode nd = (VPX_ProcessorNode) getSelectionModel().getSelectionPath()
+						.getLastPathComponent();
+
+				parent.showAliasConfig(nd.getNodeName());
 
 			}
 		});
 
-		vpx_Cxt_Rename = VPXComponentFactory.createJMenuItem("Rename");
+		vpx_Cxt_Rename = VPXComponentFactory.createJMenuItem("Rename SubSystem");
 
 		vpx_Cxt_Rename.addActionListener(new ActionListener() {
 
@@ -1085,7 +1104,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Remove = VPXComponentFactory.createJMenuItem("Remove");
+		vpx_Cxt_Remove = VPXComponentFactory.createJMenuItem("Remove SubSystem");
 
 		vpx_Cxt_Remove.addActionListener(new ActionListener() {
 
@@ -1108,7 +1127,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Swap = VPXComponentFactory.createJMenuItem("Swap");
+		vpx_Cxt_Swap = VPXComponentFactory.createJMenuItem("Swap SubSystems");
 
 		vpx_Cxt_Swap.addActionListener(new ActionListener() {
 
@@ -1118,9 +1137,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_SubSystem.add(vpx_Cxt_Rename);
-
-		vpx_Cxt_SubSystem.add(vpx_Cxt_Remove);
 	}
 
 	private void refresh() {
@@ -1226,6 +1242,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(vpx_Cxt_Refresh);
 
+				vpx_contextMenu.add(vpx_Cxt_Reload);
+
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 
 			} else if (nodeLevel == 1) { // VPXSubSystem - Child Node
@@ -1243,6 +1261,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
 				if (!node.getNodeName().trim().equals(VPXConstants.VPXUNLIST)) {
+
+					vpx_Cxt_SubSystem.removeAll();
+
+					vpx_Cxt_SubSystem.add(vpx_Cxt_Rename);
+
+					vpx_Cxt_SubSystem.add(vpx_Cxt_Remove);
+
 					vpx_contextMenu.add(vpx_Cxt_SubSystem);
 
 					vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
@@ -1297,11 +1322,60 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		} else {
 
+			// vpx_Cxt_SubSystem.removeAll();
+
+			if (isSameParent(paths)) {
+
+				if (paths[0].getParentPath().toString().contains(VPXConstants.VPXUNLIST)) {
+
+					vpx_contextMenu.add(vpx_Cxt_New);
+
+				} else {
+
+					if (paths.length <= 3) {
+
+						vpx_contextMenu.add(vpx_Cxt_Remove);
+					}
+				}
+
+			} else {
+
+				vpx_contextMenu.add(vpx_Cxt_Swap);
+
+			}
 			// To Do
-			vpx_contextMenu.add(vpx_Cxt_SubSystem);
+			// vpx_contextMenu.add(vpx_Cxt_SubSystem);
 		}
 
 		return vpx_contextMenu;
+	}
+
+	private boolean isSameParent(TreePath[] paths) {
+
+		String temp = "";
+
+		String parentPath = "";
+
+		boolean ret = true;
+
+		for (int i = 0; i < paths.length; i++) {
+
+			temp = paths[i].getParentPath().toString();
+
+			if (i == 0) {
+				parentPath = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
+			} else {
+				if (!parentPath.equals(temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1))) {
+
+					ret = false;
+
+					break;
+				}
+			}
+
+		}
+
+		return ret;
 	}
 
 	@Override

@@ -130,6 +130,10 @@ class HexTable extends JTable {
 
 	private JCheckBoxMenuItem vpx_Hex_Cxt_GrpAs_Floating32;
 
+	private JMenuItem vpx_Hex_Cxt_FillMemory;
+
+	private JMenuItem vpx_Hex_Cxt_SetMemory;
+
 	/**
 	 * Creates a new table to display hex data.
 	 *
@@ -217,20 +221,37 @@ class HexTable extends JTable {
 				currRow = table.rowAtPoint(p);
 
 				String addr = hexEditor.getHexEditorRowHeader().getRowHeaderModel().getElementAt(currRow).toString();
+
 				currAddress = (VPXUtilities.getValue(addr) == -1) ? 0 : VPXUtilities.getValue(addr);
 
 				currCol = table.columnAtPoint(p);
 
 				if (me.isPopupTrigger()) { // if the event shows the menu
+
+					if (hexEditor.getCurrentModel() == HexEditor.UNSINGNEDFLOAT32) {
+						
+						vpx_Hex_Cxt_FillMemory.setEnabled(false);
+						vpx_Hex_Cxt_SetMemory.setEnabled(false);
+						
+					} else {
+
+						vpx_Hex_Cxt_FillMemory.setEnabled(true);
+						vpx_Hex_Cxt_SetMemory.setEnabled(true);
+
+					}
+
 					vpx_Hex_ContextMenu.show(table, me.getX(), me.getY()); // and
 																			// show
 																			// the
 																			// menu
-				} else if (me.getClickCount() == 2) {
-
-					parent.doSetMemory(currAddress + currCol, getValueAt(currRow, currCol).toString(), "");
-
-				}
+				} /*
+					 * else if (me.getClickCount() == 2) {
+					 * 
+					 * parent.doSetMemory(currAddress + currCol,
+					 * getValueAt(currRow, currCol).toString(), "");
+					 * 
+					 * }
+					 */
 			}
 		});
 	}
@@ -410,7 +431,7 @@ class HexTable extends JTable {
 			}
 		});
 
-		JMenuItem vpx_Hex_Cxt_FillMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Fill"),
+		vpx_Hex_Cxt_FillMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Fill"),
 				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Hex_Cxt_FillMemory.addActionListener(new ActionListener() {
@@ -422,7 +443,7 @@ class HexTable extends JTable {
 			}
 		});
 
-		JMenuItem vpx_Hex_Cxt_SetMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Set"),
+		vpx_Hex_Cxt_SetMemory = VPXComponentFactory.createJMenuItem(rBundle.getString("Action.Dump.Set"),
 				VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Hex_Cxt_SetMemory.addActionListener(new ActionListener() {
@@ -732,13 +753,13 @@ class HexTable extends JTable {
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Delete);
 
 		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
-
-		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Redo);
-
-		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Undo);
-
-		vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
-
+		/*
+		 * vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Redo);
+		 * 
+		 * vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Undo);
+		 * 
+		 * vpx_Hex_ContextMenu.add(VPXComponentFactory.createJSeparator());
+		 */
 		vpx_Hex_ContextMenu.add(vpx_Hex_Cxt_Settings);
 
 	}
@@ -984,12 +1005,17 @@ class HexTable extends JTable {
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		return false;// cellToOffset(row, col) > -1;
+
+		if (hexEditor.getCurrentModel() == HexEditor.UNSINGNEDFLOAT32 || hexEditor.getCurrentModel() == HexEditor.HEX64) {
+			return false;
+		} else {
+			return cellToOffset(row, col) > -1;
+		}
 	}
 
 	public boolean isCellSelected(int row, int col) {
 		int offset = cellToOffset(row, col);
-		if (offset == -1) { // "Ascii dump" column
+		if (offset == -1) { 
 			return false;
 		}
 		int start = getSmallestSelectionIndex();

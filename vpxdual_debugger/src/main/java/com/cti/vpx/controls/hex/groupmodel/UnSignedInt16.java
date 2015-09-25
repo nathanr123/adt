@@ -39,6 +39,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.hex.ByteBuffer;
 import com.cti.vpx.controls.hex.HexEditor;
 
@@ -69,6 +70,8 @@ public class UnSignedInt16 extends AbstractTableModel {
 	 * for fast rendering.
 	 */
 	private String[] byteStrVals;
+
+	private BigInteger bi;
 
 	/**
 	 * Creates the model.
@@ -172,8 +175,8 @@ public class UnSignedInt16 extends AbstractTableModel {
 		}
 		// & with 0xff to convert to unsigned
 
-	byte[] b = doc.getByteByGroup(pos, 2, true);
-		
+		byte[] b = doc.getByteByGroup(pos, 2, true);
+
 		return new BigInteger(b).intValue();
 
 	}
@@ -307,19 +310,27 @@ public class UnSignedInt16 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		byte b = (byte) Integer.parseInt((String) value, 16);
-		int offset = editor.cellToOffset(row, col);
-		if (offset > -1) { // i.e., not col 17...
-			byte old = doc.getByte(offset);
-			if (old == b) {
-				return;
-			}
-			doc.setByte(offset, b);
-			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
-			fireTableCellUpdated(row, col);
-			fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
-			editor.fireHexEditorEvent(offset, 1, 1);
-		}
+
+		String val = String.format("%04x", Integer.parseInt(value.toString()));
+
+		byte[] bArr = new byte[2];
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		int offset = editor.cellToOffset(row, col) * 2;
+
+		replaceBytes(offset, 2, bArr);
+
+		bi = new BigInteger(bArr);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, bi.longValue());
+
+		fireTableCellUpdated(row, col);
+
+		editor.fireHexEditorEvent(offset, 2, 2);
+
 	}
 
 	/**

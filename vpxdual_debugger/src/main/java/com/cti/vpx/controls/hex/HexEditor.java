@@ -307,7 +307,7 @@ public class HexEditor extends JScrollPane {
 		}
 
 		table.setCheckedSelectedFormat(currentMode);
-		
+
 		setShowRowHeader(getHexEditorRowHeader().getRowHeaderModel().getStartAddress(), true);
 	}
 
@@ -359,6 +359,12 @@ public class HexEditor extends JScrollPane {
 
 	public int getCurrentModel() {
 		return this.currentMode;
+	}
+
+	public VPX_MemoryBrowserWindow getMemoryWindow() {
+
+		return this.parent.getMemoryWindow();
+
 	}
 
 	/**

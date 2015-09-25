@@ -38,6 +38,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.hex.ByteBuffer;
 import com.cti.vpx.controls.hex.HexEditor;
 
@@ -80,7 +81,7 @@ public class Hex8 extends AbstractTableModel {
 	public Hex8(HexEditor editor, ResourceBundle msg) {
 
 		this.editor = editor;
-		//doc = new ByteBuffer(16);
+		// doc = new ByteBuffer(16);
 		bytesPerRow = 16;
 
 		undoManager = new UndoManager();
@@ -137,7 +138,7 @@ public class Hex8 extends AbstractTableModel {
 	 * @return The number of columns to display.
 	 */
 	public int getColumnCount() {
-	
+
 		return getBytesPerRow();
 	}
 
@@ -167,7 +168,7 @@ public class Hex8 extends AbstractTableModel {
 	public Object getValueAt(int row, int col) {
 
 		int pos = editor.cellToOffset(row, col);
-		
+
 		if (pos == -1) { // A cell that isn't part of the byte array
 			return "";
 		}
@@ -251,7 +252,7 @@ public class Hex8 extends AbstractTableModel {
 	}
 
 	public void setBytes(ByteBuffer buff) {
-		this.doc = null;				
+		this.doc = null;
 		this.doc = buff;
 	}
 
@@ -307,17 +308,27 @@ public class Hex8 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
+
 		byte b = (byte) Integer.parseInt((String) value, 16);
+
 		int offset = editor.cellToOffset(row, col);
+
 		if (offset > -1) { // i.e., not col 17...
+
 			byte old = doc.getByte(offset);
+
 			if (old == b) {
 				return;
 			}
+
 			doc.setByte(offset, b);
+
 			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
+
+			this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT8, 1, b);
+
 			fireTableCellUpdated(row, col);
-		//	fireTableCellUpdated(row, bytesPerRow); // "Ascii dump" column
+
 			editor.fireHexEditorEvent(offset, 1, 1);
 		}
 	}
