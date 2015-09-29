@@ -1548,6 +1548,7 @@ public class VPXUtilities {
 
 		Map<String, String> memVars = new TreeMap<String, String>();
 
+		memVars.put("", "");
 		String str = readMapFile(filename);
 
 		String vars = str.substring(str.lastIndexOf("--------   ----"));

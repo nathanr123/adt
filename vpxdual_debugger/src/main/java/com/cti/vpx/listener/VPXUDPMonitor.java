@@ -83,10 +83,14 @@ public class VPXUDPMonitor {
 
 	private VPXSystem vpxSystem;
 
-	private static int offset0 = 0;
-	private static int offset1 = 0;
-	private static int offset2 = 0;
-	private static int offset3 = 0;
+	private static int memOffset0 = 0;
+	private static int memOffset1 = 0;
+	private static int memOffset2 = 0;
+	private static int memOffset3 = 0;
+
+	private static int plotOffset0 = 0;
+	private static int plotOffset1 = 0;
+	private static int plotOffset2 = 0;
 
 	private byte[] memoryBuff0;
 	private byte[] memoryBuff1;
@@ -979,7 +983,7 @@ public class VPXUDPMonitor {
 		try {
 			datagramSocket = new DatagramSocket();
 
-			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(filter.getProcessor());// VPXUtilities.getProcessorType(ip);
+			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(filter.getProcessor());
 
 			ATPCommand msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
@@ -1002,23 +1006,18 @@ public class VPXUDPMonitor {
 				str = str.substring(2, str.length());
 			}
 
-			// new BigInteger(str, 16).intValue()
+			msg.params.memoryinfo.core.set(Integer.parseInt(filter.getCore()));
+
 			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
 
 			msg.params.memoryinfo.length.set(Integer.valueOf(filter.getMemoryLength()));
 
 			msg.params.memoryinfo.memIndex.set(filter.getMemoryBrowserID());
-			// msg.command_msg.set("temp1");
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
 					InetAddress.getByName(filter.getProcessor()), VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
-
-			// ((VPX_ETHWindow) listener).updateLog("Memory Read from IP : " +
-			// filter.getProcessor() + " Address : "
-			// + filter.getMemoryAddress() + " Length : " +
-			// filter.getMemoryLength());
 
 		} catch (Exception e) {
 
@@ -1084,35 +1083,35 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						offset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
-						int len = (int) msg.params.memoryinfo.length.get() - offset0;
+						int len = (int) msg.params.memoryinfo.length.get() - memOffset0;
 
-						System.arraycopy(b, 0, memoryBuff0, offset0, len);
+						System.arraycopy(b, 0, memoryBuff0, memOffset0, len);
 
 					} else if (index == 1) {
 
-						offset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
-						int len = (int) msg.params.memoryinfo.length.get() - offset1;
+						int len = (int) msg.params.memoryinfo.length.get() - memOffset1;
 
-						System.arraycopy(b, 0, memoryBuff1, offset1, len);
+						System.arraycopy(b, 0, memoryBuff1, memOffset1, len);
 
 					} else if (index == 2) {
 
-						offset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
-						int len = (int) msg.params.memoryinfo.length.get() - offset2;
+						int len = (int) msg.params.memoryinfo.length.get() - memOffset2;
 
-						System.arraycopy(b, 0, memoryBuff1, offset2, len);
+						System.arraycopy(b, 0, memoryBuff1, memOffset2, len);
 
 					} else if (index == 3) {
 
-						offset3 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset3 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
-						int len = (int) msg.params.memoryinfo.length.get() - offset3;
+						int len = (int) msg.params.memoryinfo.length.get() - memOffset3;
 
-						System.arraycopy(b, 0, memoryBuff3, offset3, len);
+						System.arraycopy(b, 0, memoryBuff3, memOffset3, len);
 
 					}
 
@@ -1122,27 +1121,27 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						offset0 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset0 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
 
-						System.arraycopy(b, 0, memoryBuff0, offset0, b.length);
+						System.arraycopy(b, 0, memoryBuff0, memOffset0, b.length);
 
 					} else if (index == 1) {
 
-						offset1 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset1 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
 
-						System.arraycopy(b, 0, memoryBuff1, offset1, b.length);
+						System.arraycopy(b, 0, memoryBuff1, memOffset1, b.length);
 
 					} else if (index == 2) {
 
-						offset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
 
-						System.arraycopy(b, 0, memoryBuff0, offset2, b.length);
+						System.arraycopy(b, 0, memoryBuff0, memOffset2, b.length);
 
 					} else if (index == 3) {
 
-						offset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
 
-						System.arraycopy(b, 0, memoryBuff2, offset3, b.length);
+						System.arraycopy(b, 0, memoryBuff2, memOffset3, b.length);
 
 					}
 
@@ -1155,44 +1154,38 @@ public class VPXUDPMonitor {
 
 					memoryBuff0 = new byte[(int) msg.params.memoryinfo.length.get()];
 
-					offset0 = 0;
+					memOffset0 = 0;
 
-					System.arraycopy(b, offset0, memoryBuff0, 0, (int) msg.params.memoryinfo.length.get());
+					System.arraycopy(b, memOffset0, memoryBuff0, 0, (int) msg.params.memoryinfo.length.get());
 
 				} else if (index == 1) {
 
 					memoryBuff1 = new byte[(int) msg.params.memoryinfo.length.get()];
 
-					offset1 = 0;
+					memOffset1 = 0;
 
-					System.arraycopy(b, offset1, memoryBuff1, 0, (int) msg.params.memoryinfo.length.get());
+					System.arraycopy(b, memOffset1, memoryBuff1, 0, (int) msg.params.memoryinfo.length.get());
 
 				} else if (index == 2) {
 
 					memoryBuff2 = new byte[(int) msg.params.memoryinfo.length.get()];
 
-					offset2 = 0;
+					memOffset2 = 0;
 
-					System.arraycopy(b, offset2, memoryBuff2, 0, (int) msg.params.memoryinfo.length.get());
+					System.arraycopy(b, memOffset2, memoryBuff2, 0, (int) msg.params.memoryinfo.length.get());
 
 				} else if (index == 3) {
 
 					memoryBuff3 = new byte[(int) msg.params.memoryinfo.length.get()];
 
-					offset3 = 0;
+					memOffset3 = 0;
 
-					System.arraycopy(b, offset3, memoryBuff3, 0, (int) msg.params.memoryinfo.length.get());
+					System.arraycopy(b, memOffset3, memoryBuff3, 0, (int) msg.params.memoryinfo.length.get());
 
 				}
 				isComplete = true;
 			}
-			/*
-			 * System.out.println(String.format(
-			 * "Total Packets %d curr %d leng %d isComplete ",
-			 * msg.params.flash_info.totalnoofpackets.get(),
-			 * msg.params.flash_info.currentpacket.get(),
-			 * msg.params.memoryinfo.length.get()) + isComplete);
-			 */
+
 			if (isComplete) {
 
 				byte[] bb = new byte[(int) msg.params.memoryinfo.length.get()];
@@ -1213,84 +1206,310 @@ public class VPXUDPMonitor {
 
 				((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bb);
 
-				// HexEditorDemoApp hd = new HexEditorDemoApp();
-
-				// hd.setBytes((int) msg.params.memoryinfo.address.get(),bfs);
-
-				// hd.setVisible(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void populatePlot(String ip, ATPCommand msg) {
+	public void readPlot(MemoryViewFilter filter) {
 
-		boolean isComplete = false;
+		DatagramSocket datagramSocket;
 
-		int index = (int) msg.params.memoryinfo.memIndex.get();
+		try {
+			datagramSocket = new DatagramSocket();
 
-		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(filter.getProcessor());// VPXUtilities.getProcessorType(ip);
 
-		for (int i = 0; i < b.length; i++) {
+			ATPCommand msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
-			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+			byte[] buffer = new byte[msg.size()];
 
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_PLOT);
+
+			String str = filter.getMemoryAddress();
+
+			if (str.startsWith("0x") || str.startsWith("0X")) {
+
+				str = str.substring(2, str.length());
+			}
+
+			msg.params.memoryinfo.core.set(Integer.parseInt(filter.getCore()));
+
+			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
+
+			msg.params.memoryinfo.length.set(Integer.valueOf(filter.getMemoryLength()));
+
+			msg.params.memoryinfo.memIndex.set(filter.getMemoryBrowserID());
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+					InetAddress.getByName(filter.getProcessor()), VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
 		}
 
-		if (msg.params.flash_info.totalnoofpackets.get() > 1) {
+	}
 
-			if (msg.params.flash_info.currentpacket.get() == 1) {
+	public void readPlot(MemoryViewFilter filter1, MemoryViewFilter filter2) {
 
-				if (index == 0)
-					plotBuff0 = ArrayUtils.addAll(b);
-				else if (index == 1)
-					plotBuff1 = ArrayUtils.addAll(b);
-				else if (index == 2)
-					plotBuff2 = ArrayUtils.addAll(b);
+		DatagramSocket datagramSocket;
 
-			} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+		try {
+			datagramSocket = new DatagramSocket();
 
-				if (index == 0)
-					plotBuff0 = ArrayUtils.addAll(plotBuff0, b);
-				else if (index == 1)
-					plotBuff1 = ArrayUtils.addAll(plotBuff1, b);
-				else if (index == 2)
-					plotBuff2 = ArrayUtils.addAll(plotBuff2, b);
+			// Filter 1
+			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(filter1.getProcessor());// VPXUtilities.getProcessorType(ip);
+
+			ATPCommand msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_PLOT);
+
+			String str = filter1.getMemoryAddress();
+
+			if (str.startsWith("0x") || str.startsWith("0X")) {
+
+				str = str.substring(2, str.length());
+			}
+
+			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
+
+			msg.params.memoryinfo.core.set(Integer.parseInt(filter1.getCore()));
+
+			msg.params.memoryinfo.length.set(Integer.valueOf(filter1.getMemoryLength()));
+
+			msg.params.memoryinfo.memIndex.set(filter1.getMemoryBrowserID());
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+					InetAddress.getByName(filter1.getProcessor()), VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			// Filter 2
+			procesor = vpxSystem.getProcessorTypeByIP(filter2.getProcessor());// VPXUtilities.getProcessorType(ip);
+
+			msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
+
+			buffer = new byte[msg.size()];
+
+			bf.clear();
+
+			bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_PLOT);
+
+			str = filter2.getMemoryAddress();
+
+			if (str.startsWith("0x") || str.startsWith("0X")) {
+
+				str = str.substring(2, str.length());
+			}
+
+			msg.params.memoryinfo.address.set(new BigInteger(str, 16).intValue());
+
+			msg.params.memoryinfo.core.set(Integer.parseInt(filter2.getCore()));
+
+			msg.params.memoryinfo.length.set(Integer.valueOf(filter2.getMemoryLength()));
+
+			msg.params.memoryinfo.memIndex.set(filter2.getMemoryBrowserID());
+
+			packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(filter2.getProcessor()),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void populatePlot(String ip, ATPCommand msg) {
+
+		try {
+			boolean isComplete = false;
+
+			char[] idxs = String.format("%02d", msg.params.memoryinfo.memIndex.get()).toCharArray();
+
+			int index = Character.getNumericValue(idxs[0]);
+
+			int lineid = Character.getNumericValue(idxs[1]);
+
+			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+
+			for (int i = 0; i < b.length; i++) {
+
+				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+				/*
+				 * System.out.print(String.format("%02x ",
+				 * msg.params.memoryinfo.buffer[i].get()));
+				 * 
+				 * if ((i + 1) % 16 == 0) { System.out.println(); }
+				 */
+
+			}
+
+			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
+
+				if (msg.params.flash_info.currentpacket.get() == 1) {
+
+					if (index == 0) {
+
+						plotBuff0 = new byte[(int) msg.params.memoryinfo.length.get()];
+
+						System.arraycopy(b, 0, plotBuff0, 0, b.length);
+
+					} else if (index == 1) {
+
+						plotBuff1 = new byte[(int) msg.params.memoryinfo.length.get()];
+
+						System.arraycopy(b, 0, plotBuff1, 0, b.length);
+
+					} else if (index == 2) {
+
+						plotBuff2 = new byte[(int) msg.params.memoryinfo.length.get()];
+
+						System.arraycopy(b, 0, plotBuff2, 0, b.length);
+
+					}
+
+					isComplete = false;
+
+				} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+
+					if (index == 0) {
+
+						plotOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						int len = (int) msg.params.memoryinfo.length.get() - plotOffset0;
+
+						System.arraycopy(b, 0, plotBuff0, plotOffset0, len);
+
+					} else if (index == 1) {
+
+						plotOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						int len = (int) msg.params.memoryinfo.length.get() - plotOffset1;
+
+						System.arraycopy(b, 0, plotBuff1, plotOffset1, len);
+
+					} else if (index == 2) {
+
+						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						int len = (int) msg.params.memoryinfo.length.get() - plotOffset2;
+
+						System.arraycopy(b, 0, plotBuff1, plotOffset2, len);
+
+					}
+
+					isComplete = true;
+
+				} else {
+
+					if (index == 0) {
+
+						plotOffset0 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+
+						System.arraycopy(b, 0, plotBuff0, plotOffset0, b.length);
+
+					} else if (index == 1) {
+
+						plotOffset1 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+
+						System.arraycopy(b, 0, plotBuff1, plotOffset1, b.length);
+
+					} else if (index == 2) {
+
+						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+
+						System.arraycopy(b, 0, plotBuff0, plotOffset2, b.length);
+
+					}
+
+					isComplete = false;
+				}
+
+			} else {
+
+				if (index == 0) {
+
+					plotBuff0 = new byte[(int) msg.params.memoryinfo.length.get()];
+
+					plotOffset0 = 0;
+
+					System.arraycopy(b, plotOffset0, plotBuff0, 0, (int) msg.params.memoryinfo.length.get());
+
+				} else if (index == 1) {
+
+					plotBuff1 = new byte[(int) msg.params.memoryinfo.length.get()];
+
+					plotOffset1 = 0;
+
+					System.arraycopy(b, plotOffset1, plotBuff1, 0, (int) msg.params.memoryinfo.length.get());
+
+				} else if (index == 2) {
+
+					plotBuff2 = new byte[(int) msg.params.memoryinfo.length.get()];
+
+					plotOffset2 = 0;
+
+					System.arraycopy(b, plotOffset2, plotBuff2, 0, (int) msg.params.memoryinfo.length.get());
+
+				}
 
 				isComplete = true;
 			}
 
-		} else {
+			if (isComplete) {
 
-			if (index == 0)
-				plotBuff0 = ArrayUtils.addAll(b);
-			else if (index == 1)
-				plotBuff1 = ArrayUtils.addAll(b);
-			else if (index == 2)
-				plotBuff2 = ArrayUtils.addAll(b);
+				byte[] bb = new byte[(int) msg.params.memoryinfo.length.get()];
 
-			isComplete = true;
-		}
+				if (index == 0) {
+					System.arraycopy(plotBuff0, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
 
-		if (isComplete) {
+				} else if (index == 1) {
+					System.arraycopy(plotBuff1, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
 
-			byte[] bfs = new byte[(int) msg.params.memoryinfo.length.get()];
+				} else if (index == 2) {
+					System.arraycopy(plotBuff2, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
 
-			if (index == 0)
-				System.arraycopy(plotBuff0, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
-			else if (index == 1)
-				System.arraycopy(plotBuff1, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
-			else if (index == 2)
-				System.arraycopy(plotBuff2, 0, bfs, 0, (int) msg.params.memoryinfo.length.get());
+				}
 
-			((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bfs);
+				((VPX_ETHWindow) listener).populatePlot(index, lineid, msg.params.memoryinfo.address.get(), bb);
 
-			// HexEditorDemoApp hd = new HexEditorDemoApp();
-
-			// hd.setBytes((int) msg.params.memoryinfo.address.get(),bfs);
-
-			// hd.setVisible(true);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -1642,6 +1861,12 @@ public class VPXUDPMonitor {
 			case ATP.MSG_TYPE_MEMORY:
 
 				populateMemory(ip, msgCommand);
+
+				break;
+
+			case ATP.MSG_TYPE_PLOT:
+
+				populatePlot(ip, msgCommand);
 
 				break;
 			}

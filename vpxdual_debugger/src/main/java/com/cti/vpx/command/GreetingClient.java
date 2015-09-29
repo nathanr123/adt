@@ -1067,9 +1067,17 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	}
 
 	@Override
-	public void populatePlot(int plotID, long startAddress, byte[] buffer) {
+	public void readPlot(MemoryViewFilter filter1, MemoryViewFilter filter2) {
 		// TODO Auto-generated method stub
-
+		
 	}
+
+	@Override
+	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 }

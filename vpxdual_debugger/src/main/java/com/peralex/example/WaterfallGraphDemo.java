@@ -16,32 +16,32 @@ public class WaterfallGraphDemo extends javax.swing.JPanel {
 	private final com.peralex.utilities.ui.graphs.graphBase.GraphWrapper graphWrapper;
   private final IntensityWaterfallGraph lineGraph;
   
-  private static final int WATERFALL_WIDTH = 400;
+  private static final int WATERFALL_WIDTH = 1024;
   
   /** Creates new form GraphWithMultipleLines */
   public WaterfallGraphDemo() {
     initComponents();
     
     lineGraph = new IntensityWaterfallGraph();
-    lineGraph.setGridXMinMax(0, 100);
+    lineGraph.setGridXMinMax(0, 1024);
     lineGraph.setThresholdLimits(0, 100);
     lineGraph.setThresholdValues(10, 90);
 		lineGraph.setGridVisible(true);
 		lineGraph.setZoomEnabled(true);
 		
     graphWrapper = new com.peralex.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
-    graphWrapper.replaceYAxis(lineGraph.getWaterfallIntensityAxis());
-    graphWrapper.setXAxisLabelVisible(false);
-    graphWrapper.setXAxisScaleVisible(false);
-    graphWrapper.setCursorCoordinatesVisible(false);
-    graphWrapper.getXAxisExtraPanel().setVisible(false);
+   // graphWrapper.replaceYAxis(lineGraph.getWaterfallIntensityAxis());
+    graphWrapper.setXAxisLabelVisible(true);
+    graphWrapper.setXAxisScaleVisible(true);
+    graphWrapper.setCursorCoordinatesVisible(true);
+    graphWrapper.getXAxisExtraPanel().setVisible(true);
     graphWrapper.setAxisTitles("", "Waterfall_Time_Axis");
     graphWrapper.setTitle("Waterfall Graph with Intensity Axis");
     graphWrapper.setAxisTitlesAndUnits("X", "froobles", "Y", "bagets");
     
     graphPanel.add(graphWrapper, BorderLayout.CENTER);
     
-    new javax.swing.Timer(50, new ActionListener() {
+    new javax.swing.Timer(1000, new ActionListener() {
     	public void actionPerformed(ActionEvent e)
     	{
     		final float [] data = new float[WATERFALL_WIDTH];
@@ -74,7 +74,7 @@ public class WaterfallGraphDemo extends javax.swing.JPanel {
     add(graphPanel, java.awt.BorderLayout.CENTER);
 
     controlPanel.setLayout(new java.awt.GridBagLayout());
-    add(controlPanel, java.awt.BorderLayout.EAST);
+  //  add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
   
   // Variables declaration - do not modify//GEN-BEGIN:variables

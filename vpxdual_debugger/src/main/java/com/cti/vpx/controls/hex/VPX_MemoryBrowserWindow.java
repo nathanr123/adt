@@ -55,6 +55,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -2851744765165677816L;
+	
+	private int MINUTE = 5 * 1000;
 
 	private JPanel contentPane;
 
@@ -451,11 +453,13 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(txtMemoryLength, "cell 4 0,alignx left,aligny center");
 
 		JLabel lblStride = new JLabel("Stride");
+		
 		lblStride.setVisible(false);
 
 		memoryAddressPanel.add(lblStride, "cell 5 0,alignx left,aligny center");
 
 		txtMemoryStride = new JTextField();
+		
 		txtMemoryStride.setVisible(false);
 
 		txtMemoryStride.setPreferredSize(new Dimension(20, 20));
@@ -521,6 +525,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		cmbMemoryVariables.removeAllItems();
 
+		//cmbMemoryVariables.addItem("");
+		
 		memVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
 		cmbMemoryVariables.addMemoryVariables(memVariables);
@@ -557,11 +563,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		if (cmbCores.getItemCount() > 0) {
 
-			filter.setCore(cmbCores.getSelectedItem().toString());
+			filter.setCore(String.valueOf(cmbCores.getSelectedIndex()-1));
 
 		} else {
 
-			filter.setCore("");
+			filter.setCore("0");
 		}
 
 		filter.setAutoRefresh(chkAutoRefresh.isSelected());
@@ -941,7 +947,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		if (chkAutoRefresh.isSelected()) {
 
-			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * 5 * 1000;
+			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * MINUTE;
 
 			isAutoRefresh = true;
 

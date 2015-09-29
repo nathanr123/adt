@@ -149,7 +149,7 @@ public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener 
 		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		oTitlePanel.add(oCoordinatesPanel, gridBagConstraints);
+		//oTitlePanel.add(oCoordinatesPanel, gridBagConstraints);
 
 		oHeaderBottomExtraPanel.setLayout(new java.awt.BorderLayout());
 
@@ -258,9 +258,11 @@ public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener 
 				long lYScalingFactor, String sYScaleUnit) {
 			updateCoordinatesPanelSuffixes();
 			if (!sXAxisUnit.equals("")) {
+			//	System.out.println(sXAxisTitle + " (" + sXScaleUnit + sXAxisUnit + ")");
 				oXAxisLabel.setText(sXAxisTitle + " (" + sXScaleUnit + sXAxisUnit + ")");
 			}
 			if (!sYAxisUnit.equals("")) {
+				//System.out.println(sYAxisTitle + " (" + sYScaleUnit + sYAxisUnit + ")");
 				oYAxisLabel.setText(sYAxisTitle + " (" + sYScaleUnit + sYAxisUnit + ")");
 			}
 		}

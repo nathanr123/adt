@@ -20,7 +20,7 @@ public abstract class PopupMenuDrawSurface extends EventsSurface
 	/**
 	 * This flag indicates whether the PopupMenu is enabled or disabled.
 	 */
-	private boolean bPopupMenuEnabled = true;
+	private boolean bPopupMenuEnabled = false;
 	
   
   /** 
@@ -58,7 +58,7 @@ public abstract class PopupMenuDrawSurface extends EventsSurface
 	 */
 	public void setPopupMenuEnabled(boolean bEnabled)
 	{
-		this.bPopupMenuEnabled = bEnabled;
+		this.bPopupMenuEnabled = false;
 	}
 	
 	/**

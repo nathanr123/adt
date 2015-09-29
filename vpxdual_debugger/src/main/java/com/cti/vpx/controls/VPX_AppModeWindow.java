@@ -107,7 +107,8 @@ public class VPX_AppModeWindow extends JFrame {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					VPX_AppModeWindow frame = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
+					VPX_AppModeWindow frame = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),
+							VPXUtilities.getSerialPorts());
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -150,7 +151,7 @@ public class VPX_AppModeWindow extends JFrame {
 	private void init() {
 
 		setTitle("Debug Wizard");
-		
+
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -167,8 +168,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 		contentPane = new JPanel();
 
-		contentPane.setBorder(new TitledBorder(null, "Debugging Mode", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
+		contentPane.setBorder(
+				new TitledBorder(null, "Debugging Mode", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		basePane.add(contentPane, BorderLayout.CENTER);
 
@@ -252,8 +253,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 					if (!flnmae.endsWith(".log")) {
 
-						if (Boolean.valueOf(VPXUtilities
-								.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+						if (Boolean.valueOf(
+								VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
 							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
 						} else {
@@ -261,8 +262,8 @@ public class VPX_AppModeWindow extends JFrame {
 						}
 
 					} else {
-						if (Boolean.valueOf(VPXUtilities
-								.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+						if (Boolean.valueOf(
+								VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
 							flnmae = flnmae.substring(0, flnmae.length() - 4);
 
@@ -806,7 +807,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 					}
 
-					VPXSessionManager.setCurrentPeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
+					VPXSessionManager
+							.setCurrentPeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
 					VPXSessionManager.setCurrentIP(txtIPAddress.getText());
 
@@ -833,16 +835,16 @@ public class VPX_AppModeWindow extends JFrame {
 					}
 					if (!sub) {
 
-						JOptionPane
-								.showMessageDialog(VPX_AppModeWindow.this, "Given Subnet Mask is not a valid.Please check",
-										"Error Log", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this,
+								"Given Subnet Mask is not a valid.Please check", "Error Log",
+								JOptionPane.ERROR_MESSAGE);
 
 						txtSubnet.requestFocus();
 					}
 					if (!gateway) {
 
-						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Given Gateway is not a valid.Please check",
-								"Error Log", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this,
+								"Given Gateway is not a valid.Please check", "Error Log", JOptionPane.ERROR_MESSAGE);
 
 						txtGateway.requestFocus();
 					}
@@ -850,11 +852,14 @@ public class VPX_AppModeWindow extends JFrame {
 
 			} else {
 
-				updateLogSettings();
+				if (cmbCOMM.getSelectedIndex() > 0) {
+					
+					updateLogSettings();
 
-				VPX_UARTWindow window = new VPX_UARTWindow();
+					VPX_UARTWindow window = new VPX_UARTWindow(cmbCOMM.getSelectedItem().toString());
 
-				window.setVisible(true);
+					window.setVisible(true);
+				}
 
 			}
 

@@ -1,33 +1,44 @@
 package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
 import java.awt.Dimension;
-import java.awt.GridLayout;
-
-import javax.swing.JComboBox;
-
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import net.miginfocom.swing.MigLayout;
-
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXUtilities;
+
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
+import net.miginfocom.swing.MigLayout;
+import java.awt.Color;
 
 public class VPX_UARTWindow extends JFrame {
 
@@ -44,6 +55,12 @@ public class VPX_UARTWindow extends JFrame {
 	private JTextArea txtAMessage;
 	private JComboBox<String> cmbConsoleCoresFilter;
 	private JComboBox<String> cmbMessagesCoresFilter;
+	Map<Integer, String> cmdHistory = new LinkedHashMap<Integer, String>();
+	private int currentCommandIndex = -1;
+
+	private String currCommport = "";
+
+	private OutputStream out;
 
 	/**
 	 * Launch the application.
@@ -52,7 +69,7 @@ public class VPX_UARTWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VPX_UARTWindow frame = new VPX_UARTWindow();
+					VPX_UARTWindow frame = new VPX_UARTWindow("COM3");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -64,7 +81,10 @@ public class VPX_UARTWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VPX_UARTWindow() {
+	public VPX_UARTWindow(String commport) {
+		setResizable(false);
+
+		this.currCommport = commport;
 
 		rBundle = VPXUtilities.getResourceBundle();
 
@@ -72,9 +92,18 @@ public class VPX_UARTWindow extends JFrame {
 
 		loadComponents();
 
+		loadCores();
+
 		centerFrame();
 
 		setVisible(true);
+
+		try {
+			connect(commport);
+		} catch (Exception e) {
+
+			JOptionPane.showMessageDialog(this, "Error in connecting..", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void init() {
@@ -85,7 +114,28 @@ public class VPX_UARTWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setSize(600, 700);
+		setSize(782, 700);
+	}
+
+	private void loadCores() {
+
+		cmbConsoleCoresFilter.removeAll();
+
+		cmbMessagesCoresFilter.removeAll();
+
+		cmbConsoleCoresFilter.addItem("All Cores");
+
+		for (int i = 0; i < 8; i++) {
+
+			cmbConsoleCoresFilter.addItem(String.format("Core - %d", i));
+
+			cmbMessagesCoresFilter.addItem(String.format("Core - %d", i));
+
+		}
+
+		cmbConsoleCoresFilter.setSelectedIndex(0);
+
+		cmbMessagesCoresFilter.setSelectedIndex(0);
 	}
 
 	private void loadComponents() {
@@ -125,6 +175,9 @@ public class VPX_UARTWindow extends JFrame {
 		consolePanel.add(scrConsole, BorderLayout.CENTER);
 
 		txtAConsole = new JTextArea();
+		txtAConsole.setEditable(false);
+		txtAConsole.setBackground(Color.BLACK);
+		txtAConsole.setForeground(Color.WHITE);
 
 		scrConsole.setViewportView(txtAConsole);
 
@@ -158,6 +211,40 @@ public class VPX_UARTWindow extends JFrame {
 
 		txtConsoleMsg.setColumns(10);
 
+		txtConsoleMsg.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+
+				if (arg0.getKeyChar() == KeyEvent.VK_ENTER) {
+
+					sendData();
+
+				}
+				if (arg0.getKeyCode() == KeyEvent.VK_UP) {
+
+					navigateCommand(arg0);
+
+				} else if (arg0.getKeyCode() == KeyEvent.VK_DOWN) {
+
+					navigateCommand(arg0);
+				}
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
 		JPanel buttonPanel = new JPanel();
 
 		FlowLayout fl_buttonPanel = (FlowLayout) buttonPanel.getLayout();
@@ -168,11 +255,34 @@ public class VPX_UARTWindow extends JFrame {
 
 		JButton btnSend = new JButton("Send");
 
+		btnSend.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendData();
+
+			}
+		});
+
 		btnSend.setHorizontalAlignment(SwingConstants.LEFT);
 
 		buttonPanel.add(btnSend);
 
 		JButton btnClear = new JButton("Clear");
+
+		btnClear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				txtConsoleMsg.setText("");
+
+				txtAConsole.setText("");
+
+				txtAMessage.setText("");
+
+			}
+		});
 
 		buttonPanel.add(btnClear);
 
@@ -189,6 +299,9 @@ public class VPX_UARTWindow extends JFrame {
 		messagePanel.add(scrMessages, BorderLayout.CENTER);
 
 		txtAMessage = new JTextArea();
+		txtAMessage.setEditable(false);
+		txtAMessage.setBackground(Color.BLACK);
+		txtAMessage.setForeground(Color.WHITE);
 
 		scrMessages.setViewportView(txtAMessage);
 	}
@@ -206,6 +319,163 @@ public class VPX_UARTWindow extends JFrame {
 		int dy = centerPoint.y - windowSize.height / 2;
 
 		setLocation(dx, dy);
+	}
+
+	private void navigateCommand(KeyEvent keyEvent) {
+
+		if (keyEvent.getKeyCode() == KeyEvent.VK_UP) {
+
+			if (currentCommandIndex > 0) {
+
+				currentCommandIndex = currentCommandIndex - 1;
+
+				txtConsoleMsg.setText(cmdHistory.get(currentCommandIndex));
+			}
+
+		} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN) {
+
+			if (currentCommandIndex < cmdHistory.size()) {
+
+				currentCommandIndex = currentCommandIndex + 1;
+
+				txtConsoleMsg.setText(cmdHistory.get(currentCommandIndex));
+			}
+
+		}
+
+	}
+
+	public void connect(String portName) throws Exception {
+
+		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+
+		if (portIdentifier.isCurrentlyOwned()) {
+
+			JOptionPane.showMessageDialog(this, "Port is currently in use", "Error", JOptionPane.ERROR_MESSAGE);
+
+		} else {
+
+			CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
+
+			if (commPort instanceof SerialPort) {
+
+				SerialPort serialPort = (SerialPort) commPort;
+
+				serialPort.setSerialPortParams(57600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
+						SerialPort.PARITY_NONE);
+
+				InputStream in = serialPort.getInputStream();
+
+				out = serialPort.getOutputStream();
+
+				serialPort.addEventListener(new SerialReader(in));
+
+				serialPort.notifyOnDataAvailable(true);
+
+			}
+		}
+	}
+
+	public void sendData() {
+
+		try {
+
+			String data = txtConsoleMsg.getText().trim();
+
+			if (data.length() > 0) {
+
+				txtAMessage.append(String.format(" %s@%s\\> %s", this.currCommport,
+						cmbMessagesCoresFilter.getSelectedItem().toString(), data) + "\n");
+
+				cmdHistory.put(cmdHistory.size(), txtConsoleMsg.getText().trim());
+
+				currentCommandIndex = cmdHistory.size();
+
+				out.write(String.format("%d::%s", cmbMessagesCoresFilter.getSelectedIndex(), data).getBytes());
+
+				txtConsoleMsg.setText("");
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+	}
+
+	public class SerialReader implements SerialPortEventListener {
+
+		private InputStream in;
+
+		private byte[] buffer = new byte[1024];
+
+		public SerialReader(InputStream in) {
+
+			this.in = in;
+		}
+
+		public void serialEvent(SerialPortEvent arg0) {
+
+			int data;
+
+			try {
+
+				int len = 0;
+
+				while ((data = in.read()) > -1) {
+
+					if (data == '\n') {
+						break;
+					}
+
+					buffer[len++] = (byte) data;
+				}
+
+				String msg = new String(buffer, 0, len);
+
+				if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
+
+					if (msg.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
+
+						txtAConsole.append(msg + "\n");
+					}
+
+				} else {
+
+					txtAConsole.append(msg + "\n");
+				}
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+
+			}
+		}
+
+	}
+
+	public class SerialWriter implements Runnable {
+		OutputStream out;
+
+		public SerialWriter(OutputStream out) {
+
+			this.out = out;
+		}
+
+		public void run() {
+			int i = 0;
+			try {
+
+				while (i <= 10000) {
+
+					this.out.write(String.format("UART %d\n", i).getBytes());
+
+					i++;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
 	}
 
 }

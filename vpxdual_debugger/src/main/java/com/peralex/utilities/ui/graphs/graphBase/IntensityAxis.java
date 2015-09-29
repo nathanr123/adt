@@ -70,7 +70,7 @@ public class IntensityAxis extends JPanel implements ILocaleListener
 	private Color oGradientStopColor = Color.BLACK;
 	private boolean bSelfMaintained = false;
 	
-	private boolean bColorScale = false;
+	private boolean bColorScale = true;
 	
 	private final JPopupMenu oPopupMenu = new JPopupMenu();
 	private final JCheckBoxMenuItem oColorScaleMenuItem;
@@ -121,8 +121,8 @@ public class IntensityAxis extends JPanel implements ILocaleListener
 		// the number format is used to size the width, so make it shorter to reduce the width
 		axis.setFormat(new DecimalFormat("0"));
 		
-		this.add(oWaterfallOnOffButton, BorderLayout.NORTH);
-		this.add(axis, BorderLayout.CENTER);
+		//this.add(oWaterfallOnOffButton, BorderLayout.NORTH);
+	//	this.add(axis, BorderLayout.CENTER);
 		
 		addComponentListener(new ComponentAdapter()
 		{

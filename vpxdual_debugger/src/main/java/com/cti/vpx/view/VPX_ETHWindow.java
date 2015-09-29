@@ -1906,13 +1906,52 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void readPlot(MemoryViewFilter filter) {
-		// TODO Auto-generated method stub
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				udpMonitor.readPlot(filter);
+
+			}
+		});
+
+		th.start();
 
 	}
 
 	@Override
-	public void populatePlot(int plotID, long startAddress, byte[] buffer) {
-		// TODO Auto-generated method stub
+	public void readPlot(MemoryViewFilter filter1, MemoryViewFilter filter2) {
+
+		udpMonitor.readPlot(filter1, filter2);
+
+	}
+
+	@Override
+	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+
+					if (memoryPlotWindow[plotID].isVisible()) {
+
+						memoryPlotWindow[plotID].populateValues(lineID, buffer);
+
+						memoryPlotWindow[plotID].setVisible(true);
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		th.start();
 
 	}
 

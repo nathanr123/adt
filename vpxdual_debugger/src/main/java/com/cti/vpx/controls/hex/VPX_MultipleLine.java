@@ -1,19 +1,13 @@
-package com.peralex.example;
+package com.cti.vpx.controls.hex;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import javax.swing.JComponent;
-import javax.swing.JLayeredPane;
 
 import com.peralex.utilities.ui.graphs.lineGraph.GeneratedLineData;
 import com.peralex.utilities.ui.graphs.lineGraph.MultiLineGraph;
@@ -22,7 +16,7 @@ import com.peralex.utilities.ui.graphs.lineGraph.MultiLineGraph;
  *
  * @author Noel Grandin
  */
-public class GraphWithMultipleLines extends javax.swing.JPanel {
+public class VPX_MultipleLine extends javax.swing.JPanel {
 
 	/**
 	 * 
@@ -31,22 +25,27 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 	private static final String LINE_1 = "Line1";
 	private static final String LINE_2 = "Line2";
 
+	private static final int LINEID_1 = 1;
+
+	private static final int LINEID_2 = 2;
+
 	private final com.peralex.utilities.ui.graphs.graphBase.GraphWrapper graphWrapper;
 	private final MultiLineGraph lineGraph;
-	private final GeneratedLineData line1Data;
-	private final GeneratedLineData line2Data;
+	private GeneratedLineData line1Data;
+	private GeneratedLineData line2Data;
 
 	private final javax.swing.Timer dataTimer;
+	private final javax.swing.Timer dataTimer1;
 
 	/** Creates new form GraphWithMultipleLines */
-	public GraphWithMultipleLines() {
+	public VPX_MultipleLine() {
 		initComponents();
 
 		lineGraph = new MultiLineGraph();
 
 		lineGraph.setFrameLimitingEnabled(true);
 		lineGraph.setGridVisible(true);
-		lineGraph.setZoomEnabled(true);
+		lineGraph.setZoomEnabled(false);
 
 		graphWrapper = new com.peralex.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
 		// graphWrapper.setTitle("Multiple Line Graph");
@@ -54,8 +53,6 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 
 		graphPanel.add(graphWrapper, BorderLayout.CENTER);
 
-		lineGraph.setGridXMinMax(0, 1024);
-		lineGraph.setGridYMinMax(0, 255);
 		lineGraph.setLineColor(LINE_1, Color.RED);
 		line1ColorComboBox.setSelectedItem("Red");
 		lineGraph.setLineColor(LINE_2, Color.GREEN);
@@ -64,32 +61,53 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 		line1Data = new GeneratedLineData(0, 0, 0, new float[0]);
 
 		line2Data = new GeneratedLineData(0, 0, 0, new float[0]);
+		
+		lineGraph.setGridYMinMax(0, 255);
 
-		dataTimer = new javax.swing.Timer(1000, new ActionListener() {
+		dataTimer = new javax.swing.Timer(500, new ActionListener() {
+			
 			public void actionPerformed(ActionEvent e) {
 
-				float[] floats = getFile("D:\\test.bin");
+				float[] floats = getFile("D:\\test1.bin");
+			
 				line1Data.setXValues(0, floats.length, floats.length);
-				final float[] yValues1 = new float[floats.length];
-				System.arraycopy(floats, 0, yValues1, 0, floats.length);
-				line1Data.setYValues(yValues1);
 				
+				lineGraph.setGridXMinMax(0, floats.length);
+				
+				final float[] yValues1 = new float[floats.length];
+				
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+				
+				line1Data.setYValues(yValues1);
+
 				lineGraph.setGraphData(LINE_1, line1Data);
 
-				/*
-				floats = getFile("D:\\test.bin");
-				line2Data.setXValues(0, floats.length, floats.length);
-				final float[] yValues2 = new float[floats.length];
-				line2Data.setYValues(yValues2);
-				System.arraycopy(floats, 0, yValues2, 0, floats.length);
 
-				
-				lineGraph.setGraphData(LINE_2, line2Data);
-				*/	
 			}
 		});
 
-		dataTimer.start();
+	//	dataTimer.start();
+		
+		dataTimer1 = new javax.swing.Timer(550, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				
+				float[] floats = getFile("D:\\rews.bin");
+				
+				line2Data.setXValues(0, floats.length, floats.length);				
+				
+				final float[] yValues2 = new float[floats.length];
+				
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+				
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+
+			}
+		});
+
+	//	dataTimer1.start();
 	}
 
 	public float[] getFile(String fileName) {
@@ -109,14 +127,91 @@ public class GraphWithMultipleLines extends javax.swing.JPanel {
 		return f;
 
 	}
+	
+	public void clearAll(){
+		
+		lineGraph.clear();
+		
+		line1Data = new GeneratedLineData(0, 0, 0, new float[0]);
+
+		line2Data = new GeneratedLineData(0, 0, 0, new float[0]);
+		
+		lineGraph.setGridYMinMax(0, 255);
+	}
+
+	public void setBytes(byte[] bytes1, byte[] bytes2) {
+
+		float[] floats = toFloatArray(bytes1);
+
+		line1Data.setXValues(0, floats.length, floats.length);
+
+		lineGraph.setGridXMinMax(0, floats.length);
+
+		lineGraph.setGridYMinMax(0, 255);
+
+		final float[] yValues1 = new float[floats.length];
+
+		System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+		line1Data.setYValues(yValues1);
+
+		lineGraph.setGraphData(LINE_1, line1Data);
+
+		floats = toFloatArray(bytes2);
+
+		line2Data.setXValues(0, floats.length, floats.length);
+
+		final float[] yValues2 = new float[floats.length];
+
+		line2Data.setYValues(yValues2);
+
+		System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+		lineGraph.setGraphData(LINE_2, line2Data);
+
+	}
+
+	public void setBytes(int lineID, byte[] bytes) {
+
+		float[] floats = toFloatArray(bytes);
+
+		if (lineID == LINEID_1) {
+			
+			line1Data.setXValues(0, floats.length, floats.length);
+			
+			lineGraph.setGridXMinMax(0, floats.length);
+			
+			final float[] yValues1 = new float[floats.length];
+			
+			System.arraycopy(floats, 0, yValues1, 0, floats.length);
+			
+			line1Data.setYValues(yValues1);
+
+			lineGraph.setGraphData(LINE_1, line1Data);
+
+		} else if (lineID == LINEID_2) {
+			
+			line2Data.setXValues(0, floats.length, floats.length);				
+			
+			final float[] yValues2 = new float[floats.length];
+			
+			System.arraycopy(floats, 0, yValues2, 0, floats.length);
+			
+			line2Data.setYValues(yValues2);
+
+			lineGraph.setGraphData(LINE_2, line2Data);
+		}
+
+	}
 
 	private static float[] toFloatArray(byte[] bytes) {
 
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		FloatBuffer fb = buffer.asFloatBuffer();
+		float[] floatArray = new float[bytes.length];
 
-		float[] floatArray = new float[fb.limit()];
-		fb.get(floatArray);
+		for (int i = 0; i < floatArray.length; i++) {
+
+			floatArray[i] = (float) (bytes[i] & 0x0ff);
+		}
 
 		return floatArray;
 	}

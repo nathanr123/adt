@@ -11,28 +11,38 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.NumberFormatter;
 
-import net.miginfocom.swing.MigLayout;
-
+import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXSessionManager;
+import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
-import com.peralex.example.GraphWithMultipleLines;
+
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
@@ -40,6 +50,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 8729031397351962182L;
+
+	private int MINUTE = 5 * 1000;
 
 	private int memoryPlotID = -1;
 
@@ -49,7 +61,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JPanel plot1FilterPanel;
 
-	private JTextField txtPlot1AutoRefresh;
+	private JSpinner spinAutoRefresh;
 
 	private JTextField txtPlot1MapFilePath;
 
@@ -69,7 +81,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JRadioButton radPlot1UseMap;
 
-	private JComboBox<String> cmbPlot1MemoryVariables;
+	private VPX_FilterComboBox cmbPlot1MemoryVariables;
 
 	private JRadioButton radPlot1UserAddress;
 
@@ -103,7 +115,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JRadioButton radPlot2UseMap;
 
-	private JComboBox<String> cmbPlot2MemoryVariables;
+	private VPX_FilterComboBox cmbPlot2MemoryVariables;
 
 	private JRadioButton radPlot2UserAddress;
 
@@ -121,11 +133,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private MemoryViewFilter plot1Filter;
 
-	private VPXSubSystem plot1CurProcFilter;
-
 	private MemoryViewFilter plot2Filter;
-
-	private VPXSubSystem plot2CurProcFilter;
 
 	private final ButtonGroup Plot1MemoryGroup = new ButtonGroup();
 
@@ -164,6 +172,24 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	private JLabel lblPlot2Stride;
 
 	private JLabel lblPlot2Length;
+
+	private SpinnerNumberModel periodicitySpinnerModel;
+
+	private final JFileChooser fileDialog = new JFileChooser();
+
+	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Map Files", "map");
+
+	private Map<String, String> plot1MemVariables;
+
+	private Map<String, String> plot2MemVariables;
+
+	private boolean isAutoRefresh = false;
+
+	private int currentThreadSleepTime;
+
+	private Thread autoRefreshThread = null;
+
+	private VPX_MultipleLine multiLine = new VPX_MultipleLine();
 
 	/**
 	 * 
@@ -259,13 +285,22 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		btnPlot = new JButton("Plot");
 
+		btnPlot.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doReadMemory();
+
+			}
+		});
+
 		controlsPanel.add(btnPlot);
 
 		btnClear = new JButton("Clear");
 
 		controlsPanel.add(btnClear);
 
-		contentPane.add(new GraphWithMultipleLines(), BorderLayout.CENTER);
+		contentPane.add(multiLine, BorderLayout.CENTER);
 
 		createPlot1FilterPanel();
 
@@ -464,19 +499,23 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			public void actionPerformed(ActionEvent e) {
 
-				txtPlot1AutoRefresh.setEnabled(chkPlot1AutoRefresh.isSelected());
+				spinAutoRefresh.setEnabled(chkPlot1AutoRefresh.isSelected());
 			}
 		});
 
 		plot1SubSystemPanel.add(chkPlot1AutoRefresh, "cell 6 0,alignx center,aligny top");
 
-		txtPlot1AutoRefresh = new JTextField();
+		periodicitySpinnerModel = new SpinnerNumberModel(1, 1, 10, 1);
 
-		txtPlot1AutoRefresh.setEnabled(false);
+		spinAutoRefresh = new JSpinner(periodicitySpinnerModel);
 
-		plot1SubSystemPanel.add(txtPlot1AutoRefresh, "cell 7 0,alignx left,aligny center");
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinAutoRefresh.getEditor()).getTextField();
 
-		txtPlot1AutoRefresh.setColumns(10);
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
+		spinAutoRefresh.setEnabled(false);
+
+		plot1SubSystemPanel.add(spinAutoRefresh, "cell 7 0,growx,aligny center");
 
 		lblPlot1Mins = new JLabel("Mins");
 
@@ -490,7 +529,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1FilterPanel.add(plot1MapPanel);
 
-		plot1MapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][120px]", "[23px]"));
+		plot1MapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][]", "[23px]"));
 
 		radPlot1UseMap = new JRadioButton("Use Map File");
 
@@ -524,11 +563,50 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		btnPlot1MapFileBrowse = new JButton("Browse");
 
+		btnPlot1MapFileBrowse.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				fileDialog.addChoosableFileFilter(filterOut);
+
+				fileDialog.setAcceptAllFileFilterUsed(false);
+
+				int returnVal = fileDialog.showOpenDialog(null);
+
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+					File file = fileDialog.getSelectedFile();
+
+					loadPlot1MemoryVariables(file.getAbsolutePath());
+
+				}
+
+			}
+		});
+
 		btnPlot1MapFileBrowse.setEnabled(false);
 
 		plot1MapPanel.add(btnPlot1MapFileBrowse, "cell 3 0,alignx left,aligny top");
 
-		cmbPlot1MemoryVariables = new JComboBox<String>();
+		cmbPlot1MemoryVariables = new VPX_FilterComboBox();
+		
+		cmbPlot1MemoryVariables.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getSource().equals(cmbPlot1MemoryVariables)) {
+
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+
+						fillMemory1Address();
+
+					}
+				}
+
+			}
+		});
 
 		cmbPlot1MemoryVariables.setEnabled(false);
 
@@ -585,9 +663,13 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		lblPlot1Stride = new JLabel("Stride");
 
+		lblPlot1Stride.setVisible(false);
+
 		plot1MemoryAddressPanel.add(lblPlot1Stride, "cell 5 0,alignx right,aligny center");
 
 		txtPlot1MemoryStride = new JTextField();
+
+		txtPlot1MemoryStride.setVisible(false);
 
 		txtPlot1MemoryStride.setPreferredSize(new Dimension(20, 20));
 
@@ -602,6 +684,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1MemoryFilter = new MemoryViewFilter();
 
+		plot1MemoryFilter.setMemoryBrowserID((memoryPlotID * 10) + 1);
+
 		if (cmbPlot1SubSystem.getItemCount() > 0)
 			plot1MemoryFilter.setSubsystem(cmbPlot1SubSystem.getSelectedItem().toString());
 
@@ -609,17 +693,18 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			plot1MemoryFilter.setProcessor(cmbPlot1Processor.getSelectedItem().toString());
 
 		if (cmbPlot1Cores.getItemCount() > 0) {
-			plot1MemoryFilter.setCore(cmbPlot1Cores.getSelectedItem().toString());
+
+			plot1MemoryFilter.setCore(String.valueOf(cmbPlot1Cores.getSelectedIndex() - 1));
 
 		} else {
-			plot1MemoryFilter.setCore("");
+			plot1MemoryFilter.setCore("0");
 		}
 
 		plot1MemoryFilter.setAutoRefresh(chkPlot1AutoRefresh.isSelected());
 
-		if (txtPlot1AutoRefresh.getText().length() > 0)
+		if (spinAutoRefresh.getValue().toString().length() > 0)
 
-			plot1MemoryFilter.setTimeinterval(Integer.parseInt(txtPlot1AutoRefresh.getText().trim()));
+			plot1MemoryFilter.setTimeinterval(Integer.parseInt(spinAutoRefresh.getValue().toString().trim()));
 		else
 			plot1MemoryFilter.setTimeinterval(0);
 
@@ -778,9 +863,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		chkPlot1AutoRefresh.setSelected(plot1MemoryFilter.isAutoRefresh());
 
-		txtPlot1AutoRefresh.setEnabled(chkPlot1AutoRefresh.isSelected());
+		spinAutoRefresh.setEnabled(chkPlot1AutoRefresh.isSelected());
 
-		txtPlot1AutoRefresh.setText(plot1MemoryFilter.getTimeinterval() + "");
+		spinAutoRefresh.setValue(plot1MemoryFilter.getTimeinterval());
 
 		radPlot1UseMap.setSelected(plot1MemoryFilter.isUseMapFile());
 
@@ -802,64 +887,151 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private void loadPlot1Filters() {
 
-		if (vpxSystem == null)
-			vpxSystem = VPXSessionManager.getVPXSystem();
+		vpxSystem = VPXSessionManager.getVPXSystem();
+
+		cmbPlot1SubSystem.removeAllItems();
+
+		cmbPlot1SubSystem.addItem("Select SubSystem");
 
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+		if (subsystem.size() > 0) {
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+			for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
 
-			cmbPlot1SubSystem.addItem(vpxSubSystem.getSubSystem());
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				cmbPlot1SubSystem.addItem(vpxSubSystem.getSubSystem());
+			}
 		}
+
+		List<Processor> unlist = vpxSystem.getUnListed();
+
+		if (unlist.size() > 0) {
+
+			cmbPlot1SubSystem.addItem(VPXConstants.VPXUNLIST);
+		}
+
 	}
 
 	private void loadPlot1ProcessorsFilter() {
 
-		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+		cmbPlot1Processor.removeAllItems();
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+		cmbPlot1Processor.addItem("Select Processor");
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+		if (cmbPlot1SubSystem.getSelectedIndex() > 0) {
 
-			if (vpxSubSystem.getSubSystem().equals(cmbPlot1SubSystem.getSelectedItem().toString())) {
+			VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(cmbPlot1SubSystem.getSelectedItem().toString());
 
-				plot1CurProcFilter = vpxSubSystem;
+			List<VPXSubSystem> s = vpxSystem.getSubsystem();
 
-				cmbPlot1Processor.removeAllItems();
+			for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
 
-				cmbPlot1Processor.addItem(vpxSubSystem.getIpP2020());
+				VPXSubSystem vpxSubSystem = iterator.next();
 
-				cmbPlot1Processor.addItem(vpxSubSystem.getIpDSP1());
+				if (vpxSubSystem.getSubSystem().equals(cmbPlot1SubSystem.getSelectedItem().toString())) {
 
-				cmbPlot1Processor.addItem(vpxSubSystem.getIpDSP2());
+					curProcFilter = vpxSubSystem;
 
-				break;
+					cmbPlot1Processor.addItem(vpxSubSystem.getIpDSP1());
+
+					cmbPlot1Processor.addItem(vpxSubSystem.getIpDSP2());
+
+					break;
+
+				}
+
 			}
 
+			if (curProcFilter == null) {
+
+				List<Processor> p = vpxSystem.getUnListed();
+
+				for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+					Processor processor = iterator.next();
+
+					if (!processor.getName().contains("P2020")) {
+
+						cmbPlot1Processor.addItem(processor.getiP_Addresses());
+					}
+				}
+
+			}
 		}
+
 	}
 
 	private void loadPlot1CoresFilter() {
 
 		cmbPlot1Cores.removeAllItems();
 
-		if (cmbPlot1Processor.getSelectedItem().toString().equals(plot1CurProcFilter.getIpP2020())) {
+		cmbPlot1Cores.addItem("Select Core");
 
-			cmbPlot1Cores.setEnabled(false);
+		if (cmbPlot1SubSystem.getSelectedIndex() > 0 && cmbPlot1Processor.getSelectedIndex() > 0) {
 
-		} else {
+			String subSystem = cmbPlot1SubSystem.getSelectedItem().toString();
 
-			cmbPlot1Cores.setEnabled(true);
+			String proc = cmbPlot1Processor.getSelectedItem().toString();
 
-			cmbPlot1Cores.addItem("All Cores");
+			if (subSystem.equals(VPXConstants.VPXUNLIST)) {
 
-			for (int i = 0; i < 8; i++) {
-				cmbPlot1Cores.addItem(String.format("Core %s", i));
+				List<Processor> s = vpxSystem.getUnListed();
+
+				if (s.size() > 0) {
+
+					for (Iterator<Processor> iterator = s.iterator(); iterator.hasNext();) {
+
+						Processor processor = iterator.next();
+
+						if (processor.getiP_Addresses().equals(proc)) {
+
+							if (processor.getName().contains("P2020")) {
+
+								cmbPlot1Cores.setEnabled(false);
+
+								break;
+
+							} else {
+
+								cmbPlot1Cores.setEnabled(true);
+
+								for (int i = 0; i < 8; i++) {
+									cmbPlot1Cores.addItem(String.format("Core %s", i));
+								}
+
+								cmbPlot1Cores.setSelectedIndex(0);
+
+								break;
+							}
+
+						}
+
+					}
+				}
+
+			} else {
+
+				VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(subSystem);
+
+				if (proc.equals(curProcFilter.getIpP2020())) {
+
+					cmbPlot1Cores.setEnabled(false);
+
+				} else {
+
+					cmbPlot1Cores.setEnabled(true);
+
+					for (int i = 0; i < 8; i++) {
+						cmbPlot1Cores.addItem(String.format("Core %s", i));
+					}
+
+					cmbPlot1Cores.setSelectedIndex(0);
+				}
+
 			}
 
-			cmbPlot1Cores.setSelectedIndex(0);
 		}
 	}
 
@@ -938,6 +1110,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		chkPlot2AutoRefresh = new JCheckBox("Auto Refresh in every");
 
+		chkPlot2AutoRefresh.setVisible(false);
+
 		chkPlot2AutoRefresh.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -950,6 +1124,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		txtPlot2AutoRefresh = new JTextField();
 
+		txtPlot2AutoRefresh.setVisible(false);
+
 		txtPlot2AutoRefresh.setEnabled(false);
 
 		plot2SubSystemPanel.add(txtPlot2AutoRefresh, "cell 7 0,alignx left,aligny center");
@@ -957,6 +1133,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		txtPlot2AutoRefresh.setColumns(10);
 
 		lblPlot2Mins = new JLabel("Mins");
+
+		lblPlot2Mins.setVisible(false);
 
 		plot2SubSystemPanel.add(lblPlot2Mins, "cell 8 0,alignx left,aligny center");
 
@@ -1002,12 +1180,51 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		btnPlot2MapFileBrowse = new JButton("Browse");
 
+		btnPlot2MapFileBrowse.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				fileDialog.addChoosableFileFilter(filterOut);
+
+				fileDialog.setAcceptAllFileFilterUsed(false);
+
+				int returnVal = fileDialog.showOpenDialog(null);
+
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+					File file = fileDialog.getSelectedFile();
+
+					loadPlot2MemoryVariables(file.getAbsolutePath());
+
+				}
+
+			}
+		});
+
 		btnPlot2MapFileBrowse.setEnabled(false);
 
 		plot2MapPanel.add(btnPlot2MapFileBrowse, "cell 3 0,alignx left,aligny top");
 
-		cmbPlot2MemoryVariables = new JComboBox<String>();
+		cmbPlot2MemoryVariables = new VPX_FilterComboBox();
 
+		cmbPlot2MemoryVariables.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getSource().equals(cmbPlot2MemoryVariables)) {
+
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+
+						fillMemory2Address();
+
+					}
+				}
+
+			}
+		});
+		
 		cmbPlot2MemoryVariables.setEnabled(false);
 
 		cmbPlot2MemoryVariables.setPreferredSize(new Dimension(120, 20));
@@ -1064,9 +1281,13 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		lblPlot2Stride = new JLabel("Stride");
 
+		lblPlot2Stride.setVisible(false);
+
 		plot2MemoryAddressPanel.add(lblPlot2Stride, "cell 5 0,alignx right,aligny center");
 
 		txtPlot2MemoryStride = new JTextField();
+
+		txtPlot2MemoryStride.setVisible(false);
 
 		txtPlot2MemoryStride.setPreferredSize(new Dimension(20, 20));
 
@@ -1080,6 +1301,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		plot2MemoryFilter = null;
 
 		plot2MemoryFilter = new MemoryViewFilter();
+
+		plot2MemoryFilter.setMemoryBrowserID((memoryPlotID * 10) + 2);
+
 		if (cmbPlot2SubSystem.getItemCount() > 0)
 			plot2MemoryFilter.setSubsystem(cmbPlot2SubSystem.getSelectedItem().toString());
 
@@ -1088,10 +1312,10 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		if (cmbPlot2Cores.getItemCount() > 0) {
 
-			plot2MemoryFilter.setCore(cmbPlot2Cores.getSelectedItem().toString());
+			plot2MemoryFilter.setCore(String.valueOf(cmbPlot2Cores.getSelectedIndex() - 1));
 
 		} else {
-			plot2MemoryFilter.setCore("");
+			plot2MemoryFilter.setCore("0");
 		}
 
 		plot2MemoryFilter.setAutoRefresh(chkPlot2AutoRefresh.isSelected());
@@ -1202,42 +1426,79 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private void loadPlot2Filters() {
 
-		if (vpxSystem == null)
-			vpxSystem = VPXSessionManager.getVPXSystem();
+		vpxSystem = VPXSessionManager.getVPXSystem();
+
+		cmbPlot2SubSystem.removeAllItems();
+
+		cmbPlot2SubSystem.addItem("Select SubSystem");
 
 		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+		if (subsystem.size() > 0) {
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+			for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
 
-			cmbPlot2SubSystem.addItem(vpxSubSystem.getSubSystem());
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				cmbPlot2SubSystem.addItem(vpxSubSystem.getSubSystem());
+			}
+		}
+
+		List<Processor> unlist = vpxSystem.getUnListed();
+
+		if (unlist.size() > 0) {
+
+			cmbPlot2SubSystem.addItem(VPXConstants.VPXUNLIST);
 		}
 	}
 
 	private void loadPlot2ProcessorsFilter() {
 
-		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+		cmbPlot2Processor.removeAllItems();
 
-		for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+		cmbPlot2Processor.addItem("Select Processor");
 
-			VPXSubSystem vpxSubSystem = iterator.next();
+		if (cmbPlot2SubSystem.getSelectedIndex() > 0) {
 
-			if (vpxSubSystem.getSubSystem().equals(cmbPlot2SubSystem.getSelectedItem().toString())) {
+			VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(cmbPlot2SubSystem.getSelectedItem().toString());
 
-				plot2CurProcFilter = vpxSubSystem;
+			List<VPXSubSystem> s = vpxSystem.getSubsystem();
 
-				cmbPlot2Processor.removeAllItems();
+			for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
 
-				cmbPlot2Processor.addItem(vpxSubSystem.getIpP2020());
+				VPXSubSystem vpxSubSystem = iterator.next();
 
-				cmbPlot2Processor.addItem(vpxSubSystem.getIpDSP1());
+				if (vpxSubSystem.getSubSystem().equals(cmbPlot2SubSystem.getSelectedItem().toString())) {
 
-				cmbPlot2Processor.addItem(vpxSubSystem.getIpDSP2());
+					curProcFilter = vpxSubSystem;
 
-				break;
+					// cmbProcessor.addItem(vpxSubSystem.getIpP2020());
+
+					cmbPlot2Processor.addItem(vpxSubSystem.getIpDSP1());
+
+					cmbPlot2Processor.addItem(vpxSubSystem.getIpDSP2());
+
+					break;
+
+				}
+
 			}
 
+			if (curProcFilter == null) {
+
+				List<Processor> p = vpxSystem.getUnListed();
+
+				for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+					Processor processor = iterator.next();
+
+					if (!processor.getName().contains("P2020")) {
+
+						cmbPlot2Processor.addItem(processor.getiP_Addresses());
+					}
+				}
+
+			}
 		}
 	}
 
@@ -1245,21 +1506,71 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		cmbPlot2Cores.removeAllItems();
 
-		if (cmbPlot2Processor.getSelectedItem().toString().equals(plot2CurProcFilter.getIpP2020())) {
+		cmbPlot2Cores.addItem("Select Core");
 
-			cmbPlot2Cores.setEnabled(false);
+		if (cmbPlot2SubSystem.getSelectedIndex() > 0 && cmbPlot2Processor.getSelectedIndex() > 0) {
 
-		} else {
+			String subSystem = cmbPlot2SubSystem.getSelectedItem().toString();
 
-			cmbPlot2Cores.setEnabled(true);
+			String proc = cmbPlot2Processor.getSelectedItem().toString();
 
-			cmbPlot2Cores.addItem("All Cores");
+			if (subSystem.equals(VPXConstants.VPXUNLIST)) {
 
-			for (int i = 0; i < 8; i++) {
-				cmbPlot2Cores.addItem(String.format("Core %s", i));
+				List<Processor> s = vpxSystem.getUnListed();
+
+				if (s.size() > 0) {
+
+					for (Iterator<Processor> iterator = s.iterator(); iterator.hasNext();) {
+
+						Processor processor = iterator.next();
+
+						if (processor.getiP_Addresses().equals(proc)) {
+
+							if (processor.getName().contains("P2020")) {
+
+								cmbPlot2Cores.setEnabled(false);
+
+								break;
+
+							} else {
+
+								cmbPlot2Cores.setEnabled(true);
+
+								for (int i = 0; i < 8; i++) {
+									cmbPlot2Cores.addItem(String.format("Core %s", i));
+								}
+
+								cmbPlot2Cores.setSelectedIndex(0);
+
+								break;
+							}
+
+						}
+
+					}
+				}
+
+			} else {
+
+				VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(subSystem);
+
+				if (proc.equals(curProcFilter.getIpP2020())) {
+
+					cmbPlot2Cores.setEnabled(false);
+
+				} else {
+
+					cmbPlot2Cores.setEnabled(true);
+
+					for (int i = 0; i < 8; i++) {
+						cmbPlot2Cores.addItem(String.format("Core %s", i));
+					}
+
+					cmbPlot2Cores.setSelectedIndex(0);
+				}
+
 			}
 
-			cmbPlot2Cores.setSelectedIndex(0);
 		}
 	}
 
@@ -1269,7 +1580,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1FilterPanel.setEnabled(isPlot1);
 
-		txtPlot1AutoRefresh.setEnabled(isPlot1);
+		spinAutoRefresh.setEnabled(isPlot1);
 
 		txtPlot1MapFilePath.setEnabled(isPlot1);
 
@@ -1332,19 +1643,50 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			btnClear.setEnabled(false);
 		}
+	}
 
-		if (isPlot1) {
+	private void loadPlot1MemoryVariables(String fileName) {
 
-			if (cmbPlot1Processor.getItemCount() > 0) {
+		cmbPlot1MemoryVariables.removeAllItems();
 
-				int i = cmbPlot1Processor.getSelectedIndex();
+		//cmbPlot1MemoryVariables.addItem("");
 
-				cmbPlot1Processor.setSelectedIndex(i + 1);
+		plot1MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
-				cmbPlot1Processor.setSelectedIndex(i);
+		cmbPlot1MemoryVariables.addMemoryVariables(plot1MemVariables);
 
-			}
+		cmbPlot1MemoryVariables.setSelectedIndex(0);
+
+	}
+
+
+	private void fillMemory1Address() {
+
+		if (plot1MemVariables.containsKey(cmbPlot1MemoryVariables.getSelectedItem().toString())) {
+
+			txtPlot1MemoryAddres.setText(plot1MemVariables.get(cmbPlot1MemoryVariables.getSelectedItem().toString()));
 		}
+	}
+	
+	private void fillMemory2Address() {
+		
+		if (plot2MemVariables.containsKey(cmbPlot2MemoryVariables.getSelectedItem().toString())) {
+
+			txtPlot2MemoryAddres.setText(plot2MemVariables.get(cmbPlot2MemoryVariables.getSelectedItem().toString()));
+		}
+	}
+	
+	private void loadPlot2MemoryVariables(String fileName) {
+
+		cmbPlot2MemoryVariables.removeAllItems();
+
+		//cmbPlot2MemoryVariables.addItem("");
+
+		plot2MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
+
+		cmbPlot2MemoryVariables.addMemoryVariables(plot2MemVariables);
+
+		cmbPlot2MemoryVariables.setSelectedIndex(0);
 
 	}
 
@@ -1417,19 +1759,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			btnClear.setEnabled(false);
 		}
-
-		if (isPlot2) {
-
-			if (cmbPlot2Processor.getItemCount() > 0) {
-
-				int i = cmbPlot2Processor.getSelectedIndex();
-
-				cmbPlot2Processor.setSelectedIndex(i + 1);
-
-				cmbPlot2Processor.setSelectedIndex(i);
-
-			}
-		}
 	}
 
 	@Override
@@ -1471,6 +1800,142 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
+
+	}
+
+	public void populateValues(int lineID, byte[] bytes) {
+		multiLine.setBytes(lineID, bytes);
+	}
+
+	private void readMemory() {
+
+		if (chkPlot1.isSelected() && chkPlot2.isSelected()) {
+
+			createPlot1Filters();
+
+			createPlot2Filters();
+
+			parent.readPlot(plot1MemoryFilter, plot2MemoryFilter);
+
+		} else {
+
+			if (chkPlot1.isSelected()) {
+
+				createPlot1Filters();
+
+				parent.readPlot(plot1MemoryFilter);
+
+			} else if (chkPlot2.isSelected()) {
+
+				createPlot2Filters();
+
+				parent.readPlot(plot2MemoryFilter);
+
+			}
+		}
+	}
+
+	private void doReadMemory() {
+
+		// boolean isSelectedProcessorValid = isSelectedProcessorValid();
+
+		// boolean isSelectedCoreValid = isSelectedCoreValid();
+
+		// boolean isAddressValid = isAddressValid();
+
+		// boolean isLengthValid = isLengthValid();
+
+		// if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid
+		// && isLengthValid) {
+
+		multiLine.clearAll();
+
+		readMemory();
+
+		// Thread th = new Thread(new Runnable() {
+
+		// @Override
+		// public void run() {
+
+		// showLoadProcessingWindow("Memory loading...");
+
+		// }
+		// });
+
+		// th.start();
+		/*
+		 * } else { if (!isSelectedProcessorValid) {
+		 * 
+		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
+		 * "Please select processor", "Validation", JOptionPane.ERROR_MESSAGE);
+		 * 
+		 * } else if (!isSelectedCoreValid) {
+		 * 
+		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
+		 * "Please select core", "Validation", JOptionPane.ERROR_MESSAGE);
+		 * 
+		 * } else if (!isAddressValid) {
+		 * 
+		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
+		 * "Addres is invalid.\nEnter valid address!.", "Validation",
+		 * JOptionPane.ERROR_MESSAGE);
+		 * 
+		 * } else if (!isLengthValid) {
+		 * 
+		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
+		 * "Length is invalid.\nEnter valid length( between 1 to " +
+		 * (ATP.DEFAULTBUFFERSIZE * 10) + " )!.", "Validation",
+		 * JOptionPane.ERROR_MESSAGE);
+		 * 
+		 * } }
+		 */
+		if (chkPlot1AutoRefresh.isSelected()) {
+
+			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * MINUTE;
+
+			isAutoRefresh = true;
+
+			startAutoRefreshThread();
+
+		} else {
+
+			isAutoRefresh = false;
+		}
+
+	}
+
+	private void startAutoRefreshThread() {
+
+		if (autoRefreshThread == null) {
+
+			autoRefreshThread = null;
+
+			autoRefreshThread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					while (isAutoRefresh) {
+
+						try {
+
+							readMemory();
+
+							Thread.sleep(currentThreadSleepTime);
+
+						} catch (Exception e) {
+
+							e.printStackTrace();
+
+						}
+
+					}
+
+				}
+			});
+
+			autoRefreshThread.start();
+		}
 
 	}
 }
