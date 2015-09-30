@@ -18,12 +18,15 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void readMemory(MemoryViewFilter filter);
 
+	public void populateMemory(int memID, long startAddress, byte[] buffer);
+
 	public void readPlot(MemoryViewFilter filter);
 
 	public void readPlot(MemoryViewFilter filter1, MemoryViewFilter filter2);
 
-	public void populateMemory(int memID, long startAddress, byte[] buffer);
-
 	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer);
 
+	public void readWaterfall(String ip);
+
+	public void populateWaterfall(String ip,byte[] bytes);
 }

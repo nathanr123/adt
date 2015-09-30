@@ -57,10 +57,10 @@ import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
-import com.cti.vpx.controls.hex.VPX_MemoryBrowser;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryPlotWindow;
+import com.cti.vpx.controls.hex.VPX_WaterfallWindow;
 import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.listener.VPXAdvertisementListener;
 import com.cti.vpx.listener.VPXCommunicationListener;
@@ -181,9 +181,9 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPXUDPMonitor udpMonitor;
 
-	public VPX_MemoryBrowser vpxMemoryBrowser = null;
-
 	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
+
+	private VPX_WaterfallWindow waterfallWindow = new VPX_WaterfallWindow();
 
 	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
@@ -570,7 +570,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				showWaterfall();
+				showWaterfall(VPXSessionManager.getCurrentIP());
 
 			}
 		});
@@ -1365,7 +1365,23 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				new VPX_AliasConfigWindow(VPX_ETHWindow.this).showAliasWindow(subsystem);
+				new VPX_AliasConfigWindow(VPX_ETHWindow.this).showRenameAliasWindow(subsystem);
+
+			}
+		});
+
+		th.start();
+
+	}
+
+	public void showAliasConfig(String p2IP, String d1IP, String d2IP) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				new VPX_AliasConfigWindow(VPX_ETHWindow.this).showAddAliasWindow(p2IP, d1IP, d2IP);
 
 			}
 		});
@@ -1501,7 +1517,11 @@ public class VPX_ETHWindow extends JFrame
 		updateLog("Showing Amplitude Graph");
 	}
 
-	public void showWaterfall() {
+	public void showWaterfall(String ip) {
+
+		waterfallWindow.showWaterFall(ip);
+
+		readWaterfall(ip);
 
 		updateLog("Showing Waterfall Graph");
 	}
@@ -1978,6 +1998,25 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		th.start();
+
+	}
+
+	@Override
+	public void readWaterfall(String ip) {
+
+		udpMonitor.readWaterfallData(ip);
+
+	}
+
+	@Override
+	public void populateWaterfall(String ip, byte[] bytes) {
+
+		if (waterfallWindow.isVisible()) {
+
+			waterfallWindow.loadData(bytes);
+
+			waterfallWindow.showWaterFall(ip);
+		}
 
 	}
 

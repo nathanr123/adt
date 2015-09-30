@@ -1272,23 +1272,17 @@ public class VPXUtilities {
 
 			for (NetworkInterface netint : Collections.list(nets)) {
 
-				// System.out.printf("Name: %s\n", netint.getName());
-
 				Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
 
 				for (InetAddress inetAddress : Collections.list(inetAddresses)) {
 
 					if (inetAddress.getHostAddress().endsWith(ip)) {
-						// System.out.printf("InetAddress: %s\n",
-						// inetAddress.getHostAddress());
 
 						ret = netint.getDisplayName();
 
 						break;
 					}
 				}
-
-				// System.out.printf("\n");
 			}
 
 		} catch (Exception e) {
@@ -1679,6 +1673,11 @@ public class VPXUtilities {
 	public static boolean isFileValid(String fileName) {
 
 		return isFileValid(fileName, false);
+	}
+
+	public static boolean isBetween(long value, long min, long max) {
+
+		return (value >= min && value <= max);
 	}
 
 	public static boolean isFileValid(String fileName, boolean isDirectory) {

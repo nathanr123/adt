@@ -289,7 +289,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				doReadMemory();
+				doPlotMemory();
 
 			}
 		});
@@ -1835,7 +1835,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		}
 	}
 
-	private void doReadMemory() {
+	private void doPlotMemory() {
 
 		// boolean isSelectedProcessorValid = isSelectedProcessorValid();
 

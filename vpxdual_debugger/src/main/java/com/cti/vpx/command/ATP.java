@@ -33,9 +33,16 @@ public interface ATP {
 	public static final int MSG_TYPE_LOADMEMORY = 0xCA;
 
 	public static final int MSG_TYPE_LOADMEMORY_ACK = 0xCB;
-	
+
 	public static final int MSG_TYPE_LOADMEMORY_DONE = 0xCC;
 
+	public static final int MSG_TYPE_WATERFALL = 0xCD;
+
+	public static final int MSG_TYPE_AMPLITUDE = 0xCE;
+
+	public static final int MSG_TYPE_WATERFALL_INTERRUPTED = 0xCF;
+
+	public static final int MSG_TYPE_AMPLITUDE_INTERRUPTED = 0xD0;
 
 	// Result
 	public static final int TEST_RESULT_PASS = 0x01;
@@ -62,6 +69,92 @@ public interface ATP {
 	public enum MESSAGE_MODE {
 		MSG_MODE_CONSOLE, MSG_MODE_MESSAGE
 	};
+
+	// Address Ranges
+
+	// 256MB DDR3 SDRAM for cores 0 - 7
+
+	// Core 0
+	public static final long CORE0_DDR3_START_ADDRESS = 0x80000000l;
+
+	public static final long CORE0_DDR3_END_ADDRESS = 0x8FFFFFFFl;
+
+	// Core 1
+	public static final long CORE1_DDR3_START_ADDRESS = 0x90000000l;
+
+	public static final long CORE1_DDR3_END_ADDRESS = 0x9FFFFFFFl;
+
+	// Core 2
+	public static final long CORE2_DDR3_START_ADDRESS = 0xA0000000l;
+
+	public static final long CORE2_DDR3_END_ADDRESS = 0xAFFFFFFFl;
+
+	// Core 3
+	public static final long CORE3_DDR3_START_ADDRESS = 0xB0000000l;
+
+	public static final long CORE3_DDR3_END_ADDRESS = 0xBFFFFFFFl;
+
+	// Core 4
+	public static final long CORE4_DDR3_START_ADDRESS = 0xC0000000l;
+
+	public static final long CORE4_DDR3_END_ADDRESS = 0xCFFFFFFFl;
+
+	// Core 5
+	public static final long CORE5_DDR3_START_ADDRESS = 0xD0000000l;
+
+	public static final long CORE5_DDR3_END_ADDRESS = 0xDFFFFFFFl;
+
+	// Core 6
+	public static final long CORE6_DDR3_START_ADDRESS = 0xE0000000l;
+
+	public static final long CORE6_DDR3_END_ADDRESS = 0xEFFFFFFFl;
+
+	// Core 7
+	public static final long CORE7_DDR3_START_ADDRESS = 0xF0000000l;
+
+	public static final long CORE7_DDR3_END_ADDRESS = 0xFFFFFFFFl;
+
+	// L2 SDRAM for cores 0 - 7
+
+	// Core 0
+	public static final long C0_L2SRAM_START_ADDRESS = 0x10800000l;
+
+	public static final long C0_L2SRAM_END_ADDRESS = 0x1087FFFFl;
+
+	// Core 1
+	public static final long C1_L2SRAM_START_ADDRESS = 0x11800000l;
+
+	public static final long C1_L2SRAM_END_ADDRESS = 0x1187FFFFl;
+
+	// Core 2
+	public static final long C2_L2SRAM_START_ADDRESS = 0x12800000l;
+
+	public static final long C2_L2SRAM_END_ADDRESS = 0x1287FFFFl;
+
+	// Core 3
+	public static final long C3_L2SRAM_START_ADDRESS = 0x13800000l;
+
+	public static final long C3_L2SRAM_END_ADDRESS = 0x1387FFFFl;
+
+	// Core 4
+	public static final long C4_L2SRAM_START_ADDRESS = 0x14800000l;
+
+	public static final long C4_L2SRAM_END_ADDRESS = 0x1487FFFFl;
+
+	// Core 5
+	public static final long C5_L2SRAM_START_ADDRESS = 0x15800000l;
+
+	public static final long C5_L2SRAM_END_ADDRESS = 0x1587FFFFl;
+
+	// Core 6
+	public static final long C6_L2SRAM_START_ADDRESS = 0x16800000l;
+
+	public static final long C6_L2SRAM_END_ADDRESS = 0x1687FFFFl;
+
+	// Core 7
+	public static final long C7_L2SRAM_START_ADDRESS = 0x17800000l;
+
+	public static final long C7_L2SRAM_END_ADDRESS = 0x1787FFFFl;
 
 	// Endianess ByteOrder
 	public static final ByteOrder BYTEORDER_P2020 = ByteOrder.BIG_ENDIAN;

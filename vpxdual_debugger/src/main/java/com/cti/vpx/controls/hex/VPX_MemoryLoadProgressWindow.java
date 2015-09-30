@@ -111,8 +111,6 @@ public class VPX_MemoryLoadProgressWindow extends JDialog {
 
 		bytesRecieved = bytesRecieved + bytesRcvd;
 
-		long remain = (totpkt - cur);
-
 	}
 
 	public void closeLoadMemory() {

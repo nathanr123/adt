@@ -55,7 +55,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -2851744765165677816L;
-	
+
 	private int MINUTE = 5 * 1000;
 
 	private JPanel contentPane;
@@ -453,13 +453,13 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		memoryAddressPanel.add(txtMemoryLength, "cell 4 0,alignx left,aligny center");
 
 		JLabel lblStride = new JLabel("Stride");
-		
+
 		lblStride.setVisible(false);
 
 		memoryAddressPanel.add(lblStride, "cell 5 0,alignx left,aligny center");
 
 		txtMemoryStride = new JTextField();
-		
+
 		txtMemoryStride.setVisible(false);
 
 		txtMemoryStride.setPreferredSize(new Dimension(20, 20));
@@ -525,8 +525,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		cmbMemoryVariables.removeAllItems();
 
-		//cmbMemoryVariables.addItem("");
-		
+		// cmbMemoryVariables.addItem("");
+
 		memVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
 		cmbMemoryVariables.addMemoryVariables(memVariables);
@@ -563,7 +563,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		if (cmbCores.getItemCount() > 0) {
 
-			filter.setCore(String.valueOf(cmbCores.getSelectedIndex()-1));
+			filter.setCore(String.valueOf(cmbCores.getSelectedIndex() - 1));
 
 		} else {
 
@@ -933,8 +933,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			} else if (!isAddressValid) {
 
-				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, "Addres is invalid.\nEnter valid address!.",
-						"Validation", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this, getAddressErrorMessage(), "Validation",
+						JOptionPane.ERROR_MESSAGE);
 
 			} else if (!isLengthValid) {
 
@@ -957,6 +957,92 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			isAutoRefresh = false;
 		}
+	}
+
+	private String getAddressErrorMessage() {
+
+		String ret = "";
+
+		if (cmbCores.getSelectedIndex() > 0) {
+
+			switch (cmbCores.getSelectedIndex() - 1) {
+
+			case 0:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE0_DDR3_START_ADDRESS, ATP.CORE0_DDR3_END_ADDRESS,
+						ATP.C0_L2SRAM_START_ADDRESS, ATP.C0_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 1:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE1_DDR3_START_ADDRESS, ATP.CORE1_DDR3_END_ADDRESS,
+						ATP.C1_L2SRAM_START_ADDRESS, ATP.C1_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 2:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE2_DDR3_START_ADDRESS, ATP.CORE2_DDR3_END_ADDRESS,
+						ATP.C2_L2SRAM_START_ADDRESS, ATP.C2_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 3:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE3_DDR3_START_ADDRESS, ATP.CORE3_DDR3_END_ADDRESS,
+						ATP.C3_L2SRAM_START_ADDRESS, ATP.C3_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 4:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE4_DDR3_START_ADDRESS, ATP.CORE4_DDR3_END_ADDRESS,
+						ATP.C4_L2SRAM_START_ADDRESS, ATP.C4_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 5:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE5_DDR3_START_ADDRESS, ATP.CORE5_DDR3_END_ADDRESS,
+						ATP.C5_L2SRAM_START_ADDRESS, ATP.C5_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 6:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE6_DDR3_START_ADDRESS, ATP.CORE6_DDR3_END_ADDRESS,
+						ATP.C6_L2SRAM_START_ADDRESS, ATP.C6_L2SRAM_END_ADDRESS);
+				break;
+
+			case 7:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(cmbCores.getSelectedIndex() - 1), ATP.CORE7_DDR3_START_ADDRESS, ATP.CORE7_DDR3_END_ADDRESS,
+						ATP.C7_L2SRAM_START_ADDRESS, ATP.C7_L2SRAM_END_ADDRESS);
+
+				break;
+
+			}
+
+		}
+
+		return ret;
 	}
 
 	private void startAutoRefreshThread() {
@@ -995,21 +1081,93 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	}
 
 	private boolean isSelectedProcessorValid() {
+
 		return cmbProcessor.getSelectedIndex() > 0;
 	}
 
 	private boolean isSelectedCoreValid() {
+
 		return cmbCores.getSelectedIndex() > 0;
 	}
 
 	private boolean isAddressValid() {
 
+		boolean retValue = true;
+
 		long address = VPXUtilities.getValue(txtMemoryAddres.getText().trim());
 
-		if (address == -1)
+		if (address == -1 || cmbCores.getSelectedIndex() == 0)
 			return false;
 
-		return true;
+		int core = cmbCores.getSelectedIndex() - 1;
+
+		if (core == 0) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE0_DDR3_START_ADDRESS, ATP.CORE0_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C0_L2SRAM_START_ADDRESS, ATP.C0_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 1) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE1_DDR3_START_ADDRESS, ATP.CORE1_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C1_L2SRAM_START_ADDRESS, ATP.C1_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 2) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE2_DDR3_START_ADDRESS, ATP.CORE2_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C2_L2SRAM_START_ADDRESS, ATP.C2_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 3) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE3_DDR3_START_ADDRESS, ATP.CORE3_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C3_L2SRAM_START_ADDRESS, ATP.C3_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 4) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE4_DDR3_START_ADDRESS, ATP.CORE4_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C4_L2SRAM_START_ADDRESS, ATP.C4_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 5) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE5_DDR3_START_ADDRESS, ATP.CORE5_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C5_L2SRAM_START_ADDRESS, ATP.C5_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 6) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE6_DDR3_START_ADDRESS, ATP.CORE6_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C6_L2SRAM_START_ADDRESS, ATP.C6_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 7) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE7_DDR3_START_ADDRESS, ATP.CORE7_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C7_L2SRAM_START_ADDRESS, ATP.C7_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		}
+
+		return retValue;
 	}
 
 	private boolean isLengthValid() {
@@ -1083,8 +1241,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		long addr = hexPanel.getHexEditor().getHexEditorRowHeader().getRowHeaderModel().getStartAddress() + fromAddress;
 
-		parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID,
-				typeSize, length, newValue);
+		parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID, typeSize,
+				length, newValue);
 	}
 
 	public void setBytes(long startAddress, byte[] buf) {

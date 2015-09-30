@@ -979,7 +979,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				parent.showWaterfall();
+				VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) getSelectionPath().getLastPathComponent();
+
+				parent.showWaterfall(rightClickedNode.getNodeIP());
 
 			}
 		});
@@ -1081,11 +1083,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				VPX_ProcessorNode nd = (VPX_ProcessorNode) getSelectionModel().getSelectionPath()
-						.getLastPathComponent();
-
-				parent.showAliasConfig(nd.getNodeName());
-
+				doCreateNew(getSelectionPaths());
 			}
 		});
 
@@ -1114,14 +1112,31 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				VPX_ProcessorNode nd = (VPX_ProcessorNode) getSelectionModel().getSelectionPath()
 						.getLastPathComponent();
 
-				int result = JOptionPane.showConfirmDialog(parent,
-						String.format("Are yousure you want to remove subsystem \'%s\' from the VPXSystem?",
-								nd.getNodeName()),
-						"Confirmation", JOptionPane.YES_NO_OPTION);
+				if (nd.isSubSytemNode()) {
 
-				if (result == JOptionPane.YES_OPTION) {
+					int result = JOptionPane.showConfirmDialog(parent,
+							String.format("Are yousure you want to remove subsystem \'%s\' from the VPXSystem?",
+									nd.getNodeName()),
+							"Confirmation", JOptionPane.YES_NO_OPTION);
 
-					parent.deleteSubSystem(nd.getNodeName());
+					if (result == JOptionPane.YES_OPTION) {
+
+						parent.deleteSubSystem(nd.getNodeName());
+					}
+				} else {
+					String temp = getSelectionModel().getSelectionPath().getParentPath().toString();
+
+					temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
+					
+					int result = JOptionPane.showConfirmDialog(parent,
+							String.format("Are yousure you want to remove subsystem \'%s\' from the VPXSystem?",
+									temp),
+							"Confirmation", JOptionPane.YES_NO_OPTION);
+
+					if (result == JOptionPane.YES_OPTION) {
+
+						parent.deleteSubSystem(temp);
+					}
 				}
 
 			}
@@ -1134,6 +1149,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
+				doSwap(getSelectionPaths());
 			}
 		});
 
@@ -1189,6 +1205,117 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	public void refreshProcessorTree() {
 
 		loadSystemRootNodeWithoutUnListed();
+
+	}
+
+	private void doCreateNew(TreePath[] paths) {
+
+		String[] nameArrays = getNodeNames(paths);
+
+		String p1 = "";
+
+		String d1 = "";
+
+		String d2 = "";
+
+		if (nameArrays != null) {
+
+			for (int i = 0; i < nameArrays.length; i++) {
+
+				if (nameArrays[i].contains("P2020")) {
+
+					p1 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
+
+				} else if (nameArrays[i].contains("DSP1")) {
+
+					d1 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
+
+				} else if (nameArrays[i].contains("DSP2")) {
+
+					d2 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
+				}
+
+			}
+
+			parent.showAliasConfig(p1, d1, d2);
+
+		} else {
+
+			JOptionPane.showMessageDialog(parent, "Must select 3 Processors only.\nSelect P2020, DSP1, DSP2 order");
+		}
+
+	}
+
+	private void doSwap(TreePath[] paths) {
+
+		String sub1 = "";
+		String sub2 = "";
+
+		if ((paths.length % 2) != 0) {
+
+			JOptionPane.showMessageDialog(parent, "Please select correct processors");
+
+			return;
+
+		} else {
+
+			String temp = "";
+
+			for (int i = 0; i < paths.length; i++) {
+
+				temp = paths[i].getParentPath().toString();
+
+				if (i == 0) {
+
+					sub1 = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
+
+				} else {
+
+					if (!sub1.equals(temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1))) {
+
+						sub2 = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
+
+						break;
+					}
+				}
+
+			}
+
+		}
+
+		String[] nameArrays = getNodeNames(paths);
+
+		String p1 = "";
+
+		String d1 = "";
+
+		String d2 = "";
+
+		if (nameArrays != null) {
+
+			for (int i = 0; i < nameArrays.length; i++) {
+
+				if (nameArrays[i].contains("P2020")) {
+
+					p1 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
+
+				} else if (nameArrays[i].contains("DSP1")) {
+
+					d1 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
+
+				} else if (nameArrays[i].contains("DSP2")) {
+
+					d2 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
+				}
+
+			}
+
+			parent.showAliasConfig(p1, d1, d2);
+
+		} else {
+
+			JOptionPane.showMessageDialog(parent, "Must select 3 Processors only.\nSelect P2020, DSP1, DSP2 order");
+		}
 
 	}
 
@@ -1348,6 +1475,28 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		}
 
 		return vpx_contextMenu;
+	}
+
+	private String[] getNodeNames(TreePath[] paths) {
+
+		if (paths.length != 3)
+			return null;
+
+		String[] nodes = new String[paths.length];
+
+		String temp = "";
+
+		for (int i = 0; i < paths.length; i++) {
+
+			temp = paths[i].getLastPathComponent().toString();
+
+			String str = temp.substring(temp.indexOf("'>") + 2, temp.indexOf("</"));
+
+			nodes[i] = str;
+
+		}
+
+		return nodes;
 	}
 
 	private boolean isSameParent(TreePath[] paths) {

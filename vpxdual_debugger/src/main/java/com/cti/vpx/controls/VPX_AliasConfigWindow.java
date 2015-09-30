@@ -433,6 +433,38 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		}
 	}
 
+	private void loadSubsystemAddable(String p2020IP, String dsp1IP, String dsp2IP) {
+
+		txtAliasName.setText("");
+		
+		txtAliasName.setEditable(true);
+
+		txtP2020.setText(p2020IP);
+		
+		txtP2020.setEditable(false);
+
+		txtDSP1.setText(dsp1IP);
+		
+		txtDSP1.setEditable(false);
+
+		txtDSP2.setText(dsp2IP);
+		
+		txtDSP2.setEditable(false);
+
+		btnAdd.setEnabled(true);
+
+		btnDelete.setEnabled(false);
+
+		btnUpdate.setEnabled(false);
+
+		btnClearAll.setEnabled(false);
+
+		btnReset.setEnabled(false);
+
+		btnSave.setEnabled(true);
+
+	}
+
 	private void addorSaveSubSystem() {
 
 		boolean ismodify = true;
@@ -668,11 +700,21 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 	}
 
-	public void showAliasWindow(String subSystemName) {
+	public void showRenameAliasWindow(String subSystemName) {
 
 		loadAliasFile();
 
 		loadSubsystemEditable(subSystemName);
+
+		setVisible(true);
+
+	}
+
+	public void showAddAliasWindow(String p2020IP, String dsp1IP, String dsp2IP) {
+
+		loadAliasFile();
+
+		loadSubsystemAddable(p2020IP, dsp1IP, dsp2IP);
 
 		setVisible(true);
 

@@ -430,23 +430,28 @@ public class VPX_UARTWindow extends JFrame {
 					buffer[len++] = (byte) data;
 				}
 
-				String msg = new String(buffer, 0, len);
+				String msg1 = new String(buffer, 0, len);
 
-				if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
+				if (msg1.length() > 0) {
+					
+					String msg = msg1.split("::")[1];
 
-					if (msg.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
+					if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
+
+						if (msg1.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
+
+							txtAConsole.append(msg + "\n");
+						}
+
+					} else {
 
 						txtAConsole.append(msg + "\n");
 					}
-
-				} else {
-
-					txtAConsole.append(msg + "\n");
 				}
 
 			} catch (IOException e) {
 
-				e.printStackTrace();
+				txtAConsole.append("\n");
 
 			}
 		}

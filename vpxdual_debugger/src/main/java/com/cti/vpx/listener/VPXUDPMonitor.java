@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.swing.SwingWorker;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
@@ -84,21 +83,31 @@ public class VPXUDPMonitor {
 	private VPXSystem vpxSystem;
 
 	private static int memOffset0 = 0;
+
 	private static int memOffset1 = 0;
+
 	private static int memOffset2 = 0;
+
 	private static int memOffset3 = 0;
 
 	private static int plotOffset0 = 0;
+
 	private static int plotOffset1 = 0;
+
 	private static int plotOffset2 = 0;
 
 	private byte[] memoryBuff0;
+
 	private byte[] memoryBuff1;
+
 	private byte[] memoryBuff2;
+
 	private byte[] memoryBuff3;
 
 	private byte[] plotBuff0;
+
 	private byte[] plotBuff1;
+
 	private byte[] plotBuff2;
 
 	public VPXUDPMonitor() throws Exception {
@@ -1513,6 +1522,59 @@ public class VPXUDPMonitor {
 		}
 	}
 
+	public void readWaterfallData(String ip) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_WATERFALL);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void populateWaterfallData(String ip, ATPCommand msg) {
+
+		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+
+		for (int i = 0; i < b.length; i++) {
+
+			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+			System.out.print(String.format("%02x ", msg.params.memoryinfo.buffer[i].get()));
+
+			if ((i + 1) % 16 == 0) {
+				System.out.println();
+			}
+
+		}
+
+		((VPX_ETHWindow) listener).populateWaterfall(ip, b);
+
+	}
+
 	public void populateBISTResult(String ip, ATPCommand msg) {
 
 		if (bist != null) {
@@ -1867,6 +1929,12 @@ public class VPXUDPMonitor {
 			case ATP.MSG_TYPE_PLOT:
 
 				populatePlot(ip, msgCommand);
+
+				break;
+
+			case ATP.MSG_TYPE_WATERFALL:
+
+				populateWaterfallData(ip, msgCommand);
 
 				break;
 			}

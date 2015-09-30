@@ -691,7 +691,10 @@ public class VPX_AppModeWindow extends JFrame {
 
 				nw = VPXUtilities.getEthernetPort(name);
 
-				txtIPAddress.setText(nw.getIpAddresses().get(0));
+				if (nw.getIpAddresses().size() > 0) {
+					txtIPAddress.setText(nw.getIpAddresses().get(0));
+				} else
+					txtIPAddress.setText("");
 
 				txtSubnet.setText(nw.getSubnet());
 

@@ -50,12 +50,14 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
-	FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files", "dat");
+	private FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files", "dat");
 
-	FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
+	private FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
 
-	FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	private FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
+	
 	private JTextField txtLengthBytes;
+	
 	private JTextField txtLengthWords;
 
 	private String currentProcessor;

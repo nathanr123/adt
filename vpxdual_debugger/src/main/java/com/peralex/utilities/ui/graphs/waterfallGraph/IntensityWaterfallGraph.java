@@ -14,7 +14,7 @@ public class IntensityWaterfallGraph extends AmplitudeDetectionWaterfallGraph
 	/**
 	 * scale the intensity axis so that it just fits current min/max values in the data.
 	 */
-  private boolean bAutoScale = false;
+  private boolean bAutoScale = true;
   private final Variance autoScaleVariance = new Variance();
   private final ArithmeticMean autoScaleMean = new ArithmeticMean();
   private float fThresholdMin = Float.MIN_VALUE;

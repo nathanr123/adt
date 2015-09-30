@@ -26,8 +26,8 @@ public class VPXConstants {
 	public final static String LINUX_OSNAME = "Linux";
 
 	public final static String WIN_CMD_BASE = "netsh interface show interface";
-	
-	public final static String LINUX_CMD_BASE = "";
+
+	public final static String LINUX_CMD_BASE = "ip link show | grep UP |grep eth | awk '{print $2,$8,$9}'";
 
 	public static final String RESOURCENAME = "VPX_Dual_adt";
 
@@ -66,7 +66,7 @@ public class VPXConstants {
 	public static final int DSP1AVAILBLE = -3;
 
 	public static final int DSP2AVAILBLE = -4;
-	
+
 	public static final int SUBNAMEUNLIST = -5;
 
 	public static final int MAXRESPONSETIMEOUT = 5;

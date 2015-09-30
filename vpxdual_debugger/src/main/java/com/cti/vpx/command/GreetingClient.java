@@ -175,13 +175,15 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		jp.add(jb5);
 
-		JButton jb6 = new JButton("Set Memory");
+		JButton jb6 = new JButton("Get Waterfall");
 
 		jb6.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setMemory();
+				//setMemory();
+				
+				getWaterFall();
 			}
 		});
 
@@ -211,6 +213,41 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			// TODO: handle exception
 		}
 
+	}
+	
+	public void getWaterFall(){
+		
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_WATERFALL);
+			
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			jt.append("Message Sent\n");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void setMemory() {
@@ -1074,6 +1111,18 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	@Override
 	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void readWaterfall(String ip) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void populateWaterfall(String ip,byte[] bytes) {
 		// TODO Auto-generated method stub
 		
 	}
