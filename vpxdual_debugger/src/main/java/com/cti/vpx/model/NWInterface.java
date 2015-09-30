@@ -18,7 +18,11 @@ public class NWInterface {
 
 	String subnet;
 
-	public NWInterface(){}
+	String DisplayName;
+
+	public NWInterface() {
+	}
+
 	/**
 	 * @param name
 	 * @param isEnabled
@@ -167,6 +171,14 @@ public class NWInterface {
 
 	public void addIPAddress(String ip) {
 		ipAddresses.add(ip);
+	}
+
+	public String getDisplayName() {
+		return DisplayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		DisplayName = displayName;
 	}
 
 }

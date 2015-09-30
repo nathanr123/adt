@@ -45,7 +45,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 
 		lineGraph.setFrameLimitingEnabled(true);
 		lineGraph.setGridVisible(true);
-		lineGraph.setZoomEnabled(false);
+		lineGraph.setZoomEnabled(true);
 
 		graphWrapper = new com.peralex.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
 		// graphWrapper.setTitle("Multiple Line Graph");
@@ -63,12 +63,12 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		line2Data = new GeneratedLineData(0, 0, 0, new float[0]);
 		
 		lineGraph.setGridYMinMax(0, 255);
-
+		
 		dataTimer = new javax.swing.Timer(500, new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 
-				float[] floats = getFile("D:\\test1.bin");
+				float[] floats = getFile("D:\\test.bin");
 			
 				line1Data.setXValues(0, floats.length, floats.length);
 				
@@ -86,7 +86,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 			}
 		});
 
-	//	dataTimer.start();
+	dataTimer.start();
 		
 		dataTimer1 = new javax.swing.Timer(550, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -303,7 +305,7 @@ public class VPXUtilities {
 		return String.format("%d.%d.%d.%d", (ipaslong >>> 24) & 0xff, (ipaslong >>> 16) & 0xff, (ipaslong >>> 8) & 0xff,
 				(ipaslong) & 0xff);
 	}
-	
+
 	public static String toNumInUnits(long bytes) {
 		int u = 0;
 		for (; bytes > 1024 * 1024; bytes >>= 10) {
@@ -1261,6 +1263,41 @@ public class VPXUtilities {
 		return nwIfaces;
 	}
 
+	public static String findDisplayName(String ip) {
+
+		String ret = "";
+		try {
+
+			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+
+			for (NetworkInterface netint : Collections.list(nets)) {
+
+				// System.out.printf("Name: %s\n", netint.getName());
+
+				Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+
+				for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+
+					if (inetAddress.getHostAddress().endsWith(ip)) {
+						// System.out.printf("InetAddress: %s\n",
+						// inetAddress.getHostAddress());
+
+						ret = netint.getDisplayName();
+
+						break;
+					}
+				}
+
+				// System.out.printf("\n");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+
 	public static void setCurrentNWIface(String ip) {
 
 		try {
@@ -1461,6 +1498,8 @@ public class VPXUtilities {
 							ifs.setSubnet(sss[1]);
 
 							ifs.setGateWay(sss[2]);
+
+							ifs.setDisplayName(findDisplayName(sss[0]));
 
 							nw = ifs;
 						}

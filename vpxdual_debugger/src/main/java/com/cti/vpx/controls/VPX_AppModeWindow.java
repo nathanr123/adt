@@ -99,6 +99,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private SpinnerNumberModel periodicitySpinnerModel;
 
+	private JTextField txtDiplayName;
+
 	/**
 	 * Launch the application.
 	 */
@@ -365,6 +367,7 @@ public class VPX_AppModeWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				if (currentMode != VPXConstants.UARTMODE)
+
 					reloadCenterComponents(VPXConstants.UARTMODE);
 
 			}
@@ -384,7 +387,9 @@ public class VPX_AppModeWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				if (currentMode != VPXConstants.ETHMODE)
+
 					reloadCenterComponents(VPXConstants.ETHMODE);
 
 			}
@@ -425,9 +430,10 @@ public class VPX_AppModeWindow extends JFrame {
 			}
 
 		} else if (mode == VPXConstants.ETHMODE) {
+
 			centerPanel.removeAll();
 
-			setSize(470, 570);
+			setSize(470, 600);
 
 			centerPanel.setBounds(5, 80, 412, 220);
 
@@ -519,27 +525,33 @@ public class VPX_AppModeWindow extends JFrame {
 
 		ethPanel.add(lblNwInterface);
 
+		JLabel lblDispName = new JLabel("Name");
+
+		lblDispName.setBounds(10, 52, 115, 22);
+
+		ethPanel.add(lblDispName);
+
 		JLabel lblIpAddress = new JLabel("IP Address");
 
-		lblIpAddress.setBounds(10, 52, 115, 22);
+		lblIpAddress.setBounds(10, 89, 115, 22);
 
 		ethPanel.add(lblIpAddress);
 
 		JLabel lblSubnet = new JLabel("Subnet");
 
-		lblSubnet.setBounds(10, 89, 115, 22);
+		lblSubnet.setBounds(10, 126, 115, 22);
 
 		ethPanel.add(lblSubnet);
 
 		JLabel lblGateway = new JLabel("Gateway");
 
-		lblGateway.setBounds(10, 126, 115, 22);
+		lblGateway.setBounds(10, 163, 115, 22);
 
 		ethPanel.add(lblGateway);
 
 		JLabel lblPeriodicity = new JLabel("Periodicity");
 
-		lblPeriodicity.setBounds(10, 163, 115, 22);
+		lblPeriodicity.setBounds(10, 200, 115, 22);
 
 		ethPanel.add(lblPeriodicity);
 
@@ -564,9 +576,17 @@ public class VPX_AppModeWindow extends JFrame {
 
 		ethPanel.add(cmbNWIface);
 
+		txtDiplayName = new JTextField("");
+
+		txtDiplayName.setEditable(false);
+
+		txtDiplayName.setBounds(148, 52, 260, 22);
+
+		ethPanel.add(txtDiplayName);
+
 		txtIPAddress = new JTextField();
 
-		txtIPAddress.setBounds(148, 52, 260, 22);
+		txtIPAddress.setBounds(148, 89, 260, 22);
 
 		ethPanel.add(txtIPAddress);
 
@@ -576,7 +596,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 		txtSubnet.setColumns(10);
 
-		txtSubnet.setBounds(148, 89, 260, 22);
+		txtSubnet.setBounds(148, 126, 260, 22);
 
 		ethPanel.add(txtSubnet);
 
@@ -584,7 +604,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 		txtGateway.setColumns(10);
 
-		txtGateway.setBounds(148, 126, 260, 22);
+		txtGateway.setBounds(148, 163, 260, 22);
 
 		ethPanel.add(txtGateway);
 
@@ -596,13 +616,13 @@ public class VPX_AppModeWindow extends JFrame {
 
 		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 
-		spinPeriodicity.setBounds(148, 163, 77, 22);
+		spinPeriodicity.setBounds(148, 200, 77, 22);
 
 		ethPanel.add(spinPeriodicity);
 
 		JLabel lblInMins = new JLabel("in Secs (Min: 3, Max: 60)");
 
-		lblInMins.setBounds(234, 163, 150, 22);
+		lblInMins.setBounds(234, 200, 150, 22);
 
 		ethPanel.add(lblInMins);
 
@@ -647,6 +667,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 		nwIFModel.removeAllElements();
 
+		nwIFModel.addElement("Select Network");
+
 		if (nwIFaces.size() > 0) {
 
 			for (Iterator<NWInterface> iterator = nwIFaces.iterator(); iterator.hasNext();) {
@@ -674,6 +696,8 @@ public class VPX_AppModeWindow extends JFrame {
 				txtSubnet.setText(nw.getSubnet());
 
 				txtGateway.setText(nw.getGateWay());
+
+				txtDiplayName.setText(nw.getDisplayName());
 
 				if (nw.isConnected() && nw.isEnabled()) {
 
@@ -716,6 +740,8 @@ public class VPX_AppModeWindow extends JFrame {
 		txtSubnet.setEnabled(val);
 
 		txtGateway.setEnabled(val);
+
+		txtDiplayName.setEnabled(val);
 
 		spinPeriodicity.setEnabled(val);
 
@@ -813,7 +839,9 @@ public class VPX_AppModeWindow extends JFrame {
 					VPXSessionManager.setCurrentIP(txtIPAddress.getText());
 
 					try {
+
 						VPX_ETHWindow window = new VPX_ETHWindow();
+
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null,
 								"Another instance is running or the ports are bind by another application.",
@@ -853,7 +881,7 @@ public class VPX_AppModeWindow extends JFrame {
 			} else {
 
 				if (cmbCOMM.getSelectedIndex() > 0) {
-					
+
 					updateLogSettings();
 
 					VPX_UARTWindow window = new VPX_UARTWindow(cmbCOMM.getSelectedItem().toString());

@@ -3,6 +3,7 @@ package com.peralex.utilities.ui.graphs.graphBase;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -124,7 +125,7 @@ public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener 
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		oTitlePanel.add(oHeaderLeftExtraPanel, gridBagConstraints);
+		//oTitlePanel.add(oHeaderLeftExtraPanel, gridBagConstraints);
 
 		oTitleLabel.setText("");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -134,7 +135,7 @@ public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener 
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
-		oTitlePanel.add(oTitleLabel, gridBagConstraints);
+		//oTitlePanel.add(oTitleLabel, gridBagConstraints);
 
 		oHeaderRightExtraPanel.setLayout(new java.awt.BorderLayout());
 
@@ -143,13 +144,14 @@ public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener 
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		oTitlePanel.add(oHeaderRightExtraPanel, gridBagConstraints);
+		//oTitlePanel.add(oHeaderRightExtraPanel, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		//oTitlePanel.add(oCoordinatesPanel, gridBagConstraints);
+		oCoordinatesPanel.setPreferredSize(new Dimension(300, 25));
+		oTitlePanel.add(oCoordinatesPanel, gridBagConstraints);
 
 		oHeaderBottomExtraPanel.setLayout(new java.awt.BorderLayout());
 
@@ -158,7 +160,7 @@ public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener 
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		oTitlePanel.add(oHeaderBottomExtraPanel, gridBagConstraints);
+		//oTitlePanel.add(oHeaderBottomExtraPanel, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;

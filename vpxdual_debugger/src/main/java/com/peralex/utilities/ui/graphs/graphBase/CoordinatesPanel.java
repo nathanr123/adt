@@ -64,14 +64,14 @@ public class CoordinatesPanel extends javax.swing.JPanel
 
     setBackground(new java.awt.Color(255, 255, 255));
     setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    oXCoordinateLabel.setText(" X: ");
+    oXCoordinateLabel.setText(" Address : ");
     add(oXCoordinateLabel);
 
     oXCoordinateValue.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     oXCoordinateValue.setValue(0.0);
     add(oXCoordinateValue);
 
-    oYCoordinateLabel.setText(" Y: ");
+    oYCoordinateLabel.setText(" Data : ");
     add(oYCoordinateLabel);
 
     oYCoordinateValue.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
