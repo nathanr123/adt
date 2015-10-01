@@ -213,6 +213,50 @@ public class ScrollableBufferedImage
 			oImage.getRaster().setDataElements(0, y, len, 1, aiImageData);
 		}
   }
+	
+	/**
+	 * Draw a line of RGB data at the top of the image
+	 * @param len the length of data in the array to use
+	 */
+	public synchronized void drawRGB_Top(int[] aiImageData, int len,int height)
+	{
+		
+		if (oImage==null)
+		{
+			return;
+		}
+		int y = iImageIndex ;
+		if (y<0) {
+			y += height;//oImage.getHeight();
+		}
+		if (len!=oImage.getWidth())
+		{
+			// perform a very rough scaling - this shouldn't happen very often, so it's not a problem.
+			final int [] newImageData = new int[oImage.getWidth()];
+			final float scalingFactor = len / (float)oImage.getWidth();
+			for (int i=0; i<newImageData.length; i++)
+			{
+				newImageData[i] = aiImageData[(int) (i * scalingFactor)];
+			}
+
+			// draw the scaled data
+			oImage.getRaster().setDataElements(0, y, newImageData.length, 1, newImageData);
+			
+			// allow the server a little time before whinging - if we receive 20 of these then someone has
+			// forgotten to program a call to the server to resample the data.
+			whingeAboutDataLength++;
+			if (whingeAboutDataLength>20)
+			{
+				new Throwable("aiImageData is length " + len + " while image is width " + oImage.getWidth()  
+						+ ". Make sure to set the correct size in setSizeAndClear()/resizeExisting()").printStackTrace();
+			}
+		}
+		else
+		{
+			whingeAboutDataLength = 0;
+			oImage.getRaster().setDataElements(0, y, len, 1, aiImageData);
+		}
+  }
         
 	/**
 	 * This method will cause the display to clear.

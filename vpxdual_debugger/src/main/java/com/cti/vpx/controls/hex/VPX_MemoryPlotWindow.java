@@ -185,6 +185,10 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private boolean isAutoRefresh = false;
 
+	private boolean isPlot1Chkd = false;
+
+	private boolean isPlot2Chkd = false;
+
 	private int currentThreadSleepTime;
 
 	private Thread autoRefreshThread = null;
@@ -590,7 +594,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		plot1MapPanel.add(btnPlot1MapFileBrowse, "cell 3 0,alignx left,aligny top");
 
 		cmbPlot1MemoryVariables = new VPX_FilterComboBox();
-		
+
 		cmbPlot1MemoryVariables.addItemListener(new ItemListener() {
 
 			@Override
@@ -1224,7 +1228,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			}
 		});
-		
+
 		cmbPlot2MemoryVariables.setEnabled(false);
 
 		cmbPlot2MemoryVariables.setPreferredSize(new Dimension(120, 20));
@@ -1649,7 +1653,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		cmbPlot1MemoryVariables.removeAllItems();
 
-		//cmbPlot1MemoryVariables.addItem("");
+		// cmbPlot1MemoryVariables.addItem("");
 
 		plot1MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
@@ -1659,7 +1663,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	}
 
-
 	private void fillMemory1Address() {
 
 		if (plot1MemVariables.containsKey(cmbPlot1MemoryVariables.getSelectedItem().toString())) {
@@ -1667,20 +1670,20 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			txtPlot1MemoryAddres.setText(plot1MemVariables.get(cmbPlot1MemoryVariables.getSelectedItem().toString()));
 		}
 	}
-	
+
 	private void fillMemory2Address() {
-		
+
 		if (plot2MemVariables.containsKey(cmbPlot2MemoryVariables.getSelectedItem().toString())) {
 
 			txtPlot2MemoryAddres.setText(plot2MemVariables.get(cmbPlot2MemoryVariables.getSelectedItem().toString()));
 		}
 	}
-	
+
 	private void loadPlot2MemoryVariables(String fileName) {
 
 		cmbPlot2MemoryVariables.removeAllItems();
 
-		//cmbPlot2MemoryVariables.addItem("");
+		// cmbPlot2MemoryVariables.addItem("");
 
 		plot2MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
@@ -1809,25 +1812,17 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private void readMemory() {
 
-		if (chkPlot1.isSelected() && chkPlot2.isSelected()) {
-
-			createPlot1Filters();
-
-			createPlot2Filters();
+		if (isPlot1Chkd && isPlot2Chkd) {
 
 			parent.readPlot(plot1MemoryFilter, plot2MemoryFilter);
 
 		} else {
 
-			if (chkPlot1.isSelected()) {
-
-				createPlot1Filters();
+			if (isPlot1Chkd) {
 
 				parent.readPlot(plot1MemoryFilter);
 
-			} else if (chkPlot2.isSelected()) {
-
-				createPlot2Filters();
+			} else if (isPlot2Chkd) {
 
 				parent.readPlot(plot2MemoryFilter);
 
@@ -1848,6 +1843,36 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		// if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid
 		// && isLengthValid) {
 
+		if (chkPlot1.isSelected() && chkPlot2.isSelected()) {
+
+			createPlot1Filters();
+
+			createPlot2Filters();
+
+			isPlot1Chkd = true;
+
+			isPlot2Chkd = true;
+
+		} else {
+
+			if (chkPlot1.isSelected()) {
+
+				createPlot1Filters();
+
+				isPlot1Chkd = true;
+
+				isPlot2Chkd = false;
+
+			} else if (chkPlot2.isSelected()) {
+
+				createPlot2Filters();
+
+				isPlot1Chkd = false;
+
+				isPlot2Chkd = true;
+
+			}
+		}
 		multiLine.clearAll();
 
 		readMemory();

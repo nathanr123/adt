@@ -197,7 +197,7 @@ public class WaterfallGraph extends ZoomDrawSurface
 		
 		synchronized (oTimeStampList)
 		{
-			final int desiredSize = Math.max(getHeight()-1, 0);
+			final int desiredSize = Math.max(getHeight(), 0);
 			while (oTimeStampList.size()>desiredSize)
 			{
 				oTimeStampList.removeLast();
@@ -220,16 +220,16 @@ public class WaterfallGraph extends ZoomDrawSurface
 			}
 			oAmplitudeTimeStamp = oTimeStamp;
 			// Move the display one pixel up
-			scrollUp();
+			scrollDown();
 		}
 		else if (oTimeStamp.before(oAmplitudeTimeStamp))
 		{
 			oAmplitudeTimeStamp = oTimeStamp;
 			// Move the display one pixel down
-			scrollDown();
+			scrollUp();
 		}
 
-		oImage.drawRGB_Bottom(aiImageData, imageDataLen);
+		oImage.drawRGB_Top(aiImageData, imageDataLen,getHeight());
 		
 		repaint();
   }

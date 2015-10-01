@@ -83,7 +83,7 @@ public class VPX_WaterfallWindow extends JFrame {
 			}
 		});
 
-		// th.start();
+		 th.start();
 	}
 
 	Random random = new Random();
@@ -290,8 +290,8 @@ public class VPX_WaterfallWindow extends JFrame {
 
 		}
 
-		txtMaxValue.setText(String.format("%02x", largetst));
-		txtMinValue.setText(String.format("%02x", smallest));
+		txtMaxValue.setText(String.format("%02X", largetst));
+		txtMinValue.setText(String.format("%02X", smallest));
 
 	}
 }

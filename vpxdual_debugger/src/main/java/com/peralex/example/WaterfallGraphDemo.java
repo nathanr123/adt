@@ -30,9 +30,9 @@ public class WaterfallGraphDemo extends javax.swing.JPanel {
 		lineGraph = new IntensityWaterfallGraph();
 		lineGraph.setGridXMinMax(0, 1024);
 		lineGraph.setThresholdLimits(0, 255);
-		lineGraph.setThresholdValues(0, 240);
-		lineGraph.setGridVisible(false);
-		lineGraph.setZoomEnabled(false);
+		lineGraph.setThresholdValues(10, 200);
+		lineGraph.setGridVisible(true);
+		lineGraph.setZoomEnabled(true);
 
 		graphWrapper = new com.peralex.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
 		graphWrapper.replaceYAxis(lineGraph.getWaterfallIntensityAxis());
