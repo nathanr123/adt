@@ -181,8 +181,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//setMemory();
-				
+				// setMemory();
+
 				getWaterFall();
 			}
 		});
@@ -214,9 +214,9 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		}
 
 	}
-	
-	public void getWaterFall(){
-		
+
+	public void getWaterFall() {
+
 		DatagramSocket datagramSocket;
 
 		try {
@@ -235,7 +235,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			msg.msgID.set(ATP.MSG_ID_GET);
 
 			msg.msgType.set(ATP.MSG_TYPE_WATERFALL);
-			
+
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
 					VPXUDPListener.COMM_PORTNO);
 
@@ -247,7 +247,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void setMemory() {
@@ -422,6 +422,49 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		}
 
+	}
+
+	public void boot(String ip) {
+
+		DatagramSocket datagramSocket;
+
+		ATPCommand msg = null;
+
+		byte[] buffer = null;
+
+		ByteBuffer bf = null;
+
+		try {
+
+			datagramSocket = new DatagramSocket();
+
+			msg = new P2020ATPCommand();
+
+			buffer = new byte[msg.size()];
+
+			bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_BOOT);
+
+			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NAND);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			datagramSocket.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
 	}
 
 	public void setPeriodicityByBradcast(int period) {
@@ -1106,27 +1149,31 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	@Override
 	public void readPlot(MemoryViewFilter filter1, MemoryViewFilter filter2) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void readWaterfall(String ip) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void populateWaterfall(String ip,byte[] bytes) {
+	public void populateWaterfall(String ip, byte[] bytes) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	
+	@Override
+	public void sendWaterfallInterrupt(String ip) {
+		// TODO Auto-generated method stub
+
+	}
 
 }

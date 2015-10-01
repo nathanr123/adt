@@ -214,13 +214,15 @@ public class VPXConstants {
 
 		public static final String ICON_CONFIG_NAME = "config.png";
 
-		public static final String ICON_DETAIL_NAME = "detail1.png";
+		public static final String ICON_DETAIL_NAME = "properties.gif";
 
 		public static final String ICON_REFRESH_NAME = "refresh.png";
 
 		public static final String ICON_MEMORY_NAME = "memory2.gif";
 
 		public static final String ICON_MAD_NAME = "mad.png";
+		
+		public static final String ICON_MAD_WIZARD_NAME = "config_wiz.gif";
 
 		public static final String ICON_PLOT_NAME = "plot.png";
 
@@ -303,6 +305,8 @@ public class VPXConstants {
 		public static final ImageIcon ICON_MEMORY = VPXUtilities.getImageIcon(ICON_MEMORY_NAME, 14, 14);
 
 		public static final ImageIcon ICON_MAD = VPXUtilities.getImageIcon(ICON_MAD_NAME, 14, 14);
+		
+		public static final ImageIcon ICON_MAD_WIZARD = VPXUtilities.getImageIcon(ICON_MAD_WIZARD_NAME, 14, 14);
 
 		public static final ImageIcon ICON_PLOT = VPXUtilities.getImageIcon(ICON_PLOT_NAME, 14, 14);
 

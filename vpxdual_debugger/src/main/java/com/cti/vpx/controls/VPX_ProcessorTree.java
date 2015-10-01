@@ -1467,7 +1467,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			} else {
 
-				vpx_contextMenu.add(vpx_Cxt_Swap);
+			//	vpx_contextMenu.add(vpx_Cxt_Swap);
 
 			}
 			// To Do

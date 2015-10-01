@@ -1555,6 +1555,39 @@ public class VPXUDPMonitor {
 
 	}
 
+	public void setWaterfallInterrupted(String ip) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_WATERFALL_INTERRUPTED);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
 	public void populateWaterfallData(String ip, ATPCommand msg) {
 
 		byte[] b = new byte[msg.params.memoryinfo.buffer.length];

@@ -7,10 +7,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.cti.vpx.view.VPX_ETHWindow;
 import com.peralex.example.WaterfallGraphDemo;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class VPX_WaterfallWindow extends JFrame {
+public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	/**
 	 * 
@@ -40,6 +43,10 @@ public class VPX_WaterfallWindow extends JFrame {
 
 	private WaterfallGraphDemo newWaterfallGraph = new WaterfallGraphDemo();
 
+	private VPX_ETHWindow parent;
+
+	private String currentip;
+
 	/**
 	 * Launch the application.
 	 */
@@ -47,7 +54,7 @@ public class VPX_WaterfallWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VPX_WaterfallWindow frame = new VPX_WaterfallWindow();
+					VPX_WaterfallWindow frame = new VPX_WaterfallWindow(null);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -59,7 +66,9 @@ public class VPX_WaterfallWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VPX_WaterfallWindow() {
+	public VPX_WaterfallWindow(VPX_ETHWindow parnt) {
+
+		this.parent = parnt;
 
 		init();
 
@@ -76,14 +85,14 @@ public class VPX_WaterfallWindow extends JFrame {
 
 						Thread.sleep(100);
 					} catch (Exception e) {
-						// TODO: handle exception
+						
 					}
 				}
 
 			}
 		});
 
-		 th.start();
+		// th.start();
 	}
 
 	Random random = new Random();
@@ -120,8 +129,6 @@ public class VPX_WaterfallWindow extends JFrame {
 		for (int i = 0; i < floatArray.length; i++) {
 
 			floatArray[i] = (float) (bytes[i] & 0x0ff) / 100;
-
-			// System.out.println(floatArray[i]);
 		}
 
 		return floatArray;
@@ -154,6 +161,8 @@ public class VPX_WaterfallWindow extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		setBounds(100, 100, 820, 597);
+
+		addWindowListener(this);
 
 		contentPane = new JPanel();
 
@@ -260,6 +269,8 @@ public class VPX_WaterfallWindow extends JFrame {
 
 	public void showWaterFall(String ip) {
 
+		this.currentip = ip;
+
 		setTitle("Waterfall Graph - " + ip);
 
 		txtProcessor.setText(ip);
@@ -291,7 +302,51 @@ public class VPX_WaterfallWindow extends JFrame {
 		}
 
 		txtMaxValue.setText(String.format("%02X", largetst));
+		
 		txtMinValue.setText(String.format("%02X", smallest));
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+
+		parent.sendWaterfallInterrupt(currentip);
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 }

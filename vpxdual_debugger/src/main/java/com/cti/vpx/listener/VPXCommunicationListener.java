@@ -29,4 +29,6 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 	public void readWaterfall(String ip);
 
 	public void populateWaterfall(String ip,byte[] bytes);
+	
+	public void sendWaterfallInterrupt(String ip);
 }

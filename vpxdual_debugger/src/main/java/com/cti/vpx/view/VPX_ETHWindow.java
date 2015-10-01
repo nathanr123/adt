@@ -53,6 +53,7 @@ import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorTree;
+import com.cti.vpx.controls.VPX_StartupPanel;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
@@ -183,7 +184,7 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
 
-	private VPX_WaterfallWindow waterfallWindow = new VPX_WaterfallWindow();
+	private VPX_WaterfallWindow waterfallWindow = new VPX_WaterfallWindow(this);
 
 	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
@@ -589,7 +590,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Window_FlashWizard = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Wizard"),
-				VPXConstants.Icons.ICON_MAD);
+				VPXConstants.Icons.ICON_MAD_WIZARD);
 
 		vpx_Menu_Window_FlashWizard.addActionListener(new ActionListener() {
 
@@ -1129,6 +1130,9 @@ public class VPX_ETHWindow extends JFrame
 		contentPanel.add(messagePanel, BorderLayout.EAST);
 
 		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
+
+		// vpx_Content_Tabbed_Pane_Right.addTab("Startup", new
+		// VPX_StartupPanel());
 
 		contentPanel.add(vpx_Content_Tabbed_Pane_Right);
 
@@ -2017,6 +2021,13 @@ public class VPX_ETHWindow extends JFrame
 
 			waterfallWindow.showWaterFall(ip);
 		}
+
+	}
+
+	@Override
+	public void sendWaterfallInterrupt(String ip) {
+
+		udpMonitor.setWaterfallInterrupted(ip);
 
 	}
 
