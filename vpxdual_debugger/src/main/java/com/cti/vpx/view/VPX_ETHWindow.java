@@ -3,6 +3,7 @@ package com.cti.vpx.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,11 +33,13 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
+import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
 import com.cti.vpx.controls.VPX_ChangePeriodicityWindow;
@@ -53,6 +56,7 @@ import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorTree;
+import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
@@ -154,6 +158,10 @@ public class VPX_ETHWindow extends JFrame
 
 	private JMenuItem vpx_Menu_Tools_ShowView_Log;
 
+	private JMenu vpx_Menu_Tools_ShowView_Mode;
+
+	private JMenuItem vpx_Menu_Tools_ShowView_Mode_UART;
+
 	// Help Menu Items
 	private JMenuItem vpx_Menu_Help_Help;
 
@@ -228,8 +236,6 @@ public class VPX_ETHWindow extends JFrame
 
 		init();
 
-		promptAliasConfigFileName();
-
 		subnetFilter = new VPX_SubnetFilterWindow(VPX_ETHWindow.this);
 
 		udpMonitor = new VPXUDPMonitor();
@@ -241,8 +247,20 @@ public class VPX_ETHWindow extends JFrame
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_NONE);
-		
+
 		setVisible(true);
+
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					promptAliasConfigFileName();
+
+				} catch (Exception e) {
+
+				}
+			}
+		});
+
 	}
 
 	private void init() {
@@ -737,6 +755,23 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
+		vpx_Menu_Tools_ShowView_Mode = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Tools.ShowView.Mode"));
+
+		vpx_Menu_Tools_ShowView_Mode_UART = VPXComponentFactory
+				.createJMenuItem(rBundle.getString("Menu.Tools.ShowView.Mode.UART"), VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Menu_Tools_ShowView_Mode_UART.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showAppMode();
+
+			}
+		});
+
+		vpx_Menu_Tools_ShowView_Mode.add(vpx_Menu_Tools_ShowView_Mode_UART);
+
 		// Help Menus
 		vpx_Menu_Help_Help = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Help"),
 				VPXConstants.Icons.ICON_HELP);
@@ -873,6 +908,10 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Menu_Tools_ShowView.add(vpx_Menu_Tools_ShowView_Console);
 
 		vpx_Menu_Tools_ShowView.add(vpx_Menu_Tools_ShowView_Log);
+
+		vpx_Menu_Tools_ShowView.add(VPXComponentFactory.createJSeparator());
+
+		vpx_Menu_Tools_ShowView.add(vpx_Menu_Tools_ShowView_Mode);
 
 		vpx_Menu_Tool.add(vpx_Menu_Tools_ShowView);
 
@@ -1814,6 +1853,17 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Content_Tabbed_Pane_Message.setSelectedIndex(0);
 	}
 
+	public void showAppMode() {
+
+		this.dispose();
+
+		VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),
+				VPXUtilities.getSerialPorts());
+
+		window.showWindow();
+
+	}
+
 	public void showHelp() {
 
 		Thread th = new Thread(new Runnable() {
@@ -2147,8 +2197,7 @@ public class VPX_ETHWindow extends JFrame
 
 			init();
 
-			loadComponents();		
-			
+			loadComponents();
 
 		}
 

@@ -189,7 +189,7 @@ public class VPX_UARTWindow extends JFrame {
 
 		vpx_UART_Menu_File_Exit = VPXComponentFactory.createJMenuItem("Exit");
 
-		vpx_UART_Menu_Window_ChangeMode = VPXComponentFactory.createJMenuItem("Change Mode");
+		vpx_UART_Menu_Window_ChangeMode = VPXComponentFactory.createJMenuItem("Ethernet Mode");
 
 		vpx_UART_Menu_Help_About = VPXComponentFactory.createJMenuItem("About");
 
