@@ -74,24 +74,6 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 	private JButton btnSave;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					VPX_AliasConfigWindow frame = new VPX_AliasConfigWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	public VPX_AliasConfigWindow() {
@@ -125,7 +107,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		setTitle("Alias Configuration");
 
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_CONFIG.getImage());
 
 		setResizable(false);
 
@@ -436,19 +418,19 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 	private void loadSubsystemAddable(String p2020IP, String dsp1IP, String dsp2IP) {
 
 		txtAliasName.setText("");
-		
+
 		txtAliasName.setEditable(true);
 
 		txtP2020.setText(p2020IP);
-		
+
 		txtP2020.setEditable(false);
 
 		txtDSP1.setText(dsp1IP);
-		
+
 		txtDSP1.setEditable(false);
 
 		txtDSP2.setText(dsp2IP);
-		
+
 		txtDSP2.setEditable(false);
 
 		btnAdd.setEnabled(true);

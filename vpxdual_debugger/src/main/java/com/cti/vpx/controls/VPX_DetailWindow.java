@@ -87,7 +87,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		setAlwaysOnTop(true);
 
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_DETAIL.getImage());
 
 		addWindowListener(this);
 

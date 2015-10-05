@@ -24,6 +24,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -34,6 +35,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
+import com.cti.vpx.command.ATP;
+import com.cti.vpx.controls.graph.VPX_MultipleLine;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -237,6 +240,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	private void init() {
 
 		setTitle("Memory Plot " + memoryPlotID);
+
+		setIconImage(VPXConstants.Icons.ICON_PLOT.getImage());
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -1832,99 +1837,54 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private void doPlotMemory() {
 
-		// boolean isSelectedProcessorValid = isSelectedProcessorValid();
+		if (isPlot1Valid() && isPlot2Valid()) {
 
-		// boolean isSelectedCoreValid = isSelectedCoreValid();
-
-		// boolean isAddressValid = isAddressValid();
-
-		// boolean isLengthValid = isLengthValid();
-
-		// if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid
-		// && isLengthValid) {
-
-		if (chkPlot1.isSelected() && chkPlot2.isSelected()) {
-
-			createPlot1Filters();
-
-			createPlot2Filters();
-
-			isPlot1Chkd = true;
-
-			isPlot2Chkd = true;
-
-		} else {
-
-			if (chkPlot1.isSelected()) {
+			if (chkPlot1.isSelected() && chkPlot2.isSelected()) {
 
 				createPlot1Filters();
 
-				isPlot1Chkd = true;
-
-				isPlot2Chkd = false;
-
-			} else if (chkPlot2.isSelected()) {
-
 				createPlot2Filters();
 
-				isPlot1Chkd = false;
+				isPlot1Chkd = true;
 
 				isPlot2Chkd = true;
 
+			} else {
+
+				if (chkPlot1.isSelected()) {
+
+					createPlot1Filters();
+
+					isPlot1Chkd = true;
+
+					isPlot2Chkd = false;
+
+				} else if (chkPlot2.isSelected()) {
+
+					createPlot2Filters();
+
+					isPlot1Chkd = false;
+
+					isPlot2Chkd = true;
+
+				}
 			}
-		}
-		multiLine.clearAll();
+			multiLine.clearAll();
 
-		readMemory();
+			readMemory();
 
-		// Thread th = new Thread(new Runnable() {
+			if (chkPlot1AutoRefresh.isSelected()) {
 
-		// @Override
-		// public void run() {
+				currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * MINUTE;
 
-		// showLoadProcessingWindow("Memory loading...");
+				isAutoRefresh = true;
 
-		// }
-		// });
+				startAutoRefreshThread();
 
-		// th.start();
-		/*
-		 * } else { if (!isSelectedProcessorValid) {
-		 * 
-		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
-		 * "Please select processor", "Validation", JOptionPane.ERROR_MESSAGE);
-		 * 
-		 * } else if (!isSelectedCoreValid) {
-		 * 
-		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
-		 * "Please select core", "Validation", JOptionPane.ERROR_MESSAGE);
-		 * 
-		 * } else if (!isAddressValid) {
-		 * 
-		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
-		 * "Addres is invalid.\nEnter valid address!.", "Validation",
-		 * JOptionPane.ERROR_MESSAGE);
-		 * 
-		 * } else if (!isLengthValid) {
-		 * 
-		 * JOptionPane.showMessageDialog(VPX_MemoryBrowserWindow.this,
-		 * "Length is invalid.\nEnter valid length( between 1 to " +
-		 * (ATP.DEFAULTBUFFERSIZE * 10) + " )!.", "Validation",
-		 * JOptionPane.ERROR_MESSAGE);
-		 * 
-		 * } }
-		 */
-		if (chkPlot1AutoRefresh.isSelected()) {
+			} else {
 
-			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * MINUTE;
-
-			isAutoRefresh = true;
-
-			startAutoRefreshThread();
-
-		} else {
-
-			isAutoRefresh = false;
+				isAutoRefresh = false;
+			}
 		}
 
 	}
@@ -1962,5 +1922,318 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			autoRefreshThread.start();
 		}
 
+	}
+	// Validation
+
+	private boolean isPlot1Valid() {
+
+		boolean retValue = true;
+
+		if (chkPlot1.isSelected()) {
+
+			boolean isSelectedProcessorValid = isValidIndex(cmbPlot1Processor.getSelectedIndex());
+
+			boolean isSelectedCoreValid = isValidIndex(cmbPlot1Cores.getSelectedIndex());
+
+			boolean isAddressValid = isAddressValid(txtPlot1MemoryAddres.getText().trim(),
+					cmbPlot1Cores.getSelectedIndex());
+
+			boolean isLengthValid = isLengthValid(txtPlot1MemoryLength.getText().trim());
+
+			if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid && isLengthValid) {
+
+				retValue = true;
+
+			} else {
+				if (!isSelectedProcessorValid) {
+
+					JOptionPane.showMessageDialog(VPX_MemoryPlotWindow.this, "Please select processor for Plot-1",
+							"Validation", JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				} else if (!isSelectedCoreValid) {
+
+					JOptionPane.showMessageDialog(VPX_MemoryPlotWindow.this, "Please select core for Plot-1",
+							"Validation", JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				} else if (!isAddressValid) {
+
+					JOptionPane.showMessageDialog(VPX_MemoryPlotWindow.this,
+							"Plot-1 " + getAddressErrorMessage(cmbPlot1Cores.getSelectedIndex()), "Validation",
+							JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				} else if (!isLengthValid) {
+
+					JOptionPane
+							.showMessageDialog(VPX_MemoryPlotWindow.this,
+									"Plot-1 Length is invalid.\nEnter valid length( between 1 to "
+											+ (ATP.DEFAULTBUFFERSIZE * 10) + " )!.",
+									"Validation", JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				}
+			}
+
+		}
+
+		return retValue;
+	}
+
+	private boolean isPlot2Valid() {
+
+		boolean retValue = true;
+
+		if (chkPlot2.isSelected()) {
+
+			boolean isSelectedProcessorValid = isValidIndex(cmbPlot2Processor.getSelectedIndex());
+
+			boolean isSelectedCoreValid = isValidIndex(cmbPlot2Cores.getSelectedIndex());
+
+			boolean isAddressValid = isAddressValid(txtPlot2MemoryAddres.getText().trim(),
+					cmbPlot2Cores.getSelectedIndex());
+
+			boolean isLengthValid = isLengthValid(txtPlot2MemoryLength.getText().trim());
+
+			if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid && isLengthValid) {
+
+				retValue = true;
+
+			} else {
+				if (!isSelectedProcessorValid) {
+
+					JOptionPane.showMessageDialog(VPX_MemoryPlotWindow.this, "Please select processor for Plot-2",
+							"Validation", JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				} else if (!isSelectedCoreValid) {
+
+					JOptionPane.showMessageDialog(VPX_MemoryPlotWindow.this, "Please select core for Plot-2",
+							"Validation", JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				} else if (!isAddressValid) {
+
+					JOptionPane.showMessageDialog(VPX_MemoryPlotWindow.this,
+							"Plot-2 " + getAddressErrorMessage(cmbPlot2Cores.getSelectedIndex()), "Validation",
+							JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				} else if (!isLengthValid) {
+
+					JOptionPane
+							.showMessageDialog(VPX_MemoryPlotWindow.this,
+									"Plot-2 Length is invalid.\nEnter valid length( between 1 to "
+											+ (ATP.DEFAULTBUFFERSIZE * 10) + " )!.",
+									"Validation", JOptionPane.ERROR_MESSAGE);
+
+					return false;
+
+				}
+			}
+
+		}
+
+		return retValue;
+	}
+
+	private String getAddressErrorMessage(int index) {
+
+		String ret = "";
+
+		if (index > 0) {
+
+			switch (index - 1) {
+
+			case 0:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE0_DDR3_START_ADDRESS, ATP.CORE0_DDR3_END_ADDRESS,
+						ATP.C0_L2SRAM_START_ADDRESS, ATP.C0_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 1:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE1_DDR3_START_ADDRESS, ATP.CORE1_DDR3_END_ADDRESS,
+						ATP.C1_L2SRAM_START_ADDRESS, ATP.C1_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 2:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE2_DDR3_START_ADDRESS, ATP.CORE2_DDR3_END_ADDRESS,
+						ATP.C2_L2SRAM_START_ADDRESS, ATP.C2_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 3:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE3_DDR3_START_ADDRESS, ATP.CORE3_DDR3_END_ADDRESS,
+						ATP.C3_L2SRAM_START_ADDRESS, ATP.C3_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 4:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE4_DDR3_START_ADDRESS, ATP.CORE4_DDR3_END_ADDRESS,
+						ATP.C4_L2SRAM_START_ADDRESS, ATP.C4_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 5:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE5_DDR3_START_ADDRESS, ATP.CORE5_DDR3_END_ADDRESS,
+						ATP.C5_L2SRAM_START_ADDRESS, ATP.C5_L2SRAM_END_ADDRESS);
+
+				break;
+
+			case 6:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE6_DDR3_START_ADDRESS, ATP.CORE6_DDR3_END_ADDRESS,
+						ATP.C6_L2SRAM_START_ADDRESS, ATP.C6_L2SRAM_END_ADDRESS);
+				break;
+
+			case 7:
+
+				ret = String.format(
+						"Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )",
+						(index - 1), ATP.CORE7_DDR3_START_ADDRESS, ATP.CORE7_DDR3_END_ADDRESS,
+						ATP.C7_L2SRAM_START_ADDRESS, ATP.C7_L2SRAM_END_ADDRESS);
+
+				break;
+
+			}
+
+		}
+
+		return ret;
+	}
+
+	private boolean isValidIndex(int index) {
+
+		return index > 0;
+	}
+
+	private boolean isLengthValid(String length) {
+
+		boolean retval = false;
+
+		try {
+
+			int val = Integer.valueOf(length.trim());
+
+			if (val > 0 && val <= (ATP.DEFAULTBUFFERSIZE * 10)) {
+
+				retval = true;
+
+			}
+
+		} catch (Exception e) {
+			retval = false;
+		}
+
+		return retval;
+	}
+
+	private boolean isAddressValid(String addr, int coreIDX) {
+
+		boolean retValue = true;
+
+		long address = VPXUtilities.getValue(addr.trim());
+
+		if (address == -1 || coreIDX == 0)
+			return false;
+
+		int core = coreIDX - 1;
+
+		if (core == 0) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE0_DDR3_START_ADDRESS, ATP.CORE0_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C0_L2SRAM_START_ADDRESS, ATP.C0_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 1) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE1_DDR3_START_ADDRESS, ATP.CORE1_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C1_L2SRAM_START_ADDRESS, ATP.C1_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 2) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE2_DDR3_START_ADDRESS, ATP.CORE2_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C2_L2SRAM_START_ADDRESS, ATP.C2_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 3) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE3_DDR3_START_ADDRESS, ATP.CORE3_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C3_L2SRAM_START_ADDRESS, ATP.C3_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 4) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE4_DDR3_START_ADDRESS, ATP.CORE4_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C4_L2SRAM_START_ADDRESS, ATP.C4_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 5) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE5_DDR3_START_ADDRESS, ATP.CORE5_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C5_L2SRAM_START_ADDRESS, ATP.C5_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 6) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE6_DDR3_START_ADDRESS, ATP.CORE6_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C6_L2SRAM_START_ADDRESS, ATP.C6_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		} else if (core == 7) {
+
+			if (!VPXUtilities.isBetween(address, ATP.CORE7_DDR3_START_ADDRESS, ATP.CORE7_DDR3_END_ADDRESS)
+					&& !VPXUtilities.isBetween(address, ATP.C7_L2SRAM_START_ADDRESS, ATP.C7_L2SRAM_END_ADDRESS)) {
+
+				retValue = false;
+			}
+
+		}
+
+		return retValue;
 	}
 }

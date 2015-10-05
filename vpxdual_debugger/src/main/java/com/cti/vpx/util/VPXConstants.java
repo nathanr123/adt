@@ -221,7 +221,7 @@ public class VPXConstants {
 		public static final String ICON_MEMORY_NAME = "memory2.gif";
 
 		public static final String ICON_MAD_NAME = "mad.png";
-		
+
 		public static final String ICON_MAD_WIZARD_NAME = "config_wiz.gif";
 
 		public static final String ICON_PLOT_NAME = "plot.png";
@@ -251,6 +251,10 @@ public class VPXConstants {
 		public static final String ICON_HELP_NAME = "help.png";
 
 		public static final String ICON_ABOUT_NAME = "detail.png";
+
+		public static final String ICON_WATERFALL_NAME = "waterfall.png";
+
+		public static final String ICON_AMPLITUDE_NAME = "amplitude.png";
 
 		// Icons
 
@@ -305,7 +309,7 @@ public class VPXConstants {
 		public static final ImageIcon ICON_MEMORY = VPXUtilities.getImageIcon(ICON_MEMORY_NAME, 14, 14);
 
 		public static final ImageIcon ICON_MAD = VPXUtilities.getImageIcon(ICON_MAD_NAME, 14, 14);
-		
+
 		public static final ImageIcon ICON_MAD_WIZARD = VPXUtilities.getImageIcon(ICON_MAD_WIZARD_NAME, 14, 14);
 
 		public static final ImageIcon ICON_PLOT = VPXUtilities.getImageIcon(ICON_PLOT_NAME, 14, 14);
@@ -327,6 +331,10 @@ public class VPXConstants {
 		public static final ImageIcon ICON_DETACH = VPXUtilities.getImageIcon(ICON_DETACH_NAME, 14, 14);
 
 		public static final ImageIcon IMAGE_BG = VPXUtilities.getImageIcon(IMAGE_BG_NAME, 596, 596);
+
+		public static final ImageIcon ICON_WATERFALL = VPXUtilities.getImageIcon(ICON_WATERFALL_NAME, 14, 14);
+
+		public static final ImageIcon ICON_AMPLITUDE = VPXUtilities.getImageIcon(ICON_AMPLITUDE_NAME, 596, 596);
 
 	}
 

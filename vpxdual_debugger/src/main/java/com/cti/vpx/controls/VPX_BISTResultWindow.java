@@ -171,7 +171,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		setTitle("Buil In Self Test");
 
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_BIST.getImage());
 
 		setBounds(100, 100, 900, 600);
 

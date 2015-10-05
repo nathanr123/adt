@@ -656,35 +656,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	}
 
-	public class ScanAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 477649130981302914L;
-
-		public ScanAction(String name) {
-
-			putValue(NAME, name);
-
-		}
-
-		public ScanAction(ImageIcon icon) {
-
-			super("", icon);
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			VPX_ScanWindow ir = new VPX_ScanWindow();
-
-			ir.setVisible(true);
-
-		}
-	}
-
 	private class VPX_ProcessorTreeCellRenderer extends DefaultTreeCellRenderer {
 		/**
 		 * 

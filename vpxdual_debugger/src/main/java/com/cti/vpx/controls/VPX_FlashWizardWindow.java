@@ -178,7 +178,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		setTitle("Flash Wizard");
 
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_MAD_WIZARD.getImage());
 
 		setResizable(false);
 

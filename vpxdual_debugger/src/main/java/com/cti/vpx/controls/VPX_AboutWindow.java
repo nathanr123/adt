@@ -33,20 +33,6 @@ public class VPX_AboutWindow extends JDialog {
 	private ResourceBundle rBundle;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			VPX_AboutWindow dialog = new VPX_AboutWindow();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.showDialog();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Create the dialog.
 	 */
 	public VPX_AboutWindow() {
@@ -67,7 +53,7 @@ public class VPX_AboutWindow extends JDialog {
 
 		setBounds(100, 100, 383, 206);
 
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_ABOUT.getImage());
 
 		setModal(true);
 

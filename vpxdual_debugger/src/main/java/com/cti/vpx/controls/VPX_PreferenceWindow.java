@@ -121,7 +121,7 @@ public class VPX_PreferenceWindow extends JDialog {
 
 		setResizable(false);
 		
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_SETTINGS.getImage());
 
 		fileDialog.setAcceptAllFileFilterUsed(false);
 	}

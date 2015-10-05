@@ -3,7 +3,6 @@ package com.cti.vpx.controls.hex;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -127,22 +126,6 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JDialog dialog;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VPX_MemoryBrowserWindow frame = new VPX_MemoryBrowserWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	public VPX_MemoryBrowserWindow() {
@@ -175,6 +158,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private void init() {
 
 		setTitle("Memory Browser " + (memoryBrowserID + 1));
+
+		setIconImage(VPXConstants.Icons.ICON_MEMORY.getImage());
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -1194,7 +1179,6 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -1215,25 +1199,21 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 

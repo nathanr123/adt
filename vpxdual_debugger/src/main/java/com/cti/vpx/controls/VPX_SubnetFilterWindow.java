@@ -54,7 +54,7 @@ public class VPX_SubnetFilterWindow extends JDialog {
 
 		setResizable(false);
 
-		setIconImage(VPXUtilities.getAppIcon());
+		setIconImage(VPXConstants.Icons.ICON_FILTER.getImage());
 
 		setTitle("Subnet Filter");
 

@@ -61,7 +61,6 @@ import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
-import com.cti.vpx.controls.VPX_EmptyIcon;
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
@@ -407,6 +406,11 @@ public class VPXUtilities {
 	public static ImageIcon getImageIcon(String path, int w, int h) {
 
 		return new ImageIcon(getImage(path).getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
+	}
+
+	public static ImageIcon getImageIcon(String path) {
+
+		return new ImageIcon(getImage(path).getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH));
 	}
 
 	private static Image getImage(String name) {
