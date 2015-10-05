@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -779,36 +780,51 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private void saveLogtoFile() {
 
+		JFileChooser chooser;
+
 		try {
 
-			String path = System.getProperty("user.home") + "\\Messages."
-					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".txt";
+			chooser = new JFileChooser();
+			
+			chooser.setCurrentDirectory(new java.io.File("."));
 
-			FileWriter fw = new FileWriter(new File(path), true);
+			chooser.setDialogTitle("Select folder to save");
 
-			fw.write("User Messages\n");
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			
+			if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 
-			fw.write("_______________________________\n");
+				String path = chooser.getSelectedFile().getPath() + "\\Messages."
+						+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
+						+ ".txt";
 
-			fw.write("\n");
+				FileWriter fw = new FileWriter(new File(path), true);
 
-			fw.write(txtP_User_Msg_Display.getText());
+				fw.write("User Messages\n");
 
-			fw.write("\n");
+				fw.write("_______________________________\n");
 
-			fw.write("Processor Messages\n");
+				fw.write("\n");
 
-			fw.write("_______________________________\n");
+				fw.write(txtP_User_Msg_Display.getText());
 
-			fw.write("\n");
+				fw.write("\n");
 
-			fw.write(txtP_Proc_Msg_Display.getText());
+				fw.write("Processor Messages\n");
 
-			fw.write("\n");
+				fw.write("_______________________________\n");
 
-			fw.close();
+				fw.write("\n");
 
-			VPXUtilities.showPopup("File Saved at " + path);
+				fw.write(txtP_Proc_Msg_Display.getText());
+
+				fw.write("\n");
+
+				fw.close();
+
+				VPXUtilities.showPopup("File Saved at " + path,path);
+			}
 
 		} catch (Exception e) {
 
@@ -972,10 +988,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 						} else {
 
 							if (cmbCores.getSelectedIndex() > 0) {
-								
+
 								parent.sendMessage(VPXSessionManager.getCurrentProcessor(),
 										cmbCores.getSelectedIndex() - 1, txt_Msg_Send.getText());
-								
+
 								updateUserMessage(txt_Msg_Send.getText());
 
 								txt_Msg_Send.setText("");

@@ -3,13 +3,17 @@
  */
 package com.cti.vpx.util;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,8 +46,10 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 import javax.xml.bind.JAXBContext;
@@ -355,6 +361,112 @@ public class VPXUtilities {
 		// start timer to close JDialog as dialog modal we must start the timer
 		// before its visible
 		timer.start();
+
+		Dimension windowSize = dialog.getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		dialog.setLocation(dx, dy);
+
+		dialog.setVisible(true);
+	}
+
+	public static void showPopup(String msg, String file) {
+
+		JPanel centerPanel = new JPanel(new BorderLayout());
+
+		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+		final JButton btnOpen;
+
+		final JButton btnOpenFolder;
+
+		final JButton btnClose;
+
+		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION,
+				null, new Object[] {}, null);
+
+		final JDialog dialog = new JDialog();
+
+		dialog.setTitle("Message");
+
+		dialog.setModal(true);
+
+		dialog.setUndecorated(true);
+
+		dialog.setLayout(new BorderLayout());
+
+		centerPanel.setBorder(new LineBorder(Color.GRAY));
+
+		btnOpen = new JButton("Open");
+
+		btnOpen.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.openFile(file);
+
+				dialog.dispose();
+
+			}
+		});
+
+		btnOpenFolder = new JButton("Open Folder");
+
+		btnOpenFolder.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				try {
+
+					Desktop.getDesktop().open(new File(file.substring(0, file.lastIndexOf("\\"))));
+
+				} catch (IOException ee) {
+
+				}
+
+				dialog.dispose();
+
+			}
+		});
+
+		btnClose = new JButton("Close");
+
+		btnClose.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				dialog.dispose();
+
+			}
+		});
+
+		buttonsPanel.add(btnOpen);
+
+		buttonsPanel.add(btnOpenFolder);
+
+		buttonsPanel.add(btnClose);
+
+		centerPanel.add(optionPane, BorderLayout.CENTER);
+
+		centerPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+		dialog.setContentPane(centerPanel);
+
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+		dialog.setAlwaysOnTop(true);
+
+		dialog.setSize(new Dimension(450, 100));
 
 		Dimension windowSize = dialog.getSize();
 

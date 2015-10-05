@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -125,19 +126,6 @@ public class VPX_BISTResultWindow extends JDialog {
 	private VPX_TestProgressWindow progress;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			VPX_BISTResultWindow dialog = new VPX_BISTResultWindow(new BIST());
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Create the dialog.
 	 */
 	public VPX_BISTResultWindow() {
@@ -221,8 +209,8 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		testDetailPanel.setBackground(Color.WHITE);
 
-		testDetailPanel.setBorder(new TitledBorder(null, "Test Detail", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
+		testDetailPanel
+				.setBorder(new TitledBorder(null, "Test Detail", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		detailPanel.add(testDetailPanel);
 
@@ -347,8 +335,8 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		resultDetailPanel.setBackground(Color.WHITE);
 
-		resultDetailPanel.setBorder(new TitledBorder(null, "Result Tetail", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
+		resultDetailPanel
+				.setBorder(new TitledBorder(null, "Result Tetail", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		detailPanel.add(resultDetailPanel);
 
@@ -489,8 +477,8 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		p2020TestResultPanel.setBackground(Color.WHITE);
 
-		p2020TestResultPanel.setBorder(new TitledBorder(null, "P2020 Test Result", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		p2020TestResultPanel.setBorder(
+				new TitledBorder(null, "P2020 Test Result", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		resultPanel.add(p2020TestResultPanel, BorderLayout.CENTER);
 
@@ -727,8 +715,8 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp1TestResultPanel.setBackground(Color.WHITE);
 
-		dsp1TestResultPanel.setBorder(new TitledBorder(null, "DSP 1 Test Result", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		dsp1TestResultPanel.setBorder(
+				new TitledBorder(null, "DSP 1 Test Result", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		dspTestResultBasePanel.add(dsp1TestResultPanel);
 
 		dsp1TestResultPanel.setLayout(new GridLayout(0, 2, 0, 0));
@@ -797,8 +785,8 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		dsp2TestResultPanel.setBackground(Color.WHITE);
 
-		dsp2TestResultPanel.setBorder(new TitledBorder(null, "DSP 2 Test Result", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		dsp2TestResultPanel.setBorder(
+				new TitledBorder(null, "DSP 2 Test Result", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		dspTestResultBasePanel.add(dsp2TestResultPanel);
 
@@ -1057,139 +1045,155 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		PrintWriter writer;
 
+		JFileChooser chooser;
+
 		try {
 
-			String fileName = String.format("%s\\%s_%s_%s.txt", System.getProperty("user.home"), testResult.getTest()
-					.replaceAll(" ", "_"), testResult.getTestSubSystem(), VPXUtilities.getCurrentTime(3));
+			chooser = new JFileChooser();
 
-			writer = new PrintWriter(fileName, "UTF-8");
+			chooser.setCurrentDirectory(new java.io.File("."));
 
-			writer.println("---------------------------------------");
+			chooser.setDialogTitle("Select folder to save");
 
-			writer.println("Test Detail");
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-			writer.println("---------------------------------------");
+			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 
-			writer.println(String.format("Test : %s", testResult.getTest()));
+				String fileName = String.format("%s\\%s_%s_%s.txt", chooser.getSelectedFile().getPath(),
+						testResult.getTest().replaceAll(" ", "_"), testResult.getTestSubSystem(),
+						VPXUtilities.getCurrentTime(3));
 
-			writer.println(String.format("Test Type : %s", testResult.getTestType()));
+				writer = new PrintWriter(fileName, "UTF-8");
 
-			writer.println(String.format("Sub System : %s", testResult.getTestSubSystem()));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("P2020 IP : %s", testResult.getTestP2020IP()));
+				writer.println("Test Detail");
 
-			writer.println(String.format("DSP 1 IP : %s", testResult.getTestDSP1IP()));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("DSP 2 IP : %s", testResult.getTestDSP2IP()));
+				writer.println(String.format("Test : %s", testResult.getTest()));
 
-			writer.println(String.format("Test Date : %s", testResult.getTestDate()));
+				writer.println(String.format("Test Type : %s", testResult.getTestType()));
 
-			writer.println(String.format("Test Time : %s", testResult.getTestTime()));
+				writer.println(String.format("Sub System : %s", testResult.getTestSubSystem()));
 
-			writer.println("");
+				writer.println(String.format("P2020 IP : %s", testResult.getTestP2020IP()));
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("DSP 1 IP : %s", testResult.getTestDSP1IP()));
 
-			writer.println("P2020 Test Result Detail");
+				writer.println(String.format("DSP 2 IP : %s", testResult.getTestDSP2IP()));
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("Test Date : %s", testResult.getTestDate()));
 
-			writer.println("");
+				writer.println(String.format("Test Time : %s", testResult.getTestTime()));
 
-			writer.println(String.format("Processor : %s", getAsPlainText(testResult.getResultP2020Processor())));
+				writer.println("");
 
-			writer.println(String.format("DDR3 : %s", getAsPlainText(testResult.getResultP2020DDR3())));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("NOR Flash : %s", getAsPlainText(testResult.getResultP2020NORFlash())));
+				writer.println("P2020 Test Result Detail");
 
-			writer.println(String.format("Ethernet : %s", getAsPlainText(testResult.getResultP2020Ethernet())));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("PCIe : %s", getAsPlainText(testResult.getResultP2020PCIe())));
+				writer.println("");
 
-			writer.println(String.format("SRIO : %s", getAsPlainText(testResult.getResultP2020SRIO())));
+				writer.println(String.format("Processor : %s", getAsPlainText(testResult.getResultP2020Processor())));
 
-			writer.println(String.format("Local Temp : %s", getAsPlainText(testResult.getResultP2020Temprature1())));
+				writer.println(String.format("DDR3 : %s", getAsPlainText(testResult.getResultP2020DDR3())));
 
-			writer.println(String.format("Top Temp : %s", getAsPlainText(testResult.getResultP2020Temprature2())));
+				writer.println(String.format("NOR Flash : %s", getAsPlainText(testResult.getResultP2020NORFlash())));
 
-			writer.println(String.format("Bottom Temp : %s", getAsPlainText(testResult.getResultP2020Temprature3())));
+				writer.println(String.format("Ethernet : %s", getAsPlainText(testResult.getResultP2020Ethernet())));
 
-			writer.println(String.format("Voltage 3.3 : %s", getAsPlainText(testResult.getResultP2020Voltage1())));
+				writer.println(String.format("PCIe : %s", getAsPlainText(testResult.getResultP2020PCIe())));
 
-			writer.println(String.format("Voltage 2.5 : %s", getAsPlainText(testResult.getResultP2020Voltage2())));
+				writer.println(String.format("SRIO : %s", getAsPlainText(testResult.getResultP2020SRIO())));
 
-			writer.println(String.format("Voltage 1.8 : %s", getAsPlainText(testResult.getResultP2020Voltage3())));
+				writer.println(
+						String.format("Local Temp : %s", getAsPlainText(testResult.getResultP2020Temprature1())));
 
-			writer.println(String.format("Voltage 1.5 : %s", getAsPlainText(testResult.getResultP2020Voltage4())));
+				writer.println(String.format("Top Temp : %s", getAsPlainText(testResult.getResultP2020Temprature2())));
 
-			writer.println(String.format("Voltage 1.2 : %s", getAsPlainText(testResult.getResultP2020Voltage5())));
+				writer.println(
+						String.format("Bottom Temp : %s", getAsPlainText(testResult.getResultP2020Temprature3())));
 
-			writer.println(String.format("Voltage 1.0 : %s", getAsPlainText(testResult.getResultP2020Voltage6())));
+				writer.println(String.format("Voltage 3.3 : %s", getAsPlainText(testResult.getResultP2020Voltage1())));
 
-			writer.println(String.format("Voltage 1.05 : %s", getAsPlainText(testResult.getResultP2020Voltage7())));
+				writer.println(String.format("Voltage 2.5 : %s", getAsPlainText(testResult.getResultP2020Voltage2())));
 
-			writer.println("");
+				writer.println(String.format("Voltage 1.8 : %s", getAsPlainText(testResult.getResultP2020Voltage3())));
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("Voltage 1.5 : %s", getAsPlainText(testResult.getResultP2020Voltage4())));
 
-			writer.println("DSP 1 Test Result Detail");
+				writer.println(String.format("Voltage 1.2 : %s", getAsPlainText(testResult.getResultP2020Voltage5())));
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("Voltage 1.0 : %s", getAsPlainText(testResult.getResultP2020Voltage6())));
 
-			writer.println("");
+				writer.println(String.format("Voltage 1.05 : %s", getAsPlainText(testResult.getResultP2020Voltage7())));
 
-			writer.println(String.format("Processor : %s", getAsPlainText(testResult.getResultDSP1Processor())));
+				writer.println("");
 
-			writer.println(String.format("DDR3 : %s", getAsPlainText(testResult.getResultDSP1DDR3())));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("NAND : %s", getAsPlainText(testResult.getResultDSP1NAND())));
+				writer.println("DSP 1 Test Result Detail");
 
-			writer.println(String.format("NOR : %s", getAsPlainText(testResult.getResultDSP1NOR())));
+				writer.println("---------------------------------------");
 
-			writer.println("");
+				writer.println("");
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("Processor : %s", getAsPlainText(testResult.getResultDSP1Processor())));
 
-			writer.println("DSP 2 Test Result Detail");
+				writer.println(String.format("DDR3 : %s", getAsPlainText(testResult.getResultDSP1DDR3())));
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("NAND : %s", getAsPlainText(testResult.getResultDSP1NAND())));
 
-			writer.println(String.format("Processor : %s", getAsPlainText(testResult.getResultDSP2Processor())));
+				writer.println(String.format("NOR : %s", getAsPlainText(testResult.getResultDSP1NOR())));
 
-			writer.println(String.format("DDR3 : %s", getAsPlainText(testResult.getResultDSP2DDR3())));
+				writer.println("");
 
-			writer.println(String.format("NAND : %s", getAsPlainText(testResult.getResultDSP2NAND())));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("NOR : %s", getAsPlainText(testResult.getResultDSP2NOR())));
+				writer.println("DSP 2 Test Result Detail");
 
-			writer.println("");
+				writer.println("---------------------------------------");
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("Processor : %s", getAsPlainText(testResult.getResultDSP2Processor())));
 
-			writer.println("Result Detail");
+				writer.println(String.format("DDR3 : %s", getAsPlainText(testResult.getResultDSP2DDR3())));
 
-			writer.println("---------------------------------------");
+				writer.println(String.format("NAND : %s", getAsPlainText(testResult.getResultDSP2NAND())));
 
-			writer.println("");
+				writer.println(String.format("NOR : %s", getAsPlainText(testResult.getResultDSP2NOR())));
 
-			writer.println(String.format("Total No.of Tests : %s", testResult.getResultTestNoofTests()));
+				writer.println("");
 
-			writer.println(String.format("Tests Passed : %s", testResult.getResultTestPassed()));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("Tests Failed : %s", testResult.getResultTestFailed()));
+				writer.println("Result Detail");
 
-			writer.println(String.format("Test Started At : %s", testResult.getResultTestStartedAt()));
+				writer.println("---------------------------------------");
 
-			writer.println(String.format("Test Completed At : %s", testResult.getResultTestCompletedAt()));
+				writer.println("");
 
-			writer.println(String.format("Test Duration : %s", testResult.getResultTestDuration()));
+				writer.println(String.format("Total No.of Tests : %s", testResult.getResultTestNoofTests()));
 
-			writer.println(String.format("Test Status : %s", testResult.getResultTestStatus()));
+				writer.println(String.format("Tests Passed : %s", testResult.getResultTestPassed()));
 
-			writer.close();
+				writer.println(String.format("Tests Failed : %s", testResult.getResultTestFailed()));
 
-			JOptionPane.showMessageDialog(VPX_BISTResultWindow.this, "File Saved at " + fileName, "Result File",
-					JOptionPane.NO_OPTION);
+				writer.println(String.format("Test Started At : %s", testResult.getResultTestStartedAt()));
+
+				writer.println(String.format("Test Completed At : %s", testResult.getResultTestCompletedAt()));
+
+				writer.println(String.format("Test Duration : %s", testResult.getResultTestDuration()));
+
+				writer.println(String.format("Test Status : %s", testResult.getResultTestStatus()));
+
+				writer.close();
+
+				JOptionPane.showMessageDialog(VPX_BISTResultWindow.this, "File Saved at " + fileName, "Result File",
+						JOptionPane.NO_OPTION);
+			}
 
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();

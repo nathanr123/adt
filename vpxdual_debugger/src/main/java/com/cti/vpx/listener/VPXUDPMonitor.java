@@ -180,7 +180,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void sendBoot(String ip) {
+	public void sendBoot(String ip, int option) {
 
 		ATPCommand msg = null;
 
@@ -203,6 +203,10 @@ public class VPXUDPMonitor {
 			msg.msgID.set(ATP.MSG_ID_SET);
 
 			msg.msgType.set(ATP.MSG_TYPE_BOOT);
+
+			System.out.println(option);
+			
+			msg.params.flash_info.flashdevice.set(option);
 
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
@@ -323,6 +327,8 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
+			System.out.println("Sending "+ip+" "+period);
+			
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
@@ -369,6 +375,8 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
 			msg.periodicity.set(period);
+			
+			System.out.println("Sending "+ip+" "+period);
 
 			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
 

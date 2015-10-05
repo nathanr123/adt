@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -23,6 +24,7 @@ import javax.swing.border.EtchedBorder;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
@@ -35,10 +37,14 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	private FileWriter fw;
 
+	private VPX_ETHWindow parent;
+
 	/**
 	 * Create the panel.
 	 */
-	public VPX_LoggerPanel() {
+	public VPX_LoggerPanel(VPX_ETHWindow parnt) {
+
+		this.parent = parnt;
 
 		init();
 
@@ -186,18 +192,32 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void saveLogtoFile() {
+		JFileChooser chooser;
 
 		try {
-			String path = System.getProperty("user.home") + "\\"
-					+ txtA_Log.getText().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".log";
 
-			fw = new FileWriter(new File(path), true);
+			chooser = new JFileChooser();
 
-			txtA_Log.write(fw);
+			chooser.setCurrentDirectory(new java.io.File("."));
 
-			fw.close();
+			chooser.setDialogTitle("Select folder to save");
 
-			VPXUtilities.showPopup("File Saved at " + path);
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+			if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+
+				String path = chooser.getSelectedFile().getPath() + "\\"
+						+ txtA_Log.getText().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
+						+ ".log";
+
+				fw = new FileWriter(new File(path), true);
+
+				txtA_Log.write(fw);
+
+				fw.close();
+
+				VPXUtilities.showPopup("File Saved at " + path, path);
+			}
 
 		} catch (Exception e) {
 

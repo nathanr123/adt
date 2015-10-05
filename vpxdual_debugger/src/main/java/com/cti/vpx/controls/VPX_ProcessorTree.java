@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
-import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -36,6 +34,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
@@ -79,7 +78,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private JMenuItem vpx_Cxt_BIST;
 
-	private JMenuItem vpx_Cxt_Reboot;
+	private JMenu vpx_Cxt_Reboot;
+
+	private JMenuItem vpx_Cxt_Reboot_NAND;
+
+	private JMenuItem vpx_Cxt_Reboot_NOR;
 
 	private JMenuItem vpx_Cxt_Execution;
 
@@ -717,12 +720,20 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				VPX_ProcessorNode node = (VPX_ProcessorNode) getLastSelectedPathComponent();
 
 				if (node != null) {
+					
+					enableNodeComponents(node);
+
 					if (node.isProcessorNode()) {
 
 						setSelectedProcessor(node);
 
-					} else {
+					} else if(node.isSubSytemNode()) {
+						VPXSessionManager.setCurrentProcessor("", "", "");					
+						
+						
+					}else if(node.isRootNode()) {
 						VPXSessionManager.setCurrentProcessor("", "", "");
+						
 					}
 				}
 			}
@@ -808,7 +819,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	private void setSelectedProcessor(VPX_ProcessorNode node) {
-
+	
+		enableNodeComponents(node);
+		
 		if (node.isProcessorNode()) {
 
 			VPXSessionManager.setCurrentProcessor(node.getSubSystemName(), node.getNodeTypeString(), node.getNodeIP());
@@ -819,6 +832,31 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		}
 
 		parent.updateProcessorSettings();
+	}
+
+	private void enableNodeComponents(VPX_ProcessorNode node) {
+
+		if (node.isProcessorNode()) {
+
+			if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_P2020) {
+
+				parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_P2020);
+
+			} else if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP2
+					|| node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP1) {
+
+				parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_DSP);
+			}
+
+		} else if (node.isSubSytemNode()) {
+
+			parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_SUBSYSTEM);
+
+		} else if (node.isRootNode()) {
+
+			parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_NONE);
+		}
+
 	}
 
 	@Override
@@ -970,17 +1008,37 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Reboot = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot"));
+		vpx_Cxt_Reboot = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Window.Reboot"));
 
-		vpx_Cxt_Reboot.addActionListener(new ActionListener() {
+		vpx_Cxt_Reboot_NAND = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot.Nand"));
+
+		vpx_Cxt_Reboot_NAND.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				parent.setReboot(VPXSessionManager.getCurrentProcessor());
+				parent.setReboot(VPXSessionManager.getCurrentProcessor(), ATP.FLASH_DEVICE_NAND);
 
 			}
 		});
+
+		vpx_Cxt_Reboot_NOR = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot.Nor"));
+
+		vpx_Cxt_Reboot_NOR.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.setReboot(VPXSessionManager.getCurrentProcessor(), ATP.FLASH_DEVICE_NOR);
+
+			}
+		});
+
+		vpx_Cxt_Reboot.add(vpx_Cxt_Reboot_NAND);
+
+		vpx_Cxt_Reboot.add(VPXComponentFactory.createJSeparator());
+
+		vpx_Cxt_Reboot.add(vpx_Cxt_Reboot_NOR);
 
 		vpx_Cxt_BIST = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"),
 				VPXConstants.Icons.ICON_BIST);
@@ -1098,10 +1156,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 					String temp = getSelectionModel().getSelectionPath().getParentPath().toString();
 
 					temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
-					
+
 					int result = JOptionPane.showConfirmDialog(parent,
-							String.format("Are yousure you want to remove subsystem \'%s\' from the VPXSystem?",
-									temp),
+							String.format("Are yousure you want to remove subsystem \'%s\' from the VPXSystem?", temp),
 							"Confirmation", JOptionPane.YES_NO_OPTION);
 
 					if (result == JOptionPane.YES_OPTION) {
@@ -1438,7 +1495,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			} else {
 
-			//	vpx_contextMenu.add(vpx_Cxt_Swap);
+				// vpx_contextMenu.add(vpx_Cxt_Swap);
 
 			}
 			// To Do

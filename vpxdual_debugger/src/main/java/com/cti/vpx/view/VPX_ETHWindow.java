@@ -53,7 +53,6 @@ import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorTree;
-import com.cti.vpx.controls.VPX_StartupPanel;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
@@ -194,6 +193,24 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_CloseProgressWindow closeWindow;
 
+	private JButton btnOpenLog;
+
+	private JButton btnAliasConfig;
+
+	private JButton btnDetail;
+
+	private JButton btnMemoryBrowser;
+
+	private JButton btnMemoryPlot;
+
+	private JButton btnMAD;
+
+	private JButton btnBIST;
+
+	private JButton btnFlash;
+
+	private JButton btnExecute;
+
 	private static VPX_SubnetFilterWindow subnetFilter;
 
 	public static int currentNoofMemoryView;
@@ -223,6 +240,8 @@ public class VPX_ETHWindow extends JFrame
 
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
+		enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_NONE);
+		
 		setVisible(true);
 	}
 
@@ -925,7 +944,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnOpenLog = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_OPEN, null);
+		btnOpenLog = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_OPEN, null);
 
 		btnOpenLog.setToolTipText("Open Log File");
 
@@ -941,7 +960,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_ToolBar.add(btnOpenLog);
 
-		JButton btnAliasConfig = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_CONFIG, null);
+		btnAliasConfig = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_CONFIG, null);
 
 		btnAliasConfig.setToolTipText("Alias Configuration");
 
@@ -957,7 +976,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_ToolBar.add(btnAliasConfig);
 
-		JButton btnDetail = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_DETAIL, null);
+		btnDetail = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_DETAIL, null);
 
 		btnDetail.setToolTipText("VPX System Detail");
 
@@ -971,7 +990,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnMemoryBrowser = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MEMORY, null);
+		btnMemoryBrowser = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MEMORY, null);
 
 		btnMemoryBrowser.setToolTipText("Memory Browser");
 
@@ -984,7 +1003,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnMemoryPlot = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_PLOT, null);
+		btnMemoryPlot = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_PLOT, null);
 
 		btnMemoryPlot.setToolTipText("Memory Plots");
 
@@ -998,7 +1017,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnMAD = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MAD, null);
+		btnMAD = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MAD, null);
 
 		btnMAD.setToolTipText("MAD Utility");
 
@@ -1012,7 +1031,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnBIST = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_BIST, null);
+		btnBIST = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_BIST, null);
 
 		btnBIST.setToolTipText("Built In Self Test");
 
@@ -1026,7 +1045,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnFlash = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_ETHFLASH, null);
+		btnFlash = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_ETHFLASH, null);
 
 		btnFlash.setToolTipText("Ethernet Flash");
 
@@ -1040,7 +1059,7 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		JButton btnExecute = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_EXECUTION, null);
+		btnExecute = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_EXECUTION, null);
 
 		btnExecute.setToolTipText("Execution");
 
@@ -1140,9 +1159,9 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
 
-		logger = new VPX_LoggerPanel();
+		logger = new VPX_LoggerPanel(this);
 
-		console = new VPX_ConsolePanel();
+		console = new VPX_ConsolePanel(this);
 
 		vpx_Content_Tabbed_Pane_Message.addTab("Log", logger);
 
@@ -1359,6 +1378,16 @@ public class VPX_ETHWindow extends JFrame
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
 		}
+
+	}
+
+	public void openFile(String fileName) {
+
+		File file = new File(fileName);
+
+		vpx_Content_Tabbed_Pane_Right.addTab("Log File - " + file.getAbsolutePath(), new VPX_LogFileViewPanel(file));
+
+		vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
 	}
 
@@ -1583,14 +1612,14 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void setReboot(String ip) {
+	public void setReboot(String ip, int option) {
 
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				udpMonitor.sendBoot(ip);
+				udpMonitor.sendBoot(ip, option);
 
 			}
 		});
@@ -2118,7 +2147,8 @@ public class VPX_ETHWindow extends JFrame
 
 			init();
 
-			loadComponents();
+			loadComponents();		
+			
 
 		}
 
@@ -2185,6 +2215,149 @@ public class VPX_ETHWindow extends JFrame
 			}
 		}
 
+	}
+
+	public void enableSelectedProcessorMenus(int option) {
+
+		switch (option) {
+
+		case VPXConstants.PROCESSOR_SELECTED_MODE_NONE:
+		default:
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(false);
+
+			vpx_Menu_Window_EthFlash.setEnabled(false);
+
+			vpx_Menu_Window_Execution.setEnabled(false);
+
+			vpx_Menu_Window_Amplitude.setEnabled(false);
+
+			vpx_Menu_Window_Waterfall.setEnabled(false);
+
+			vpx_Menu_Window_BIST.setEnabled(false);
+
+			vpx_Menu_Window_P2020Config.setEnabled(false);
+
+			vpx_Menu_Window_ChangeIP.setEnabled(false);
+
+			btnMemoryBrowser.setEnabled(false);
+
+			btnMemoryPlot.setEnabled(false);
+
+			btnMAD.setEnabled(false);
+
+			btnBIST.setEnabled(false);
+
+			btnFlash.setEnabled(false);
+
+			btnExecute.setEnabled(false);
+
+			break;
+
+		case VPXConstants.PROCESSOR_SELECTED_MODE_DSP:
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(true);
+
+			vpx_Menu_Window_EthFlash.setEnabled(true);
+
+			vpx_Menu_Window_Execution.setEnabled(true);
+
+			vpx_Menu_Window_Amplitude.setEnabled(true);
+
+			vpx_Menu_Window_Waterfall.setEnabled(true);
+
+			vpx_Menu_Window_BIST.setEnabled(false);
+
+			vpx_Menu_Window_P2020Config.setEnabled(false);
+
+			vpx_Menu_Window_ChangeIP.setEnabled(false);
+
+			btnMemoryBrowser.setEnabled(true);
+
+			btnMemoryPlot.setEnabled(true);
+
+			btnMAD.setEnabled(true);
+
+			btnBIST.setEnabled(false);
+
+			btnFlash.setEnabled(true);
+
+			btnExecute.setEnabled(true);
+
+			break;
+		case VPXConstants.PROCESSOR_SELECTED_MODE_P2020:
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(false);
+
+			vpx_Menu_Window_EthFlash.setEnabled(false);
+
+			vpx_Menu_Window_Execution.setEnabled(false);
+
+			vpx_Menu_Window_Amplitude.setEnabled(false);
+
+			vpx_Menu_Window_Waterfall.setEnabled(false);
+
+			vpx_Menu_Window_BIST.setEnabled(true);
+
+			vpx_Menu_Window_P2020Config.setEnabled(true);
+
+			vpx_Menu_Window_ChangeIP.setEnabled(true);
+
+			btnMemoryBrowser.setEnabled(false);
+
+			btnMemoryPlot.setEnabled(false);
+
+			btnMAD.setEnabled(true);
+
+			btnBIST.setEnabled(true);
+
+			btnFlash.setEnabled(false);
+
+			btnExecute.setEnabled(false);
+
+			break;
+
+		case VPXConstants.PROCESSOR_SELECTED_MODE_SUBSYSTEM:
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(false);
+
+			vpx_Menu_Window_EthFlash.setEnabled(false);
+
+			vpx_Menu_Window_Execution.setEnabled(false);
+
+			vpx_Menu_Window_Amplitude.setEnabled(false);
+
+			vpx_Menu_Window_Waterfall.setEnabled(false);
+
+			vpx_Menu_Window_BIST.setEnabled(false);
+
+			vpx_Menu_Window_P2020Config.setEnabled(false);
+
+			vpx_Menu_Window_ChangeIP.setEnabled(false);
+
+			btnMemoryBrowser.setEnabled(false);
+
+			btnMemoryPlot.setEnabled(false);
+
+			btnMAD.setEnabled(false);
+
+			btnBIST.setEnabled(false);
+
+			btnFlash.setEnabled(false);
+
+			btnExecute.setEnabled(false);
+
+			break;
+
+		}
 	}
 
 }

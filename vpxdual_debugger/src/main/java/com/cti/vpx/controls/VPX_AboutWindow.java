@@ -15,13 +15,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
-
-import javax.swing.ImageIcon;
 
 public class VPX_AboutWindow extends JDialog {
 

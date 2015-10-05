@@ -87,6 +87,14 @@ public class VPXConstants {
 
 	public static final int COMPILATION = 1;
 
+	public static final int PROCESSOR_SELECTED_MODE_NONE = 0;
+
+	public static final int PROCESSOR_SELECTED_MODE_P2020 = 1;
+
+	public static final int PROCESSOR_SELECTED_MODE_DSP = 2;
+
+	public static final int PROCESSOR_SELECTED_MODE_SUBSYSTEM = 3;
+
 	public static final StyleContext PROCESSOR_MESSAGE_DISPLAY_CONTEXT = new StyleContext();
 
 	public static final StyledDocument PROCESSOR_MESSAGE_DISPLAY_DOCUMENT = new DefaultStyledDocument(
