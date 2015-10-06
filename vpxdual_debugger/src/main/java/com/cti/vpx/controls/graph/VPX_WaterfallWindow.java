@@ -243,7 +243,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		txtRefreshRate.setHorizontalAlignment(SwingConstants.CENTER);
 
-		txtRefreshRate.setText("5 Secs.");
+		txtRefreshRate.setText("2 Secs.");
 
 		txtRefreshRate.setEditable(false);
 

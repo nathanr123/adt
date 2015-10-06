@@ -86,9 +86,9 @@ public class MultiLineGraph extends AbstractLineGraph
 	/**
 	 * active optimised drawing mode
 	 */
-	private boolean bOptimizedDrawMode = false;
+	private boolean bOptimizedDrawMode = true;
 
-	private boolean bCacheChanged = false;
+	private boolean bCacheChanged = true;
 
   
 	/**

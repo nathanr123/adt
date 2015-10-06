@@ -586,8 +586,14 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	public void showMemoryBrowser() {
 
 		loadFilters();
+		
+		byte[] b = {0};
+		
+		setBytes(0, b);
 
 		applyFilters();
+		
+		btnClear.doClick();
 
 		setVisible(true);
 	}

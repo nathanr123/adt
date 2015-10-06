@@ -443,8 +443,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				String path = chooser.getSelectedFile().getPath();
 
-				if (!path.endsWith(".dat")) {
-					path += ".dat";
+				if (!path.endsWith(".bin")) {
+					path += ".bin";
 				}
 
 				FileOutputStream fos = new FileOutputStream(path);

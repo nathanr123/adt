@@ -36,16 +36,16 @@ public class WaterfallGraphDemo extends javax.swing.JPanel {
 
 		graphWrapper = new com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
 		graphWrapper.replaceYAxis(lineGraph.getWaterfallIntensityAxis());
-		graphWrapper.setXAxisLabelVisible(false);
-		graphWrapper.setXAxisScaleVisible(false);
-		graphWrapper.setCursorCoordinatesVisible(false);
-		graphWrapper.getXAxisExtraPanel().setVisible(false);
-		graphWrapper.setYAxisLabelVisible(false);
+		graphWrapper.setXAxisLabelVisible(true);
+		graphWrapper.setXAxisScaleVisible(true);
+		graphWrapper.setCursorCoordinatesVisible(true);
+		graphWrapper.getXAxisExtraPanel().setVisible(true);
+		graphWrapper.setYAxisLabelVisible(true);
 		graphWrapper.setYAxisScaleVisible(false);
 
-		graphWrapper.setAxisTitles("", "Waterfall_Time_Axis");
-		graphWrapper.setTitle("Waterfall Graph with Intensity Axis");
-		graphWrapper.setAxisTitlesAndUnits("X", "froobles", "Y", "bagets");
+		//graphWrapper.setAxisTitles("", "Waterfall_Time_Axis");
+	//	graphWrapper.setTitle("Waterfall Graph with Intensity Axis");
+		graphWrapper.setAxisTitlesAndUnits("X", "Address", "Y", "Data");
 
 		graphPanel.add(graphWrapper, BorderLayout.CENTER);
 
@@ -80,7 +80,7 @@ public class WaterfallGraphDemo extends javax.swing.JPanel {
 			}
 		});
 
-		//th.start();
+		th.start();
 	}
 
 	Random random = new Random();

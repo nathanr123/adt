@@ -331,6 +331,8 @@ public class VPX_AppModeWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				VPX_AppModeWindow.this.dispose();
+				
+				System.exit(0);
 
 			}
 		});

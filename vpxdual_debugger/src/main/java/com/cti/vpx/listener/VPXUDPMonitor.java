@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXSubnetFilter;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+
+import ch.qos.logback.core.net.SyslogOutputStream;
 
 public class VPXUDPMonitor {
 
@@ -205,7 +208,7 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_BOOT);
 
 			System.out.println(option);
-			
+
 			msg.params.flash_info.flashdevice.set(option);
 
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
@@ -327,8 +330,8 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			System.out.println("Sending "+ip+" "+period);
-			
+			System.out.println("Sending " + ip + " " + period);
+
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
@@ -375,8 +378,8 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
 			msg.periodicity.set(period);
-			
-			System.out.println("Sending "+ip+" "+period);
+
+			System.out.println("Sending " + ip + " " + period);
 
 			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
 
@@ -1616,6 +1619,63 @@ public class VPXUDPMonitor {
 
 	}
 
+	public void populateAmplitudeData(String ip, ATPCommand msg) {
+
+		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+
+		byte[] fb = new byte[4];
+
+		float[] fl = new float[b.length / 4];
+
+		int j = 0;
+
+		int k = 0;
+
+		for (int i = 0; i < b.length; i++) {
+
+			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+			if ((i + 1) % 4 == 0) {
+
+				j = 0;
+
+				fl[k] = ByteBuffer.wrap(fb).getFloat();
+				k++;
+
+			} else {
+				fb[j] = b[i];
+				j++;
+			}
+
+		}
+
+		///ByteBuffer.wrap(b).asFloatBuffer().get(fl);
+
+		for (int i = 0; i < fl.length; i++) {
+			System.out.println(fl[i]);
+		}
+		/*
+		 * byte[] x = new byte[512]; byte[] y = new byte[512];
+		 * 
+		 * for (int i = 0; i < 512; i++) {
+		 * 
+		 * x[i] = (byte) msg.params.memoryinfo.buffer[i].get(); }
+		 * 
+		 * int k = 0; for (int j = 512; j < 1024; j++) { y[k] = (byte)
+		 * msg.params.memoryinfo.buffer[j].get(); k++; }
+		 * 
+		 * for (int i = 0; i < 512; i++) {
+		 * 
+		 * System.out.println(String.format("X : %02x Y : %02x", x[i], y[i])); }
+		 * 
+		 * DrawChart demo = new DrawChart("Dynamic Data view"); demo.pack();
+		 * 
+		 * demo.addData(x, y); // RefineryUtilities.centerFrameOnScreen(demo);
+		 * demo.setVisible(true); // ((VPX_ETHWindow)
+		 * listener).populateWaterfall(ip, b);
+		 */
+	}
+
 	public void populateBISTResult(String ip, ATPCommand msg) {
 
 		if (bist != null) {
@@ -1978,6 +2038,13 @@ public class VPXUDPMonitor {
 				populateWaterfallData(ip, msgCommand);
 
 				break;
+
+			case ATP.MSG_TYPE_AMPLITUDE:
+
+				populateAmplitudeData(ip, msgCommand);
+
+				break;
+
 			}
 
 		}

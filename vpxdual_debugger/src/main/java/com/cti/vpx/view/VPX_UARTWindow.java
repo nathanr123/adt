@@ -75,8 +75,6 @@ public class VPX_UARTWindow extends JFrame {
 
 	private JTextArea txtAConsole;
 
-	private JTextArea txtAMessage;
-
 	private JComboBox<String> cmbConsoleCoresFilter;
 
 	private JComboBox<String> cmbMessagesCoresFilter;
@@ -112,6 +110,8 @@ public class VPX_UARTWindow extends JFrame {
 	private JMenuItem vpx_UART_Menu_Help_About;
 
 	private JMenuItem vpx_UART_Menu_Help_Help;
+
+	private String currentCommand = "";
 
 	/**
 	 * Launch the application.
@@ -164,13 +164,11 @@ public class VPX_UARTWindow extends JFrame {
 		setTitle(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " :: "
 				+ currCommport);
 
-		setPreferredSize(new Dimension(800, 600));
-
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setSize(782, 700);
+		setSize(1000, 700);
 	}
 
 	private void createMenuBar() {
@@ -189,7 +187,7 @@ public class VPX_UARTWindow extends JFrame {
 
 		vpx_UART_Menu_File_Exit = VPXComponentFactory.createJMenuItem("Exit");
 
-		vpx_UART_Menu_Window_ChangeMode = VPXComponentFactory.createJMenuItem("Ethernet Mode");
+		vpx_UART_Menu_Window_ChangeMode = VPXComponentFactory.createJMenuItem("Change Mode");
 
 		vpx_UART_Menu_Help_About = VPXComponentFactory.createJMenuItem("About");
 
@@ -311,7 +309,7 @@ public class VPX_UARTWindow extends JFrame {
 
 		setContentPane(contentPane);
 
-		contentPane.setLayout(new GridLayout(2, 1, 0, 0));
+		contentPane.setLayout(new GridLayout(1, 1, 0, 0));
 
 		JPanel consolePanel = new JPanel();
 
@@ -330,6 +328,7 @@ public class VPX_UARTWindow extends JFrame {
 		consolePanel.add(consoleFilterPanel, BorderLayout.NORTH);
 
 		cmbConsoleCoresFilter = new JComboBox<String>();
+
 		cmbConsoleCoresFilter.setVisible(false);
 
 		cmbConsoleCoresFilter.setPreferredSize(new Dimension(130, 20));
@@ -366,15 +365,8 @@ public class VPX_UARTWindow extends JFrame {
 
 		scrConsole.setViewportView(txtAConsole);
 
-		JPanel messagesControlPanel = new JPanel();
-
-		contentPane.add(messagesControlPanel);
-
-		messagesControlPanel.setLayout(new BorderLayout(0, 0));
-
 		JPanel ControlsPanel = new JPanel();
-
-		messagesControlPanel.add(ControlsPanel, BorderLayout.SOUTH);
+		consolePanel.add(ControlsPanel, BorderLayout.SOUTH);
 
 		ControlsPanel.setLayout(new BorderLayout(0, 0));
 
@@ -447,48 +439,11 @@ public class VPX_UARTWindow extends JFrame {
 
 		buttonPanel.add(btnSend);
 
-		JButton btnClear = new JButton("Clear");
-
-		btnClear.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				txtConsoleMsg.setText("");
-
-				txtAConsole.setText("");
-
-				txtAMessage.setText("");
-
-			}
-		});
-
-		buttonPanel.add(btnClear);
-
 		cmbMessagesCoresFilter = new JComboBox<String>();
 		cmbMessagesCoresFilter.setVisible(false);
 		buttonPanel.add(cmbMessagesCoresFilter);
 
 		cmbMessagesCoresFilter.setPreferredSize(new Dimension(130, 20));
-
-		JPanel messagePanel = new JPanel();
-
-		messagePanel.setBorder(new TitledBorder(null, "Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-		messagesControlPanel.add(messagePanel, BorderLayout.CENTER);
-
-		messagePanel.setLayout(new BorderLayout(0, 0));
-
-		JScrollPane scrMessages = new JScrollPane();
-
-		messagePanel.add(scrMessages, BorderLayout.CENTER);
-
-		txtAMessage = new JTextArea();
-		txtAMessage.setEditable(false);
-		txtAMessage.setBackground(Color.BLACK);
-		txtAMessage.setForeground(Color.WHITE);
-
-		scrMessages.setViewportView(txtAMessage);
 	}
 
 	private void centerFrame() {
@@ -577,7 +532,10 @@ public class VPX_UARTWindow extends JFrame {
 
 			if (data.length() > 0) {
 
-				txtAMessage.append(String.format(" %s\\> %s", this.currCommport, data) + "\n");
+				// txtAConsole.append(String.format(" %s\\> %s",
+				// this.currCommport, data) + "\n");
+
+				currentCommand = txtConsoleMsg.getText().trim();
 
 				cmdHistory.put(cmdHistory.size(), txtConsoleMsg.getText().trim());
 
@@ -629,8 +587,19 @@ public class VPX_UARTWindow extends JFrame {
 
 				if (msg1.length() > 0) {
 
+					/*if (msg1.trim().startsWith("~ #")) {
+
+						msg1 = "\n";
+					}
+					if (msg1.trim().equals(currentCommand.trim())) {
+
+						msg1 = String.format(" %s\\> %s", VPX_UARTWindow.this.currCommport, msg1);
+					}*/
+					// txtAConsole.append(String.format(" %s\\> %s",
+					// this.currCommport, data) + "\n");
 					txtAConsole.append(msg1 + "\n");
 
+					txtAConsole.setCaretPosition(txtAConsole.getText().length());
 					/*
 					 * String msg = msg1.split("::")[1];
 					 * 
@@ -729,7 +698,7 @@ public class VPX_UARTWindow extends JFrame {
 
 		txtAConsole.setText("");
 
-		txtAMessage.setText("");
+		// txtAMessage.setText("");
 
 		cmbConsoleCoresFilter.setSelectedIndex(0);
 	}
@@ -756,25 +725,7 @@ public class VPX_UARTWindow extends JFrame {
 
 				FileWriter fw = new FileWriter(new File(path), true);
 
-				fw.write("Console Messages\n");
-
-				fw.write("_______________________________\n");
-
-				fw.write("\n");
-
 				fw.write(txtAConsole.getText());
-
-				fw.write("\n");
-
-				fw.write("Processor Messages\n");
-
-				fw.write("_______________________________\n");
-
-				fw.write("\n");
-
-				fw.write(txtAMessage.getText());
-
-				fw.write("\n");
 
 				fw.close();
 

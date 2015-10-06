@@ -175,7 +175,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		jp.add(jb5);
 
-		JButton jb6 = new JButton("Get Waterfall");
+		JButton jb6 = new JButton("Get Amplitude");
 
 		jb6.addActionListener(new ActionListener() {
 
@@ -183,7 +183,9 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			public void actionPerformed(ActionEvent e) {
 				// setMemory();
 
-				getWaterFall();
+				//getWaterFall();
+				
+				getAmplitude();
 			}
 		});
 
@@ -235,6 +237,41 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			msg.msgID.set(ATP.MSG_ID_GET);
 
 			msg.msgType.set(ATP.MSG_TYPE_WATERFALL);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			jt.append("Message Sent\n");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void getAmplitude() {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_AMPLITUDE);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
 					VPXUDPListener.COMM_PORTNO);
@@ -667,7 +704,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		 * e.printStackTrace(); }
 		 */
 
-		sendPeriodicity("172.17.10.140", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
+		sendPeriodicity("172.17.10.130", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
 
 	}
 

@@ -86,7 +86,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 			}
 		});
 
-	dataTimer.start();
+	//dataTimer.start();
 		
 		dataTimer1 = new javax.swing.Timer(550, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
