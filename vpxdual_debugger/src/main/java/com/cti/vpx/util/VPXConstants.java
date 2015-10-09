@@ -111,6 +111,10 @@ public class VPXConstants {
 
 	public static final int MAX_MEMORY_PLOT = 3;
 
+	public static final int MAX_WATERFALL = 3;
+
+	public static final int MAX_AMPLITUDE = 3;
+
 	public static final int MAX_PROCESSOR = 3;
 
 	/*

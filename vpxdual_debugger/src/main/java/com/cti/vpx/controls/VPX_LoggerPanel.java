@@ -23,6 +23,7 @@ import javax.swing.border.EtchedBorder;
 
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -140,7 +141,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 			if (VPXUtilities.isLogEnabled()) {
 
-				String filePath = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
+				String filePath = VPXSessionManager.getCurrentLogFileName();//VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
 
 				VPXUtilities.appendUsingFileWriter(filePath, log);
 

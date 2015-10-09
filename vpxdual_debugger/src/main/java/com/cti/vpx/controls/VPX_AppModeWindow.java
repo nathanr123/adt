@@ -253,32 +253,11 @@ public class VPX_AppModeWindow extends JFrame {
 
 					String flnmae = jb.getSelectedFile().getPath();
 
-					if (!flnmae.endsWith(".log")) {
-
-						if (Boolean.valueOf(
-								VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
-
-							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
-						} else {
-							flnmae += ".log";
-						}
-
-					} else {
-						if (Boolean.valueOf(
-								VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
-
-							flnmae = flnmae.substring(0, flnmae.length() - 4);
-
-							flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
-						}
-
-					}
-
 					txtLogFileName.setText(flnmae);
 
-					VPXUtilities.setEnableLog(true);
-
-					VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
+					if (!flnmae.endsWith(".log")) {
+						flnmae += ".log";
+					}
 				}
 			}
 		});
@@ -331,7 +310,7 @@ public class VPX_AppModeWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				VPX_AppModeWindow.this.dispose();
-				
+
 				System.exit(0);
 
 			}
@@ -770,7 +749,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 		if (isLogEnabled) {
 
-			txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
+			if (txtLogFileName.getText().trim().length() == 0)
+				txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
 
 		} else {
 
@@ -821,6 +801,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 		if (updateLogSettings()) {
 
+			setLogFileSettings();
+			
 			if (currentMode == VPXConstants.ETHMODE) {
 
 				boolean ip = VPXUtilities.isValidIP(txtIPAddress.getText());
@@ -844,7 +826,6 @@ public class VPX_AppModeWindow extends JFrame {
 					VPXSessionManager.setCurrentIP(txtIPAddress.getText());
 
 					try {
-
 						VPX_ETHWindow window = new VPX_ETHWindow();
 
 					} catch (Exception e) {
@@ -904,6 +885,36 @@ public class VPX_AppModeWindow extends JFrame {
 			txtLogFileName.requestFocusInWindow();
 		}
 
+	}
+
+	private void setLogFileSettings() {
+
+		String flnmae = txtLogFileName.getText();
+
+		if (!flnmae.endsWith(".log")) {
+
+			if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+
+				flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
+			} else {
+				flnmae += ".log";
+			}
+
+		} else {
+			if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+
+				flnmae = flnmae.substring(0, flnmae.length() - 4);
+
+				flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
+			}
+
+		}
+
+		VPXSessionManager.setCurrentLogFileName(flnmae);
+
+		VPXUtilities.setEnableLog(true);
+
+		VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
 	}
 
 	public void showWindow() {

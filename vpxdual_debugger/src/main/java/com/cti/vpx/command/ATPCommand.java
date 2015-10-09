@@ -3,7 +3,6 @@ package com.cti.vpx.command;
 import java.nio.ByteOrder;
 
 import javolution.io.Struct;
-import javolution.io.Union;
 
 public class ATPCommand extends Struct implements ATP {
 

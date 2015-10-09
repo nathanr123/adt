@@ -12,6 +12,8 @@ public class VPXSessionManager {
 
 	private static String currentSystemIP;
 
+	private static String currentLogFileName;
+
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
 	private static VPXSystem vpxSystem = null;
@@ -104,4 +106,40 @@ public class VPXSessionManager {
 
 		vpxSystem = sys;
 	}
+
+	public static String getCurrentSystemIP() {
+
+		return currentSystemIP;
+	}
+
+	public static void setCurrentSystemIP(String currentSystemIP) {
+
+		VPXSessionManager.currentSystemIP = currentSystemIP;
+	}
+
+	public static String getCurrentLogFileName() {
+
+		return currentLogFileName;
+	}
+
+	public static void setCurrentLogFileName(String currentLogFileName) {
+
+		VPXSessionManager.currentLogFileName = currentLogFileName;
+	}
+
+	public static VPXSystem getVpxSystem() {
+
+		return vpxSystem;
+	}
+
+	public static void setVpxSystem(VPXSystem vpxSystem) {
+
+		VPXSessionManager.vpxSystem = vpxSystem;
+	}
+
+	public static void setCurrentProcessor(String currentProcessor) {
+
+		VPXSessionManager.currentProcessor = currentProcessor;
+	}
+
 }

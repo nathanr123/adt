@@ -9,6 +9,7 @@ import java.awt.event.WindowFocusListener;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -87,6 +88,8 @@ public class VPX_TabbedPane extends JTabbedPane {
 
 		final JFrame frame = new JFrame();
 
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
 		frame.setIconImage(VPXUtilities.getAppIcon());
 
 		Window parentWindow = SwingUtilities.windowForComponent(this);
@@ -110,12 +113,29 @@ public class VPX_TabbedPane extends JTabbedPane {
 
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent event) {
-				frame.dispose();
 
-				insertTab(title, icon, c, toolTip, Math.min(tabIndex, getTabCount()));
+				String[] buttons = { "Yes", "No", "Pin to tab" };
 
-				c.setBorder(border);
-				setSelectedComponent(c);
+				int rc = JOptionPane.showOptionDialog(null, "Dou you want to close", "Confirmation",
+						JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[2]);
+
+				System.out.println(rc);
+				
+				if (rc == 0) {
+
+					frame.dispose();
+
+				} else if (rc == 2) {
+
+					frame.dispose();
+
+					insertTab(title, icon, c, toolTip, Math.min(tabIndex, getTabCount()));
+
+					c.setBorder(border);
+
+					setSelectedComponent(c);
+
+				}
 			}
 
 		});

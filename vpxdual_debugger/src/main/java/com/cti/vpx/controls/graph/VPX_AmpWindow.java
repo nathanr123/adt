@@ -1,7 +1,9 @@
 package com.cti.vpx.controls.graph;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -13,11 +15,20 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.cti.vpx.controls.graph.example.WaterfallGraphPanel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_WaterfallWindow extends JFrame implements WindowListener {
+public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 	/**
 	 * 
@@ -34,16 +45,38 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	private JTextField txtMaxValue;
 
-	private static WaterfallGraphPanel newWaterfallGraph = new WaterfallGraphPanel();
+	public XYSeries series;
+
+	private XYSeriesCollection dataset;
 
 	private VPX_ETHWindow parent;
 
 	private String currentip;
 
+	private JFreeChart chart;
+
+	private ChartPanel chartPanel;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					VPX_AmpWindow frame = new VPX_AmpWindow(null);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
 	/**
 	 * Create the frame.
 	 */
-	public VPX_WaterfallWindow(VPX_ETHWindow parnt) {
+	public VPX_AmpWindow(VPX_ETHWindow parnt) {
 
 		this.parent = parnt;
 
@@ -70,6 +103,10 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 		setContentPane(contentPane);
 
 		contentPane.setLayout(new BorderLayout(0, 0));
+
+		series = new XYSeries("Amplitude", true, true);
+
+		dataset = new XYSeriesCollection(series);
 
 	}
 
@@ -157,44 +194,90 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		controlPanels.add(lblDummy2);
 
-		JPanel waterfallPanel = new JPanel();
+		chart = createChart(dataset);
 
-		contentPane.add(waterfallPanel, BorderLayout.CENTER);
+		chartPanel = new ChartPanel(chart);
 
-		waterfallPanel.setLayout(new BorderLayout(0, 0));
-
-		waterfallPanel.add(newWaterfallGraph, BorderLayout.CENTER);
+		contentPane.add(chartPanel, BorderLayout.CENTER);
 	}
 
-	public void showWaterFall(String ip) {
+	private JFreeChart createChart(final XYDataset dataset) {
+
+		JFreeChart jfreechart = ChartFactory.createXYLineChart("", "Time", "Amplitude", dataset,
+				PlotOrientation.VERTICAL, true, true, true);
+
+		jfreechart.setAntiAlias(true);
+
+		jfreechart.setBackgroundPaint(Color.BLACK);
+
+		jfreechart.setBorderVisible(true);
+
+		jfreechart.setTextAntiAlias(true);
+
+		XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+
+		XYItemRenderer renderer = xyplot.getRenderer();
+
+		renderer.setSeriesPaint(0, Color.RED);
+
+		renderer.setSeriesItemLabelsVisible(0, false);
+
+		renderer.setSeriesVisibleInLegend(0, false, false);
+
+		xyplot.getRangeAxis().setLabelPaint(Color.WHITE);
+
+		xyplot.getRangeAxis().setTickLabelPaint(Color.WHITE);
+
+		xyplot.getDomainAxis().setLabelPaint(Color.WHITE);
+
+		xyplot.getDomainAxis().setTickLabelPaint(Color.WHITE);
+
+		xyplot.setDomainGridlinesVisible(true);
+
+		xyplot.setRangeCrosshairVisible(true);
+
+		xyplot.setBackgroundPaint(Color.DARK_GRAY);
+
+		return jfreechart;
+	}
+
+	public void showAmplitude(String ip) {
 
 		this.currentip = ip;
 
-		newWaterfallGraph.clearAlldata();
-
-		setTitle("Waterfall Graph - " + currentip);
+		setTitle("Amplitude Graph - " + currentip);
 
 		txtProcessor.setText(currentip);
 
 		setVisible(true);
 	}
 
-	public void loadData(byte[] bytes) {
+	public void loadData(float[] xAxis, float[] yAxis) {
 
-		setMinMaxValues(bytes);
+		this.series.clear();
 
-		newWaterfallGraph.addAmplitudeData(bytes);
+		this.dataset.removeSeries(series);
+
+		for (int i = 0; i < xAxis.length; i++) {
+
+			final double x = xAxis[i];// (i) / 10.0;
+
+			final double y = yAxis[i];// Math.sin(x);
+
+			this.series.addOrUpdate(x, y);
+		}
+
+		this.dataset.addSeries(series);
 	}
 
+	/*
 	private void setMinMaxValues(byte[] bytes) {
 
 		// assign first element of an array to largest and smallest
 		byte smallest = (byte) (bytes[0] & 0x0ff);
-
 		byte largetst = (byte) (bytes[0] & 0x0ff);
 
 		for (int i = 1; i < bytes.length; i++) {
-
 			byte b = (byte) (bytes[i] & 0x0ff);
 
 			if (b > largetst)
@@ -209,41 +292,47 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 		txtMinValue.setText(String.format("%02X", smallest));
 
 	}
-
+*/
 	@Override
 	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		parent.sendWaterfallInterrupt(currentip);
+		//parent.sendWaterfallInterrupt(currentip);
 
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 }

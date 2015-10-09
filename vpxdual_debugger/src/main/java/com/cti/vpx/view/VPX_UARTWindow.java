@@ -49,6 +49,7 @@ import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 
 import gnu.io.CommPort;
@@ -105,13 +106,13 @@ public class VPX_UARTWindow extends JFrame {
 
 	private JMenuItem vpx_UART_Menu_File_Exit;
 
-	private JMenuItem vpx_UART_Menu_Window_ChangeMode;
+	private JMenu vpx_UART_Menu_Window_ChangeMode;
+
+	private JMenuItem vpx_UART_Menu_Window_ChangeMode_ETH;
 
 	private JMenuItem vpx_UART_Menu_Help_About;
 
 	private JMenuItem vpx_UART_Menu_Help_Help;
-
-	private String currentCommand = "";
 
 	/**
 	 * Launch the application.
@@ -187,7 +188,11 @@ public class VPX_UARTWindow extends JFrame {
 
 		vpx_UART_Menu_File_Exit = VPXComponentFactory.createJMenuItem("Exit");
 
-		vpx_UART_Menu_Window_ChangeMode = VPXComponentFactory.createJMenuItem("Change Mode");
+		vpx_UART_Menu_Window_ChangeMode = VPXComponentFactory.createJMenu("Change Mode");
+
+		vpx_UART_Menu_Window_ChangeMode_ETH = VPXComponentFactory.createJMenuItem("Ethernet Mode");
+
+		vpx_UART_Menu_Window_ChangeMode.add(vpx_UART_Menu_Window_ChangeMode_ETH);
 
 		vpx_UART_Menu_Help_About = VPXComponentFactory.createJMenuItem("About");
 
@@ -268,7 +273,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 		});
 
-		vpx_UART_Menu_Window_ChangeMode.addActionListener(new ActionListener() {
+		vpx_UART_Menu_Window_ChangeMode_ETH.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -532,18 +537,12 @@ public class VPX_UARTWindow extends JFrame {
 
 			if (data.length() > 0) {
 
-				// txtAConsole.append(String.format(" %s\\> %s",
-				// this.currCommport, data) + "\n");
-
-				currentCommand = txtConsoleMsg.getText().trim();
-
 				cmdHistory.put(cmdHistory.size(), txtConsoleMsg.getText().trim());
 
 				currentCommandIndex = cmdHistory.size();
 
-				// out.write(String.format("%d::%s",
-				// cmbMessagesCoresFilter.getSelectedIndex(), data).getBytes());
 				out.write(data.getBytes());
+
 				out.write("\n".getBytes());
 
 				txtConsoleMsg.setText("");
@@ -587,19 +586,23 @@ public class VPX_UARTWindow extends JFrame {
 
 				if (msg1.length() > 0) {
 
-					/*if (msg1.trim().startsWith("~ #")) {
-
-						msg1 = "\n";
-					}
-					if (msg1.trim().equals(currentCommand.trim())) {
-
-						msg1 = String.format(" %s\\> %s", VPX_UARTWindow.this.currCommport, msg1);
-					}*/
+					/*
+					 * if (msg1.trim().startsWith("~ #")) {
+					 * 
+					 * msg1 = "\n"; } if
+					 * (msg1.trim().equals(currentCommand.trim())) {
+					 * 
+					 * msg1 = String.format(" %s\\> %s",
+					 * VPX_UARTWindow.this.currCommport, msg1); }
+					 */
 					// txtAConsole.append(String.format(" %s\\> %s",
 					// this.currCommport, data) + "\n");
+
 					txtAConsole.append(msg1 + "\n");
 
 					txtAConsole.setCaretPosition(txtAConsole.getText().length());
+
+					updateLog(msg1);
 					/*
 					 * String msg = msg1.split("::")[1];
 					 * 
@@ -881,4 +884,32 @@ public class VPX_UARTWindow extends JFrame {
 
 	}
 
+	public void updateLog(String log) {
+
+		updateLog(VPXConstants.INFO, log);
+	}
+
+	public void updateLog(int LEVEL, String log) {
+
+		updateLogtoFile(log);
+
+	}
+
+	public void updateLogtoFile(String log) {
+
+		try {
+
+			if (VPXUtilities.isLogEnabled()) {
+
+				String filePath = VPXSessionManager.getCurrentLogFileName();// VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
+
+				VPXUtilities.appendUsingFileWriter(filePath, log);
+
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
 }

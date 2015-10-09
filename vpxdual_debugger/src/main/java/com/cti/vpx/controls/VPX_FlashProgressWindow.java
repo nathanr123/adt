@@ -283,7 +283,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		}
 
-		lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(2, (System.currentTimeMillis() - starttime)));
+		lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - starttime)));
 	}
 
 	public void doneFlash() {

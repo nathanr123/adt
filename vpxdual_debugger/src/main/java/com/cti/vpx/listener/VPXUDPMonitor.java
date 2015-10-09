@@ -7,7 +7,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.command.P2020MSGCommand;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
+import com.cti.vpx.controls.graph.VPX_AmplitudeWindow;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.model.BIST;
@@ -39,8 +39,6 @@ import com.cti.vpx.util.VPXSubnetFilter;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
-
 public class VPXUDPMonitor {
 
 	VPXUDPListener listener;
@@ -54,8 +52,6 @@ public class VPXUDPMonitor {
 	private boolean isipinRange = true;
 
 	private byte[] filestoSend;
-
-	// private byte[] filesfromRecv;
 
 	private int start;
 
@@ -85,6 +81,9 @@ public class VPXUDPMonitor {
 
 	private VPXSystem vpxSystem;
 
+	// Memory Window
+
+	// memory offset
 	private static int memOffset0 = 0;
 
 	private static int memOffset1 = 0;
@@ -93,12 +92,7 @@ public class VPXUDPMonitor {
 
 	private static int memOffset3 = 0;
 
-	private static int plotOffset0 = 0;
-
-	private static int plotOffset1 = 0;
-
-	private static int plotOffset2 = 0;
-
+	// memory buffer
 	private byte[] memoryBuff0;
 
 	private byte[] memoryBuff1;
@@ -107,11 +101,48 @@ public class VPXUDPMonitor {
 
 	private byte[] memoryBuff3;
 
+	// Plot Window
+
+	// plot offset
+	private static int plotOffset0 = 0;
+
+	private static int plotOffset1 = 0;
+
+	private static int plotOffset2 = 0;
+
+	// plot buffer
 	private byte[] plotBuff0;
 
 	private byte[] plotBuff1;
 
 	private byte[] plotBuff2;
+
+	// Waterfall Window
+
+	// waterfall buffer
+	private byte[] waterfallBuff0;
+
+	private byte[] waterfallBuff1;
+
+	private byte[] waterfallBuff2;
+
+	// Amplitude Window
+
+	// amplitude offset
+	private static int amplitudeOffset0 = 0;
+
+	private static int amplitudeOffset1 = 0;
+
+	private static int amplitudeOffset2 = 0;
+
+	// amplitude buffer
+	private byte[] amplitudeBuff0;
+
+	private byte[] amplitudeBuff1;
+
+	private byte[] amplitudeBuff2;
+
+	VPX_AmplitudeWindow demo = new VPX_AmplitudeWindow("Dynamic Data view");
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -183,7 +214,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void sendBoot(String ip, int option) {
+	public void sendBoot(String ip, int processor, int flashdevice, int page) {
 
 		ATPCommand msg = null;
 
@@ -207,9 +238,19 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(ATP.MSG_TYPE_BOOT);
 
-			System.out.println(option);
+			if (processor == 0)
+				msg.processorTYPE.set(ATP.PROCESSOR_TYPE.PROCESSOR_P2020);
+			else if (processor == 1)
+				msg.processorTYPE.set(ATP.PROCESSOR_TYPE.PROCESSOR_DSP1);
+			else if (processor == 2)
+				msg.processorTYPE.set(ATP.PROCESSOR_TYPE.PROCESSOR_DSP2);
 
-			msg.params.flash_info.flashdevice.set(option);
+			if (flashdevice == 0)
+				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NAND);
+			else
+				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+
+			msg.params.flash_info.offset.set(page);
 
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
@@ -330,8 +371,6 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			System.out.println("Sending " + ip + " " + period);
-
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
@@ -378,8 +417,6 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_PERIDAICITY);
 
 			msg.periodicity.set(period);
-
-			System.out.println("Sending " + ip + " " + period);
 
 			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
 
@@ -442,7 +479,8 @@ public class VPXUDPMonitor {
 
 	// Sending File
 
-	public void sendFile(VPX_FlashProgressWindow parentDialog, String filename, String ip) {
+	public void sendFile(VPX_FlashProgressWindow parentDialog, String filename, String ip, int flashDevice,
+			int location) {
 
 		try {
 
@@ -466,7 +504,7 @@ public class VPXUDPMonitor {
 
 			isFlashingStatred = true;
 
-			sendFileToProcessor(ip, FileUtils.sizeOf(f), fb.getBytePacket(0));
+			sendFileToProcessor(ip, FileUtils.sizeOf(f), fb.getBytePacket(0), flashDevice, location);
 
 		} catch (Exception e) {
 
@@ -474,7 +512,7 @@ public class VPXUDPMonitor {
 		}
 	}
 
-	public void sendFileToProcessor(String ip, long size, byte[] sendBuffer) {
+	public void sendFileToProcessor(String ip, long size, byte[] sendBuffer, int flashDevice, int location) {
 		try {
 
 			ATPCommand msg = new DSPATPCommand();
@@ -491,7 +529,12 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(ATP.MSG_TYPE_FLASH);
 
-			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+			if (flashDevice == 0)
+				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NAND);
+			else
+				msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
+
+			msg.params.flash_info.offset.set(location);
 
 			msg.params.flash_info.totalfilesize.set(size);
 
@@ -525,64 +568,6 @@ public class VPXUDPMonitor {
 			e.printStackTrace();
 		}
 
-	}
-
-	public void recvAndSaveFile(String ip, ATPCommand msg) {
-		/*
-		 * 
-		 * int currPacket = (int) msg.params.flash_info.currentpacket.get();
-		 * 
-		 * if (currPacket == 0) {
-		 * 
-		 * filesfromRecv = new byte[(int)
-		 * msg.params.flash_info.totalfilesize.get()]; } start = currPacket *
-		 * msg.params.memoryinfo.buffer.length;
-		 * 
-		 * end = start + msg.params.memoryinfo.buffer.length;
-		 * 
-		 * if (end > filestoSend.length) { end = filestoSend.length; }
-		 * 
-		 * for (int i = start, j = 0; i < end; i++, j++) {
-		 * 
-		 * filesfromRecv[i] = (byte) msg.params.memoryinfo.buffer[j].get(); }
-		 * 
-		 * // Sending part
-		 * 
-		 * if (currPacket < msg.params.flash_info.totalnoofpackets.get()) {
-		 * 
-		 * DatagramSocket datagramSocket;
-		 * 
-		 * try { datagramSocket = new DatagramSocket();
-		 * 
-		 * datagramSocket.setBroadcast(true);
-		 * 
-		 * byte[] buffer = new byte[msg.size()];
-		 * 
-		 * ByteBuffer bf = ByteBuffer.wrap(buffer);
-		 * 
-		 * bf.order(msg.byteOrder());
-		 * 
-		 * msg.setByteBuffer(bf, 0);
-		 * 
-		 * msg.msgID.set(ATP.MSG_ID_SET);
-		 * 
-		 * msg.msgType.set(ATP.MSG_TYPE_FLASH_ACK);
-		 * 
-		 * msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NOR);
-		 * 
-		 * msg.params.flash_info.currentpacket.set(currPacket);
-		 * 
-		 * DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
-		 * InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO);
-		 * 
-		 * datagramSocket.send(packet);
-		 * 
-		 * } catch (Exception e) {
-		 * 
-		 * e.printStackTrace(); } } else { try { FileOutputStream fos = new
-		 * FileOutputStream("D:\\2.java"); fos.write(filesfromRecv);
-		 * fos.close(); } catch (Exception e) { e.printStackTrace(); } }
-		 */
 	}
 
 	public void sendNextPacket(String ip, ATPCommand msg) {
@@ -736,15 +721,7 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.length.set(length);
 
 			this.memLoadDialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
-			/*
-			 * System.out.println( String.format(
-			 * "Address : %d File Size : %d Total Packets : %d Current Packet : %d Packet Size : %d"
-			 * , msg.params.memoryinfo.address.get(),
-			 * msg.params.flash_info.totalfilesize.get(),
-			 * msg.params.flash_info.totalnoofpackets.get(),
-			 * msg.params.flash_info.currentpacket.get(),
-			 * msg.params.memoryinfo.length.get()));
-			 */
+
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
@@ -789,18 +766,12 @@ public class VPXUDPMonitor {
 
 					msg.params.memoryinfo.byteZero.set(bb[0]);
 
-					// System.out.println();
 					for (int i = 0; i < bb.length; i++) {
 
 						msg.params.memoryinfo.buffer[i].set(bb[i]);
 
-						/*
-						 * System.out.print(String.format("%02x ", bb[i]));
-						 * 
-						 * if (((i + 1) % 16) == 0) { System.out.println(); }
-						 */
-
 					}
+
 					this.memLoadDialog.updatePackets(size, tot, currPacket, bb.length, bb.length);
 
 					msg.params.memoryinfo.length.set(bb.length);
@@ -816,15 +787,7 @@ public class VPXUDPMonitor {
 				msg.params.flash_info.currentpacket.set(currPacket);
 
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
-				/*
-				 * System.out.println(String.format(
-				 * "Address : %d File Size : %d Total Packets : %d Current Packet : %d Packet Size : %d"
-				 * , msg.params.memoryinfo.address.get(),
-				 * msg.params.flash_info.totalfilesize.get(),
-				 * msg.params.flash_info.totalnoofpackets.get(),
-				 * msg.params.flash_info.currentpacket.get(),
-				 * msg.params.memoryinfo.length.get()));
-				 */
+
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -864,8 +827,6 @@ public class VPXUDPMonitor {
 
 		} catch (Exception e) {
 
-			// Fix Me
-			// e.printStackTrace();
 		}
 	}
 
@@ -1623,57 +1584,36 @@ public class VPXUDPMonitor {
 
 		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
-		byte[] fb = new byte[4];
-
 		float[] fl = new float[b.length / 4];
-
-		int j = 0;
 
 		int k = 0;
 
 		for (int i = 0; i < b.length; i++) {
 
 			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
-
-			if ((i + 1) % 4 == 0) {
-
-				j = 0;
-
-				fl[k] = ByteBuffer.wrap(fb).getFloat();
-				k++;
-
-			} else {
-				fb[j] = b[i];
-				j++;
-			}
-
 		}
 
-		///ByteBuffer.wrap(b).asFloatBuffer().get(fl);
+		ByteBuffer.wrap(b).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(fl);
 
 		for (int i = 0; i < fl.length; i++) {
 			System.out.println(fl[i]);
 		}
-		/*
-		 * byte[] x = new byte[512]; byte[] y = new byte[512];
-		 * 
-		 * for (int i = 0; i < 512; i++) {
-		 * 
-		 * x[i] = (byte) msg.params.memoryinfo.buffer[i].get(); }
-		 * 
-		 * int k = 0; for (int j = 512; j < 1024; j++) { y[k] = (byte)
-		 * msg.params.memoryinfo.buffer[j].get(); k++; }
-		 * 
-		 * for (int i = 0; i < 512; i++) {
-		 * 
-		 * System.out.println(String.format("X : %02x Y : %02x", x[i], y[i])); }
-		 * 
-		 * DrawChart demo = new DrawChart("Dynamic Data view"); demo.pack();
-		 * 
-		 * demo.addData(x, y); // RefineryUtilities.centerFrameOnScreen(demo);
-		 * demo.setVisible(true); // ((VPX_ETHWindow)
-		 * listener).populateWaterfall(ip, b);
-		 */
+
+		float x[] = new float[fl.length / 2];
+		float y[] = new float[fl.length / 2];
+
+		k = 0;
+		for (int i = 0; i < fl.length; i += 2) {
+			x[k] = fl[i];
+			y[k] = fl[i + 1];
+			k++;
+		}
+
+		demo.pack();
+
+		demo.addData(x, y); // RefineryUtilities.centerFrameOnScreen(demo);
+		demo.setVisible(true);
+
 	}
 
 	public void populateBISTResult(String ip, ATPCommand msg) {
@@ -1946,8 +1886,6 @@ public class VPXUDPMonitor {
 
 			case ATP.MSG_TYPE_FLASH:
 
-				recvAndSaveFile(ip, msgCommand);
-
 				break;
 
 			case ATP.MSG_TYPE_FLASH_ACK:
@@ -2054,6 +1992,7 @@ public class VPXUDPMonitor {
 	// Parsing Advertisement Packets
 	private synchronized void parseAdvertisementPacket(String ip, String msg) {
 
+		System.out.println(ip + " -- " + msg);
 		if (msg.length() == 6) {
 
 			if (subnet != null) {

@@ -27,7 +27,7 @@ public class GraphsDemo {
 		// GraphWithScrollingLines());
 		// tabbedPane.addTab("Scrolling Line Graph - XY", new
 		// GraphWithScrollingLinesXY());
-		tabbedPane.addTab("Waterfall Graph", new WaterfallGraphDemo());
+		tabbedPane.addTab("Waterfall Graph", new WaterfallGraphPanel());
 		// tabbedPane.addTab("Overview Graph", new OverviewGraphDisplay());
 		// tabbedPane.addTab("Custom Graph", new GraphWithCustomDrawSurface());
 

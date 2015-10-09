@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -266,6 +267,14 @@ public class VPXUtilities {
 
 			ret = VPXConstants.DATEFORMAT_TIMEFULL.format(millis);
 
+		else if (format == 4) {
+
+			VPXConstants.DATEFORMAT_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
+
+		}
+
 		return ret;
 	}
 
@@ -379,6 +388,11 @@ public class VPXUtilities {
 
 	public static void showPopup(String msg, String file) {
 
+		showPopup(msg, file, false);
+	}
+
+	public static void showPopup(String msg, String file, boolean isUART) {
+
 		JPanel centerPanel = new JPanel(new BorderLayout());
 
 		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -450,7 +464,8 @@ public class VPXUtilities {
 			}
 		});
 
-		buttonsPanel.add(btnOpen);
+		if (!isUART)
+			buttonsPanel.add(btnOpen);
 
 		buttonsPanel.add(btnOpenFolder);
 

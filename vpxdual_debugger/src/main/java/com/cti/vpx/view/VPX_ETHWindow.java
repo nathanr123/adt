@@ -33,7 +33,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.command.MSGCommand;
@@ -41,6 +40,7 @@ import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
+import com.cti.vpx.controls.VPX_BootWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
 import com.cti.vpx.controls.VPX_ChangePeriodicityWindow;
 import com.cti.vpx.controls.VPX_ConsolePanel;
@@ -56,7 +56,6 @@ import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorTree;
-import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
@@ -94,6 +93,8 @@ public class VPX_ETHWindow extends JFrame
 	private VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
 
 	private VPX_BISTResultWindow bistWindow = new VPX_BISTResultWindow();
+
+	private VPX_BootWindow bootWindow = new VPX_BootWindow(this);
 
 	private VPX_DetailWindow detail = new VPX_DetailWindow(VPX_ETHWindow.this);
 
@@ -138,6 +139,8 @@ public class VPX_ETHWindow extends JFrame
 	private JMenuItem vpx_Menu_Window_FlashWizard;
 
 	private JMenuItem vpx_Menu_Window_BIST;
+
+	private JMenuItem vpx_Menu_Window_Boot;
 
 	private JMenuItem vpx_Menu_Window_Execution;
 
@@ -191,7 +194,7 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
 
-	private VPX_WaterfallWindow waterfallWindow = new VPX_WaterfallWindow(this);
+	private VPX_WaterfallWindow waterfallWindow = null;
 
 	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
@@ -224,6 +227,10 @@ public class VPX_ETHWindow extends JFrame
 	public static int currentNoofMemoryView;
 
 	public static int currentNoofMemoryPlot;
+
+	public static int currentNoofWaterfall;
+
+	public static int currentNoofAmplitude;
 
 	/**
 	 * Create the frame.
@@ -312,6 +319,8 @@ public class VPX_ETHWindow extends JFrame
 		udpMonitor.applyFilterbySubnet(mask);
 	}
 
+	// Memory Window
+
 	public void openMemoryBrowser(MemoryViewFilter filter) {
 
 		currentNoofMemoryView++;
@@ -367,6 +376,8 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
 	}
+
+	// Plot Window
 
 	public void createMemoryPlots() {
 
@@ -514,7 +525,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				refreshProcessorTree();
+				refreshProcessorTree(false);
 
 			}
 		});
@@ -648,6 +659,19 @@ public class VPX_ETHWindow extends JFrame
 			public void actionPerformed(ActionEvent e) {
 
 				showBIST();
+
+			}
+		});
+
+		vpx_Menu_Window_Boot = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot"),
+				VPXConstants.Icons.ICON_EMPTY);
+
+		vpx_Menu_Window_Boot.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showBootOption(VPXSessionManager.getCurrentIP());
 
 			}
 		});
@@ -814,13 +838,6 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_File_Exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
 
-		// Window Menu Items
-		// vpx_Menu_Window_MemoryBrowser.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-		// ActionEvent.CTRL_MASK));
-
-		// vpx_Menu_Window_MemoryPlot.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-		// ActionEvent.CTRL_MASK));
-
 		vpx_Menu_Window_MAD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
 
 		vpx_Menu_Window_FlashWizard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK));
@@ -882,6 +899,8 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_Window.add(vpx_Menu_Window_BIST);
 
+		vpx_Menu_Window.add(vpx_Menu_Window_Boot);
+
 		vpx_Menu_Window.add(VPXComponentFactory.createJSeparator());
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryBrowser);
@@ -937,14 +956,14 @@ public class VPX_ETHWindow extends JFrame
 
 		JButton btnAliasRefresh = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_REFRESH, null);
 
-		btnAliasRefresh.setToolTipText("Refresh Processors List Tree");
+		btnAliasRefresh.setToolTipText("Reload processors tree");
 
 		btnAliasRefresh.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				vpx_Menu_File_Refresh.doClick();
+				refreshProcessorTree(true);
 
 			}
 		});
@@ -1189,9 +1208,6 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
 
-		// vpx_Content_Tabbed_Pane_Right.addTab("Startup", new
-		// VPX_StartupPanel());
-
 		contentPanel.add(vpx_Content_Tabbed_Pane_Right);
 
 		vpx_Right_SplitPane.setLeftComponent(contentPanel);
@@ -1387,17 +1403,12 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void refreshProcessorTree() {
-
-		vpx_Processor_Tree.refreshProcessorsStatus();
-	}
-
 	public void refreshProcessorTree(boolean isReload) {
 
 		if (isReload) {
 			vpx_Processor_Tree.refreshProcessorTree();
 		} else {
-			vpx_Processor_Tree.refreshProcessorsStatus();
+			vpx_Processor_Tree.refreshStatus();
 		}
 	}
 
@@ -1515,8 +1526,6 @@ public class VPX_ETHWindow extends JFrame
 
 					udpMonitor.close();
 
-					// udpMonitor.stopMonitor();
-
 					VPX_ETHWindow.this.dispose();
 
 					System.exit(0);
@@ -1591,6 +1600,8 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showWaterfall(String ip) {
 
+		waterfallWindow = new VPX_WaterfallWindow(this);
+
 		waterfallWindow.showWaterFall(ip);
 
 		readWaterfall(ip);
@@ -1630,6 +1641,23 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void showBootOption(String ip) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				bootWindow.showBootoption(ip);
+
+				updateLog("Opening boot option");
+			}
+		});
+
+		th.start();
+
+	}
+
 	public void showBIST() {
 
 		updateLog("Starting Built in Self Test");
@@ -1651,14 +1679,14 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void setReboot(String ip, int option) {
+	public void setReboot(String ip, int processor, int flashdevice, int page) {
 
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				udpMonitor.sendBoot(ip, option);
+				udpMonitor.sendBoot(ip, processor, flashdevice, page);
 
 			}
 		});
@@ -1705,6 +1733,8 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showFlashWizard() {
 
+		updateLog("Opening flash wizard window");
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -1732,9 +1762,6 @@ public class VPX_ETHWindow extends JFrame
 		if (VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD)
 				.equals(paswordWindow.getPasword())) {
 
-			// addTab("VLAN", new JScrollPane(new
-			// VPX_P2020ConfigurationPanel(tab)));
-
 			final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
 
 			JPanel contentPane = new JPanel();
@@ -1758,9 +1785,8 @@ public class VPX_ETHWindow extends JFrame
 			frame.addWindowListener(new WindowAdapter() {
 
 				@Override
-				public void windowClosing(WindowEvent e) { // Dispose of the
-					// native
-					// component cleanly
+				public void windowClosing(WindowEvent e) {
+
 					browserCanvas.dispose();
 				}
 			});
@@ -1898,13 +1924,11 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -1917,25 +1941,21 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -2094,11 +2114,11 @@ public class VPX_ETHWindow extends JFrame
 	@Override
 	public void populateWaterfall(String ip, byte[] bytes) {
 
-		if (waterfallWindow.isVisible()) {
+		if (waterfallWindow != null) {
 
 			waterfallWindow.loadData(bytes);
 
-			waterfallWindow.showWaterFall(ip);
+			waterfallWindow.setVisible(true);
 		}
 
 	}
@@ -2136,9 +2156,10 @@ public class VPX_ETHWindow extends JFrame
 		}
 	}
 
-	public void sendFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow) {
+	public void sendFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow, int flashdevice,
+			int location) {
 
-		udpMonitor.sendFile(flashingWindow, filename, ip);
+		udpMonitor.sendFile(flashingWindow, filename, ip, flashdevice, location);
 
 	}
 
@@ -2287,6 +2308,8 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_BIST.setEnabled(false);
 
+			vpx_Menu_Window_Boot.setEnabled(false);
+
 			vpx_Menu_Window_P2020Config.setEnabled(false);
 
 			vpx_Menu_Window_ChangeIP.setEnabled(false);
@@ -2321,6 +2344,8 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_BIST.setEnabled(false);
 
+			vpx_Menu_Window_Boot.setEnabled(false);
+
 			vpx_Menu_Window_P2020Config.setEnabled(false);
 
 			vpx_Menu_Window_ChangeIP.setEnabled(false);
@@ -2353,6 +2378,8 @@ public class VPX_ETHWindow extends JFrame
 			vpx_Menu_Window_Waterfall.setEnabled(false);
 
 			vpx_Menu_Window_BIST.setEnabled(true);
+
+			vpx_Menu_Window_Boot.setEnabled(true);
 
 			vpx_Menu_Window_P2020Config.setEnabled(true);
 
@@ -2387,6 +2414,8 @@ public class VPX_ETHWindow extends JFrame
 			vpx_Menu_Window_Waterfall.setEnabled(false);
 
 			vpx_Menu_Window_BIST.setEnabled(false);
+
+			vpx_Menu_Window_Boot.setEnabled(false);
 
 			vpx_Menu_Window_P2020Config.setEnabled(false);
 

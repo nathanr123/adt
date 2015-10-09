@@ -63,6 +63,9 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private String flashIP = "";
 
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public VPX_EthernetFlashPanel(VPX_ETHWindow parent) {
 
 		this.parent = parent;
@@ -107,10 +110,10 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		setPreferredSize(new Dimension(800, 496));
 	}
 
-	public void interruptFlash(){
+	public void interruptFlash() {
 		parent.setInterrupt(flashIP);
 	}
-	
+
 	private void loadComponents() {
 
 		JPanel flashPanl = new JPanel();
@@ -181,7 +184,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 						flashIP = cmbFlshProcessors.getSelectedItem().toString();
 					}
 
-					parent.sendFile(flashIP, txtBinFilePath.getText(), dialog);
+					parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(), cmbOffset.getSelectedIndex());
 
 				} else {
 

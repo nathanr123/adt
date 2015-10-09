@@ -34,7 +34,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import com.cti.vpx.command.ATP;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
@@ -78,11 +77,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private JMenuItem vpx_Cxt_BIST;
 
-	private JMenu vpx_Cxt_Reboot;
-
-	private JMenuItem vpx_Cxt_Reboot_NAND;
-
-	private JMenuItem vpx_Cxt_Reboot_NOR;
+	private JMenuItem vpx_Cxt_Reboot;
 
 	private JMenuItem vpx_Cxt_Execution;
 
@@ -585,10 +580,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	}
 
-	private void loadSystemRootNodeWithoutUnListed() {
+	private void reload() {
 
 		systemRootNode.removeAllChildren();
-
+		
 		List<VPXSubSystem> subSystems = system.getSubsystem();
 
 		system.clearUnlisted();
@@ -621,9 +616,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		}
 
+		refresh();
 	}
 
-	public void refreshProcessorsStatus() {
+	public void refreshStatus() {
 
 		long response = 0, difference = 0;
 
@@ -720,20 +716,19 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				VPX_ProcessorNode node = (VPX_ProcessorNode) getLastSelectedPathComponent();
 
 				if (node != null) {
-					
+
 					enableNodeComponents(node);
 
 					if (node.isProcessorNode()) {
 
 						setSelectedProcessor(node);
 
-					} else if(node.isSubSytemNode()) {
-						VPXSessionManager.setCurrentProcessor("", "", "");					
-						
-						
-					}else if(node.isRootNode()) {
+					} else if (node.isSubSytemNode()) {
 						VPXSessionManager.setCurrentProcessor("", "", "");
-						
+
+					} else if (node.isRootNode()) {
+						VPXSessionManager.setCurrentProcessor("", "", "");
+
 					}
 				}
 			}
@@ -819,9 +814,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	}
 
 	private void setSelectedProcessor(VPX_ProcessorNode node) {
-	
+
 		enableNodeComponents(node);
-		
+
 		if (node.isProcessorNode()) {
 
 			VPXSessionManager.setCurrentProcessor(node.getSubSystemName(), node.getNodeTypeString(), node.getNodeIP());
@@ -906,7 +901,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				refreshProcessorsStatus();
+				refreshStatus();
 
 			}
 		});
@@ -1008,37 +1003,17 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Reboot = VPXComponentFactory.createJMenu(rBundle.getString("Menu.Window.Reboot"));
+		vpx_Cxt_Reboot = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot"));
 
-		vpx_Cxt_Reboot_NAND = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot.Nand"));
-
-		vpx_Cxt_Reboot_NAND.addActionListener(new ActionListener() {
+		vpx_Cxt_Reboot.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				parent.setReboot(VPXSessionManager.getCurrentProcessor(), ATP.FLASH_DEVICE_NAND);
+				parent.showBootOption(VPXSessionManager.getCurrentProcessor());
 
 			}
 		});
-
-		vpx_Cxt_Reboot_NOR = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Reboot.Nor"));
-
-		vpx_Cxt_Reboot_NOR.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				parent.setReboot(VPXSessionManager.getCurrentProcessor(), ATP.FLASH_DEVICE_NOR);
-
-			}
-		});
-
-		vpx_Cxt_Reboot.add(vpx_Cxt_Reboot_NAND);
-
-		vpx_Cxt_Reboot.add(VPXComponentFactory.createJSeparator());
-
-		vpx_Cxt_Reboot.add(vpx_Cxt_Reboot_NOR);
 
 		vpx_Cxt_BIST = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.BIST"),
 				VPXConstants.Icons.ICON_BIST);
@@ -1232,7 +1207,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	public void refreshProcessorTree() {
 
-		loadSystemRootNodeWithoutUnListed();
+		reload();
 
 	}
 

@@ -373,25 +373,21 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -400,7 +396,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
@@ -425,7 +420,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -785,14 +779,13 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		try {
 
 			chooser = new JFileChooser();
-			
+
 			chooser.setCurrentDirectory(new java.io.File("."));
 
 			chooser.setDialogTitle("Select folder to save");
 
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			
-			
+
 			if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 
 				String path = chooser.getSelectedFile().getPath() + "\\Messages."
@@ -823,7 +816,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				fw.close();
 
-				VPXUtilities.showPopup("File Saved at " + path,path);
+				VPXUtilities.showPopup("File Saved at " + path, path);
 			}
 
 		} catch (Exception e) {
@@ -1124,6 +1117,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			setTitle("Command History");
 
+			setIconImage(VPXUtilities.getAppIcon());
+
 			setBounds(100, 100, 450, 300);
 
 			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -1158,25 +1153,21 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				@Override
 				public void mousePressed(MouseEvent e) {
-					// TODO Auto-generated method stub
 
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					// TODO Auto-generated method stub
 
 				}
 
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					// TODO Auto-generated method stub
 
 				}
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					// TODO Auto-generated method stub
 
 				}
 			});

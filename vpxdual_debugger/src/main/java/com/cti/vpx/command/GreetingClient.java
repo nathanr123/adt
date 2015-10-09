@@ -136,7 +136,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		jp.add(jb2);
 
-		JButton jb3 = new JButton("Start BIST");
+		JButton jb3 = new JButton("Boot");
 
 		jb3.addActionListener(new ActionListener() {
 
@@ -144,7 +144,10 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			public void actionPerformed(ActionEvent e) {
 				// sendCMD();
 
-				startBist();
+				//startBist();
+				
+				boot("172.17.10.2");
+				
 
 			}
 		});
@@ -183,8 +186,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 			public void actionPerformed(ActionEvent e) {
 				// setMemory();
 
-				//getWaterFall();
-				
+				// getWaterFall();
+
 				getAmplitude();
 			}
 		});
@@ -251,7 +254,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		}
 
 	}
-	
+
 	public void getAmplitude() {
 
 		DatagramSocket datagramSocket;
@@ -489,7 +492,11 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.msgType.set(ATP.MSG_TYPE_BOOT);
 
+			msg.processorTYPE.set(ATP.PROCESSOR_TYPE.PROCESSOR_DSP1);
+
 			msg.params.flash_info.flashdevice.set(ATP.FLASH_DEVICE_NAND);
+			
+			msg.params.flash_info.offset.set(0);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					VPXUDPListener.COMM_PORTNO);
@@ -893,7 +900,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			dialog.setVisible(true);
 
-			udp.sendFile(dialog, "D:\\UARTTestProject.bin", "172.17.10.130");
+			udp.sendFile(dialog, "D:\\UARTTestProject.bin", "172.17.10.130", 0, 0);
 
 		} catch (Exception e) {
 			e.printStackTrace();
