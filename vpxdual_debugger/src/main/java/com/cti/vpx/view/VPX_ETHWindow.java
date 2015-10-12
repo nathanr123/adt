@@ -59,6 +59,7 @@ import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
+import com.cti.vpx.controls.graph.VPX_AmpWindow;
 import com.cti.vpx.controls.graph.VPX_WaterfallWindow;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
@@ -194,7 +195,9 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
 
-	private VPX_WaterfallWindow waterfallWindow = null;
+	private VPX_WaterfallWindow[] waterfallWindow;
+
+	private VPX_AmpWindow[] amplitudeWindow;
 
 	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
@@ -301,6 +304,10 @@ public class VPX_ETHWindow extends JFrame
 		createMemoryBrowsers();
 
 		createMemoryPlots();
+
+		createWaterfallWindows();
+
+		createAmplitudeWindows();
 	}
 
 	public void createMemoryBrowsers() {
@@ -316,6 +323,7 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	public void applyMask(String mask) {
+
 		udpMonitor.applyFilterbySubnet(mask);
 	}
 
@@ -443,6 +451,166 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+	}
+
+	// Waterfall Window
+
+	private void createWaterfallWindows() {
+
+		waterfallWindow = new VPX_WaterfallWindow[VPXConstants.MAX_WATERFALL];
+
+		for (int i = 0; i < VPXConstants.MAX_WATERFALL; i++) {
+
+			waterfallWindow[i] = new VPX_WaterfallWindow(this, i);
+
+		}
+
+	}
+
+	public void openWaterfall(String ip) {
+
+		currentNoofWaterfall++;
+
+		if (currentNoofWaterfall > VPXConstants.MAX_WATERFALL) {
+
+			JOptionPane.showMessageDialog(this, "Maximum 3 waterfall graphs are allowed.You are exceeding the limit",
+					"Maximum Reached", JOptionPane.ERROR_MESSAGE);
+
+			currentNoofWaterfall = VPXConstants.MAX_WATERFALL;
+		}
+
+		for (int i = 0; i < VPXConstants.MAX_WATERFALL; i++) {
+
+			if (!waterfallWindow[i].isVisible()) {
+
+				waterfallWindow[i].showWaterFall(ip);
+
+				// readWaterfall(ip);
+
+				break;
+			}
+		}
+
+		if (currentNoofWaterfall == VPXConstants.MAX_WATERFALL) {
+
+			vpx_Menu_Window_Waterfall.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_Waterfall.setEnabled(true);
+		}
+
+		vpx_Menu_Window_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
+				+ (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ");
+
+		updateLog("Waterfall graph for " + ip + " opened ");
+
+		/*
+		 * waterfallWindow = new VPX_WaterfallWindow(this);
+		 * 
+		 * waterfallWindow.showWaterFall(ip);
+		 * 
+		 * readWaterfall(ip);
+		 * 
+		 * updateLog("Showing Waterfall Graph");
+		 */
+	}
+
+	public void reindexWaterfallIndex() {
+
+		currentNoofWaterfall--;
+
+		if (currentNoofWaterfall == VPXConstants.MAX_WATERFALL) {
+
+			vpx_Menu_Window_Waterfall.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_Waterfall.setEnabled(true);
+		}
+
+		vpx_Menu_Window_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
+				+ (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ");
+	}
+
+	// Amplitude Window
+
+	private void createAmplitudeWindows() {
+
+		amplitudeWindow = new VPX_AmpWindow[VPXConstants.MAX_AMPLITUDE];
+
+		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
+
+			amplitudeWindow[i] = new VPX_AmpWindow(this, i);
+
+		}
+
+	}
+
+	public void openAmplitude(String ip) {
+
+		currentNoofAmplitude++;
+
+		if (currentNoofAmplitude > VPXConstants.MAX_AMPLITUDE) {
+
+			JOptionPane.showMessageDialog(this, "Maximum 3 amplitude graphs are allowed.You are exceeding the limit",
+					"Maximum Reached", JOptionPane.ERROR_MESSAGE);
+
+			currentNoofAmplitude = VPXConstants.MAX_AMPLITUDE;
+		}
+
+		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
+
+			if (!amplitudeWindow[i].isVisible()) {
+
+				amplitudeWindow[i].showAmplitude(ip);
+
+				readAmplitude(ip);
+
+				break;
+			}
+		}
+
+		if (currentNoofAmplitude == VPXConstants.MAX_AMPLITUDE) {
+
+			vpx_Menu_Window_Amplitude.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_Amplitude.setEnabled(true);
+		}
+
+		vpx_Menu_Window_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
+				+ (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ");
+
+		updateLog("Amplitude graph for " + ip + " opened ");
+
+		/*
+		 * waterfallWindow = new VPX_WaterfallWindow(this);
+		 * 
+		 * waterfallWindow.showWaterFall(ip);
+		 * 
+		 * readWaterfall(ip);
+		 * 
+		 * updateLog("Showing Waterfall Graph");
+		 */
+	}
+
+	public void reindexAmplitudeIndex() {
+
+		currentNoofAmplitude--;
+
+		if (currentNoofAmplitude == VPXConstants.MAX_AMPLITUDE) {
+
+			vpx_Menu_Window_Amplitude.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_Amplitude.setEnabled(true);
+		}
+
+		vpx_Menu_Window_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
+				+ (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ");
 	}
 
 	public void reloadVPXSystem() {
@@ -599,20 +767,20 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		vpx_Menu_Window_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude"),
-				VPXConstants.Icons.ICON_EMPTY);
+		vpx_Menu_Window_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude")
+				+ " ( " + (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ", VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Window_Amplitude.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				showAmplitude();
+				showAmplitude(VPXSessionManager.getCurrentIP());
 
 			}
 		});
-		vpx_Menu_Window_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall"),
-				VPXConstants.Icons.ICON_EMPTY);
+		vpx_Menu_Window_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall")
+				+ " ( " + (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ", VPXConstants.Icons.ICON_EMPTY);
 
 		vpx_Menu_Window_Waterfall.addActionListener(new ActionListener() {
 
@@ -1569,6 +1737,22 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void showWaterfall(String ip) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				openWaterfall(ip);
+
+			}
+		});
+
+		th.start();
+
+	}
+
 	public void showEthFlash() {
 
 		Thread th = new Thread(new Runnable() {
@@ -1593,20 +1777,21 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void showAmplitude() {
+	public void showAmplitude(String ip) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				openAmplitude(ip);
+
+			}
+		});
+
+		th.start();
 
 		updateLog("Showing Amplitude Graph");
-	}
-
-	public void showWaterfall(String ip) {
-
-		waterfallWindow = new VPX_WaterfallWindow(this);
-
-		waterfallWindow.showWaterFall(ip);
-
-		readWaterfall(ip);
-
-		updateLog("Showing Waterfall Graph");
 	}
 
 	public void showMAD() {
@@ -2113,20 +2298,71 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void populateWaterfall(String ip, byte[] bytes) {
-
-		if (waterfallWindow != null) {
-
-			waterfallWindow.loadData(bytes);
-
-			waterfallWindow.setVisible(true);
-		}
-
+		/*
+		 * if (waterfallWindow != null) {
+		 * 
+		 * waterfallWindow.loadData(bytes);
+		 * 
+		 * waterfallWindow.setVisible(true); }
+		 */
 	}
 
 	@Override
 	public void sendWaterfallInterrupt(String ip) {
 
 		udpMonitor.setWaterfallInterrupted(ip);
+
+	}
+
+	@Override
+	public void readAmplitude(String ip) {
+		
+		udpMonitor.readAmplitudeData(ip);
+
+	}
+
+	@Override
+	public void populateAmplitude(String ip, float[] xAxis, float[] yAxis) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+
+					int idx = -1;
+
+					for (int i = 0; i < amplitudeWindow.length; i++) {
+
+						if (amplitudeWindow[i].getIP().equals(ip)) {
+
+							idx = i;
+							
+							break;
+						}
+					}
+
+					if (amplitudeWindow[idx].isVisible()) {
+
+						amplitudeWindow[idx].loadData(xAxis, yAxis);
+
+						amplitudeWindow[idx].setVisible(true);
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		th.start();
+
+	}
+
+	@Override
+	public void sendAmplitudeInterrupt(String ip) {
+		udpMonitor.setAmplitudeInterrupted(ip);
 
 	}
 

@@ -26,6 +26,8 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	private JPanel contentPane;
 
+	private int waterfallID = -1;
+
 	private JTextField txtRefreshRate;
 
 	private JTextField txtProcessor;
@@ -43,7 +45,9 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 	/**
 	 * Create the frame.
 	 */
-	public VPX_WaterfallWindow(VPX_ETHWindow parnt) {
+	public VPX_WaterfallWindow(VPX_ETHWindow parnt, int idx) {
+
+		this.waterfallID = idx;
 
 		this.parent = parnt;
 
@@ -172,7 +176,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		newWaterfallGraph.clearAlldata();
 
-		setTitle("Waterfall Graph - " + currentip);
+		setTitle(String.format("Waterfall Graph (%d) :: %s", (waterfallID + 1), currentip));
 
 		txtProcessor.setText(currentip);
 
@@ -210,6 +214,20 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	}
 
+	public int getWaterfallID() {
+		return waterfallID;
+	}
+
+	public void setWaterfallID(int waterfallID) {
+		this.waterfallID = waterfallID;
+	}
+
+	public String getIP() {
+
+		return this.currentip;
+
+	}
+
 	@Override
 	public void windowOpened(WindowEvent e) {
 
@@ -225,6 +243,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosed(WindowEvent e) {
 
+		parent.reindexWaterfallIndex();
 	}
 
 	@Override

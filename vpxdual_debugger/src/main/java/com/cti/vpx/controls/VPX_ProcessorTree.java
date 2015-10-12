@@ -93,8 +93,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private JMenuItem vpx_Cxt_Remove;
 
-	private JMenuItem vpx_Cxt_Swap;
-
 	private VPX_ETHWindow parent;
 
 	private VPXSystem system = new VPXSystem();
@@ -583,7 +581,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 	private void reload() {
 
 		systemRootNode.removeAllChildren();
-		
+
 		List<VPXSubSystem> subSystems = system.getSubsystem();
 
 		system.clearUnlisted();
@@ -965,18 +963,22 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude"));
+		vpx_Cxt_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude") + " ( "
+				+ (VPXConstants.MAX_AMPLITUDE - VPX_ETHWindow.currentNoofAmplitude) + " ) ");
 
 		vpx_Cxt_Amplitude.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				parent.showAmplitude();
+				VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) getSelectionPath().getLastPathComponent();
+
+				parent.showAmplitude(rightClickedNode.getNodeIP());
 
 			}
 		});
-		vpx_Cxt_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall"));
+		vpx_Cxt_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall") + " ( "
+				+ (VPXConstants.MAX_WATERFALL - VPX_ETHWindow.currentNoofWaterfall) + " ) ");
 
 		vpx_Cxt_Waterfall.addActionListener(new ActionListener() {
 
@@ -1145,17 +1147,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Swap = VPXComponentFactory.createJMenuItem("Swap SubSystems");
-
-		vpx_Cxt_Swap.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				doSwap(getSelectionPaths());
-			}
-		});
-
 	}
 
 	private void refresh() {
@@ -1249,79 +1240,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	}
 
-	private void doSwap(TreePath[] paths) {
-
-		String sub1 = "";
-		String sub2 = "";
-
-		if ((paths.length % 2) != 0) {
-
-			JOptionPane.showMessageDialog(parent, "Please select correct processors");
-
-			return;
-
-		} else {
-
-			String temp = "";
-
-			for (int i = 0; i < paths.length; i++) {
-
-				temp = paths[i].getParentPath().toString();
-
-				if (i == 0) {
-
-					sub1 = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
-
-				} else {
-
-					if (!sub1.equals(temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1))) {
-
-						sub2 = temp.substring(temp.lastIndexOf(" ") + 1, temp.length() - 1);
-
-						break;
-					}
-				}
-
-			}
-
-		}
-
-		String[] nameArrays = getNodeNames(paths);
-
-		String p1 = "";
-
-		String d1 = "";
-
-		String d2 = "";
-
-		if (nameArrays != null) {
-
-			for (int i = 0; i < nameArrays.length; i++) {
-
-				if (nameArrays[i].contains("P2020")) {
-
-					p1 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
-
-				} else if (nameArrays[i].contains("DSP1")) {
-
-					d1 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
-
-				} else if (nameArrays[i].contains("DSP2")) {
-
-					d2 = nameArrays[i].substring(nameArrays[i].indexOf(")") + 1);
-				}
-
-			}
-
-			parent.showAliasConfig(p1, d1, d2);
-
-		} else {
-
-			JOptionPane.showMessageDialog(parent, "Must select 3 Processors only.\nSelect P2020, DSP1, DSP2 order");
-		}
-
-	}
-
 	public JPopupMenu getPopupMenu(VPX_ProcessorNode node, int nodeLevel) {
 
 		TreePath[] paths = getSelectionPaths();
@@ -1337,6 +1255,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_Cxt_MemoryPlot.setText((rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 					+ (VPXConstants.MAX_MEMORY_PLOT - VPX_ETHWindow.currentNoofMemoryPlot) + " ) "));
+
+			vpx_Cxt_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
+					+ (VPXConstants.MAX_WATERFALL - VPX_ETHWindow.currentNoofWaterfall) + " ) ");
+
+			vpx_Cxt_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
+					+ (VPXConstants.MAX_AMPLITUDE - VPX_ETHWindow.currentNoofAmplitude) + " ) ");
 
 			if (nodeLevel == 0) { // VPXSystem - Root Node
 

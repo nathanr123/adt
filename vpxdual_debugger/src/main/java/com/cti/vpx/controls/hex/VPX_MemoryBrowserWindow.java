@@ -1202,7 +1202,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		parent.reindexMemoryBrowserIndex();
 
 	}
-
+	
 	@Override
 	public void windowIconified(WindowEvent e) {
 

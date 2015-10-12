@@ -35,6 +35,8 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = 3949787968608726203L;
 
+	private int amplitudeID = -1;
+
 	private JPanel contentPane;
 
 	private JTextField txtRefreshRate;
@@ -64,7 +66,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VPX_AmpWindow frame = new VPX_AmpWindow(null);
+					VPX_AmpWindow frame = new VPX_AmpWindow(null, 0);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -76,7 +78,9 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 	/**
 	 * Create the frame.
 	 */
-	public VPX_AmpWindow(VPX_ETHWindow parnt) {
+	public VPX_AmpWindow(VPX_ETHWindow parnt, int id) {
+
+		this.amplitudeID = id;
 
 		this.parent = parnt;
 
@@ -245,7 +249,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 		this.currentip = ip;
 
-		setTitle("Amplitude Graph - " + currentip);
+		setTitle(String.format("Amplitude Graph (%d) :: %s", (amplitudeID + 1), currentip));
 
 		txtProcessor.setText(currentip);
 
@@ -268,17 +272,21 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 		}
 
 		this.dataset.addSeries(series);
+		
+		setMinMaxValues(yAxis);
 	}
 
-	/*
-	private void setMinMaxValues(byte[] bytes) {
+	
+	private void setMinMaxValues(float[] yValues) {
 
 		// assign first element of an array to largest and smallest
-		byte smallest = (byte) (bytes[0] & 0x0ff);
-		byte largetst = (byte) (bytes[0] & 0x0ff);
+		float smallest = yValues[0];
 
-		for (int i = 1; i < bytes.length; i++) {
-			byte b = (byte) (bytes[i] & 0x0ff);
+		float largetst = yValues[0];
+		
+		for (int i = 1; i < yValues.length; i++) {
+
+			float b = yValues[i];
 
 			if (b > largetst)
 				largetst = b;
@@ -287,12 +295,18 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 		}
 
-		txtMaxValue.setText(String.format("%02X", largetst));
+		txtMaxValue.setText(""+largetst);
 
-		txtMinValue.setText(String.format("%02X", smallest));
+		txtMinValue.setText(""+smallest);
 
 	}
-*/
+
+	public String getIP() {
+
+		return this.currentip;
+
+	}
+
 	@Override
 	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
@@ -302,13 +316,14 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		//parent.sendWaterfallInterrupt(currentip);
+		parent.sendAmplitudeInterrupt(currentip);
 
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
+
+		parent.reindexAmplitudeIndex();
 
 	}
 

@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +120,10 @@ public class VPXUDPMonitor {
 
 	// Waterfall Window
 
+	// waterfall ips
+
+	private VPXArrayList waterfallIPs = new VPXArrayList();
+
 	// waterfall buffer
 	private byte[] waterfallBuff0;
 
@@ -127,6 +132,8 @@ public class VPXUDPMonitor {
 	private byte[] waterfallBuff2;
 
 	// Amplitude Window
+
+	private String[] amplitudeIPs = new String[VPXConstants.MAX_AMPLITUDE];
 
 	// amplitude offset
 	private static int amplitudeOffset0 = 0;
@@ -144,18 +151,24 @@ public class VPXUDPMonitor {
 
 	VPX_AmplitudeWindow demo = new VPX_AmplitudeWindow("Dynamic Data view");
 
+	int temp = 0;
+
 	public VPXUDPMonitor() throws Exception {
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
+
+		init();
 
 		createDefaultMonitors();
 	}
 
 	public VPXUDPMonitor(VPXUDPListener parent) throws Exception {
 
-		listener = parent;
+		this.listener = parent;
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
+
+		init();
 
 		createDefaultMonitors();
 
@@ -212,6 +225,13 @@ public class VPXUDPMonitor {
 
 		communicationMonitor.stopMonitor();
 
+	}
+
+	private void init() {
+		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
+
+			amplitudeIPs[i] = "";
+		}
 	}
 
 	public void sendBoot(String ip, int processor, int flashdevice, int page) {
@@ -1409,7 +1429,7 @@ public class VPXUDPMonitor {
 
 						int len = (int) msg.params.memoryinfo.length.get() - plotOffset2;
 
-						System.arraycopy(b, 0, plotBuff1, plotOffset2, len);
+						System.arraycopy(b, 0, plotBuff2, plotOffset2, len);
 
 					}
 
@@ -1433,7 +1453,7 @@ public class VPXUDPMonitor {
 
 						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
 
-						System.arraycopy(b, 0, plotBuff0, plotOffset2, b.length);
+						System.arraycopy(b, 0, plotBuff2, plotOffset2, b.length);
 
 					}
 
@@ -1580,39 +1600,249 @@ public class VPXUDPMonitor {
 
 	}
 
+	public void readAmplitudeData(String ip) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+
+			if (isContainIP(ip) < 0) {
+				addAmplitudeIP(ip);
+			}
+
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_GET);
+
+			msg.msgType.set(ATP.MSG_TYPE_AMPLITUDE);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+		} catch (Exception e) {
+
+			removeAmplitudeIP(ip);
+
+			e.printStackTrace();
+		}
+
+	}
+
+	public void setAmplitudeInterrupted(String ip) {
+
+		DatagramSocket datagramSocket;
+
+		try {
+			datagramSocket = new DatagramSocket();
+
+			DSPATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_AMPLITUDE_INTERRUPTED);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			removeAmplitudeIP(ip);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
 	public void populateAmplitudeData(String ip, ATPCommand msg) {
 
-		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+		try {
+			boolean isComplete = false;
 
-		float[] fl = new float[b.length / 4];
+			int index = isContainIP(ip);
 
-		int k = 0;
+			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
-		for (int i = 0; i < b.length; i++) {
+			for (int i = 0; i < b.length; i++) {
 
-			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+			}
+
+			float[] f0 = new float[b.length / 4];
+
+			ByteBuffer.wrap(b).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(f0);
+
+			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
+
+				if (msg.params.flash_info.currentpacket.get() == 1) {
+
+					if (index == 0) {
+
+						amplitudeBuff0 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+
+						System.arraycopy(b, 0, amplitudeBuff0, 0, b.length);
+
+					} else if (index == 1) {
+
+						amplitudeBuff1 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+
+						System.arraycopy(b, 0, amplitudeBuff1, 0, b.length);
+
+					} else if (index == 2) {
+
+						amplitudeBuff2 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+
+						System.arraycopy(b, 0, amplitudeBuff2, 0, b.length);
+
+					}
+
+					isComplete = false;
+
+				} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+
+					if (index == 0) {
+
+						amplitudeOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
+
+					} else if (index == 1) {
+
+						amplitudeOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
+
+					} else if (index == 2) {
+
+						amplitudeOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
+
+					}
+
+					isComplete = true;
+
+				} else {
+
+					if (index == 0) {
+
+						amplitudeOffset0 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
+
+						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
+
+					} else if (index == 1) {
+
+						amplitudeOffset1 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
+
+						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
+
+					} else if (index == 2) {
+
+						amplitudeOffset2 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
+
+						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
+
+					}
+
+					isComplete = false;
+				}
+
+			} else {
+
+				int len = (int) (msg.params.flash_info.totalnoofpackets.get() * 1024);
+
+				if (index == 0) {
+
+					amplitudeBuff0 = new byte[len];
+
+					amplitudeOffset0 = 0;
+
+					System.arraycopy(b, amplitudeOffset0, amplitudeBuff0, 0, len);
+
+				} else if (index == 1) {
+
+					amplitudeBuff1 = new byte[len];
+
+					amplitudeOffset1 = 0;
+
+					System.arraycopy(b, amplitudeOffset1, amplitudeBuff1, 0, len);
+
+				} else if (index == 2) {
+
+					amplitudeBuff2 = new byte[len];
+
+					amplitudeOffset2 = 0;
+
+					System.arraycopy(b, amplitudeOffset2, amplitudeBuff2, 0, len);
+
+				}
+
+				isComplete = true;
+			}
+
+			if (isComplete) {
+
+				float[] fl = new float[(int) msg.params.flash_info.totalfilesize.get() * 2];
+
+				byte[] bb = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+
+				if (index == 0) {
+					System.arraycopy(amplitudeBuff0, 0, bb, 0, bb.length);
+
+				} else if (index == 1) {
+					System.arraycopy(amplitudeBuff1, 0, bb, 0, bb.length);
+
+				} else if (index == 2) {
+					System.arraycopy(amplitudeBuff2, 0, bb, 0, bb.length);
+
+				}
+
+				ByteBuffer.wrap(bb).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(fl);
+
+				float x[] = new float[fl.length / 2];
+				
+				float y[] = new float[fl.length / 2];
+
+				int k = 0;
+				
+				for (int i = 0; i < fl.length; i += 2) {
+					
+					x[k] = fl[i];
+					
+					y[k] = fl[i + 1];
+					
+					k++;
+				}
+
+				((VPX_ETHWindow) listener).populateAmplitude(ip, x, y);
+				
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		ByteBuffer.wrap(b).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(fl);
-
-		for (int i = 0; i < fl.length; i++) {
-			System.out.println(fl[i]);
-		}
-
-		float x[] = new float[fl.length / 2];
-		float y[] = new float[fl.length / 2];
-
-		k = 0;
-		for (int i = 0; i < fl.length; i += 2) {
-			x[k] = fl[i];
-			y[k] = fl[i + 1];
-			k++;
-		}
-
-		demo.pack();
-
-		demo.addData(x, y); // RefineryUtilities.centerFrameOnScreen(demo);
-		demo.setVisible(true);
 
 	}
 
@@ -1992,7 +2222,7 @@ public class VPXUDPMonitor {
 	// Parsing Advertisement Packets
 	private synchronized void parseAdvertisementPacket(String ip, String msg) {
 
-		System.out.println(ip + " -- " + msg);
+		// System.out.println(ip + " -- " + msg);
 		if (msg.length() == 6) {
 
 			if (subnet != null) {
@@ -2224,4 +2454,81 @@ public class VPXUDPMonitor {
 		}
 	}
 
+	private void addAmplitudeIP(String ip) {
+
+		int idx = -1;
+
+		for (int i = 0; i < amplitudeIPs.length; i++) {
+
+			if (amplitudeIPs[i].equals(ip)) {
+
+				idx = -1;
+
+				break;
+			} else {
+
+				if (amplitudeIPs[i].equals(""))
+
+					idx = i;
+
+				break;
+			}
+
+		}
+
+		if (idx > -1) {
+			amplitudeIPs[idx] = ip;
+		}
+
+	}
+
+	private void removeAmplitudeIP(String ip) {
+
+		for (int i = 0; i < amplitudeIPs.length; i++) {
+
+			if (amplitudeIPs[i].equals(ip)) {
+
+				amplitudeIPs[i] = "";
+
+				break;
+			}
+		}
+
+	}
+
+	private int isContainIP(String ip) {
+
+		int ret = -1;
+
+		for (int i = 0; i < amplitudeIPs.length; i++) {
+
+			if (amplitudeIPs[i].equals(ip)) {
+
+				ret = i;
+
+				break;
+			}
+		}
+
+		return ret;
+	}
+
+	class VPXArrayList extends ArrayList<String> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6354632262677595954L;
+
+		@Override
+		public boolean add(String e) {
+
+			if (this.size() <= VPXConstants.MAX_WATERFALL) {
+
+				return super.add(e);
+			}
+
+			return false;
+		}
+	}
 }
