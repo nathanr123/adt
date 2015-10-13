@@ -53,7 +53,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 	private VPX_ETHWindow parent;
 
-	private String currentip;
+	private String currentip="";
 
 	private JFreeChart chart;
 

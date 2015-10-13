@@ -838,7 +838,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			} else if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP2
 					|| node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP1) {
 
-				parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_DSP);
+				parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_DSP,node);
 			}
 
 		} else if (node.isSubSytemNode()) {
@@ -1357,6 +1357,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				vpx_contextMenu.add(vpx_Cxt_Refresh);
 
 				vpx_contextMenu.add(vpx_Cxt_Detail);
+
+				vpx_Cxt_Amplitude.setEnabled(node.isAmplitude());
+
+				vpx_Cxt_Waterfall.setEnabled(node.isWaterfall());
 
 			} else if (nodeLevel == 3) { // P2020 Node
 

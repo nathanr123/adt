@@ -55,6 +55,7 @@ import com.cti.vpx.controls.VPX_MADPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
+import com.cti.vpx.controls.VPX_ProcessorNode;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
@@ -481,11 +482,20 @@ public class VPX_ETHWindow extends JFrame
 
 		for (int i = 0; i < VPXConstants.MAX_WATERFALL; i++) {
 
+			if (waterfallWindow[i].getIP().equals(ip)) {
+
+				currentNoofWaterfall--;
+
+				break;
+			}
+
 			if (!waterfallWindow[i].isVisible()) {
 
 				waterfallWindow[i].showWaterFall(ip);
 
-				// readWaterfall(ip);
+				readWaterfall(ip);
+
+				updateLog("Waterfall graph for " + ip + " opened ");
 
 				break;
 			}
@@ -503,17 +513,6 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Menu_Window_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
 				+ (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ");
 
-		updateLog("Waterfall graph for " + ip + " opened ");
-
-		/*
-		 * waterfallWindow = new VPX_WaterfallWindow(this);
-		 * 
-		 * waterfallWindow.showWaterFall(ip);
-		 * 
-		 * readWaterfall(ip);
-		 * 
-		 * updateLog("Showing Waterfall Graph");
-		 */
 	}
 
 	public void reindexWaterfallIndex() {
@@ -561,11 +560,19 @@ public class VPX_ETHWindow extends JFrame
 
 		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
 
+			if (amplitudeWindow[i].getIP().equals(ip)) {
+
+				currentNoofAmplitude--;
+
+				break;
+			}
 			if (!amplitudeWindow[i].isVisible()) {
 
 				amplitudeWindow[i].showAmplitude(ip);
 
 				readAmplitude(ip);
+
+				updateLog("Amplitude graph for " + ip + " opened ");
 
 				break;
 			}
@@ -583,17 +590,6 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Menu_Window_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
 				+ (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ");
 
-		updateLog("Amplitude graph for " + ip + " opened ");
-
-		/*
-		 * waterfallWindow = new VPX_WaterfallWindow(this);
-		 * 
-		 * waterfallWindow.showWaterFall(ip);
-		 * 
-		 * readWaterfall(ip);
-		 * 
-		 * updateLog("Showing Waterfall Graph");
-		 */
 	}
 
 	public void reindexAmplitudeIndex() {
@@ -2316,7 +2312,7 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void readAmplitude(String ip) {
-		
+
 		udpMonitor.readAmplitudeData(ip);
 
 	}
@@ -2337,7 +2333,7 @@ public class VPX_ETHWindow extends JFrame
 						if (amplitudeWindow[i].getIP().equals(ip)) {
 
 							idx = i;
-							
+
 							break;
 						}
 					}
@@ -2519,6 +2515,20 @@ public class VPX_ETHWindow extends JFrame
 
 				progressFileSent.setValue(value);
 			}
+		}
+
+	}
+
+	public void enableSelectedProcessorMenus(int option, VPX_ProcessorNode node) {
+
+		enableSelectedProcessorMenus(option);
+
+		if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP1
+				|| node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP2) {
+
+			vpx_Menu_Window_Amplitude.setEnabled(node.isAmplitude());
+
+			vpx_Menu_Window_Waterfall.setEnabled(node.isWaterfall());
 		}
 
 	}
