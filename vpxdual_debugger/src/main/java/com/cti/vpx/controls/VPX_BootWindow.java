@@ -82,7 +82,7 @@ public class VPX_BootWindow extends JDialog {
 
 		setTitle("Boot Option");
 
-		setBounds(100, 100, 400, 274);
+		setBounds(100, 100, 359, 232);
 
 		setResizable(false);
 
@@ -106,7 +106,7 @@ public class VPX_BootWindow extends JDialog {
 
 		JLabel lblProcessor = new JLabel("Processor");
 
-		lblProcessor.setBounds(22, 22, 114, 22);
+		lblProcessor.setBounds(21, 12, 114, 22);
 
 		contentPanel.add(lblProcessor);
 
@@ -131,13 +131,13 @@ public class VPX_BootWindow extends JDialog {
 
 		cmbProcessor.setPreferredSize(new Dimension(175, 22));
 
-		cmbProcessor.setBounds(160, 22, 175, 22);
+		cmbProcessor.setBounds(156, 12, 175, 22);
 
 		contentPanel.add(cmbProcessor);
 
 		JLabel lblFlashDevice = new JLabel("Flash Device");
 
-		lblFlashDevice.setBounds(22, 65, 114, 22);
+		lblFlashDevice.setBounds(21, 46, 114, 22);
 
 		contentPanel.add(lblFlashDevice);
 
@@ -147,13 +147,13 @@ public class VPX_BootWindow extends JDialog {
 
 		cmbFlashDevice.setPreferredSize(new Dimension(175, 22));
 
-		cmbFlashDevice.setBounds(160, 65, 175, 22);
+		cmbFlashDevice.setBounds(156, 46, 175, 22);
 
 		contentPanel.add(cmbFlashDevice);
 
 		JLabel lblPage = new JLabel("Page");
 
-		lblPage.setBounds(22, 108, 114, 22);
+		lblPage.setBounds(21, 80, 114, 22);
 
 		contentPanel.add(lblPage);
 
@@ -163,7 +163,7 @@ public class VPX_BootWindow extends JDialog {
 
 		cmbPage.setPreferredSize(new Dimension(175, 22));
 
-		cmbPage.setBounds(160, 108, 175, 22);
+		cmbPage.setBounds(156, 80, 175, 22);
 
 		contentPanel.add(cmbPage);
 
@@ -171,7 +171,7 @@ public class VPX_BootWindow extends JDialog {
 
 		lblNote.setVerticalAlignment(SwingConstants.TOP);
 
-		lblNote.setBounds(10, 159, 374, 43);
+		lblNote.setBounds(10, 113, 333, 47);
 
 		contentPanel.add(lblNote);
 
@@ -200,6 +200,10 @@ public class VPX_BootWindow extends JDialog {
 
 					parent.setReboot(currentip, cmbProcessor.getSelectedIndex(), cmbFlashDevice.getSelectedIndex(),
 							cmbPage.getSelectedIndex());
+
+					parent.updateLog(String.format("%s boot from page %s of flash device %s", currentip,
+							cmbProcessor.getSelectedItem().toString(), cmbPage.getSelectedItem().toString(),
+							cmbFlashDevice.getSelectedItem().toString()));
 
 					VPX_BootWindow.this.dispose();
 				}

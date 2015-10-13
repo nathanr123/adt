@@ -222,7 +222,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 		XYItemRenderer renderer = xyplot.getRenderer();
 
-		renderer.setSeriesPaint(0, Color.RED);
+		renderer.setSeriesPaint(0, Color.YELLOW);
 
 		renderer.setSeriesItemLabelsVisible(0, false);
 

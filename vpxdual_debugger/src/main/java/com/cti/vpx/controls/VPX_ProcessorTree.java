@@ -1358,9 +1358,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 
-				vpx_Cxt_Amplitude.setEnabled(node.isAmplitude());
+			//	vpx_Cxt_Amplitude.setEnabled(node.isAmplitude());
 
-				vpx_Cxt_Waterfall.setEnabled(node.isWaterfall());
+			//	vpx_Cxt_Waterfall.setEnabled(node.isWaterfall());
 
 			} else if (nodeLevel == 3) { // P2020 Node
 

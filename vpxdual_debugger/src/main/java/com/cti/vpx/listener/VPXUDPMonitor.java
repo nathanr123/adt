@@ -7,7 +7,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.command.P2020MSGCommand;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
-import com.cti.vpx.controls.graph.VPX_AmplitudeWindow;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.model.BIST;
@@ -118,19 +116,6 @@ public class VPXUDPMonitor {
 
 	private byte[] plotBuff2;
 
-	// Waterfall Window
-
-	// waterfall ips
-
-	private VPXArrayList waterfallIPs = new VPXArrayList();
-
-	// waterfall buffer
-	private byte[] waterfallBuff0;
-
-	private byte[] waterfallBuff1;
-
-	private byte[] waterfallBuff2;
-
 	// Amplitude Window
 
 	private String[] amplitudeIPs = new String[VPXConstants.MAX_AMPLITUDE];
@@ -148,10 +133,6 @@ public class VPXUDPMonitor {
 	private byte[] amplitudeBuff1;
 
 	private byte[] amplitudeBuff2;
-
-	VPX_AmplitudeWindow demo = new VPX_AmplitudeWindow("Dynamic Data view");
-
-	int temp = 0;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -228,10 +209,13 @@ public class VPXUDPMonitor {
 	}
 
 	private void init() {
+
+		// Initialize amplitude ips
 		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
 
 			amplitudeIPs[i] = "";
 		}
+
 	}
 
 	public void sendBoot(String ip, int processor, int flashdevice, int page) {
@@ -724,12 +708,6 @@ public class VPXUDPMonitor {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
 
-				/*
-				 * System.out.print(String.format("%02x ", sendBuffer[i]));
-				 * 
-				 * if ((i % 16) == 0) { System.out.println(); }
-				 */
-
 			}
 
 			msg.params.flash_info.totalnoofpackets.set(tot);
@@ -1039,12 +1017,6 @@ public class VPXUDPMonitor {
 			for (int i = 0; i < b.length; i++) {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
-				/*
-				 * System.out.print(String.format("%02x ",
-				 * msg.params.memoryinfo.buffer[i].get()));
-				 * 
-				 * if ((i + 1) % 16 == 0) { System.out.println(); }
-				 */
 
 			}
 
@@ -1370,13 +1342,6 @@ public class VPXUDPMonitor {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-				/*
-				 * System.out.print(String.format("%02x ",
-				 * msg.params.memoryinfo.buffer[i].get()));
-				 * 
-				 * if ((i + 1) % 16 == 0) { System.out.println(); }
-				 */
-
 			}
 
 			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
@@ -1588,12 +1553,6 @@ public class VPXUDPMonitor {
 
 			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-			System.out.print(String.format("%02x ", msg.params.memoryinfo.buffer[i].get()));
-
-			if ((i + 1) % 16 == 0) {
-				System.out.println();
-			}
-
 		}
 
 		((VPX_ETHWindow) listener).populateWaterfall(ip, b);
@@ -1606,7 +1565,7 @@ public class VPXUDPMonitor {
 
 		try {
 
-			if (isContainIP(ip) < 0) {
+			if (isContainingAmplitudeIP(ip) < 0) {
 				addAmplitudeIP(ip);
 			}
 
@@ -1680,7 +1639,7 @@ public class VPXUDPMonitor {
 		try {
 			boolean isComplete = false;
 
-			int index = isContainIP(ip);
+			int index = isContainingAmplitudeIP(ip);
 
 			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
 
@@ -1700,73 +1659,64 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						amplitudeBuff0 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+						amplitudeOffset0 = 0;
 
-						System.arraycopy(b, 0, amplitudeBuff0, 0, b.length);
+						amplitudeBuff0 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
 
 					} else if (index == 1) {
 
-						amplitudeBuff1 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+						amplitudeOffset1 = 0;
 
-						System.arraycopy(b, 0, amplitudeBuff1, 0, b.length);
+						amplitudeBuff1 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
 
 					} else if (index == 2) {
 
-						amplitudeBuff2 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+						amplitudeOffset2 = 0;
 
-						System.arraycopy(b, 0, amplitudeBuff2, 0, b.length);
+						amplitudeBuff2 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
 
 					}
 
 					isComplete = false;
 
-				} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+				} else {
+
+					isComplete = false;
+
+					if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
+
+						isComplete = true;
+
+					}
 
 					if (index == 0) {
 
 						amplitudeOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
-						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
-
 					} else if (index == 1) {
 
 						amplitudeOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
-
-						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
 
 					} else if (index == 2) {
 
 						amplitudeOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
-						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
-
 					}
 
-					isComplete = true;
+				}
 
-				} else {
+				if (index == 0) {
 
-					if (index == 0) {
+					System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
 
-						amplitudeOffset0 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
+				} else if (index == 1) {
 
-						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
+					System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
 
-					} else if (index == 1) {
+				} else if (index == 2) {
 
-						amplitudeOffset1 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
+					System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
 
-						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
-
-					} else if (index == 2) {
-
-						amplitudeOffset2 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
-
-						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
-
-					}
-
-					isComplete = false;
 				}
 
 			} else {
@@ -1804,6 +1754,12 @@ public class VPXUDPMonitor {
 
 			if (isComplete) {
 
+				amplitudeOffset0 = 0;
+
+				amplitudeOffset1 = 0;
+
+				amplitudeOffset2 = 0;
+
 				float[] fl = new float[(int) msg.params.flash_info.totalfilesize.get() * 2];
 
 				byte[] bb = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
@@ -1822,22 +1778,21 @@ public class VPXUDPMonitor {
 				ByteBuffer.wrap(bb).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(fl);
 
 				float x[] = new float[fl.length / 2];
-				
+
 				float y[] = new float[fl.length / 2];
 
 				int k = 0;
-				
+
 				for (int i = 0; i < fl.length; i += 2) {
-					
+
 					x[k] = fl[i];
-					
+
 					y[k] = fl[i + 1];
-					
+
 					k++;
 				}
 
 				((VPX_ETHWindow) listener).populateAmplitude(ip, x, y);
-				
 
 			}
 		} catch (Exception e) {
@@ -2268,15 +2223,6 @@ public class VPXUDPMonitor {
 
 			msgCommand = new DSPATPCommand();
 		}
-		/*
-		 * if (ip.equals("172.17.10.1")) {
-		 * 
-		 * msgCommand = new P2020ATPCommand();
-		 * 
-		 * } else if (ip.equals("172.17.10.130")) {
-		 * 
-		 * msgCommand = new DSPATPCommand(); }
-		 */
 
 		bf.clear();
 
@@ -2496,7 +2442,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	private int isContainIP(String ip) {
+	private int isContainingAmplitudeIP(String ip) {
 
 		int ret = -1;
 
@@ -2513,22 +2459,4 @@ public class VPXUDPMonitor {
 		return ret;
 	}
 
-	class VPXArrayList extends ArrayList<String> {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 6354632262677595954L;
-
-		@Override
-		public boolean add(String e) {
-
-			if (this.size() <= VPXConstants.MAX_WATERFALL) {
-
-				return super.add(e);
-			}
-
-			return false;
-		}
-	}
 }

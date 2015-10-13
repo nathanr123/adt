@@ -40,7 +40,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	private VPX_ETHWindow parent;
 
-	private String currentip="";
+	private String currentip = "";
 
 	/**
 	 * Create the frame.
@@ -215,10 +215,12 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 	}
 
 	public int getWaterfallID() {
+
 		return waterfallID;
 	}
 
 	public void setWaterfallID(int waterfallID) {
+
 		this.waterfallID = waterfallID;
 	}
 

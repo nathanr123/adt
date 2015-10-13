@@ -5,10 +5,10 @@ import java.awt.EventQueue;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_Dual_ADT {
 
@@ -28,11 +28,11 @@ public class VPX_Dual_ADT {
 						new VPX_SplashWindow();
 
 					} else {
-						VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
+						//VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
 
-						window.showWindow();
+						//window.showWindow();
 						
-						//VPX_ETHWindow window = new VPX_ETHWindow();
+						VPX_ETHWindow window = new VPX_ETHWindow();
 
 					}
 

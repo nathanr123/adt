@@ -1862,6 +1862,8 @@ public class VPX_ETHWindow extends JFrame
 
 	public void setReboot(String ip, int processor, int flashdevice, int page) {
 
+		updateLog("P2020 " + ip + " is set to Reboot");
+		
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -1874,7 +1876,7 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-		updateLog("P2020 " + ip + " is set to Reboot");
+		
 	}
 
 	public void setInterrupt(String ip) {
@@ -2294,13 +2296,41 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void populateWaterfall(String ip, byte[] bytes) {
-		/*
-		 * if (waterfallWindow != null) {
-		 * 
-		 * waterfallWindow.loadData(bytes);
-		 * 
-		 * waterfallWindow.setVisible(true); }
-		 */
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+
+					int idx = -1;
+
+					for (int i = 0; i < waterfallWindow.length; i++) {
+
+						if (waterfallWindow[i].getIP().equals(ip)) {
+
+							idx = i;
+
+							break;
+						}
+					}
+
+					if (waterfallWindow[idx].isVisible()) {
+
+						waterfallWindow[idx].loadData(bytes);
+
+						waterfallWindow[idx].setVisible(true);
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		th.start();
+
 	}
 
 	@Override
