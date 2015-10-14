@@ -42,6 +42,8 @@ public class VPXUDPMonitor {
 
 	VPXUDPListener listener;
 
+	VPX_ETHWindow logger;
+
 	private static VPXSubnetFilter subnet = null;
 
 	private VPXCommunicationMonitor communicationMonitor;
@@ -146,6 +148,8 @@ public class VPXUDPMonitor {
 	public VPXUDPMonitor(VPXUDPListener parent) throws Exception {
 
 		this.listener = parent;
+
+		logger = ((VPX_ETHWindow) listener);
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
 
@@ -377,6 +381,8 @@ public class VPXUDPMonitor {
 
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
+			logger.updateLog(String.format("Periodicity changed to for %s into %d seconds", ip, period));
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -424,6 +430,8 @@ public class VPXUDPMonitor {
 
 			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
 
+			logger.updateLog(String.format("Periodicity changed to for %s into %d seconds", ip, period));
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -466,7 +474,7 @@ public class VPXUDPMonitor {
 
 			send(buffer, ip, VPXUDPListener.CONSOLE_MSG_PORTNO, false);
 
-			((VPX_ETHWindow) listener).updateLog("Message sent to " + ip);
+			logger.updateLog("Message sent to " + ip);
 
 		} catch (Exception e) {
 
@@ -509,6 +517,9 @@ public class VPXUDPMonitor {
 			isFlashingStatred = true;
 
 			sendFileToProcessor(ip, FileUtils.sizeOf(f), fb.getBytePacket(0), flashDevice, location);
+
+			logger.updateLog(String.format("Start flashing file ( %s ) for %s on flash device %s at page %d", filename,
+					ip, (flashDevice == 0 ? "NAND" : "NOR"), location));
 
 		} catch (Exception e) {
 
@@ -602,6 +613,7 @@ public class VPXUDPMonitor {
 				end = start + 1024;
 
 				if (end > filestoSend.length) {
+
 					end = filestoSend.length;
 				}
 
@@ -667,6 +679,8 @@ public class VPXUDPMonitor {
 			isLoingMemoryStatred = true;
 
 			sendMemoryFileToProcessor(ip, address, FileUtils.sizeOf(f), fb.getBytePacket(0));
+
+			logger.updateLog(String.format("Sending file ( %s ) to %s start address 0x%08x", filename, ip, address));
 
 		} catch (Exception e) {
 
@@ -856,6 +870,8 @@ public class VPXUDPMonitor {
 
 			isFlashingStatred = false;
 
+			logger.updateLog(String.format("Flashing %s  is cacelled by user", ip));
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -875,8 +891,6 @@ public class VPXUDPMonitor {
 
 		loop = 0;
 
-		DatagramSocket datagramSocket;
-
 		ATPCommand msg = null;
 
 		byte[] buffer = null;
@@ -884,8 +898,6 @@ public class VPXUDPMonitor {
 		ByteBuffer bf = null;
 
 		try {
-
-			datagramSocket = new DatagramSocket();
 
 			msg = new P2020ATPCommand();
 
@@ -903,7 +915,7 @@ public class VPXUDPMonitor {
 
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
-			datagramSocket.close();
+			logger.updateLog(String.format("Built in Self Test is started for %s", ip));
 
 		} catch (Exception e) {
 
@@ -1177,7 +1189,7 @@ public class VPXUDPMonitor {
 					System.arraycopy(memoryBuff3, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
 				}
 
-				((VPX_ETHWindow) listener).populateMemory(index, msg.params.memoryinfo.address.get(), bb);
+				logger.populateMemory(index, msg.params.memoryinfo.address.get(), bb);
 
 			}
 		} catch (Exception e) {
@@ -1471,7 +1483,7 @@ public class VPXUDPMonitor {
 
 				}
 
-				((VPX_ETHWindow) listener).populatePlot(index, lineid, msg.params.memoryinfo.address.get(), bb);
+				logger.populatePlot(index, lineid, msg.params.memoryinfo.address.get(), bb);
 
 			}
 		} catch (Exception e) {
@@ -1555,7 +1567,7 @@ public class VPXUDPMonitor {
 
 		}
 
-		((VPX_ETHWindow) listener).populateWaterfall(ip, b);
+		logger.populateWaterfall(ip, b);
 
 	}
 
@@ -1792,7 +1804,7 @@ public class VPXUDPMonitor {
 					k++;
 				}
 
-				((VPX_ETHWindow) listener).populateAmplitude(ip, x, y);
+				logger.populateAmplitude(ip, x, y);
 
 			}
 		} catch (Exception e) {
@@ -2007,19 +2019,19 @@ public class VPXUDPMonitor {
 
 				sendClose(vpxSubSystem.getIpP2020(), PROCESSOR_LIST.PROCESSOR_P2020);
 
-				((VPX_ETHWindow) listener).updateExit(i++);
+				logger.updateExit(i++);
 
 				Thread.sleep(150);
 
 				sendClose(vpxSubSystem.getIpDSP1(), PROCESSOR_LIST.PROCESSOR_DSP1);
 
-				((VPX_ETHWindow) listener).updateExit(i++);
+				logger.updateExit(i++);
 
 				Thread.sleep(150);
 
 				sendClose(vpxSubSystem.getIpDSP2(), PROCESSOR_LIST.PROCESSOR_DSP2);
 
-				((VPX_ETHWindow) listener).updateExit(i++);
+				logger.updateExit(i++);
 
 				Thread.sleep(150);
 
@@ -2041,7 +2053,7 @@ public class VPXUDPMonitor {
 
 				}
 
-				((VPX_ETHWindow) listener).updateExit(i++);
+				logger.updateExit(i++);
 
 				Thread.sleep(150);
 
@@ -2049,7 +2061,7 @@ public class VPXUDPMonitor {
 		} catch (Exception e) {
 		}
 
-		((VPX_ETHWindow) listener).updateExit(-1);
+		logger.updateExit(-1);
 	}
 
 	public void addUDPListener(VPXUDPListener udpListener) {

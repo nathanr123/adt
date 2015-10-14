@@ -245,6 +245,8 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosed(WindowEvent e) {
 
+		this.currentip = "";
+
 		parent.reindexWaterfallIndex();
 	}
 

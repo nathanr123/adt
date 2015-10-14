@@ -323,6 +323,8 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosed(WindowEvent e) {
 
+		this.currentip = "";
+		
 		parent.reindexAmplitudeIndex();
 
 	}
