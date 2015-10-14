@@ -186,11 +186,16 @@ public class VPXUDPMonitor {
 	public void applyFilterbySubnet(String subnetmask) {
 
 		subnet = VPXSubnetFilter.createInstance(VPXSessionManager.getCurrentIP() + "/" + subnetmask);
+
+		logger.updateLog(String.format("Subnet Filter %s enabled", subnet));
 	}
 
 	public void clearFilterbySubnet() {
 
+		logger.updateLog(String.format("Subnet Filter %s disabled", subnet));
+
 		subnet = null;
+
 	}
 
 	private void start() throws Exception {
@@ -381,7 +386,7 @@ public class VPXUDPMonitor {
 
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
-			logger.updateLog(String.format("Periodicity changed to for %s into %d seconds", ip, period));
+			logger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
 
 		} catch (Exception e) {
 
@@ -430,7 +435,7 @@ public class VPXUDPMonitor {
 
 			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
 
-			logger.updateLog(String.format("Periodicity changed to for %s into %d seconds", ip, period));
+			logger.updateLog(String.format("Periodicity updated to %s into %d seconds", ip, period));
 
 		} catch (Exception e) {
 
@@ -961,6 +966,9 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
+			logger.updateLog(String.format("New value set for %s core %d address 0x%08X length %d Value 0x%08X", ip,
+					core, fromAddress, length, newValue));
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -1009,6 +1017,9 @@ public class VPXUDPMonitor {
 					InetAddress.getByName(filter.getProcessor()), VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
+
+			logger.updateLog(String.format("Read memory from %s core %s address %s length %s", filter.getProcessor(),
+					filter.getCore(), filter.getMemoryAddress(), filter.getMemoryLength()));
 
 		} catch (Exception e) {
 
@@ -1240,6 +1251,9 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
+			logger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter.getProcessor(),
+					filter.getCore(), filter.getMemoryAddress(), filter.getMemoryLength()));
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -1329,6 +1343,12 @@ public class VPXUDPMonitor {
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
+
+			logger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter1.getProcessor(),
+					filter1.getCore(), filter1.getMemoryAddress(), filter1.getMemoryLength()));
+
+			logger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter2.getProcessor(),
+					filter2.getCore(), filter2.getMemoryAddress(), filter2.getMemoryLength()));
 
 		} catch (Exception e) {
 
@@ -1517,6 +1537,8 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
+			logger.updateLog(String.format("Read waterfall from %s", ip));
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -1549,6 +1571,8 @@ public class VPXUDPMonitor {
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
+
+			logger.updateLog(String.format("Reading waterfall from %s interrupted", ip));
 
 		} catch (Exception e) {
 
@@ -1602,6 +1626,8 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
+			logger.updateLog(String.format("Read amplitude from %s", ip));
+
 		} catch (Exception e) {
 
 			removeAmplitudeIP(ip);
@@ -1638,6 +1664,8 @@ public class VPXUDPMonitor {
 			datagramSocket.send(packet);
 
 			removeAmplitudeIP(ip);
+
+			logger.updateLog(String.format("Reading amplitude from %s interrupted", ip));
 
 		} catch (Exception e) {
 
@@ -1857,6 +1885,8 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, loop);
 
+				logger.updateLog(String.format("P2020 (%s) test is completed",ip));
+				
 				bist.setP2020Completed(true);
 
 			} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP1) {
@@ -1874,6 +1904,8 @@ public class VPXUDPMonitor {
 				loop++;
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP1, loop);
+				
+				logger.updateLog(String.format("DSP 1 (%s) test is completed",ip));
 
 				bist.setDSP1Completed(true);
 
@@ -1892,6 +1924,8 @@ public class VPXUDPMonitor {
 				loop++;
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP2, loop);
+				
+				logger.updateLog(String.format("DSP 2 (%s) test is completed",ip));
 
 				bist.setDSP2Completed(true);
 			}
@@ -1902,13 +1936,18 @@ public class VPXUDPMonitor {
 
 				bist.setResultTestFailed(String.format("%d Tests", fail));
 
-				if (fail == 0)
+				if (fail == 0){
 
 					bist.setResultTestStatus("Success !");
+				
+					logger.updateLog("Built In Self Test Success");
 
-				else
+				}else{
 
 					bist.setResultTestStatus("Failed !");
+				
+					logger.updateLog("Built In Self Test Failed");
+				}
 
 				bist.setResultTestPassed(String.format("%d Tests", pass));
 
@@ -1923,6 +1962,8 @@ public class VPXUDPMonitor {
 			if (loop == VPXConstants.MAX_PROCESSOR) {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
+
+				logger.updateLog(String.format("Built In Selft Test completed"));
 			}
 		}
 	}
@@ -2068,6 +2109,8 @@ public class VPXUDPMonitor {
 
 		this.listener = udpListener;
 
+		logger = ((VPX_ETHWindow) listener);
+
 	}
 
 	// Parsing Communication Packets
@@ -2189,7 +2232,6 @@ public class VPXUDPMonitor {
 	// Parsing Advertisement Packets
 	private synchronized void parseAdvertisementPacket(String ip, String msg) {
 
-		// System.out.println(ip + " -- " + msg);
 		if (msg.length() == 6) {
 
 			if (subnet != null) {

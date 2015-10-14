@@ -1787,7 +1787,7 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-		updateLog("Showing Amplitude Graph");
+		updateLog("Opening Amplitude Graph");
 	}
 
 	public void showMAD() {
@@ -1863,7 +1863,7 @@ public class VPX_ETHWindow extends JFrame
 	public void setReboot(String ip, int processor, int flashdevice, int page) {
 
 		updateLog("P2020 " + ip + " is set to Reboot");
-		
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -1876,7 +1876,6 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-		
 	}
 
 	public void setInterrupt(String ip) {
@@ -1910,7 +1909,7 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-		updateLog("Showing Execution Window");
+		updateLog("Opening Execution Window");
 
 	}
 
@@ -2001,7 +2000,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showChangePassword() {
 
-		updateLog("Showing change password");
+		updateLog("Opening change password");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2019,7 +2018,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showChangePeriodicity() {
 
-		updateLog("Showing change periodicity");
+		updateLog("Opening change periodicity");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2037,7 +2036,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showPrefrences() {
 
-		updateLog("Showing Preference window");
+		updateLog("Opening Preference window");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2314,12 +2313,14 @@ public class VPX_ETHWindow extends JFrame
 							break;
 						}
 					}
+					if (idx >= 0) {
 
-					if (waterfallWindow[idx].isVisible()) {
+						if (waterfallWindow[idx].isVisible()) {
 
-						waterfallWindow[idx].loadData(bytes);
+							waterfallWindow[idx].loadData(bytes);
 
-						waterfallWindow[idx].setVisible(true);
+							waterfallWindow[idx].setVisible(true);
+						}
 					}
 
 				} catch (Exception e) {
@@ -2368,11 +2369,13 @@ public class VPX_ETHWindow extends JFrame
 						}
 					}
 
-					if (amplitudeWindow[idx].isVisible()) {
+					if (idx >= 0) {
+						if (amplitudeWindow[idx].isVisible()) {
 
-						amplitudeWindow[idx].loadData(xAxis, yAxis);
+							amplitudeWindow[idx].loadData(xAxis, yAxis);
 
-						amplitudeWindow[idx].setVisible(true);
+							amplitudeWindow[idx].setVisible(true);
+						}
 					}
 
 				} catch (Exception e) {

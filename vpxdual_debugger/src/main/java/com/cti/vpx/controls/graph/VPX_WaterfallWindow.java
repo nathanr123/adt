@@ -36,7 +36,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	private JTextField txtMaxValue;
 
-	private static WaterfallGraphPanel newWaterfallGraph = new WaterfallGraphPanel();
+	private WaterfallGraphPanel newWaterfallGraph = null;
 
 	private VPX_ETHWindow parent;
 
@@ -50,6 +50,8 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 		this.waterfallID = idx;
 
 		this.parent = parnt;
+
+		newWaterfallGraph = new WaterfallGraphPanel();
 
 		init();
 

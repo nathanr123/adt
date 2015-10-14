@@ -66,8 +66,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JButton btn_Msg_Send;
 
-	private JButton btn_Msg_Reset;
-
 	private JButton btn_Msg_Copy;
 
 	private JButton btn_Msg_Save;
@@ -454,13 +452,13 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		controlsPanel.add(cmbCores);
 
-		btn_Msg_Reset = VPXComponentFactory.createJButton(new ResetAction("Reset"));
+		btn_Msg_Clear = VPXComponentFactory.createJButton(new ClearAction("Clear"));
 
-		btn_Msg_Reset.setPreferredSize(new Dimension(22, 22));
+		btn_Msg_Clear.setPreferredSize(new Dimension(22, 22));
 
-		btn_Msg_Reset.setBorderPainted(false);
+		btn_Msg_Clear.setBorderPainted(false);
 
-		controlsPanel.add(btn_Msg_Reset);
+		controlsPanel.add(btn_Msg_Clear);
 
 		btn_Msg_Copy = VPXComponentFactory.createJButton(new CopyAction("Copy"));
 
@@ -469,14 +467,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		btn_Msg_Copy.setBorderPainted(false);
 
 		controlsPanel.add(btn_Msg_Copy);
-
-		btn_Msg_Clear = VPXComponentFactory.createJButton(new ClearAction("Clear"));
-
-		btn_Msg_Clear.setPreferredSize(new Dimension(22, 22));
-
-		btn_Msg_Clear.setBorderPainted(false);
-
-		controlsPanel.add(btn_Msg_Clear);
 
 		btn_Msg_Save = VPXComponentFactory.createJButton(new SaveAction("Save"));
 
@@ -903,27 +893,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	}
 
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
-
-	}
-
-	class ResetAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public ResetAction(String name) {
-
-			putValue(Action.SHORT_DESCRIPTION, name);
-
-			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_UNDO);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-		}
 
 	}
 

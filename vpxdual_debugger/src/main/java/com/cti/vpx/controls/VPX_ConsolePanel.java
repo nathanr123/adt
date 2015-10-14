@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -249,6 +250,10 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 		add(scrl_Console, BorderLayout.CENTER);
 
 		txtA_Console = VPXComponentFactory.createJTextArea();
+
+		txtA_Console.setBackground(Color.BLACK);
+
+		txtA_Console.setForeground(Color.WHITE);
 
 		scrl_Console.setViewportView(txtA_Console);
 

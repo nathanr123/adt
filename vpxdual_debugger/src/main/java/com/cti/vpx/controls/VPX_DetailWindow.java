@@ -140,7 +140,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 	public void showDetailWindow() {
 
-		parent.updateLog("Showing VPXSystem Details");
+		parent.updateLog("Opening VPXSystem Details");
 
 		loadProperties(VPXSystem.class.getSimpleName());
 
@@ -290,7 +290,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		setTitle(vpxSubSystem.getSubSystem() + " Details");
 
-		parent.updateLog("Showing " + vpxSubSystem.getSubSystem() + " Details");
+		parent.updateLog("Opening " + vpxSubSystem.getSubSystem() + " Details");
 
 		tbl_Property_Model.addRow(new String[] { "System Name", VPXSystem.class.getSimpleName() });
 
@@ -335,7 +335,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			pType = PROCESSOR_TYPE.PROCESSOR_P2020;
 
-			parent.updateLog("Showing " + procType + " " + ip + " Details");
+			parent.updateLog("Opening " + procType + " " + ip + " Details");
 
 		} else if (procType.contains("DSP1")) {
 
