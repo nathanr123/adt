@@ -251,10 +251,6 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		txtA_Console = VPXComponentFactory.createJTextArea();
 
-		txtA_Console.setBackground(Color.BLACK);
-
-		txtA_Console.setForeground(Color.WHITE);
-
 		scrl_Console.setViewportView(txtA_Console);
 
 		txtA_Console.setEditable(false);

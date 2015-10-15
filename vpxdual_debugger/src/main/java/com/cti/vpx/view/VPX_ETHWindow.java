@@ -271,6 +271,8 @@ public class VPX_ETHWindow extends JFrame
 				}
 			}
 		});
+		
+		System.out.println(getFont().getName());
 
 	}
 

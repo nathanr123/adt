@@ -738,38 +738,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (e.isPopupTrigger())
 			nodePopupEvent(e);
-		/*
-		 * 
-		 * VPX_ProcessorNode node = (VPX_ProcessorNode)
-		 * getLastSelectedPathComponent();
-		 * 
-		 * if (e.getButton() == 1) {
-		 * 
-		 * if (node != null) { if (node.isProcessorNode()) {
-		 * 
-		 * setSelectedProcessor(node);
-		 * 
-		 * } else { VPXSessionManager.setCurrentProcessor("", "", ""); } }
-		 * 
-		 * } else if (e.getButton() == 3) {
-		 * 
-		 * int row = getRowForLocation(e.getX(), e.getY());
-		 * 
-		 * if (row == -1) {
-		 * 
-		 * return; }
-		 * 
-		 * setSelectionRow(row);
-		 * 
-		 * node = (VPX_ProcessorNode) getLastSelectedPathComponent();
-		 * 
-		 * if (node != null) {
-		 * 
-		 * setSelectedProcessor(node);
-		 * 
-		 * showConextMenu(e.getX(), e.getY(), node); } }
-		 */
-	}
+		}
 
 	private void nodePopupEvent(MouseEvent e) {
 
@@ -782,7 +751,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		TreePath path = tree.getPathForLocation(x, y);
 
 		if (path == null)
-			return;
+			showConextMenu(e.getX(), e.getY(), systemRootNode);
 
 		VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) path.getLastPathComponent();
 
