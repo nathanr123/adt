@@ -1639,10 +1639,6 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 			txtAResult = new JTextArea();
 
-			txtAResult.setBackground(Color.BLACK);
-
-			txtAResult.setForeground(Color.WHITE);
-
 			txtAResult.setEditable(false);
 
 			scrResult.setViewportView(txtAResult);

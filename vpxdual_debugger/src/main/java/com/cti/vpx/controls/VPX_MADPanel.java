@@ -1343,11 +1343,7 @@ public class VPX_MADPanel extends JPanel {
 			contentPanel.add(scrResult, BorderLayout.CENTER);
 
 			txtAResult = new JTextArea();
-
-			txtAResult.setBackground(Color.BLACK);
-
-			txtAResult.setForeground(Color.WHITE);
-
+			
 			txtAResult.setEditable(false);
 
 			scrResult.setViewportView(txtAResult);

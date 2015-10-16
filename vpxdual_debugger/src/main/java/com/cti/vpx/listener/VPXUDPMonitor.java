@@ -1041,6 +1041,8 @@ public class VPXUDPMonitor {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
+				printBytes(b[i], i);
+
 			}
 
 			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
@@ -1674,7 +1676,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void populateAmplitudeData(String ip, ATPCommand msg) {
+	public synchronized void populateAmplitudeData(String ip, ATPCommand msg) {
 
 		try {
 			boolean isComplete = false;
@@ -1686,6 +1688,10 @@ public class VPXUDPMonitor {
 			for (int i = 0; i < b.length; i++) {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
+
+				// if(ip.endsWith("140")){
+				// printBytes(b[i], i);
+				// }
 
 			}
 
@@ -1699,64 +1705,73 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						amplitudeOffset0 = 0;
-
 						amplitudeBuff0 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+
+						System.arraycopy(b, 0, amplitudeBuff0, 0, b.length);
 
 					} else if (index == 1) {
 
-						amplitudeOffset1 = 0;
-
 						amplitudeBuff1 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
+
+						System.arraycopy(b, 0, amplitudeBuff1, 0, b.length);
 
 					} else if (index == 2) {
 
-						amplitudeOffset2 = 0;
-
 						amplitudeBuff2 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
 
+						System.arraycopy(b, 0, amplitudeBuff2, 0, b.length);
+
 					}
 
 					isComplete = false;
 
-				} else {
-
-					isComplete = false;
-
-					if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
-
-						isComplete = true;
-
-					}
+				} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
 
 					if (index == 0) {
 
 						amplitudeOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
+						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
+
 					} else if (index == 1) {
 
 						amplitudeOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+
+						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
 
 					} else if (index == 2) {
 
 						amplitudeOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
 
+						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
+
 					}
 
-				}
+					isComplete = true;
 
-				if (index == 0) {
+				} else {
 
-					System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
+					if (index == 0) {
 
-				} else if (index == 1) {
+						amplitudeOffset0 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
 
-					System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
+						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
 
-				} else if (index == 2) {
+					} else if (index == 1) {
 
-					System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
+						amplitudeOffset1 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
 
+						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
+
+					} else if (index == 2) {
+
+						amplitudeOffset2 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
+
+						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
+
+					}
+
+					isComplete = false;
 				}
 
 			} else {
@@ -1794,12 +1809,6 @@ public class VPXUDPMonitor {
 
 			if (isComplete) {
 
-				amplitudeOffset0 = 0;
-
-				amplitudeOffset1 = 0;
-
-				amplitudeOffset2 = 0;
-
 				float[] fl = new float[(int) msg.params.flash_info.totalfilesize.get() * 2];
 
 				byte[] bb = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
@@ -1830,9 +1839,10 @@ public class VPXUDPMonitor {
 					y[k] = fl[i + 1];
 
 					k++;
+
 				}
 
-				logger.populateAmplitude(ip, x, y);
+				((VPX_ETHWindow) listener).populateAmplitude(ip, x, y);
 
 			}
 		} catch (Exception e) {
@@ -1885,8 +1895,8 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, loop);
 
-				logger.updateLog(String.format("P2020 (%s) test is completed",ip));
-				
+				logger.updateLog(String.format("P2020 (%s) test is completed", ip));
+
 				bist.setP2020Completed(true);
 
 			} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP1) {
@@ -1904,8 +1914,8 @@ public class VPXUDPMonitor {
 				loop++;
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP1, loop);
-				
-				logger.updateLog(String.format("DSP 1 (%s) test is completed",ip));
+
+				logger.updateLog(String.format("DSP 1 (%s) test is completed", ip));
 
 				bist.setDSP1Completed(true);
 
@@ -1924,8 +1934,8 @@ public class VPXUDPMonitor {
 				loop++;
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP2, loop);
-				
-				logger.updateLog(String.format("DSP 2 (%s) test is completed",ip));
+
+				logger.updateLog(String.format("DSP 2 (%s) test is completed", ip));
 
 				bist.setDSP2Completed(true);
 			}
@@ -1936,16 +1946,16 @@ public class VPXUDPMonitor {
 
 				bist.setResultTestFailed(String.format("%d Tests", fail));
 
-				if (fail == 0){
+				if (fail == 0) {
 
 					bist.setResultTestStatus("Success !");
-				
+
 					logger.updateLog("Built In Self Test Success");
 
-				}else{
+				} else {
 
 					bist.setResultTestStatus("Failed !");
-				
+
 					logger.updateLog("Built In Self Test Failed");
 				}
 
@@ -1998,7 +2008,7 @@ public class VPXUDPMonitor {
 
 		case 2:
 
-			ret = String.format("<html><font color='green'>%d.%d V</font></html>", (res / 1000), (res % 1000));
+			ret = String.format("<html><font color='green'>%d.%03d V</font></html>", (res / 1000), (res % 1000));
 
 			break;
 		}
@@ -2467,11 +2477,14 @@ public class VPXUDPMonitor {
 				break;
 			} else {
 
-				if (amplitudeIPs[i].equals(""))
+				if (amplitudeIPs[i].equals("")) {
 
 					idx = i;
 
-				break;
+					break;
+
+				}
+
 			}
 
 		}
@@ -2502,6 +2515,8 @@ public class VPXUDPMonitor {
 
 		for (int i = 0; i < amplitudeIPs.length; i++) {
 
+			System.out.println(amplitudeIPs[i] + " -- " + i);
+
 			if (amplitudeIPs[i].equals(ip)) {
 
 				ret = i;
@@ -2511,6 +2526,17 @@ public class VPXUDPMonitor {
 		}
 
 		return ret;
+	}
+
+	private void printBytes(byte byteVal, int i) {
+
+		System.out.print(String.format("%02x ", byteVal));
+
+		if (((i + 1) % 16) == 0) {
+
+			System.out.println();
+		}
+
 	}
 
 }

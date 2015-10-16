@@ -84,7 +84,7 @@ public class VPX_AboutWindow extends JDialog {
 		lblNewLabel_2.setBounds(70, 39, 249, 14);
 		contentPanel.add(lblNewLabel_2);
 
-		JLabel lblBuildOn = new JLabel("Build on: 13-04-2015 15:42:45");
+		JLabel lblBuildOn = new JLabel("Build on: 16-10-2015 14:21:34");
 		lblBuildOn.setBounds(70, 56, 249, 14);
 		contentPanel.add(lblBuildOn);
 

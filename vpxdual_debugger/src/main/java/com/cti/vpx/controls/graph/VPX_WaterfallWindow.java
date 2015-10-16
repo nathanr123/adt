@@ -15,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.cti.vpx.controls.graph.example.WaterfallGraphPanel;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_WaterfallWindow extends JFrame implements WindowListener {
@@ -63,7 +64,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		setBounds(100, 100, 820, 597);
+		setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .60), (int) (VPXUtilities.getScreenHeight() * .70));
 
 		setIconImage(VPXConstants.Icons.ICON_WATERFALL.getImage());
 

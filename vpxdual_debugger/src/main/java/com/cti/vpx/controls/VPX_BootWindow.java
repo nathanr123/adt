@@ -201,8 +201,15 @@ public class VPX_BootWindow extends JDialog {
 					parent.setReboot(currentip, cmbProcessor.getSelectedIndex(), cmbFlashDevice.getSelectedIndex(),
 							cmbPage.getSelectedIndex());
 
-					parent.updateLog(String.format("%s boot from flash device %s of page %s", cmbProcessor.getSelectedItem().toString(), cmbFlashDevice.getSelectedItem().toString(),
-							cmbPage.getSelectedItem().toString()));
+					if (cmbProcessor.getSelectedIndex() > 0) {
+
+						parent.updateLog(String.format("%s boot from flash device %s of page %s",
+								cmbProcessor.getSelectedItem().toString(), cmbFlashDevice.getSelectedItem().toString(),
+								cmbPage.getSelectedItem().toString()));
+					} else {
+
+						parent.updateLog(String.format("Board reboot initiated"));
+					}
 
 					VPX_BootWindow.this.dispose();
 				}

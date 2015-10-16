@@ -245,7 +245,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		setBounds(100, 100, 850, 750);
+		setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .60), (int) (VPXUtilities.getScreenHeight() * .70));
 
 		addWindowListener(this);
 

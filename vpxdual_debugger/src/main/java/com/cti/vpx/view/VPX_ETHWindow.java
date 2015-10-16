@@ -271,8 +271,6 @@ public class VPX_ETHWindow extends JFrame
 				}
 			}
 		});
-		
-		System.out.println(getFont().getName());
 
 	}
 
@@ -1956,7 +1954,8 @@ public class VPX_ETHWindow extends JFrame
 
 			JDialog frame = new JDialog(this, "VLAN Configuration");
 
-			frame.setBounds(100, 100, 1000, 600);
+			frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80),
+					(int) (VPXUtilities.getScreenHeight() * .70));
 
 			frame.setLocationRelativeTo(VPX_ETHWindow.this);
 
@@ -1979,11 +1978,18 @@ public class VPX_ETHWindow extends JFrame
 
 			if (browserCanvas.initialise()) {
 
-				browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
-			} else {
-			}
+				if (tab == 1) {
 
-			frame.setSize(1001, 601);
+					browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+
+				} else {
+
+					browserCanvas.setUrl("http://192.168.10.1/cgi-bin/ipsetting.cgi");
+				}
+
+			}
+			frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80) + 1,
+					(int) (VPXUtilities.getScreenHeight() * .70) + 1);
 
 			updateLog("VLAN Configuration opened");
 
@@ -2321,7 +2327,6 @@ public class VPX_ETHWindow extends JFrame
 
 							waterfallWindow[idx].loadData(bytes);
 
-							waterfallWindow[idx].setVisible(true);
 						}
 					}
 
@@ -2375,8 +2380,6 @@ public class VPX_ETHWindow extends JFrame
 						if (amplitudeWindow[idx].isVisible()) {
 
 							amplitudeWindow[idx].loadData(xAxis, yAxis);
-
-							amplitudeWindow[idx].setVisible(true);
 						}
 					}
 
@@ -2393,6 +2396,7 @@ public class VPX_ETHWindow extends JFrame
 
 	@Override
 	public void sendAmplitudeInterrupt(String ip) {
+
 		udpMonitor.setAmplitudeInterrupted(ip);
 
 	}
@@ -2442,6 +2446,8 @@ public class VPX_ETHWindow extends JFrame
 	public void updateProcessorStatus(String ip, String msg) {
 
 		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
+
+		updateStatus("Advertisement received from " + ip);
 
 	}
 
