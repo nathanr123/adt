@@ -13,6 +13,8 @@ public class VPXSessionManager {
 	private static String currentSystemIP;
 
 	private static String currentLogFileName;
+	
+	private static String currentErrorLogFileName;
 
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
@@ -125,6 +127,16 @@ public class VPXSessionManager {
 	public static void setCurrentLogFileName(String currentLogFileName) {
 
 		VPXSessionManager.currentLogFileName = currentLogFileName;
+	}
+	
+	public static String getCurrentErrorLogFileName() {
+		
+		return currentErrorLogFileName;
+	}
+
+	public static void setCurrentErrorLogFileName(String currentErrorLogFileName) {
+		
+		VPXSessionManager.currentErrorLogFileName = currentErrorLogFileName;
 	}
 
 	public static VPXSystem getVpxSystem() {

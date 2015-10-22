@@ -511,6 +511,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		cmbMemoryVariables.removeAllItems();
 
 		// cmbMemoryVariables.addItem("");
+		
+		txtMapFilePath.setText(fileName);
 
 		memVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
@@ -1056,7 +1058,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 							Thread.sleep(currentThreadSleepTime);
 
 						} catch (Exception e) {
-
+							VPXUtilities.updateError(e);
 							e.printStackTrace();
 
 						}
@@ -1175,6 +1177,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 			}
 
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			retval = false;
 		}
 

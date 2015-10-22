@@ -94,6 +94,7 @@ public class VPX_PreferenceWindow extends JDialog {
 			dialog.showPreferenceWindow();
 		} catch (Exception e) {
 			e.printStackTrace();
+			VPXUtilities.updateError(e);
 		}
 	}
 

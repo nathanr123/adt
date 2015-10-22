@@ -35,6 +35,7 @@ public class VPX_MemoryLoadProgressWindow extends JDialog {
 			VPX_MemoryLoadProgressWindow dialog = new VPX_MemoryLoadProgressWindow(null);
 			dialog.setVisible(true);
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}

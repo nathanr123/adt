@@ -83,7 +83,7 @@ public class VPX_ExecutionPanel extends JPanel {
 			f.getContentPane().add(new VPX_ExecutionPanel());
 			f.setVisible(true);
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 		}
 	}
 

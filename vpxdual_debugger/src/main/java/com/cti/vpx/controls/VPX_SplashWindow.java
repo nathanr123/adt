@@ -87,7 +87,7 @@ public class VPX_SplashWindow extends JWindow {
 				Thread.sleep(50);
 
 			} catch (Exception e) {
-
+				VPXUtilities.updateError(e);
 			}
 			count++;// increase
 			// counter

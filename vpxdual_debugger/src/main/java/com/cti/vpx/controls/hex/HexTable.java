@@ -174,7 +174,7 @@ class HexTable extends JTable {
 
 		// setDefaultEditor(Object.class, new CellEditor());
 
-		// setDefaultRenderer(Object.class, new CellRenderer());
+		 setDefaultRenderer(Object.class, new CellRenderer());
 
 		getTableHeader().setReorderingAllowed(false);
 
@@ -1600,6 +1600,7 @@ class HexTable extends JTable {
 					throw new NumberFormatException();
 				}
 			} catch (NumberFormatException nfe) {
+				VPXUtilities.updateError(nfe);
 				UIManager.getLookAndFeel().provideErrorFeedback(null);
 				return false;
 			}

@@ -129,6 +129,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
 				} catch (Exception e) {
+
 					e.printStackTrace();
 				}
 			}
@@ -422,8 +423,8 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		JPanel configDummyOutFilePanel = new JPanel();
 
-		configDummyOutFilePanel.setBorder(new TitledBorder(null, "Dummy File", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
+		configDummyOutFilePanel
+				.setBorder(new TitledBorder(null, "Dummy File", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		configDummyPanel.add(configDummyOutFilePanel, BorderLayout.CENTER);
 
@@ -1415,8 +1416,8 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		VPXUtilities.writeFile(folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE, str);
 
-		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "/"
-				+ VPXConstants.ResourceFields.DEPLOYMENTFILE);
+		currentdployCfg = currentdployCfg.replace("jsonpath",
+				folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE);
 
 		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
 
@@ -1482,6 +1483,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 		} catch (Exception e) {
 			ret = false;
 			e.printStackTrace();
+			VPXUtilities.updateError(e);
 		}
 
 		return ret;
@@ -1688,7 +1690,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 				Desktop.getDesktop().open(new File(path));
 
 			} catch (IOException e) {
-
+				VPXUtilities.updateError(e);
 			}
 		}
 

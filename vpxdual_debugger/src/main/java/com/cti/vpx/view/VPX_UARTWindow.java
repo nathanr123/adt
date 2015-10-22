@@ -125,6 +125,7 @@ public class VPX_UARTWindow extends JFrame {
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
+					VPXUtilities.updateError(e);
 				}
 			}
 		});
@@ -155,7 +156,7 @@ public class VPX_UARTWindow extends JFrame {
 		try {
 			connect(commport);
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			JOptionPane.showMessageDialog(this, "Error in connecting..", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -525,6 +526,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -549,7 +551,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (IOException e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -620,7 +622,7 @@ public class VPX_UARTWindow extends JFrame {
 				}
 
 			} catch (IOException e) {
-
+				VPXUtilities.updateError(e);
 				txtAConsole.append("\n");
 
 			}
@@ -648,6 +650,7 @@ public class VPX_UARTWindow extends JFrame {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+				VPXUtilities.updateError(e);
 				System.exit(-1);
 			}
 		}
@@ -736,7 +739,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -903,12 +906,12 @@ public class VPX_UARTWindow extends JFrame {
 
 				String filePath = VPXSessionManager.getCurrentLogFileName();// VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
 
-				VPXUtilities.appendUsingFileWriter(filePath, log);
+				VPXUtilities.updateToFile(filePath, log);
 
 			}
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}

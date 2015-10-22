@@ -268,7 +268,7 @@ public class VPXUDPMonitor {
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -352,7 +352,7 @@ public class VPXUDPMonitor {
 			send(buffer, VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO, true);
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -389,7 +389,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -438,7 +438,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Periodicity updated to %s into %d seconds", ip, period));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -482,7 +482,7 @@ public class VPXUDPMonitor {
 			logger.updateLog("Message sent to " + ip);
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -527,7 +527,7 @@ public class VPXUDPMonitor {
 					ip, (flashDevice == 0 ? "NAND" : "NOR"), location));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -584,7 +584,7 @@ public class VPXUDPMonitor {
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -649,7 +649,7 @@ public class VPXUDPMonitor {
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 			} catch (Exception e) {
-
+				VPXUtilities.updateError(e);
 				e.printStackTrace();
 			}
 		}
@@ -688,7 +688,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Sending file ( %s ) to %s start address 0x%08x", filename, ip, address));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -742,7 +742,7 @@ public class VPXUDPMonitor {
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -806,7 +806,7 @@ public class VPXUDPMonitor {
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 			} catch (Exception e) {
-
+				VPXUtilities.updateError(e);
 				e.printStackTrace();
 			}
 		}
@@ -819,7 +819,7 @@ public class VPXUDPMonitor {
 			send(buffer, InetAddress.getByName(ip), port, isBroadCast);
 
 		} catch (UnknownHostException e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -843,7 +843,7 @@ public class VPXUDPMonitor {
 			datagramSocket.close();
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 		}
 	}
 
@@ -878,7 +878,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Flashing %s  is cacelled by user", ip));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -923,7 +923,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Built in Self Test is started for %s", ip));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -970,7 +970,7 @@ public class VPXUDPMonitor {
 					core, fromAddress, length, newValue));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -1022,7 +1022,7 @@ public class VPXUDPMonitor {
 					filter.getCore(), filter.getMemoryAddress(), filter.getMemoryLength()));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1041,7 +1041,7 @@ public class VPXUDPMonitor {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-				printBytes(b[i], i);
+				//printBytes(b[i], i);
 
 			}
 
@@ -1206,6 +1206,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -1257,7 +1258,7 @@ public class VPXUDPMonitor {
 					filter.getCore(), filter.getMemoryAddress(), filter.getMemoryLength()));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1353,7 +1354,7 @@ public class VPXUDPMonitor {
 					filter2.getCore(), filter2.getMemoryAddress(), filter2.getMemoryLength()));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1509,6 +1510,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -1542,7 +1544,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Read waterfall from %s", ip));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1577,7 +1579,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Reading waterfall from %s interrupted", ip));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1633,7 +1635,7 @@ public class VPXUDPMonitor {
 		} catch (Exception e) {
 
 			removeAmplitudeIP(ip);
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1670,7 +1672,7 @@ public class VPXUDPMonitor {
 			logger.updateLog(String.format("Reading amplitude from %s interrupted", ip));
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1846,6 +1848,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1973,7 +1976,7 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
 
-				logger.updateLog(String.format("Built In Selft Test completed"));
+				logger.updateLog(String.format("Built In Self Test completed"));
 			}
 		}
 	}
@@ -2049,7 +2052,7 @@ public class VPXUDPMonitor {
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -2110,6 +2113,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 		}
 
 		logger.updateExit(-1);
@@ -2365,6 +2369,7 @@ public class VPXUDPMonitor {
 					Thread.sleep(500);
 
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -2405,6 +2410,7 @@ public class VPXUDPMonitor {
 					Thread.sleep(10);
 
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace();
 				}
 
@@ -2450,6 +2456,7 @@ public class VPXUDPMonitor {
 
 					Thread.sleep(500);
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -2515,7 +2522,7 @@ public class VPXUDPMonitor {
 
 		for (int i = 0; i < amplitudeIPs.length; i++) {
 
-			System.out.println(amplitudeIPs[i] + " -- " + i);
+		//	System.out.println(amplitudeIPs[i] + " -- " + i);
 
 			if (amplitudeIPs[i].equals(ip)) {
 

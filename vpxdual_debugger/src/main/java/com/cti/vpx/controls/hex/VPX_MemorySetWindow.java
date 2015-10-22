@@ -73,6 +73,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -445,6 +446,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 			return true;
 
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			return false;
 		}
 

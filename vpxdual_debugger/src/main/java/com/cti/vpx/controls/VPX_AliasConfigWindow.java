@@ -517,18 +517,20 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg, "Validation", JOptionPane.ERROR_MESSAGE);
 
-				return;
-
 			} else {
 
 				if (ismodify) {
 
 					if (aliasTableModel.modifySubSystem(currentSubSystem)) {
 
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
-								currentSubSystem.getSubSystem() + " updated successfully!");
+						String msg = currentSubSystem.getSubSystem()
+								+ " updated successfully!\nPlease click Save button to take effect !.";
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
 
 						parent.updateLog("Alias Configuration modified");
+
+						clearAliasFields();
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
 								"Error in modifying " + currentSubSystem.getSubSystem(), "Updating",
@@ -542,16 +544,19 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 					if (aliasTableModel.addSubSystem(currentSubSystem)) {
 
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
-								currentSubSystem.getSubSystem() + " added successfully!");
+						String msg = currentSubSystem.getSubSystem()
+								+ " added successfully!\nPlease click Save button to take effect !.";
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
 
 						parent.updateLog("Alias Configuration Subsystem added");
+
+						clearAliasFields();
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
 								"Error in adding " + currentSubSystem.getSubSystem(), "Adding",
 								JOptionPane.ERROR_MESSAGE);
 
-						return;
 					}
 				}
 			}
@@ -579,7 +584,8 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 			JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg, "Validation", JOptionPane.ERROR_MESSAGE);
 
-			return;
+			if (ismodify)
+				return;
 		}
 
 		currentSubSystem = null;
@@ -587,14 +593,28 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 	private void loadAliasDetail() {
 
-		txtAliasName.setText(currentSubSystem.getSubSystem());
+		if (currentSubSystem != null) {
 
-		txtP2020.setText(currentSubSystem.getIpP2020());
+			txtAliasName.setText(currentSubSystem.getSubSystem());
 
-		txtDSP1.setText(currentSubSystem.getIpDSP1());
+			txtP2020.setText(currentSubSystem.getIpP2020());
 
-		txtDSP2.setText(currentSubSystem.getIpDSP2());
+			txtDSP1.setText(currentSubSystem.getIpDSP1());
 
+			txtDSP2.setText(currentSubSystem.getIpDSP2());
+		}
+
+	}
+
+	private void clearAliasFields() {
+
+		txtAliasName.setText("");
+
+		txtP2020.setText("");
+
+		txtDSP1.setText("");
+
+		txtDSP2.setText("");
 	}
 
 	private int isSubsystemAvailable() {
@@ -659,8 +679,11 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 				parent.updateLog(subSystem + " deleted ");
 
-				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this,
-						currentSubSystem.getSubSystem() + " deleted successfully!");
+				String msg = currentSubSystem.getSubSystem()
+						+ " deleted successfully!";
+
+				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
+
 				currentSubSystem = null;
 
 			} else {
@@ -774,7 +797,10 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 					if (aliasTableModel.deleteSubSystem(currentSubSystem.getId())) {
 
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, sub + " deleted successfully!");
+						String msg = sub + " deleted successfully!\nPlease click Save button to take effect !.";
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
+
 					} else {
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting " + sub,
 								"Deletion", JOptionPane.ERROR_MESSAGE);
@@ -875,7 +901,13 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 			parent.updateProcessorTree();
 
-			VPX_AliasConfigWindow.this.dispose();
+			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Saved in to the file system successfully !.\nDo you want close?",
+					"Confirmation", JOptionPane.YES_NO_OPTION);
+
+			if (option == JOptionPane.YES_OPTION) {
+				
+				VPX_AliasConfigWindow.this.dispose();
+			}
 
 		}
 	}

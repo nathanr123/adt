@@ -23,6 +23,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.util.VPXUtilities;
+
 import net.miginfocom.swing.MigLayout;
 
 public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
@@ -95,6 +97,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 			th.start();
 
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -448,7 +451,7 @@ public class VPX_MemoryLoadWindow extends JDialog implements WindowListener {
 
 			return true;
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			return false;
 
 		}

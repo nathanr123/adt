@@ -594,7 +594,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, proc_Msg_Style);
 
 		} catch (BadLocationException e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -655,7 +655,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			txtP_Proc_Msg_Display.setCaretPosition(VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength());
 
 		} catch (BadLocationException e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -681,7 +681,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, style);
 
 		} catch (BadLocationException e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -810,7 +810,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			}
 
 		} catch (Exception e) {
-
+			VPXUtilities.updateError(e);
 			e.printStackTrace();
 		}
 

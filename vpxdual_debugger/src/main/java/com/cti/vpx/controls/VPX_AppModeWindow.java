@@ -113,6 +113,7 @@ public class VPX_AppModeWindow extends JFrame {
 							VPXUtilities.getSerialPorts());
 					frame.setVisible(true);
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -319,14 +320,13 @@ public class VPX_AppModeWindow extends JFrame {
 
 		bottomPanel.add(btnClose);
 
+		btnOpen.setEnabled(false);
+
 	}
 
 	private void loadTopComponents() {
 
 		JPanel topPanel = new JPanel();
-
-		// topPanel.setBorder(new TitledBorder(null, "Debugging Mode",
-		// TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		contentPane.add(topPanel, BorderLayout.NORTH);
 
@@ -436,9 +436,6 @@ public class VPX_AppModeWindow extends JFrame {
 
 		centerPanel.setLayout(new BorderLayout());
 
-		// centerPanel.setBorder(new TitledBorder(null, "Options",
-		// TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
 		centerPanel.add(getEthernetComponents(), BorderLayout.CENTER);
 
 		contentPane.add(centerPanel);
@@ -470,8 +467,11 @@ public class VPX_AppModeWindow extends JFrame {
 
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
+
 				if (arg0.getStateChange() == ItemEvent.SELECTED) {
-					// System.out.println("Item Changed");
+
+					btnOpen.setEnabled((cmbCOMM.getSelectedIndex() > 0));
+
 				}
 
 			}
@@ -546,8 +546,12 @@ public class VPX_AppModeWindow extends JFrame {
 			public void itemStateChanged(ItemEvent arg0) {
 
 				if (arg0.getSource().equals(cmbNWIface)) {
+
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
 						populateETHValues(arg0.getItem().toString());
+
+						btnOpen.setEnabled((cmbNWIface.getSelectedIndex() > 0));
 					}
 				}
 			}
@@ -731,14 +735,14 @@ public class VPX_AppModeWindow extends JFrame {
 
 		setLogProperties();
 
-		btnOpen.setEnabled(val);
+		btnOpen.setEnabled((cmbNWIface.getSelectedIndex() > 0));
 	}
 
 	private void setEnabledUARTs(boolean val) {
 
 		setLogProperties();
 
-		btnOpen.setEnabled(val);
+		btnOpen.setEnabled((cmbCOMM.getSelectedIndex() > 0));
 	}
 
 	private void setLogProperties() {
@@ -767,8 +771,10 @@ public class VPX_AppModeWindow extends JFrame {
 
 		if (chkLog.isSelected()) {
 
-			if (txtLogFileName.getText().length() > 0) { // validation for valid
-															// filepath
+			if (VPXUtilities.isFileValid(txtLogFileName.getText().trim(), true)) { // validation
+																					// for
+																					// valid
+				// filepath
 				VPXUtilities.setEnableLog(true);
 
 				VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
@@ -802,14 +808,16 @@ public class VPX_AppModeWindow extends JFrame {
 		if (updateLogSettings()) {
 
 			setLogFileSettings();
-			
+
+			VPXSessionManager.setCurrentErrorLogFileName("Error_" + VPXUtilities.getCurrentTime(3) + ".log");
+
 			if (currentMode == VPXConstants.ETHMODE) {
 
 				boolean ip = VPXUtilities.isValidIP(txtIPAddress.getText());
 
 				boolean sub = VPXUtilities.isValidIP(txtSubnet.getText());
 
-				boolean gateway = VPXUtilities.isValidIP(txtGateway.getText());
+				boolean gateway = true;// VPXUtilities.isValidIP(txtGateway.getText());
 
 				if (ip && sub && gateway) {
 
@@ -828,12 +836,32 @@ public class VPX_AppModeWindow extends JFrame {
 					try {
 						VPX_ETHWindow window = new VPX_ETHWindow();
 
+						if (isValueChanged()) {
+
+							window.updateLog(String.format(
+									"%s has configured and connected successfully. IPv4 Address : %s Subnet Mask : %s Default Gateway : %s",
+									cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
+									txtSubnet.getText(), txtGateway.getText()));
+
+						} else {
+							window.updateLog(String.format(
+									"%s has connected successfully. IPv4 Address : %s Subnet Mask : %s Default Gateway : %s",
+									cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
+									txtSubnet.getText(), txtGateway.getText()));
+
+						}
+
+						VPX_AppModeWindow.this.dispose();
+
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null,
 								"Another instance is running or the ports are bind by another application.",
 								"Opening Application", JOptionPane.ERROR_MESSAGE);
 
 						e.printStackTrace();
+						
+						VPXUtilities.updateError(e);
+
 						System.exit(0);
 					}
 
@@ -872,12 +900,21 @@ public class VPX_AppModeWindow extends JFrame {
 
 					VPX_UARTWindow window = new VPX_UARTWindow(cmbCOMM.getSelectedItem().toString());
 
+					window.updateLog("UART conncted with comm port : " + cmbCOMM.getSelectedItem().toString());
+
 					window.setVisible(true);
+
+					VPX_AppModeWindow.this.dispose();
+				} else {
+
+					JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please select valid comm port",
+							"Error comm port", JOptionPane.ERROR_MESSAGE);
+
+					VPX_AppModeWindow.this.toFront();
 				}
 
 			}
 
-			VPX_AppModeWindow.this.dispose();
 		} else {
 			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please enter the valid log filename", "Error Log",
 					JOptionPane.ERROR_MESSAGE);

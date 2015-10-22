@@ -70,6 +70,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 					VPX_AmpWindow frame = new VPX_AmpWindow(null, 0);
 					frame.setVisible(true);
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace();
 				}
 			}

@@ -267,7 +267,7 @@ public class VPX_ETHWindow extends JFrame
 					promptAliasConfigFileName();
 
 				} catch (Exception e) {
-
+					VPXUtilities.updateError(e);
 				}
 			}
 		});
@@ -1941,8 +1941,9 @@ public class VPX_ETHWindow extends JFrame
 
 		updateLog("Asking Super user password for VLAN Configuration");
 
-		if (VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD)
-				.equals(paswordWindow.getPasword())) {
+		if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
+
+			paswordWindow.dispose();
 
 			final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
 
@@ -1997,9 +1998,9 @@ public class VPX_ETHWindow extends JFrame
 
 			JOptionPane.showMessageDialog(this, "Pasword invalid", "Authentication", JOptionPane.ERROR_MESSAGE);
 
-			paswordWindow.resetPassword();
+			paswordWindow.dispose();
 
-			paswordWindow.setVisible(true);
+			showVLAN(tab);
 
 			updateLog("Invalid Password");
 		}
@@ -2254,11 +2255,12 @@ public class VPX_ETHWindow extends JFrame
 
 						memoryPlotWindow[plotID].populateValues(lineID, buffer);
 
-						memoryPlotWindow[plotID].setVisible(true);
+						//memoryPlotWindow[plotID].setVisible(true);
 					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					VPXUtilities.updateError(e);
 				}
 
 			}
@@ -2280,11 +2282,12 @@ public class VPX_ETHWindow extends JFrame
 
 						memoryBrowserWindow[memID].setBytes(startAddress, buffer);
 
-						memoryBrowserWindow[memID].setVisible(true);
+						//memoryBrowserWindow[memID].setVisible(true);
 					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					VPXUtilities.updateError(e);
 				}
 
 			}
@@ -2332,6 +2335,7 @@ public class VPX_ETHWindow extends JFrame
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					VPXUtilities.updateError(e);
 				}
 
 			}
@@ -2385,6 +2389,7 @@ public class VPX_ETHWindow extends JFrame
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					VPXUtilities.updateError(e);
 				}
 
 			}

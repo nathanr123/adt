@@ -1196,6 +1196,9 @@ public class VPX_BISTResultWindow extends JDialog {
 			}
 
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			
+			VPXUtilities.updateError(e);
+			
 			e.printStackTrace();
 		}
 

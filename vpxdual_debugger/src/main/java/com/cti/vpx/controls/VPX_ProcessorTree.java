@@ -738,7 +738,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (e.isPopupTrigger())
 			nodePopupEvent(e);
-		}
+	}
 
 	private void nodePopupEvent(MouseEvent e) {
 
@@ -752,32 +752,32 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		if (path == null)
 			showConextMenu(e.getX(), e.getY(), systemRootNode);
+		else {
+			VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) path.getLastPathComponent();
 
-		VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) path.getLastPathComponent();
+			TreePath[] selectionPaths = tree.getSelectionPaths();
 
-		TreePath[] selectionPaths = tree.getSelectionPaths();
+			// check if node was selected
+			boolean isSelected = false;
 
-		// check if node was selected
-		boolean isSelected = false;
+			if (selectionPaths != null) {
 
-		if (selectionPaths != null) {
+				for (TreePath selectionPath : selectionPaths) {
 
-			for (TreePath selectionPath : selectionPaths) {
+					if (selectionPath.equals(path)) {
 
-				if (selectionPath.equals(path)) {
-
-					isSelected = true;
+						isSelected = true;
+					}
 				}
 			}
+			// if clicked node was not selected, select it
+			if (!isSelected) {
+
+				tree.setSelectionPath(path);
+			}
+
+			showConextMenu(e.getX(), e.getY(), rightClickedNode);
 		}
-		// if clicked node was not selected, select it
-		if (!isSelected) {
-
-			tree.setSelectionPath(path);
-		}
-
-		showConextMenu(e.getX(), e.getY(), rightClickedNode);
-
 	}
 
 	private void setSelectedProcessor(VPX_ProcessorNode node) {
@@ -807,7 +807,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			} else if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP2
 					|| node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP1) {
 
-				parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_DSP,node);
+				parent.enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_DSP, node);
 			}
 
 		} else if (node.isSubSytemNode()) {
@@ -874,7 +874,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		});
 
 		vpx_Cxt_Reload = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Reload"),
-				VPXConstants.Icons.ICON_EMPTY);
+				VPXConstants.Icons.ICON_REFRESH);
 
 		vpx_Cxt_Reload.addActionListener(new ActionListener() {
 
@@ -1213,9 +1213,21 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		TreePath[] paths = getSelectionPaths();
 
+		int length = 1;
+
+		if (paths == null) {
+
+			length = 1;
+
+			nodeLevel = 0;
+		} else {
+
+			length = paths.length;
+		}
+
 		vpx_contextMenu.removeAll();
 
-		if (paths.length == 1) {
+		if (length == 1) {
 
 			setSelectedProcessor(node);
 
@@ -1263,7 +1275,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				// Tools Menu Items
 				vpx_contextMenu.add(vpx_Cxt_ChangePWD);
 
-				vpx_contextMenu.add(vpx_Cxt_Refresh);
+				//vpx_contextMenu.add(vpx_Cxt_Refresh);
 
 				vpx_contextMenu.add(vpx_Cxt_Reload);
 
@@ -1327,9 +1339,9 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 
-			//	vpx_Cxt_Amplitude.setEnabled(node.isAmplitude());
+				// vpx_Cxt_Amplitude.setEnabled(node.isAmplitude());
 
-			//	vpx_Cxt_Waterfall.setEnabled(node.isWaterfall());
+				// vpx_Cxt_Waterfall.setEnabled(node.isWaterfall());
 
 			} else if (nodeLevel == 3) { // P2020 Node
 
@@ -1359,7 +1371,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				} else {
 
-					if (paths.length <= 3) {
+					if (length <= 3) {
 
 						vpx_contextMenu.add(vpx_Cxt_Remove);
 					}

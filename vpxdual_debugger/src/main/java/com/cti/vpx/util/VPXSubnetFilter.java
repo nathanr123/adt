@@ -60,6 +60,9 @@ public class VPXSubnetFilter {
 			else
 				return new VPXSubnetFilter(InetAddress.getByName(stringArr[0]), Integer.parseInt(stringArr[1]));
 		} catch (Exception e) {
+			
+			VPXUtilities.updateError(e);
+			
 			return null;
 		}
 	}
@@ -90,6 +93,7 @@ public class VPXSubnetFilter {
 			return bigAddress.and(this.bigMask).equals(this.bigSubnetMasked);
 
 		} catch (UnknownHostException e) {
+			VPXUtilities.updateError(e);
 			return false;
 		}
 	}

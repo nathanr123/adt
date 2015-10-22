@@ -8,6 +8,8 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
+import com.cti.vpx.util.VPXUtilities;
+
 /**
  * The default transfer handler for <code>HexEditor</code>s.
  *
@@ -93,8 +95,10 @@ class HexEditorTransferHandler extends TransferHandler {
 					e.replaceSelection(bytes);
 				}
 			} catch (UnsupportedFlavorException ufe) {
+				VPXUtilities.updateError(ufe);
 				ufe.printStackTrace(); // Never happens.
 			} catch (IOException ioe) {
+				VPXUtilities.updateError(ioe);
 				ioe.printStackTrace();
 			}
 		}

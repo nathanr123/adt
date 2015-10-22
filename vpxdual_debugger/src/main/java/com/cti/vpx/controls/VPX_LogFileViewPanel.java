@@ -13,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import com.cti.vpx.util.VPXUtilities;
+
 public class VPX_LogFileViewPanel extends JPanel {
 
 	/**
@@ -91,6 +93,8 @@ public class VPX_LogFileViewPanel extends JPanel {
 
 		} catch (IOException e) {
 
+			VPXUtilities.updateError(e);
+			
 			JOptionPane.showMessageDialog(logFileText, "Can't load file " + e.getMessage());
 		}
 

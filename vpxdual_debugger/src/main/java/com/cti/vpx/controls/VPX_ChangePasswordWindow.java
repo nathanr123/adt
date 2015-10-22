@@ -58,7 +58,7 @@ public class VPX_ChangePasswordWindow extends JDialog {
 		setResizable(false);
 
 		setIconImage(VPXUtilities.getAppIcon());
-		
+
 		setTitle("Change Passoword");
 
 		setBounds(100, 100, 350, 190);
@@ -155,9 +155,9 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 	private void changePassword() {
 
-		String pwd = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD);
+		String pwd = VPXUtilities.getCurrentPassword();
 
-		if (pwd.equals(new String(pwdOldPWD.getPassword()))) {
+		if (pwd.equals(VPXUtilities.encodePassword(new String(pwdOldPWD.getPassword())))) {
 
 			String pwd1 = new String(pwdNewPWD.getPassword());
 
@@ -165,7 +165,7 @@ public class VPX_ChangePasswordWindow extends JDialog {
 
 			if (pwd1.equals(pwd2)) {
 
-				VPXUtilities.updateProperties(VPXConstants.ResourceFields.SECURITY_PWD, pwd1);
+				VPXUtilities.setCurrentPassword(pwd1);
 
 				JOptionPane.showMessageDialog(parent, "Password Changed Succesfully", "Authentication",
 						JOptionPane.INFORMATION_MESSAGE);

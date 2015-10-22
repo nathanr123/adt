@@ -210,6 +210,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 					VPX_MemoryPlotWindow frame = new VPX_MemoryPlotWindow();
 					frame.setVisible(true);
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -1659,6 +1660,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		cmbPlot1MemoryVariables.removeAllItems();
 
 		// cmbPlot1MemoryVariables.addItem("");
+		
+		txtPlot1MapFilePath.setText(fileName);
 
 		plot1MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
@@ -1689,6 +1692,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		cmbPlot2MemoryVariables.removeAllItems();
 
 		// cmbPlot2MemoryVariables.addItem("");
+		
+		txtPlot2MapFilePath.setText(fileName);
 
 		plot2MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
 
@@ -1909,7 +1914,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 							Thread.sleep(currentThreadSleepTime);
 
 						} catch (Exception e) {
-
+							VPXUtilities.updateError(e);
 							e.printStackTrace();
 
 						}
@@ -2151,6 +2156,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			}
 
 		} catch (Exception e) {
+			VPXUtilities.updateError(e);
 			retval = false;
 		}
 

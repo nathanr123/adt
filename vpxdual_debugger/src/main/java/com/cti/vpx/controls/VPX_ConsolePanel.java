@@ -590,6 +590,8 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 		} catch (Exception e) {
 
+			VPXUtilities.updateError(e);
+			
 			e.printStackTrace();
 		}
 

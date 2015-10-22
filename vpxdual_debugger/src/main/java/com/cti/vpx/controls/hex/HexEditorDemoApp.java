@@ -31,6 +31,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.cti.vpx.util.VPXUtilities;
+
 /**
  * A demo application for the Swing {@link com.cti.vpx.controls.hex.fife.ui.swing.hex.HexEditor}
  * component.
@@ -75,6 +77,7 @@ public class HexEditorDemoApp extends JFrame {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				} catch (Exception e) {
+					VPXUtilities.updateError(e);
 					e.printStackTrace(); // Do something to keep FindBugs happy
 				}
 				new HexEditorDemoApp().setVisible(true);

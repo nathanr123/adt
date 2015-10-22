@@ -1188,6 +1188,8 @@ public class VPX_MADPanel extends JPanel {
 		} catch (Exception e) {
 			ret = false;
 			e.printStackTrace();
+			
+			VPXUtilities.updateError(e);
 		}
 
 		return ret;
@@ -1429,7 +1431,7 @@ public class VPX_MADPanel extends JPanel {
 				this.dispose();
 
 			} catch (IOException e) {
-
+				VPXUtilities.updateError(e);
 			}
 		}
 

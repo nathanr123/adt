@@ -24,11 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -690,13 +693,13 @@ public class VPXUtilities {
 			// General Tab Settings
 			prop.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH, String.valueOf(true));
 			prop.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY, String.valueOf(true));
-			prop.setProperty(VPXConstants.ResourceFields.SECURITY_PWD, "cornet");
+			prop.setProperty(VPXConstants.ResourceFields.SECURITY_PWD, encodePassword("cornet"));
 			// Log Tab Settings
 			prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
 			prop.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(true));
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(true));
 			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH,
-					System.getProperty("user.dir") + "\\logger_" + getCurrentTime(3) + ".log");
+					System.getProperty("user.home") + "\\logger.log");
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, "2");
 			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
 			prop.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME, String.valueOf(true));
@@ -1029,60 +1032,17 @@ public class VPXUtilities {
 		}
 	}
 
-	/**
-	 * Use Streams when you are dealing with raw data, binary data
-	 * 
-	 * @param data
-	 */
-	public static void appendUsingOutputStream(String fileName, String data) {
-		OutputStream os = null;
-		try {
-			// below true flag tells OutputStream to append
-			os = new FileOutputStream(new File(fileName), true);
-			os.write(data.getBytes(), 0, data.length());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				os.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+	public static void updateError(Exception exception) {
 
-	/**
-	 * Use BufferedWriter when number of write operations are more
-	 * 
-	 * @param filePath
-	 * @param text
-	 * @param noOfLines
-	 */
-	public static void appendUsingBufferedWriter(String filePath, String text, int noOfLines) {
-		File file = new File(filePath);
-		FileWriter fr = null;
-		BufferedWriter br = null;
-		try {
-			// to append to file, you need to initialize FileWriter using below
-			// constructor
-			fr = new FileWriter(file, true);
-			br = new BufferedWriter(fr);
-			for (int i = 0; i < noOfLines; i++) {
-				br.newLine();
-				// you can use write or append method
-				br.write(text);
-			}
+		StringWriter error = new StringWriter();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				br.close();
-				fr.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		PrintWriter pw = new PrintWriter(error);
+
+		exception.printStackTrace(pw);
+
+		updateToFile(VPXSessionManager.getCurrentErrorLogFileName(),
+				("\n" + VPXUtilities.getCurrentTime() + "\n" + error.toString()));
+
 	}
 
 	/**
@@ -1092,7 +1052,7 @@ public class VPXUtilities {
 	 * @param text
 	 * @param noOfLines
 	 */
-	public static void appendUsingFileWriter(String filePath, String text) {
+	public static void updateToFile(String filePath, String text) {
 		File file = new File(filePath);
 		BufferedWriter fr = null;
 		try {
@@ -1473,30 +1433,16 @@ public class VPXUtilities {
 
 			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
 
+				if (gateway.length() == 0) {
+
+					gateway = "none";
+				}
+
 				String cmd = VPXConstants.RUNASADMIN + "netsh interface ip set address \"" + lan
 
 				+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
 
 				Process pp = Runtime.getRuntime().exec(cmd);
-
-				/*
-				 * BufferedReader stdInput = new BufferedReader(new
-				 * InputStreamReader(pp.getInputStream()));
-				 * 
-				 * String s = "";
-				 * 
-				 * while ((s = stdInput.readLine()) != null) {
-				 * System.out.println(s); }
-				 * 
-				 * BufferedReader stderr = new BufferedReader(new
-				 * InputStreamReader(pp.getErrorStream()));
-				 * 
-				 * while ((s = stderr.readLine()) != null) {
-				 * 
-				 * System.out.println(s);
-				 * 
-				 * }
-				 */
 
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
@@ -1506,41 +1452,10 @@ public class VPXUtilities {
 
 				Process pp = VPXLinuxCommand.runFromRoot(cmd, password);
 
-				/*
-				 * BufferedReader stdInput = new BufferedReader(new
-				 * InputStreamReader(pp.getInputStream()));
-				 * 
-				 * String s = "";
-				 * 
-				 * while ((s = stdInput.readLine()) != null) {
-				 * System.out.println(s); }
-				 * 
-				 * BufferedReader stderr = new BufferedReader(new
-				 * InputStreamReader(pp.getErrorStream()));
-				 * 
-				 * while ((s = stderr.readLine()) != null) {
-				 * 
-				 * System.out.println(s);
-				 * 
-				 * }
-				 */
 				cmd = String.format("sudo ip route replace default via %s", gateway);
 
 				pp = VPXLinuxCommand.runFromRoot(cmd, password);
 
-				/*
-				 * stdInput = new BufferedReader(new
-				 * InputStreamReader(pp.getInputStream()));
-				 * 
-				 * while ((s = stdInput.readLine()) != null) {
-				 * System.out.println(s); }
-				 * 
-				 * stderr = new BufferedReader(new
-				 * InputStreamReader(pp.getErrorStream()));
-				 * 
-				 * while ((s = stderr.readLine()) != null) {
-				 * System.out.println(s); }
-				 */
 			}
 
 			return true;
@@ -1869,6 +1784,31 @@ public class VPXUtilities {
 
 			e.printStackTrace();
 		}
+	}
+
+	public static void setCurrentPassword(String password) {
+
+		updateProperties(VPXConstants.ResourceFields.SECURITY_PWD, encodePassword(password));
+	}
+
+	public static String getDecodedPassword() {
+
+		return decodePassword(getCurrentPassword());
+	}
+
+	public static String getCurrentPassword() {
+
+		return VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.SECURITY_PWD);
+	}
+
+	public static String encodePassword(String password) {
+
+		return Base64.getEncoder().encodeToString(Base64.getEncoder().encode(password.getBytes()));
+	}
+
+	public static String decodePassword(String password) {
+
+		return new String(Base64.getDecoder().decode(Base64.getDecoder().decode(password)));
 	}
 
 }

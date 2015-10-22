@@ -42,7 +42,7 @@ public class VPX_Dual_ADT {
 							JOptionPane.ERROR_MESSAGE);
 
 					e.printStackTrace();
-
+					VPXUtilities.updateError(e);
 					System.exit(0);
 				}
 			}

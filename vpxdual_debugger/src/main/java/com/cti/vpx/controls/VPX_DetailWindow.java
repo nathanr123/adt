@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -131,7 +132,17 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property.setRowHeight(20);
 
-		tbl_Property_Model = new DefaultTableModel(new String[] { "Property", "Value" }, 0);
+		tbl_Property_Model = new DefaultTableModel(new String[] { "Property", "Value" }, 0) {
+			/**
+			* 
+			*/
+			private static final long serialVersionUID = 8926674077700437406L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 
 		tbl_Property.setModel(tbl_Property_Model);
 
@@ -181,14 +192,12 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 		setTitle("VPX System Details");
 
 		tbl_Property_Model.getDataVector().removeAllElements();
-		
+
 		tbl_Property_Model.addRow(new String[] { "System Name", sys.getName() });
 
 		List<VPXSubSystem> subSystems = sys.getSubsystem();
 
 		tbl_Property_Model.addRow(new String[] { "Total no of Subsystems", String.format("%d", subSystems.size()) });
-
-		tbl_Property_Model.addRow(new String[] { "", "" });
 
 		tbl_Property_Model.addRow(new String[] { "Subsystems Detail", "" });
 
@@ -438,6 +447,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 					Thread.sleep(5000);
 
 				} catch (Exception e) {
+					
+					VPXUtilities.updateError(e);
+					
 					e.printStackTrace();
 				}
 
@@ -492,27 +504,73 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		private static final long serialVersionUID = 1L;
 
+		private int currentCol = 0;
+
+		private boolean isTitle = false;
+
+		private Font DEFAULTFONT = super.getFont();
+
+		private Font ALTERFONT = new Font(DEFAULTFONT.getFontName(), Font.BOLD, DEFAULTFONT.getSize());
+
+		private Font TITLEFONT = new Font(DEFAULTFONT.getFontName(), Font.BOLD, DEFAULTFONT.getSize() + 2);
+
 		public CellRenderer() {
+		}
+
+		@Override
+		public Font getFont() {
+
+			if (currentCol == 0)
+				if (isTitle)
+					return TITLEFONT;
+				else
+					return DEFAULTFONT;
+			else
+				return ALTERFONT;
+
 		}
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus,
 				int row, int column) {
 
+			currentCol = column;
+
 			String s = table.getModel().getValueAt(row, column).toString();
-			
-		//	System.out.println(s);
-			
-		//	System.out.println(value.toString());
+
+			isTitle = s.equals("Subsystems Detail");
 			
 			if (s.equals("Not Alive")) {
+
 				setForeground(Color.red);
+
 			} else if (s.equals("Alive")) {
+
 				setForeground(Color.GREEN.darker());
-			}else{
+
+			} else {
+
 				setForeground(Color.BLACK);
 			}
 
-			return super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+			super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+
+			if (column == 0) {
+
+				if (isTitle) {
+
+					setFont(TITLEFONT);
+
+				} else {
+
+					setFont(DEFAULTFONT);
+				}
+
+			} else {
+
+				setFont(ALTERFONT);
+			}
+
+			return this;
 
 		}
 	}

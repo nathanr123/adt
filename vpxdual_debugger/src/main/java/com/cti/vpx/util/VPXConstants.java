@@ -31,7 +31,7 @@ public class VPXConstants {
 
 	public static final String RESOURCENAME = "VPX_Dual_adt";
 
-	public static final String RUNASADMIN = "elevate ";
+	public static final String RUNASADMIN = "";//"elevate ";
 
 	public static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
