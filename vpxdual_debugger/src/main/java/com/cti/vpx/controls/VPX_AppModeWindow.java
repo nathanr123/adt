@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -10,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,7 +69,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private JComboBox<String> cmbCOMM;
 
-	private JTextField txtLogFileName;
+	private JTextField txtWorkspacePath;
 
 	private int currentMode = -1;
 
@@ -91,15 +93,15 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private JButton btnBrowse;
 
-	private Boolean isLogEnabled;
-
-	private JCheckBox chkLog;
+	private JCheckBox chkEditWorkspace;
 
 	private NWInterface nw;
 
 	private SpinnerNumberModel periodicitySpinnerModel;
 
 	private JTextField txtDiplayName;
+
+	private JLabel lblWorkspace;
 
 	/**
 	 * Launch the application.
@@ -134,7 +136,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 		loadComponents();
 
-		setLogProperties();
+		loadWorkspaceProperties();
 
 		centerFrame();
 
@@ -146,14 +148,14 @@ public class VPX_AppModeWindow extends JFrame {
 
 		loadComponents();
 
-		setLogProperties();
+		loadWorkspaceProperties();
 
 		centerFrame();
 	}
 
 	private void init() {
 
-		setTitle("Debug Wizard");
+		setTitle("Debug Launcher");
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -196,50 +198,59 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private void loadLogComponents() {
 
-		JPanel logPanel = new JPanel();
+		JPanel workspacePanel = new JPanel();
 
-		logPanel.setBorder(new TitledBorder(null, "Log", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		workspacePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Workspace",
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
-		logPanel.setPreferredSize(new Dimension(10, 135));
+		workspacePanel.setPreferredSize(new Dimension(10, 135));
 
-		contentPane.add(logPanel, BorderLayout.NORTH);
+		// contentPane.add(logPanel, BorderLayout.NORTH);
 
-		logPanel.setLayout(null);
+		workspacePanel.setLayout(null);
 
-		chkLog = new JCheckBox("Enable Log");
+		chkEditWorkspace = new JCheckBox("Change workspace");
 
-		chkLog.addItemListener(new ItemListener() {
+		chkEditWorkspace.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 
 				boolean val = (e.getStateChange() == ItemEvent.SELECTED);
 
-				txtLogFileName.setEnabled(val);
+				txtWorkspacePath.setEnabled(val);
 
 				btnBrowse.setEnabled(val);
+
+				lblWorkspace.setEnabled(val);
 			}
 		});
 
-		chkLog.setBounds(16, 20, 157, 14);
+		chkEditWorkspace.setBounds(16, 20, 346, 14);
 
-		logPanel.add(chkLog);
+		workspacePanel.add(chkEditWorkspace);
 
-		JLabel lblLog = new JLabel("Select Log file name");
+		lblWorkspace = new JLabel("Select workspace directory");
 
-		lblLog.setBounds(16, 40, 157, 14);
+		lblWorkspace.setEnabled(false);
 
-		logPanel.add(lblLog);
+		lblWorkspace.setBounds(16, 40, 157, 14);
 
-		txtLogFileName = new JTextField();
+		workspacePanel.add(lblWorkspace);
 
-		txtLogFileName.setBounds(16, 65, 425, 20);
+		txtWorkspacePath = new JTextField();
 
-		logPanel.add(txtLogFileName);
+		txtWorkspacePath.setEnabled(false);
 
-		txtLogFileName.setColumns(10);
+		txtWorkspacePath.setBounds(16, 65, 425, 20);
+
+		workspacePanel.add(txtWorkspacePath);
+
+		txtWorkspacePath.setColumns(10);
 
 		btnBrowse = new JButton("Browse");
+
+		btnBrowse.setEnabled(false);
 
 		btnBrowse.addActionListener(new ActionListener() {
 
@@ -248,26 +259,24 @@ public class VPX_AppModeWindow extends JFrame {
 
 				JFileChooser jb = new JFileChooser();
 
+				jb.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
 				int i = jb.showOpenDialog(VPX_AppModeWindow.this);
 
 				if (i == JFileChooser.APPROVE_OPTION) {
 
 					String flnmae = jb.getSelectedFile().getPath();
 
-					txtLogFileName.setText(flnmae);
-
-					if (!flnmae.endsWith(".log")) {
-						flnmae += ".log";
-					}
+					txtWorkspacePath.setText(flnmae);
 				}
 			}
 		});
 
 		btnBrowse.setBounds(350, 100, 91, 23);
 
-		logPanel.add(btnBrowse);
+		workspacePanel.add(btnBrowse);
 
-		basePane.add(logPanel, BorderLayout.NORTH);
+		basePane.add(workspacePanel, BorderLayout.NORTH);
 
 	}
 
@@ -733,58 +742,46 @@ public class VPX_AppModeWindow extends JFrame {
 
 		spinPeriodicity.setEnabled(val);
 
-		setLogProperties();
-
 		btnOpen.setEnabled((cmbNWIface.getSelectedIndex() > 0));
 	}
 
 	private void setEnabledUARTs(boolean val) {
 
-		setLogProperties();
-
 		btnOpen.setEnabled((cmbCOMM.getSelectedIndex() > 0));
 	}
 
-	private void setLogProperties() {
+	private void loadWorkspaceProperties() {
 
-		isLogEnabled = Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_ENABLE));
-
-		chkLog.setSelected(isLogEnabled);
-
-		if (isLogEnabled) {
-
-			if (txtLogFileName.getText().trim().length() == 0)
-				txtLogFileName.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
-
-		} else {
-
-			txtLogFileName.setEnabled(false);
-
-			btnBrowse.setEnabled(false);
-		}
+		txtWorkspacePath.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.WORKSPACE_PATH));
 
 	}
 
-	private boolean updateLogSettings() {
+	private boolean validateWorkspaceSettings() {
 
-		boolean ret = false;
+		try {
 
-		if (chkLog.isSelected()) {
+			File root = new File(txtWorkspacePath.getText().trim());
 
-			if (VPXUtilities.isFileValid(txtLogFileName.getText().trim(), true)) { // validation
-																					// for
-																					// valid
-				// filepath
-				VPXUtilities.setEnableLog(true);
+			if (!root.exists()) {
 
-				VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
-				ret = true;
+				root.mkdirs();
+
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.WORKSPACE_PATH,
+						txtWorkspacePath.getText().trim());
+
+				VPXUtilities.createWorkspaceDirs(txtWorkspacePath.getText().trim());
+
+				VPXSessionManager.setWorkspacePath(txtWorkspacePath.getText().trim());
 			}
-		} else {
-			ret = true;
+
+			VPXUtilities.setEnableLog(true);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
 		}
 
-		return ret;
+		return true;
 	}
 
 	private boolean isValueChanged() {
@@ -797,19 +794,14 @@ public class VPX_AppModeWindow extends JFrame {
 
 		retGW = (nw.getGateWay().equals(txtGateway.getText().trim())) ? true : false;
 
-		if (retIP && retSub && retGW)
-			return false;
-		else
-			return true;
+		return (retIP && retSub && retGW);
 	}
 
 	private void openDebugWindow() {
 
-		if (updateLogSettings()) {
+		if (validateWorkspaceSettings()) {
 
-			setLogFileSettings();
-
-			VPXSessionManager.setCurrentErrorLogFileName("Error_" + VPXUtilities.getCurrentTime(3) + ".log");
+			setLogFileName();
 
 			if (currentMode == VPXConstants.ETHMODE) {
 
@@ -859,7 +851,7 @@ public class VPX_AppModeWindow extends JFrame {
 								"Opening Application", JOptionPane.ERROR_MESSAGE);
 
 						e.printStackTrace();
-						
+
 						VPXUtilities.updateError(e);
 
 						System.exit(0);
@@ -896,7 +888,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 				if (cmbCOMM.getSelectedIndex() > 0) {
 
-					updateLogSettings();
+					validateWorkspaceSettings();
 
 					VPX_UARTWindow window = new VPX_UARTWindow(cmbCOMM.getSelectedItem().toString());
 
@@ -919,14 +911,14 @@ public class VPX_AppModeWindow extends JFrame {
 			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please enter the valid log filename", "Error Log",
 					JOptionPane.ERROR_MESSAGE);
 
-			txtLogFileName.requestFocusInWindow();
+			txtWorkspacePath.requestFocusInWindow();
 		}
 
 	}
 
-	private void setLogFileSettings() {
+	private void setLogFileName() {
 
-		String flnmae = txtLogFileName.getText();
+		String flnmae = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
 
 		if (!flnmae.endsWith(".log")) {
 
@@ -950,8 +942,6 @@ public class VPX_AppModeWindow extends JFrame {
 		VPXSessionManager.setCurrentLogFileName(flnmae);
 
 		VPXUtilities.setEnableLog(true);
-
-		VPXUtilities.updateProperties(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFileName.getText());
 	}
 
 	public void showWindow() {

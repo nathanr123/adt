@@ -83,20 +83,29 @@ public class ATPCommand extends Struct implements ATP {
 
 	}
 
+	public class TFTPInfo extends Struct {
+
+		public final Unsigned32 filetype = new Unsigned32();
+
+		public final UTF8String filename = new UTF8String(128);
+
+		public final UTF8String ip = new UTF8String(15);
+	}
+
 	public class MemoryInfo extends Struct {
 
 		public final Unsigned32 memIndex = new Unsigned32();
-		
+
 		public final Unsigned32 address = new Unsigned32();
 
 		public final Unsigned32 core = new Unsigned32();
-		
+
 		public final Unsigned32 length = new Unsigned32();
 
 		public final Unsigned32 stride = new Unsigned32();
 
 		public final Unsigned32 newvalue = new Unsigned32();
-	
+
 		public final Unsigned32 byteZero = new Unsigned32();
 
 		public final Unsigned8 buffer[] = array(new Unsigned8[DEFAULTBUFFERSIZE]);
@@ -110,6 +119,8 @@ public class ATPCommand extends Struct implements ATP {
 		public final FlashInfo flash_info = inner(new FlashInfo());
 
 		public final MemoryInfo memoryinfo = inner(new MemoryInfo());
+
+		public final TFTPInfo tftpinfo = inner(new TFTPInfo());
 	}
 
 	@Override

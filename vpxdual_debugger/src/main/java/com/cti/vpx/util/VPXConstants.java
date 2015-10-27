@@ -31,7 +31,7 @@ public class VPXConstants {
 
 	public static final String RESOURCENAME = "VPX_Dual_adt";
 
-	public static final String RUNASADMIN = "";//"elevate ";
+	public static final String RUNASADMIN = "";// "elevate ";
 
 	public static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
@@ -123,10 +123,12 @@ public class VPXConstants {
 	 */
 
 	public static class ResourceFields {
-
+		
 		public static final String GENERAL_SPLASH = "general.splash";
 
 		public static final String GENERAL_MEMORY = "general.memorybar";
+
+		public static final String WORKSPACE_PATH = "workspace.path";
 
 		public static final String SECURITY_PWD = "security.pwd";
 
@@ -187,6 +189,36 @@ public class VPXConstants {
 		public static final String DEPLOYMENTFILE = "deploymnet_C678.json";
 
 		public static final String DEPLOYMENTCONFIGFILE = "maptoolCfg_C678.json";
+
+		public static final String FOLDER_WORKSPACE_DEFAULT = "folder.workspace.default";
+
+		public static final String FOLDER_WORKSPACE_LOG = "folder.workspace.log";
+
+		public static final String FOLDER_WORKSPACE_LOG_EVENT = "folder.workspace.log.event";
+
+		public static final String FOLDER_WORKSPACE_LOG_ERROR = "folder.workspace.log.error";
+
+		public static final String FOLDER_WORKSPACE_LOG_CONSOLE = "folder.workspace.log.console";
+
+		public static final String FOLDER_WORKSPACE_LOG_MESSAGE = "folder.workspace.log.message";
+
+		public static final String FOLDER_WORKSPACE_TFTP = "folder.workspace.tftp";
+
+		public static final String FOLDER_WORKSPACE_DATA = "folder.workspace.data";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM = "folder.workspace.subsystem";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_UNLISTED = "folder.workspace.subsystem.unlisted";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_P2020 = "folder.workspace.subsystem.p2020";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP1 = "folder.workspace.subsystem.dsp1";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP2 = "folder.workspace.subsystem.dsp2";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE = "folder.workspace.subsystem.dsp.core";
+
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_PROCESSOR_BIN = "folder.workspace.subsystem.processor.bin";
 
 	}
 

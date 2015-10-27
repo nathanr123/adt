@@ -692,36 +692,67 @@ public class VPXUtilities {
 
 			// General Tab Settings
 			prop.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH, String.valueOf(true));
+
 			prop.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY, String.valueOf(true));
+
 			prop.setProperty(VPXConstants.ResourceFields.SECURITY_PWD, encodePassword("cornet"));
 			// Log Tab Settings
+
+			prop.setProperty(VPXConstants.ResourceFields.WORKSPACE_PATH,
+					System.getProperty("user.home") + "\\workspace");
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(true));
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(true));
-			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH,
-					System.getProperty("user.home") + "\\logger.log");
+
+			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, "log");
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, "2");
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, "$(SerialNumber)_$(CurrentTime)");
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME, String.valueOf(true));
+
 			prop.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(false));
+
 			prop.setProperty(VPXConstants.ResourceFields.FILTER_SUBNET, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_PYTHON, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_MAP, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_PRELINKER, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_STRIPER, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_OFD, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_MAL, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_NML, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_DUMMY, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.DUMMY_CHK, "false");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE0, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE1, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE2, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE3, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE4, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE5, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE6, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_CORE7, "");
+
 			prop.setProperty(VPXConstants.ResourceFields.PATH_OUT, "");
 
 			// save properties to project root folder
@@ -745,7 +776,13 @@ public class VPXUtilities {
 
 		if (props == null)
 			readProperties();
+
 		return props.getProperty(key);
+	}
+	
+	public static String getString(String key) {
+
+		return resourceBundle.getString(key);
 	}
 
 	public static void updateProperties(Properties prop) {
@@ -1811,4 +1848,121 @@ public class VPXUtilities {
 		return new String(Base64.getDecoder().decode(Base64.getDecoder().decode(password)));
 	}
 
+	public static void createWorkspaceDirs(String rootPath) {
+
+		boolean isWritable = false;
+
+		try {
+
+			File root = new File(rootPath);
+
+			File[] s = File.listRoots();
+
+			for (int i = 0; i < s.length; i++) {
+
+				if (s[i].canWrite()) {
+
+					if (root.getPath().startsWith(s[i].getPath())) {
+
+						isWritable = true;
+
+						break;
+					}
+				}
+			}
+
+			if (isWritable) {
+
+				if (!root.exists())
+					root.mkdirs();
+
+				mkDir(rootPath, VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG));
+
+				mkDir(rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG),
+						VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_EVENT));
+
+				mkDir(rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG),
+						VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_ERROR));
+
+				mkDir(rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG),
+						VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_CONSOLE));
+
+				mkDir(rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG),
+						VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_MESSAGE));
+
+				mkDir(rootPath, VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM));
+
+				mkDir(rootPath, VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_DATA));
+
+				mkDir(rootPath, VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_TFTP));
+
+			} else {
+				System.out.println("root directory is wrong");
+			}
+		} catch (Exception e) {
+
+		}
+
+	}
+
+	public static void createSubsystemFolder(String name) {
+
+		// Sub System name folder
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM), name);
+
+		// P2020
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_P2020));
+
+		// P2020 bin folder
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name + "/"
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_P2020),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_PROCESSOR_BIN));
+
+		// DSP1 folder
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP1));
+
+		// DSP1 bin folder
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name + "/"
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP1),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_PROCESSOR_BIN));
+
+		// DSP1 core folders
+		for (int i = 0; i < 8; i++) {
+
+			mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name
+					+ "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP1),
+					(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE)
+							+ i));
+
+		}
+
+		// DSP2 folder
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP2));
+
+		// DSP2 bin folder
+		mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name + "/"
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP2),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_PROCESSOR_BIN));
+
+		// DSP2 core folders
+		for (int i = 0; i < 8; i++) {
+
+			mkDir(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/" + name
+					+ "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP2),
+					(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE)
+							+ i));
+
+		}
+	}
+
+	public static void mkDir(String parent, String path) {
+
+		File subdir = new File(parent, path);
+
+		subdir.mkdir();
+
+	}
 }

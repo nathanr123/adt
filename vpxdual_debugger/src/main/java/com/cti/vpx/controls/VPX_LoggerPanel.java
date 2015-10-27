@@ -193,6 +193,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void saveLogtoFile() {
+		
 		JFileChooser chooser;
 
 		try {

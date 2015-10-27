@@ -13,8 +13,12 @@ public class VPXSessionManager {
 	private static String currentSystemIP;
 
 	private static String currentLogFileName;
-	
+
 	private static String currentErrorLogFileName;
+
+	private static String currentWorkspacePath;
+
+	private static String currentLogFile;
 
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
@@ -124,18 +128,18 @@ public class VPXSessionManager {
 		return currentLogFileName;
 	}
 
-	public static void setCurrentLogFileName(String currentLogFileName) {
+	public static void setCurrentLogFileName(String logFileName) {
 
-		VPXSessionManager.currentLogFileName = currentLogFileName;
+		currentLogFileName = getEventPath() + "/" + logFileName;
 	}
-	
+
 	public static String getCurrentErrorLogFileName() {
-		
+
 		return currentErrorLogFileName;
 	}
 
 	public static void setCurrentErrorLogFileName(String currentErrorLogFileName) {
-		
+
 		VPXSessionManager.currentErrorLogFileName = currentErrorLogFileName;
 	}
 
@@ -154,4 +158,48 @@ public class VPXSessionManager {
 		VPXSessionManager.currentProcessor = currentProcessor;
 	}
 
+	public static void setWorkspacePath(String path) {
+
+		currentWorkspacePath = path;
+	}
+
+	public static String getWorkspacePath() {
+
+		return currentWorkspacePath;
+	}
+
+	public static String getLogPath() {
+
+		return getAsFullPath(currentWorkspacePath,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG));
+	}
+
+	public static String getEventPath() {
+
+		return getAsFullPath(getLogPath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_EVENT));
+	}
+
+	public static String getErrorPath() {
+
+		return getAsFullPath(getLogPath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_ERROR));
+	}
+
+	public static String getConsolePath() {
+
+		return getAsFullPath(getLogPath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_CONSOLE));
+	}
+
+	public static String getMessagePath() {
+
+		return getAsFullPath(getLogPath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_MESSAGE));
+	}
+
+	private static String getAsFullPath(String parent, String child) {
+
+		return parent + "/" + child;
+	}
 }

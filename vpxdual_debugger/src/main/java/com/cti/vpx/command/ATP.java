@@ -45,6 +45,15 @@ public interface ATP {
 	public static final int MSG_TYPE_AMPLITUDE_INTERRUPTED = 0xD0;
 
 	// Result
+	public static final int TFTP_FILEMODE_LINUX = 0x00;
+
+	public static final int TFTP_FILEMODE_FS = 0x01;
+
+	public static final int TFTP_FILEMODE_DTB = 0x02;
+
+	public static final int TFTP_FILEMODE_UBOOT = 0x03;
+
+	// Result
 	public static final int TEST_RESULT_PASS = 0x01;
 
 	public static final int TEST_RESULT_FAIL = 0x00;
