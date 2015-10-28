@@ -2471,6 +2471,7 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	public class VPX_CloseProgressWindow extends JDialog {
+		
 
 		/**
 		 * 

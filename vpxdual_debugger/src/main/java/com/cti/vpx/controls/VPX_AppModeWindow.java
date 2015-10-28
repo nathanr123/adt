@@ -771,8 +771,9 @@ public class VPX_AppModeWindow extends JFrame {
 
 				VPXUtilities.createWorkspaceDirs(txtWorkspacePath.getText().trim());
 
-				VPXSessionManager.setWorkspacePath(txtWorkspacePath.getText().trim());
 			}
+
+			VPXSessionManager.setWorkspacePath(txtWorkspacePath.getText().trim());
 
 			VPXUtilities.setEnableLog(true);
 
@@ -918,13 +919,15 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private void setLogFileName() {
 
+		String curTime = VPXUtilities.getCurrentTime(3);
+
 		String flnmae = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
 
 		if (!flnmae.endsWith(".log")) {
 
 			if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
 
-				flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
+				flnmae = flnmae + "_" + curTime + ".log";
 			} else {
 				flnmae += ".log";
 			}
@@ -934,10 +937,12 @@ public class VPX_AppModeWindow extends JFrame {
 
 				flnmae = flnmae.substring(0, flnmae.length() - 4);
 
-				flnmae = flnmae + "_" + VPXUtilities.getCurrentTime(3) + ".log";
+				flnmae = flnmae + "_" + curTime + ".log";
 			}
 
 		}
+
+		VPXSessionManager.setCurrentErrorLogFileName("Error_" + curTime + ".log");
 
 		VPXSessionManager.setCurrentLogFileName(flnmae);
 

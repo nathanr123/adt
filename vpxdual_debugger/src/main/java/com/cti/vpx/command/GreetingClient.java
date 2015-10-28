@@ -177,7 +177,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 		jp.add(jb5);
 
-		JButton jb6 = new JButton("Get Amplitude");
+		JButton jb6 = new JButton("Start TFTP");
 
 		jb6.addActionListener(new ActionListener() {
 
@@ -187,7 +187,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 				// getWaterFall();
 
-				getAmplitude();
+				//getAmplitude();
+				startTFTP("172.17.10.1");
 			}
 		});
 
@@ -613,6 +614,54 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	}
 
+	public void startTFTP(String ip) {
+
+		DatagramSocket datagramSocket;
+
+		ATPCommand msg = null;
+
+		byte[] buffer = null;
+
+		ByteBuffer bf = null;
+
+		try {
+
+			datagramSocket = new DatagramSocket();
+
+			msg = new P2020ATPCommand();
+
+			buffer = new byte[msg.size()];
+
+			bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_FLASH);
+
+			msg.params.TFTPInfo.filename.set("p2020-ver1.4.dtb");
+
+			msg.params.TFTPInfo.filetype.set(ATP.TFTP_FILEMODE_DTB);
+
+			msg.params.TFTPInfo.ip.set("172.17.1.28");
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			datagramSocket.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
 	public void populateBISTResult(ATPCommand msg) {
 
 		if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_P2020) {
@@ -711,7 +760,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		 * e.printStackTrace(); }
 		 */
 
-		sendPeriodicity("172.17.10.130", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
+		sendPeriodicity("172.17.10.1", 5, PROCESSOR_LIST.PROCESSOR_P2020);
 
 	}
 
@@ -1227,7 +1276,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	}
 
 	@Override
-	public void populateAmplitude(String ip, float[] xAxis,float[] yAxis) {
+	public void populateAmplitude(String ip, float[] xAxis, float[] yAxis) {
 		// TODO Auto-generated method stub
 
 	}

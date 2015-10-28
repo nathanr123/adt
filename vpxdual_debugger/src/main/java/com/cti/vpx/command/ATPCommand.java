@@ -87,7 +87,7 @@ public class ATPCommand extends Struct implements ATP {
 
 		public final Unsigned32 filetype = new Unsigned32();
 
-		public final UTF8String filename = new UTF8String(128);
+		public final UTF8String filename = new UTF8String(64);
 
 		public final UTF8String ip = new UTF8String(15);
 	}
@@ -120,7 +120,7 @@ public class ATPCommand extends Struct implements ATP {
 
 		public final MemoryInfo memoryinfo = inner(new MemoryInfo());
 
-		public final TFTPInfo tftpinfo = inner(new TFTPInfo());
+		public final TFTPInfo TFTPInfo = inner(new TFTPInfo());
 	}
 
 	@Override

@@ -764,50 +764,50 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private void saveLogtoFile() {
 
-		JFileChooser chooser;
+		// JFileChooser chooser;
 
 		try {
 
-			chooser = new JFileChooser();
+			// chooser = new JFileChooser();
 
-			chooser.setCurrentDirectory(new java.io.File("."));
+			// chooser.setCurrentDirectory(new java.io.File("."));
 
-			chooser.setDialogTitle("Select folder to save");
+			// chooser.setDialogTitle("Select folder to save");
 
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			// chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-			if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			// if (chooser.showSaveDialog(parent) ==
+			// JFileChooser.APPROVE_OPTION) {
 
-				String path = chooser.getSelectedFile().getPath() + "\\Messages."
-						+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
-						+ ".txt";
+			String path = VPXSessionManager.getMessagePath() + "\\Messages_"
+					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".log";
 
-				FileWriter fw = new FileWriter(new File(path), true);
+			FileWriter fw = new FileWriter(new File(path), true);
 
-				fw.write("User Messages\n");
+			fw.write("User Messages\n");
 
-				fw.write("_______________________________\n");
+			fw.write("_______________________________\n");
 
-				fw.write("\n");
+			fw.write("\n");
 
-				fw.write(txtP_User_Msg_Display.getText());
+			fw.write(txtP_User_Msg_Display.getText());
 
-				fw.write("\n");
+			fw.write("\n");
 
-				fw.write("Processor Messages\n");
+			fw.write("Processor Messages\n");
 
-				fw.write("_______________________________\n");
+			fw.write("_______________________________\n");
 
-				fw.write("\n");
+			fw.write("\n");
 
-				fw.write(txtP_Proc_Msg_Display.getText());
+			fw.write(txtP_Proc_Msg_Display.getText());
 
-				fw.write("\n");
+			fw.write("\n");
 
-				fw.close();
+			fw.close();
 
-				VPXUtilities.showPopup("File Saved at " + path, path);
-			}
+			VPXUtilities.showPopup("File Saved at " + path, path);
+			// }
 
 		} catch (Exception e) {
 			VPXUtilities.updateError(e);

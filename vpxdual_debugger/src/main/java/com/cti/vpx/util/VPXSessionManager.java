@@ -140,7 +140,7 @@ public class VPXSessionManager {
 
 	public static void setCurrentErrorLogFileName(String currentErrorLogFileName) {
 
-		VPXSessionManager.currentErrorLogFileName = currentErrorLogFileName;
+		VPXSessionManager.currentErrorLogFileName = getErrorPath() + "/" + currentErrorLogFileName;
 	}
 
 	public static VPXSystem getVpxSystem() {

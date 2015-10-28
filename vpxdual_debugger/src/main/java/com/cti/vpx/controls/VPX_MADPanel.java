@@ -35,6 +35,8 @@ import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
+import net.miginfocom.swing.MigLayout;
+
 public class VPX_MADPanel extends JPanel {
 
 	/**
@@ -104,6 +106,10 @@ public class VPX_MADPanel extends JPanel {
 
 	private boolean isFileCreated = false;
 
+	private JLabel lblConfigDummyOutFile;
+
+	private JButton btnConfigBrowseDummyOut;
+
 	/**
 	 * Create the panel.
 	 */
@@ -135,13 +141,13 @@ public class VPX_MADPanel extends JPanel {
 
 		add(madTab, BorderLayout.CENTER);
 
-		createCompilationTab();
-
 		createConfigurationTab();
 
-		madTab.addTab("Configuration", null, new JScrollPane(configPanel), null);
+		createCompilationTab();
 
-		madTab.addTab("Compilation", null, new JScrollPane(compilePanel), null);
+		madTab.addTab("Configuration", new JScrollPane(configPanel));
+
+		madTab.addTab("Compilation", new JScrollPane(compilePanel));
 
 		madTab.setEnabledAt(1, false);
 
@@ -171,8 +177,6 @@ public class VPX_MADPanel extends JPanel {
 
 		configPanel = new JPanel();
 
-		configPanel.setPreferredSize(new Dimension(760, 540));
-
 		configPanel.setLayout(new BorderLayout(0, 0));
 
 		JPanel configPathPanel = new JPanel();
@@ -181,202 +185,116 @@ public class VPX_MADPanel extends JPanel {
 
 		configPanel.add(configPathPanel, BorderLayout.CENTER);
 
-		configPathPanel.setLayout(null);
+		configPathPanel
+				.setLayout(new MigLayout("", "[][][][grow][][][]", "[grow][grow][grow][grow][grow][grow][grow]"));
 
 		JLabel lblConfigPython = new JLabel("Python");
 
-		lblConfigPython.setBounds(22, 26, 100, 26);
-
-		configPathPanel.add(lblConfigPython);
+		configPathPanel.add(lblConfigPython, "cell 1 0");
 
 		txtConfigPathPython = new JTextField();
 
-		txtConfigPathPython.setBounds(132, 26, 509, 26);
-
-		configPathPanel.add(txtConfigPathPython);
+		configPathPanel.add(txtConfigPathPython, "flowx,cell 3 0,growx");
 
 		txtConfigPathPython.setColumns(10);
 
 		JButton btnConfigBrowsePython = new JButton(new BrowseAction("Browse", txtConfigPathPython));
 
-		btnConfigBrowsePython.setBounds(647, 26, 89, 26);
-
-		configPathPanel.add(btnConfigBrowsePython);
+		configPathPanel.add(btnConfigBrowsePython, "cell 5 0");
 
 		JLabel lblConfigMAP = new JLabel("MAP Tool");
 
-		lblConfigMAP.setBounds(22, 78, 100, 26);
-
-		configPathPanel.add(lblConfigMAP);
+		configPathPanel.add(lblConfigMAP, "cell 1 1");
 
 		txtConfigPathMAP = new JTextField();
 
 		txtConfigPathMAP.setColumns(10);
 
-		txtConfigPathMAP.setBounds(132, 78, 509, 26);
-
-		configPathPanel.add(txtConfigPathMAP);
+		configPathPanel.add(txtConfigPathMAP, "flowx,cell 3 1,growx");
 
 		JButton btnConfigBrowseMAP = new JButton(new BrowseAction("Browse", txtConfigPathMAP));
 
-		btnConfigBrowseMAP.setBounds(647, 78, 89, 26);
-
-		configPathPanel.add(btnConfigBrowseMAP);
+		configPathPanel.add(btnConfigBrowseMAP, "cell 5 1");
 
 		JLabel lblConfigPrelinker = new JLabel("Prelinker Tool");
 
-		lblConfigPrelinker.setBounds(22, 130, 100, 26);
-
-		configPathPanel.add(lblConfigPrelinker);
+		configPathPanel.add(lblConfigPrelinker, "cell 1 2");
 
 		txtConfigPathPrelinker = new JTextField();
 
 		txtConfigPathPrelinker.setColumns(10);
 
-		txtConfigPathPrelinker.setBounds(132, 130, 509, 26);
-
-		configPathPanel.add(txtConfigPathPrelinker);
+		configPathPanel.add(txtConfigPathPrelinker, "flowx,cell 3 2,growx");
 
 		JButton btnConfigBrowsePrelinker = new JButton(new BrowseAction("Browse", txtConfigPathPrelinker));
 
-		btnConfigBrowsePrelinker.setBounds(647, 130, 89, 26);
-
-		configPathPanel.add(btnConfigBrowsePrelinker);
+		configPathPanel.add(btnConfigBrowsePrelinker, "cell 5 2");
 
 		JLabel lblConfigStriper = new JLabel("Stripper Tool");
 
-		lblConfigStriper.setBounds(22, 182, 100, 26);
-
-		configPathPanel.add(lblConfigStriper);
+		configPathPanel.add(lblConfigStriper, "cell 1 3");
 
 		txtConfigPathStriper = new JTextField();
 
 		txtConfigPathStriper.setColumns(10);
 
-		txtConfigPathStriper.setBounds(132, 182, 509, 26);
-
-		configPathPanel.add(txtConfigPathStriper);
+		configPathPanel.add(txtConfigPathStriper, "flowx,cell 3 3,growx");
 
 		JButton btnConfigBrowseStriper = new JButton(new BrowseAction("Browse", txtConfigPathStriper));
 
-		btnConfigBrowseStriper.setBounds(647, 182, 89, 26);
-
-		configPathPanel.add(btnConfigBrowseStriper);
+		configPathPanel.add(btnConfigBrowseStriper, "cell 5 3");
 
 		JLabel lblConfigOFD = new JLabel("OFD Tool");
 
-		lblConfigOFD.setBounds(22, 234, 100, 26);
-
-		configPathPanel.add(lblConfigOFD);
+		configPathPanel.add(lblConfigOFD, "cell 1 4");
 
 		txtConfigPathOFD = new JTextField();
 
 		txtConfigPathOFD.setColumns(10);
 
-		txtConfigPathOFD.setBounds(132, 234, 509, 26);
-
-		configPathPanel.add(txtConfigPathOFD);
+		configPathPanel.add(txtConfigPathOFD, "flowx,cell 3 4,growx");
 
 		JButton btnConfigBrowseOFD = new JButton(new BrowseAction("Browse", txtConfigPathOFD));
 
-		btnConfigBrowseOFD.setBounds(647, 234, 89, 26);
-
-		configPathPanel.add(btnConfigBrowseOFD);
+		configPathPanel.add(btnConfigBrowseOFD, "cell 5 4");
 
 		JLabel lblConfigMAL = new JLabel("MAL Application");
 
-		lblConfigMAL.setBounds(22, 286, 100, 26);
-
-		configPathPanel.add(lblConfigMAL);
+		configPathPanel.add(lblConfigMAL, "cell 1 5");
 
 		txtConfigPathMAL = new JTextField();
 
 		txtConfigPathMAL.setColumns(10);
 
-		txtConfigPathMAL.setBounds(132, 286, 509, 26);
-
-		configPathPanel.add(txtConfigPathMAL);
+		configPathPanel.add(txtConfigPathMAL, "flowx,cell 3 5,growx");
 
 		JButton btnConfigBrowseMAL = new JButton(new BrowseAction("Browse", txtConfigPathMAL));
 
-		btnConfigBrowseMAL.setBounds(647, 286, 89, 26);
-
-		configPathPanel.add(btnConfigBrowseMAL);
+		configPathPanel.add(btnConfigBrowseMAL, "cell 5 5");
 
 		JLabel lblConfigNML = new JLabel("NML Loader");
 
-		lblConfigNML.setBounds(22, 338, 100, 26);
-
-		configPathPanel.add(lblConfigNML);
+		configPathPanel.add(lblConfigNML, "cell 1 6");
 
 		txtConfigPathNML = new JTextField();
 
 		txtConfigPathNML.setColumns(10);
 
-		txtConfigPathNML.setBounds(132, 338, 509, 26);
-
-		configPathPanel.add(txtConfigPathNML);
+		configPathPanel.add(txtConfigPathNML, "flowx,cell 3 6,growx");
 
 		JButton btnConfigBrowseNMLLoader = new JButton(new BrowseAction("Browse", txtConfigPathNML));
 
-		btnConfigBrowseNMLLoader.setBounds(647, 338, 89, 26);
-
-		configPathPanel.add(btnConfigBrowseNMLLoader);
+		configPathPanel.add(btnConfigBrowseNMLLoader, "cell 5 6");
 
 		JPanel configDummyPanel = new JPanel();
-
-		configDummyPanel.setPreferredSize(new Dimension(10, 140));
 
 		configPanel.add(configDummyPanel, BorderLayout.SOUTH);
 
 		configDummyPanel.setLayout(new BorderLayout(0, 0));
 
-		JPanel configDummyOutFilePanel = new JPanel();
-
-		configDummyOutFilePanel.setBorder(new TitledBorder(null, "Dummy File", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
-
-		configDummyPanel.add(configDummyOutFilePanel, BorderLayout.CENTER);
-
-		configDummyOutFilePanel.setLayout(null);
-
-		chkConfigDummyOut = new JCheckBox("Use dummy out file if no out file is selected");
-
-		chkConfigDummyOut.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-
-				txtConfigPathDummyOut.setEnabled(chkConfigDummyOut.isSelected());
-
-			}
-		});
-
-		chkConfigDummyOut.setBounds(22, 19, 604, 23);
-
-		configDummyOutFilePanel.add(chkConfigDummyOut);
-
-		JLabel lblConfigDummyOutFile = new JLabel("Dummy Out File");
-
-		lblConfigDummyOutFile.setBounds(22, 61, 100, 26);
-
-		configDummyOutFilePanel.add(lblConfigDummyOutFile);
-
-		txtConfigPathDummyOut = new JTextField();
-
-		txtConfigPathDummyOut.setBounds(132, 61, 509, 26);
-
-		txtConfigPathDummyOut.setColumns(10);
-
-		configDummyOutFilePanel.add(txtConfigPathDummyOut);
-
-		JButton btnConfigBrowseDummyOut = new JButton(new BrowseAction("Browse", txtConfigPathDummyOut));
-
-		btnConfigBrowseDummyOut.setBounds(647, 61, 89, 26);
-
-		configDummyOutFilePanel.add(btnConfigBrowseDummyOut);
-
 		JPanel configControlPanel = new JPanel();
+
+		configControlPanel.setPreferredSize(new Dimension(10, 30));
 
 		configDummyPanel.add(configControlPanel, BorderLayout.SOUTH);
 
@@ -429,6 +347,44 @@ public class VPX_MADPanel extends JPanel {
 
 		configControlPanel.add(btnConfigClear);
 
+		JPanel configDummyOutFilePanel = new JPanel();
+
+		configDummyPanel.add(configDummyOutFilePanel, BorderLayout.CENTER);
+
+		configDummyOutFilePanel.setLayout(new MigLayout("", "[][][grow][][][]", "[][]"));
+
+		chkConfigDummyOut = new JCheckBox("Use dummy out file if no out file is selected");
+
+		chkConfigDummyOut.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				txtConfigPathDummyOut.setEnabled(chkConfigDummyOut.isSelected());
+
+				lblConfigDummyOutFile.setEnabled(chkConfigDummyOut.isSelected());
+
+				btnConfigBrowseDummyOut.setEnabled(chkConfigDummyOut.isSelected());
+
+			}
+		});
+
+		configDummyOutFilePanel.add(chkConfigDummyOut, "cell 1 0");
+
+		lblConfigDummyOutFile = new JLabel("Dummy Out File");
+
+		configDummyOutFilePanel.add(lblConfigDummyOutFile, "cell 1 1,alignx left");
+
+		txtConfigPathDummyOut = new JTextField();
+
+		configDummyOutFilePanel.add(txtConfigPathDummyOut, "flowx,cell 2 1,growx");
+
+		txtConfigPathDummyOut.setColumns(10);
+
+		btnConfigBrowseDummyOut = new JButton(new BrowseAction("Browse", txtConfigPathDummyOut));
+
+		configDummyOutFilePanel.add(btnConfigBrowseDummyOut, "cell 4 1");
+
 	}
 
 	private void createCompilationTab() {
@@ -437,8 +393,6 @@ public class VPX_MADPanel extends JPanel {
 
 		compilePanel.setLayout(new BorderLayout(0, 0));
 
-		compilePanel.setPreferredSize(new Dimension(760, 500));
-
 		JPanel compilePathPanel = new JPanel();
 
 		compilePathPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Out Files",
@@ -446,210 +400,158 @@ public class VPX_MADPanel extends JPanel {
 
 		compilePanel.add(compilePathPanel, BorderLayout.CENTER);
 
-		compilePathPanel.setLayout(null);
+		compilePathPanel
+				.setLayout(new MigLayout("", "[][][][grow][][][]", "[grow][grow][grow][grow][grow][grow][grow][grow]"));
 
 		JLabel lblCompileCore0 = new JLabel("Core 0");
 
-		lblCompileCore0.setBounds(22, 19, 100, 26);
-
-		compilePathPanel.add(lblCompileCore0);
+		compilePathPanel.add(lblCompileCore0, "cell 1 0");
 
 		txtCompilePathCore0 = new JTextField();
 
-		txtCompilePathCore0.setBounds(132, 19, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore0);
+		compilePathPanel.add(txtCompilePathCore0, "flowx,cell 3 0,growx");
 
 		txtCompilePathCore0.setColumns(10);
 
 		JButton btnCompileCore0 = new JButton(new BrowseAction("Browse", txtCompilePathCore0));
 
-		btnCompileCore0.setBounds(647, 19, 89, 26);
-
-		compilePathPanel.add(btnCompileCore0);
+		compilePathPanel.add(btnCompileCore0, "cell 5 0");
 
 		JLabel lblCompileCore1 = new JLabel("Core 1");
 
-		lblCompileCore1.setBounds(22, 64, 100, 26);
-
-		compilePathPanel.add(lblCompileCore1);
+		compilePathPanel.add(lblCompileCore1, "cell 1 1");
 
 		txtCompilePathCore1 = new JTextField();
 
 		txtCompilePathCore1.setColumns(10);
 
-		txtCompilePathCore1.setBounds(132, 64, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore1);
+		compilePathPanel.add(txtCompilePathCore1, "flowx,cell 3 1,growx");
 
 		JButton btnCompileCore1 = new JButton(new BrowseAction("Browse", txtCompilePathCore1));
 
-		btnCompileCore1.setBounds(647, 64, 89, 26);
-
-		compilePathPanel.add(btnCompileCore1);
+		compilePathPanel.add(btnCompileCore1, "cell 5 1");
 
 		JLabel lblCompileCore2 = new JLabel("Core 2");
 
-		lblCompileCore2.setBounds(22, 109, 100, 26);
-
-		compilePathPanel.add(lblCompileCore2);
+		compilePathPanel.add(lblCompileCore2, "cell 1 2");
 
 		txtCompilePathCore2 = new JTextField();
 
 		txtCompilePathCore2.setColumns(10);
 
-		txtCompilePathCore2.setBounds(132, 109, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore2);
+		compilePathPanel.add(txtCompilePathCore2, "flowx,cell 3 2,growx");
 
 		JButton btnCompileCore2 = new JButton(new BrowseAction("Browse", txtCompilePathCore2));
 
-		btnCompileCore2.setBounds(647, 109, 89, 26);
-
-		compilePathPanel.add(btnCompileCore2);
+		compilePathPanel.add(btnCompileCore2, "cell 5 2");
 
 		JLabel lblCompileCore3 = new JLabel("Core 3");
 
-		lblCompileCore3.setBounds(22, 154, 100, 26);
-
-		compilePathPanel.add(lblCompileCore3);
+		compilePathPanel.add(lblCompileCore3, "cell 1 3");
 
 		txtCompilePathCore3 = new JTextField();
 
 		txtCompilePathCore3.setColumns(10);
 
-		txtCompilePathCore3.setBounds(132, 154, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore3);
+		compilePathPanel.add(txtCompilePathCore3, "flowx,cell 3 3,growx");
 
 		JButton btnCompileCore3 = new JButton(new BrowseAction("Browse", txtCompilePathCore3));
 
-		btnCompileCore3.setBounds(647, 154, 89, 26);
-
-		compilePathPanel.add(btnCompileCore3);
+		compilePathPanel.add(btnCompileCore3, "cell 5 3");
 
 		JLabel lblCompileCore4 = new JLabel("Core 4");
 
-		lblCompileCore4.setBounds(22, 199, 100, 26);
-
-		compilePathPanel.add(lblCompileCore4);
+		compilePathPanel.add(lblCompileCore4, "cell 1 4");
 
 		txtCompilePathCore4 = new JTextField();
 
 		txtCompilePathCore4.setColumns(10);
 
-		txtCompilePathCore4.setBounds(132, 199, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore4);
+		compilePathPanel.add(txtCompilePathCore4, "flowx,cell 3 4,growx");
 
 		JButton btnCompileCore4 = new JButton(new BrowseAction("Browse", txtCompilePathCore4));
 
-		btnCompileCore4.setBounds(647, 199, 89, 26);
-
-		compilePathPanel.add(btnCompileCore4);
+		compilePathPanel.add(btnCompileCore4, "cell 5 4");
 
 		JLabel lblCompileCore5 = new JLabel("Core 5");
 
-		lblCompileCore5.setBounds(22, 244, 100, 26);
-
-		compilePathPanel.add(lblCompileCore5);
+		compilePathPanel.add(lblCompileCore5, "cell 1 5");
 
 		txtCompilePathCore5 = new JTextField();
 
 		txtCompilePathCore5.setColumns(10);
 
-		txtCompilePathCore5.setBounds(132, 244, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore5);
+		compilePathPanel.add(txtCompilePathCore5, "flowx,cell 3 5,growx");
 
 		JButton btnCompileCore5 = new JButton(new BrowseAction("Browse", txtCompilePathCore5));
 
-		btnCompileCore5.setBounds(647, 244, 89, 26);
-
-		compilePathPanel.add(btnCompileCore5);
+		compilePathPanel.add(btnCompileCore5, "cell 5 5");
 
 		JLabel lblCompileCore6 = new JLabel("Core 6");
 
-		lblCompileCore6.setBounds(22, 289, 100, 26);
-
-		compilePathPanel.add(lblCompileCore6);
+		compilePathPanel.add(lblCompileCore6, "cell 1 6");
 
 		txtCompilePathCore6 = new JTextField();
 
 		txtCompilePathCore6.setColumns(10);
 
-		txtCompilePathCore6.setBounds(132, 289, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore6);
+		compilePathPanel.add(txtCompilePathCore6, "flowx,cell 3 6,growx");
 
 		JButton btnCompileCore6 = new JButton(new BrowseAction("Browse", txtCompilePathCore6));
 
-		btnCompileCore6.setBounds(647, 289, 89, 26);
-
-		compilePathPanel.add(btnCompileCore6);
+		compilePathPanel.add(btnCompileCore6, "cell 5 6");
 
 		JLabel lblCompileCore7 = new JLabel("Core 7");
 
-		lblCompileCore7.setBounds(22, 334, 100, 26);
-
-		compilePathPanel.add(lblCompileCore7);
+		compilePathPanel.add(lblCompileCore7, "cell 1 7");
 
 		txtCompilePathCore7 = new JTextField();
 
 		txtCompilePathCore7.setColumns(10);
 
-		txtCompilePathCore7.setBounds(132, 334, 509, 26);
-
-		compilePathPanel.add(txtCompilePathCore7);
+		compilePathPanel.add(txtCompilePathCore7, "cell 3 7,growx");
 
 		JButton btnCompileCore7 = new JButton(new BrowseAction("Browse", txtCompilePathCore7));
 
-		btnCompileCore7.setBounds(647, 334, 89, 26);
-
-		compilePathPanel.add(btnCompileCore7);
+		compilePathPanel.add(btnCompileCore7, "cell 5 7");
 
 		JPanel compileOutFilePanel = new JPanel();
-
-		compileOutFilePanel.setPreferredSize(new Dimension(10, 100));
 
 		compilePanel.add(compileOutFilePanel, BorderLayout.SOUTH);
 
 		compileOutFilePanel.setLayout(new BorderLayout(0, 0));
-
-		JPanel compileFinalOutFilePanel = new JPanel();
-
-		compileFinalOutFilePanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Out File",
-				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-
-		compileOutFilePanel.add(compileFinalOutFilePanel, BorderLayout.CENTER);
-
-		compileFinalOutFilePanel.setLayout(null);
-
-		JLabel lblLblconfigfinaloutfile = new JLabel("Final Out File");
-
-		lblLblconfigfinaloutfile.setBounds(25, 24, 100, 26);
-
-		compileFinalOutFilePanel.add(lblLblconfigfinaloutfile);
-
-		txtCompilePathFinalOut = new JTextField();
-
-		txtCompilePathFinalOut.setBounds(135, 24, 509, 26);
-
-		txtCompilePathFinalOut.setColumns(10);
-
-		compileFinalOutFilePanel.add(txtCompilePathFinalOut);
-
-		JButton btnCompileFinalOutFile = new JButton(new BrowseAction("Browse", txtCompilePathFinalOut));
-
-		btnCompileFinalOutFile.setBounds(650, 24, 89, 26);
-
-		compileFinalOutFilePanel.add(btnCompileFinalOutFile);
 
 		JPanel compileControlsPanel = new JPanel();
 
 		compileOutFilePanel.add(compileControlsPanel, BorderLayout.SOUTH);
 
 		btnCompileApply = new JButton("Compile");
+
+		compileControlsPanel.add(btnCompileApply);
+
+		btnCompileClear = new JButton("Clear");
+
+		compileControlsPanel.add(btnCompileClear);
+
+		JPanel compileFinalOutFilePanel = new JPanel();
+
+		compileOutFilePanel.add(compileFinalOutFilePanel, BorderLayout.CENTER);
+
+		compileFinalOutFilePanel.setLayout(new MigLayout("", "[][][grow][][][]", "[]"));
+
+		JLabel lblLblconfigfinaloutfile = new JLabel("Final Out File");
+
+		compileFinalOutFilePanel.add(lblLblconfigfinaloutfile, "cell 1 0,alignx left");
+
+		txtCompilePathFinalOut = new JTextField();
+
+		compileFinalOutFilePanel.add(txtCompilePathFinalOut, "flowx,cell 2 0,growx");
+
+		txtCompilePathFinalOut.setColumns(10);
+
+		JButton btnCompileFinalOutFile = new JButton(new BrowseAction("Browse", txtCompilePathFinalOut));
+
+		compileFinalOutFilePanel.add(btnCompileFinalOutFile, "cell 4 0");
 
 		btnCompileApply.addActionListener(new ActionListener() {
 
@@ -676,9 +578,9 @@ public class VPX_MADPanel extends JPanel {
 					}
 
 					createDeploymentFile(txtCompilePathFinalOut.getText(), txtCompilePathCore0.getText(),
-							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(),
-							txtCompilePathCore3.getText(), txtCompilePathCore4.getText(),
-							txtCompilePathCore5.getText(), txtCompilePathCore6.getText(), txtCompilePathCore7.getText());
+							txtCompilePathCore1.getText(), txtCompilePathCore2.getText(), txtCompilePathCore3.getText(),
+							txtCompilePathCore4.getText(), txtCompilePathCore5.getText(), txtCompilePathCore6.getText(),
+							txtCompilePathCore7.getText());
 
 					madProcessWindow = new MADProcessWindow(txtCompilePathFinalOut.getText().trim());
 
@@ -703,10 +605,6 @@ public class VPX_MADPanel extends JPanel {
 			}
 		});
 
-		compileControlsPanel.add(btnCompileApply);
-
-		btnCompileClear = new JButton("Clear");
-
 		btnCompileClear.addActionListener(new ActionListener() {
 
 			@Override
@@ -716,7 +614,6 @@ public class VPX_MADPanel extends JPanel {
 			}
 		});
 
-		compileControlsPanel.add(btnCompileClear);
 	}
 
 	private void fillDummyFiles() {
@@ -812,6 +709,10 @@ public class VPX_MADPanel extends JPanel {
 
 		txtConfigPathDummyOut.setEnabled(dummy);
 
+		lblConfigDummyOutFile.setEnabled(dummy);
+
+		btnConfigBrowseDummyOut.setEnabled(dummy);
+
 		txtCompilePathCore0.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE0));
 
 		txtCompilePathCore1.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE1));
@@ -874,6 +775,10 @@ public class VPX_MADPanel extends JPanel {
 		chkConfigDummyOut.setSelected(false);
 
 		txtConfigPathDummyOut.setEnabled(false);
+
+		lblConfigDummyOutFile.setEnabled(false);
+
+		btnConfigBrowseDummyOut.setEnabled(false);
 	}
 
 	private String checkPathsValid(int option) {
@@ -1123,8 +1028,8 @@ public class VPX_MADPanel extends JPanel {
 
 		VPXUtilities.writeFile(folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE, str);
 
-		currentdployCfg = currentdployCfg.replace("jsonpath", folderPath + "/"
-				+ VPXConstants.ResourceFields.DEPLOYMENTFILE);
+		currentdployCfg = currentdployCfg.replace("jsonpath",
+				folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTFILE);
 
 		currentdployCfg = currentdployCfg.replace("imagenamepath", outfilename);
 
@@ -1188,7 +1093,7 @@ public class VPX_MADPanel extends JPanel {
 		} catch (Exception e) {
 			ret = false;
 			e.printStackTrace();
-			
+
 			VPXUtilities.updateError(e);
 		}
 
@@ -1345,7 +1250,7 @@ public class VPX_MADPanel extends JPanel {
 			contentPanel.add(scrResult, BorderLayout.CENTER);
 
 			txtAResult = new JTextArea();
-			
+
 			txtAResult.setEditable(false);
 
 			scrResult.setViewportView(txtAResult);

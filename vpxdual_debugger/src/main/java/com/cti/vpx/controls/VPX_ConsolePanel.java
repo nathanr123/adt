@@ -16,6 +16,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -561,40 +562,45 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private void saveConsoleMsgtoFile() {
 
-		JFileChooser chooser;
+		// JFileChooser chooser;
 
 		try {
 
-			chooser = new JFileChooser();
+			// chooser = new JFileChooser();
 
-			chooser.setCurrentDirectory(new java.io.File("."));
+			// chooser.setCurrentDirectory(new java.io.File("."));
 
-			chooser.setDialogTitle("Select folder to save");
+			// chooser.setDialogTitle("Select folder to save");
 
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			// chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-			if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+			// if (chooser.showSaveDialog(parent) ==
+			// JFileChooser.APPROVE_OPTION) {
 
-				String path = chooser.getSelectedFile().getPath() + "\\"
-						+ txtA_Console.getText().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
-						+ ".log";
+			String path = VPXSessionManager.getConsolePath() + "\\Console_"
+					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".log";
 
-				fw = new FileWriter(new File(path), true);
+			fw = new FileWriter(new File(path), true);
 
-				txtA_Console.write(fw);
+			txtA_Console.write(fw);
 
-				fw.close();
+			fw.close();
 
-				VPXUtilities.showPopup("File Saved at " + path, path);
-			}
+			VPXUtilities.showPopup("File Saved at " + path, path);
+			// }
 
 		} catch (Exception e) {
 
 			VPXUtilities.updateError(e);
-			
+
 			e.printStackTrace();
 		}
 
+	}
+
+	private String getCurrentTime() {
+
+		return VPXConstants.DATEFORMAT_FULL.format(Calendar.getInstance().getTime());
 	}
 
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {

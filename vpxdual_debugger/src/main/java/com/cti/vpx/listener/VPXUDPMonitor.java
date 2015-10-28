@@ -827,7 +827,7 @@ public class VPXUDPMonitor {
 	public void send(byte[] buffer, InetAddress ip, int port, boolean isBroadCast) {
 
 		DatagramSocket datagramSocket;
-
+		
 		try {
 			datagramSocket = new DatagramSocket();
 
@@ -837,13 +837,16 @@ public class VPXUDPMonitor {
 			}
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, ip, port);
-
+			
 			datagramSocket.send(packet);
 
 			datagramSocket.close();
 
 		} catch (Exception e) {
+
 			VPXUtilities.updateError(e);
+			
+			e.printStackTrace();
 		}
 	}
 
