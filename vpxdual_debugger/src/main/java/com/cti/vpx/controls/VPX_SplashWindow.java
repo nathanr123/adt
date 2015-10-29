@@ -20,6 +20,7 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_SplashWindow extends JWindow {
@@ -87,7 +88,7 @@ public class VPX_SplashWindow extends JWindow {
 				Thread.sleep(50);
 
 			} catch (Exception e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 			}
 			count++;// increase
 			// counter

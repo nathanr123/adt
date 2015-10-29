@@ -107,7 +107,7 @@ public class VPXLinuxCommand {
 			}
 			
 		} catch (IOException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 		

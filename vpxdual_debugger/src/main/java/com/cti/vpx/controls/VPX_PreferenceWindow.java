@@ -32,6 +32,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_PreferenceWindow extends JDialog {
@@ -94,7 +95,7 @@ public class VPX_PreferenceWindow extends JDialog {
 			dialog.showPreferenceWindow();
 		} catch (Exception e) {
 			e.printStackTrace();
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 		}
 	}
 

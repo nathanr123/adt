@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.GeneratedLineData;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.MultiLineGraph;
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.VPXLogger;
 
 /**
  *
@@ -121,7 +121,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 			f = toFloatArray(data);
 
 		} catch (IOException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 

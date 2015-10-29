@@ -82,6 +82,7 @@ import com.cti.vpx.controls.hex.groupmodel.UnSignedInt16;
 import com.cti.vpx.controls.hex.groupmodel.UnSignedInt32;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 /**
@@ -1600,7 +1601,7 @@ class HexTable extends JTable {
 					throw new NumberFormatException();
 				}
 			} catch (NumberFormatException nfe) {
-				VPXUtilities.updateError(nfe);
+				VPXLogger.updateError(nfe);
 				UIManager.getLookAndFeel().provideErrorFeedback(null);
 				return false;
 			}

@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,18 +9,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import com.cti.vpx.util.VPXUtilities;
-import com.cti.vpx.view.VPX_ETHWindow;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JComboBox;
-import java.awt.Dimension;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import com.cti.vpx.util.VPXLogger;
+import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_BootWindow extends JDialog {
 
@@ -203,12 +203,12 @@ public class VPX_BootWindow extends JDialog {
 
 					if (cmbProcessor.getSelectedIndex() > 0) {
 
-						parent.updateLog(String.format("%s boot from flash device %s of page %s",
+						VPXLogger.updateLog(String.format("%s boot from flash device %s of page %s",
 								cmbProcessor.getSelectedItem().toString(), cmbFlashDevice.getSelectedItem().toString(),
 								cmbPage.getSelectedItem().toString()));
 					} else {
 
-						parent.updateLog(String.format("Board reboot initiated"));
+						VPXLogger.updateLog(String.format("Board reboot initiated"));
 					}
 
 					VPX_BootWindow.this.dispose();

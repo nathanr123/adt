@@ -86,6 +86,7 @@ import com.cti.vpx.controls.hex.groupmodel.SignedInt32;
 import com.cti.vpx.controls.hex.groupmodel.UnSignedInt16;
 import com.cti.vpx.controls.hex.groupmodel.UnSignedInt32;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 ;
@@ -455,7 +456,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			}
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -595,7 +596,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				}
 			}
 		} catch (IOException ioe) {
-			VPXUtilities.updateError(ioe);
+			VPXLogger.updateError(ioe);
 			ioe.printStackTrace();
 			String message = msg.getString("Error.Title");
 			String title = msg.getString("Error.Desc");
@@ -906,7 +907,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				dumpToFile();
 
 			} catch (Exception e1) {
-				VPXUtilities.updateError(e1);
+				VPXLogger.updateError(e1);
 				e1.printStackTrace();
 			}
 
@@ -932,7 +933,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			try {
 				result = (String) contents.getTransferData(DataFlavor.stringFlavor);
 			} catch (UnsupportedFlavorException | IOException ex) {
-				VPXUtilities.updateError(ex);
+				VPXLogger.updateError(ex);
 				ex.printStackTrace();
 			}
 		}
@@ -1251,7 +1252,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 				setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
 			} catch (Exception e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 				e.printStackTrace();
 
 				JOptionPane.showMessageDialog(this, "Please enter valid value.", "Valid value",
@@ -1301,7 +1302,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				}
 
 			} catch (Exception e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 				JOptionPane.showMessageDialog(this, "Please enter valid value.", "Valid value",
 						JOptionPane.ERROR_MESSAGE);
 			}

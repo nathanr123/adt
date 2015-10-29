@@ -31,7 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,6 +49,7 @@ import javax.swing.text.StyleContext;
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -594,7 +594,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, proc_Msg_Style);
 
 		} catch (BadLocationException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -655,7 +655,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			txtP_Proc_Msg_Display.setCaretPosition(VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT.getLength());
 
 		} catch (BadLocationException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -681,7 +681,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT.setLogicalStyle(eo, style);
 
 		} catch (BadLocationException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -810,7 +810,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			// }
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -822,7 +822,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void run() {
-				parent.updateLog("Help document opened");
+				VPXLogger.updateLog("Help document opened");
 
 				final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
 
@@ -878,7 +878,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			@Override
 			public void run() {
 
-				parent.updateLog("Command histroy opened");
+				VPXLogger.updateLog("Command histroy opened");
 
 				cmdLists.showCommands(cmdHistory);
 			}

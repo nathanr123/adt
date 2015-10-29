@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 import net.miginfocom.swing.MigLayout;
@@ -35,7 +36,7 @@ public class VPX_MemoryLoadProgressWindow extends JDialog {
 			VPX_MemoryLoadProgressWindow dialog = new VPX_MemoryLoadProgressWindow(null);
 			dialog.setVisible(true);
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}

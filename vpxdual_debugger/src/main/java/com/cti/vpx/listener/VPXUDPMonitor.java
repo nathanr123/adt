@@ -33,6 +33,7 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXSubnetFilter;
 import com.cti.vpx.util.VPXUtilities;
@@ -65,6 +66,8 @@ public class VPXUDPMonitor {
 	private VPX_FlashProgressWindow dialog;
 
 	private VPX_MemoryLoadProgressWindow memLoadDialog;
+
+	private VPXTFTPMonitor tftp;
 
 	private FileBytesToSend fb;
 
@@ -187,12 +190,12 @@ public class VPXUDPMonitor {
 
 		subnet = VPXSubnetFilter.createInstance(VPXSessionManager.getCurrentIP() + "/" + subnetmask);
 
-		logger.updateLog(String.format("Subnet Filter %s enabled", subnet));
+		VPXLogger.updateLog(String.format("Subnet Filter %s enabled", subnet));
 	}
 
 	public void clearFilterbySubnet() {
 
-		logger.updateLog(String.format("Subnet Filter %s disabled", subnet));
+		VPXLogger.updateLog(String.format("Subnet Filter %s disabled", subnet));
 
 		subnet = null;
 
@@ -268,7 +271,7 @@ public class VPXUDPMonitor {
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -352,7 +355,7 @@ public class VPXUDPMonitor {
 			send(buffer, VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO, true);
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -386,10 +389,10 @@ public class VPXUDPMonitor {
 
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
-			logger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
+			VPXLogger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -435,10 +438,10 @@ public class VPXUDPMonitor {
 
 			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
 
-			logger.updateLog(String.format("Periodicity updated to %s into %d seconds", ip, period));
+			VPXLogger.updateLog(String.format("Periodicity updated to %s into %d seconds", ip, period));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -479,10 +482,10 @@ public class VPXUDPMonitor {
 
 			send(buffer, ip, VPXUDPListener.CONSOLE_MSG_PORTNO, false);
 
-			logger.updateLog("Message sent to " + ip);
+			VPXLogger.updateLog("Message sent to " + ip);
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -523,11 +526,11 @@ public class VPXUDPMonitor {
 
 			sendFileToProcessor(ip, FileUtils.sizeOf(f), fb.getBytePacket(0), flashDevice, location);
 
-			logger.updateLog(String.format("Start flashing file ( %s ) for %s on flash device %s at page %d", filename,
-					ip, (flashDevice == 0 ? "NAND" : "NOR"), location));
+			VPXLogger.updateLog(String.format("Start flashing file ( %s ) for %s on flash device %s at page %d",
+					filename, ip, (flashDevice == 0 ? "NAND" : "NOR"), location));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -584,7 +587,60 @@ public class VPXUDPMonitor {
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
+			e.printStackTrace();
+		}
+
+	}
+
+	public void sendTFTP(String ip, VPX_FlashProgressWindow parentDialog, String serverIP, String filename,
+			int fileType) {
+
+		DatagramSocket datagramSocket;
+
+		ATPCommand msg = null;
+
+		byte[] buffer = null;
+
+		ByteBuffer bf = null;
+
+		try {
+
+			System.out.println(serverIP + " " + filename);
+
+			this.dialog = parentDialog;
+
+			datagramSocket = new DatagramSocket();
+
+			msg = new P2020ATPCommand();
+
+			buffer = new byte[msg.size()];
+
+			bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(ATP.MSG_TYPE_FLASH);
+
+			msg.params.TFTPInfo.filename.set(filename);
+
+			msg.params.TFTPInfo.filetype.set(fileType);
+
+			msg.params.TFTPInfo.ip.set(serverIP);
+
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
+					VPXUDPListener.COMM_PORTNO);
+
+			datagramSocket.send(packet);
+
+			datagramSocket.close();
+
+		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 
@@ -649,7 +705,7 @@ public class VPXUDPMonitor {
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 			} catch (Exception e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 				e.printStackTrace();
 			}
 		}
@@ -685,10 +741,10 @@ public class VPXUDPMonitor {
 
 			sendMemoryFileToProcessor(ip, address, FileUtils.sizeOf(f), fb.getBytePacket(0));
 
-			logger.updateLog(String.format("Sending file ( %s ) to %s start address 0x%08x", filename, ip, address));
+			VPXLogger.updateLog(String.format("Sending file ( %s ) to %s start address 0x%08x", filename, ip, address));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -742,7 +798,7 @@ public class VPXUDPMonitor {
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -806,7 +862,7 @@ public class VPXUDPMonitor {
 				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
 			} catch (Exception e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 				e.printStackTrace();
 			}
 		}
@@ -819,7 +875,7 @@ public class VPXUDPMonitor {
 			send(buffer, InetAddress.getByName(ip), port, isBroadCast);
 
 		} catch (UnknownHostException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -827,7 +883,7 @@ public class VPXUDPMonitor {
 	public void send(byte[] buffer, InetAddress ip, int port, boolean isBroadCast) {
 
 		DatagramSocket datagramSocket;
-		
+
 		try {
 			datagramSocket = new DatagramSocket();
 
@@ -837,15 +893,15 @@ public class VPXUDPMonitor {
 			}
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, ip, port);
-			
+
 			datagramSocket.send(packet);
 
 			datagramSocket.close();
 
 		} catch (Exception e) {
 
-			VPXUtilities.updateError(e);
-			
+			VPXLogger.updateError(e);
+
 			e.printStackTrace();
 		}
 	}
@@ -878,10 +934,10 @@ public class VPXUDPMonitor {
 
 			isFlashingStatred = false;
 
-			logger.updateLog(String.format("Flashing %s  is cacelled by user", ip));
+			VPXLogger.updateLog(String.format("Flashing %s  is cacelled by user", ip));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -923,10 +979,10 @@ public class VPXUDPMonitor {
 
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
-			logger.updateLog(String.format("Built in Self Test is started for %s", ip));
+			VPXLogger.updateLog(String.format("Built in Self Test is started for %s", ip));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -969,11 +1025,11 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("New value set for %s core %d address 0x%08X length %d Value 0x%08X", ip,
+			VPXLogger.updateLog(String.format("New value set for %s core %d address 0x%08X length %d Value 0x%08X", ip,
 					core, fromAddress, length, newValue));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -1021,11 +1077,11 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("Read memory from %s core %s address %s length %s", filter.getProcessor(),
+			VPXLogger.updateLog(String.format("Read memory from %s core %s address %s length %s", filter.getProcessor(),
 					filter.getCore(), filter.getMemoryAddress(), filter.getMemoryLength()));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1044,7 +1100,7 @@ public class VPXUDPMonitor {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
 
-				//printBytes(b[i], i);
+				// printBytes(b[i], i);
 
 			}
 
@@ -1209,7 +1265,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -1257,11 +1313,11 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter.getProcessor(),
+			VPXLogger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter.getProcessor(),
 					filter.getCore(), filter.getMemoryAddress(), filter.getMemoryLength()));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1350,14 +1406,14 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter1.getProcessor(),
+			VPXLogger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter1.getProcessor(),
 					filter1.getCore(), filter1.getMemoryAddress(), filter1.getMemoryLength()));
 
-			logger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter2.getProcessor(),
+			VPXLogger.updateLog(String.format("Read plot from %s core %s address %s length %s", filter2.getProcessor(),
 					filter2.getCore(), filter2.getMemoryAddress(), filter2.getMemoryLength()));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1513,7 +1569,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -1544,10 +1600,10 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("Read waterfall from %s", ip));
+			VPXLogger.updateLog(String.format("Read waterfall from %s", ip));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1579,10 +1635,10 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("Reading waterfall from %s interrupted", ip));
+			VPXLogger.updateLog(String.format("Reading waterfall from %s interrupted", ip));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1633,12 +1689,12 @@ public class VPXUDPMonitor {
 
 			datagramSocket.send(packet);
 
-			logger.updateLog(String.format("Read amplitude from %s", ip));
+			VPXLogger.updateLog(String.format("Read amplitude from %s", ip));
 
 		} catch (Exception e) {
 
 			removeAmplitudeIP(ip);
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1672,10 +1728,10 @@ public class VPXUDPMonitor {
 
 			removeAmplitudeIP(ip);
 
-			logger.updateLog(String.format("Reading amplitude from %s interrupted", ip));
+			VPXLogger.updateLog(String.format("Reading amplitude from %s interrupted", ip));
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1851,7 +1907,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -1901,7 +1957,7 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, loop);
 
-				logger.updateLog(String.format("P2020 (%s) test is completed", ip));
+				VPXLogger.updateLog(String.format("P2020 (%s) test is completed", ip));
 
 				bist.setP2020Completed(true);
 
@@ -1921,7 +1977,7 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP1, loop);
 
-				logger.updateLog(String.format("DSP 1 (%s) test is completed", ip));
+				VPXLogger.updateLog(String.format("DSP 1 (%s) test is completed", ip));
 
 				bist.setDSP1Completed(true);
 
@@ -1941,7 +1997,7 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP2, loop);
 
-				logger.updateLog(String.format("DSP 2 (%s) test is completed", ip));
+				VPXLogger.updateLog(String.format("DSP 2 (%s) test is completed", ip));
 
 				bist.setDSP2Completed(true);
 			}
@@ -1956,13 +2012,13 @@ public class VPXUDPMonitor {
 
 					bist.setResultTestStatus("Success !");
 
-					logger.updateLog("Built In Self Test Success");
+					VPXLogger.updateLog("Built In Self Test Success");
 
 				} else {
 
 					bist.setResultTestStatus("Failed !");
 
-					logger.updateLog("Built In Self Test Failed");
+					VPXLogger.updateLog("Built In Self Test Failed");
 				}
 
 				bist.setResultTestPassed(String.format("%d Tests", pass));
@@ -1979,7 +2035,7 @@ public class VPXUDPMonitor {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
 
-				logger.updateLog(String.format("Built In Self Test completed"));
+				VPXLogger.updateLog(String.format("Built In Self Test completed"));
 			}
 		}
 	}
@@ -2028,6 +2084,11 @@ public class VPXUDPMonitor {
 
 	}
 
+	public void setTFTPServer(VPXTFTPMonitor tftpServer) {
+
+		this.tftp = tftpServer;
+	}
+
 	public void sendClose(String ip, PROCESSOR_LIST procesor) {
 
 		ATPCommand msg = null;
@@ -2055,7 +2116,7 @@ public class VPXUDPMonitor {
 			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -2116,7 +2177,7 @@ public class VPXUDPMonitor {
 
 			}
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 		}
 
 		logger.updateExit(-1);
@@ -2165,7 +2226,11 @@ public class VPXUDPMonitor {
 
 			case ATP.MSG_TYPE_FLASH_DONE:
 
-				dialog.doneFlash();
+				if (dialog != null)
+					dialog.doneFlash();
+
+				if (tftp != null)
+					tftp.shutdown();
 
 				break;
 
@@ -2372,7 +2437,7 @@ public class VPXUDPMonitor {
 					Thread.sleep(500);
 
 				} catch (Exception e) {
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -2413,7 +2478,7 @@ public class VPXUDPMonitor {
 					Thread.sleep(10);
 
 				} catch (Exception e) {
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 					e.printStackTrace();
 				}
 
@@ -2459,7 +2524,7 @@ public class VPXUDPMonitor {
 
 					Thread.sleep(500);
 				} catch (Exception e) {
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -2525,7 +2590,7 @@ public class VPXUDPMonitor {
 
 		for (int i = 0; i < amplitudeIPs.length; i++) {
 
-		//	System.out.println(amplitudeIPs[i] + " -- " + i);
+			// System.out.println(amplitudeIPs[i] + " -- " + i);
 
 			if (amplitudeIPs[i].equals(ip)) {
 

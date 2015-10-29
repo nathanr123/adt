@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -211,14 +209,6 @@ public class VPXUtilities {
 
 	public static VPX_ETHWindow getParent() {
 		return parent;
-	}
-
-	public static void updateLog(String log) {
-		parent.updateLog(log);
-	}
-
-	public static void updateStatus(String status) {
-		parent.updateStatus(status);
 	}
 
 	public static String getCurrentTime(int format) {
@@ -1067,19 +1057,6 @@ public class VPXUtilities {
 
 			return -1;
 		}
-	}
-
-	public static void updateError(Exception exception) {
-
-		StringWriter error = new StringWriter();
-
-		PrintWriter pw = new PrintWriter(error);
-
-		exception.printStackTrace(pw);
-
-		updateToFile(VPXSessionManager.getCurrentErrorLogFileName(),
-				("\n" + VPXUtilities.getCurrentTime() + "\n" + error.toString()));
-
 	}
 
 	/**

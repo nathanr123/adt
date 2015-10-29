@@ -35,6 +35,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -875,7 +876,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 			JOptionPane.showMessageDialog(null, "Paths are configured successfully");
 
-			parent.updateLog("Configured Successfully");
+			VPXLogger.updateLog("Configured Successfully");
 
 			int idx = madTab.getSelectedIndex() + 1;
 
@@ -888,9 +889,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 			JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 
-			parent.updateLog("Configuration error");
+			VPXLogger.updateLog("Configuration error");
 
-			parent.updateLog(error);
+			VPXLogger.updateLog(error);
 		}
 	}
 
@@ -904,7 +905,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		if (error.length() == 0) {
 
-			parent.updateLog("MAD Compilation started");
+			VPXLogger.updateLog("MAD Compilation started");
 
 			if (isFileCreated) {
 
@@ -926,7 +927,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 			madProcessPanel.doCompile();
 
-			parent.updateLog("MAD Compilation Completed");
+			VPXLogger.updateLog("MAD Compilation Completed");
 
 			int idx = madTab.getSelectedIndex() + 1;
 
@@ -939,9 +940,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 			JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 
-			parent.updateLog("MAD out files error");
+			VPXLogger.updateLog("MAD out files error");
 
-			parent.updateLog(error);
+			VPXLogger.updateLog(error);
 		}
 	}
 
@@ -1329,9 +1330,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 				folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
 		// String cmd = String.format("cmd /c ping 192.168.0.102");
 
-		parent.updateLog("Creating deployment files");
+		VPXLogger.updateLog("Creating deployment files");
 
-		parent.updateLog("Creating deployment configuration files");
+		VPXLogger.updateLog("Creating deployment configuration files");
 
 		try {
 
@@ -1347,7 +1348,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 				madProcessPanel.updateGeneratingMessage(s);
 
-				parent.updateLog(s);
+				VPXLogger.updateLog(s);
 
 				if (s.contains("Error")) {
 					ret = false;
@@ -1365,7 +1366,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 				JOptionPane.showMessageDialog(madProcessPanel, "Error in generating out file");
 
-				parent.updateLog("Error in generating out file");
+				VPXLogger.updateLog("Error in generating out file");
 			}
 
 			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXConstants.ResourceFields.DEPLOYMENTFILE,
@@ -1377,7 +1378,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 		} catch (Exception e) {
 			ret = false;
 			e.printStackTrace();
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 		}
 
 		return ret;
@@ -1584,7 +1585,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 				Desktop.getDesktop().open(new File(path));
 
 			} catch (IOException e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 			}
 		}
 

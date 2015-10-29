@@ -28,6 +28,7 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -151,7 +152,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 	public void showDetailWindow() {
 
-		parent.updateLog("Opening VPXSystem Details");
+		VPXLogger.updateLog("Opening VPXSystem Details");
 
 		loadProperties(VPXSystem.class.getSimpleName());
 
@@ -299,7 +300,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		setTitle(vpxSubSystem.getSubSystem() + " Details");
 
-		parent.updateLog("Opening " + vpxSubSystem.getSubSystem() + " Details");
+		VPXLogger.updateLog("Opening " + vpxSubSystem.getSubSystem() + " Details");
 
 		tbl_Property_Model.addRow(new String[] { "System Name", VPXSystem.class.getSimpleName() });
 
@@ -344,7 +345,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			pType = PROCESSOR_TYPE.PROCESSOR_P2020;
 
-			parent.updateLog("Opening " + procType + " " + ip + " Details");
+			VPXLogger.updateLog("Opening " + procType + " " + ip + " Details");
 
 		} else if (procType.contains("DSP1")) {
 
@@ -448,7 +449,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 				} catch (Exception e) {
 					
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 					
 					e.printStackTrace();
 				}

@@ -19,11 +19,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
-import net.miginfocom.swing.MigLayout;
-
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_ChangePeriodicityWindow extends JDialog {
 
@@ -119,7 +120,7 @@ public class VPX_ChangePeriodicityWindow extends JDialog {
 						VPXSessionManager.setCurrentPeriodicity(Integer
 								.valueOf(spinPeriodicity.getValue().toString().trim()));
 
-						parent.updateLog("Periodicity updated successfully");
+						VPXLogger.updateLog("Periodicity updated successfully");
 
 						JOptionPane.showMessageDialog(parent, "Periodicity updated successfully");
 

@@ -26,6 +26,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -70,7 +71,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 					VPX_AmpWindow frame = new VPX_AmpWindow(null, 0);
 					frame.setVisible(true);
 				} catch (Exception e) {
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 					e.printStackTrace();
 				}
 			}

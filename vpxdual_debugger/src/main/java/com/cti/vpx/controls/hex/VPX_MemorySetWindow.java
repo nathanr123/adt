@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 import net.miginfocom.swing.MigLayout;
@@ -73,7 +74,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -446,7 +447,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 			return true;
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			return false;
 		}
 

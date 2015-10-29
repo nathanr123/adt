@@ -34,6 +34,7 @@ import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -528,7 +529,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
 
-						parent.updateLog("Alias Configuration modified");
+						VPXLogger.updateLog("Alias Configuration modified");
 
 						clearAliasFields();
 					} else {
@@ -549,7 +550,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
 
-						parent.updateLog("Alias Configuration Subsystem added");
+						VPXLogger.updateLog("Alias Configuration Subsystem added");
 
 						clearAliasFields();
 					} else {
@@ -677,7 +678,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 				parent.updateProcessorTree();
 
-				parent.updateLog(subSystem + " deleted ");
+				VPXLogger.updateLog(subSystem + " deleted ");
 
 				String msg = currentSubSystem.getSubSystem()
 						+ " deleted successfully!";

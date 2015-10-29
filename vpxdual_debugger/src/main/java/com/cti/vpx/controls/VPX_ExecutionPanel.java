@@ -17,7 +17,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.util.VPXConstants;
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.VPXLogger;
 
 public class VPX_ExecutionPanel extends JPanel {
 
@@ -83,7 +83,7 @@ public class VPX_ExecutionPanel extends JPanel {
 			f.getContentPane().add(new VPX_ExecutionPanel());
 			f.setVisible(true);
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 		}
 	}
 

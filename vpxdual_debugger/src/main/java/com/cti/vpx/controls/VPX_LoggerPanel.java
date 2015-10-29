@@ -23,7 +23,6 @@ import javax.swing.border.EtchedBorder;
 
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
-import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -112,12 +111,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	}
 
-	public void updateLog(String log) {
-
-		updateLog(VPXConstants.INFO, log);
-	}
-
-	public void updateLog(int LEVEL, String log) {
+	public void appendLog(String log) {
 
 		if (log.length() > 0) {
 
@@ -125,57 +119,10 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 				txtA_Log.append("\n");
 
-			String logMsg = VPXUtilities.getCurrentTime() + "  " + getLevel(LEVEL) + "  " + log;
-
-			txtA_Log.append(logMsg);
+			txtA_Log.append(log);
 
 			txtA_Log.setCaretPosition(txtA_Log.getText().length());
-
-			updateLogtoFile(logMsg);
 		}
-	}
-
-	public void updateLogtoFile(String log) {
-
-		try {
-
-			if (VPXUtilities.isLogEnabled()) {
-
-				String filePath = VPXSessionManager.getCurrentLogFileName();
-
-				VPXUtilities.updateToFile(filePath, log);
-
-			}
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
-	}
-
-	private String getLevel(int level) {
-
-		String lvl = "INFO: ";
-
-		if (level == VPXConstants.INFO) {
-
-			lvl = "INFO: ";
-
-		} else if (level == VPXConstants.ERROR) {
-
-			lvl = "ERROR: ";
-
-		} else if (level == VPXConstants.WARN) {
-
-			lvl = "WARN: ";
-
-		} else if (level == VPXConstants.FATAL) {
-
-			lvl = "FATAL: ";
-
-		}
-
-		return lvl;
 	}
 
 	private void clearContents() {
@@ -193,7 +140,7 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void saveLogtoFile() {
-		
+
 		JFileChooser chooser;
 
 		try {

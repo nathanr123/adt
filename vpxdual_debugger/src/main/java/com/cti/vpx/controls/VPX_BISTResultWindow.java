@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
@@ -25,8 +26,8 @@ import javax.swing.border.TitledBorder;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
-import java.awt.Color;
 
 public class VPX_BISTResultWindow extends JDialog {
 
@@ -1197,7 +1198,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			
 			e.printStackTrace();
 		}

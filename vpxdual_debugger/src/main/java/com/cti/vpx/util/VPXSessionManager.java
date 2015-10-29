@@ -198,8 +198,14 @@ public class VPXSessionManager {
 				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_MESSAGE));
 	}
 
+	public static String getTFTPPath() {
+
+		return getAsFullPath(getWorkspacePath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_TFTP));
+	}
+
 	private static String getAsFullPath(String parent, String child) {
 
-		return parent + "/" + child;
+		return parent + "\\" + child;
 	}
 }

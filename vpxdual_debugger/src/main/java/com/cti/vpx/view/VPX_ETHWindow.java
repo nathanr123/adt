@@ -35,6 +35,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
@@ -70,11 +71,13 @@ import com.cti.vpx.controls.tab.VPX_TabbedPane;
 import com.cti.vpx.listener.VPXAdvertisementListener;
 import com.cti.vpx.listener.VPXCommunicationListener;
 import com.cti.vpx.listener.VPXMessageListener;
+import com.cti.vpx.listener.VPXTFTPMonitor;
 import com.cti.vpx.listener.VPXUDPMonitor;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -194,6 +197,8 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPXUDPMonitor udpMonitor;
 
+	private VPXTFTPMonitor tftpMonitor = null;
+
 	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
 
 	private VPX_WaterfallWindow[] waterfallWindow;
@@ -267,7 +272,7 @@ public class VPX_ETHWindow extends JFrame
 					promptAliasConfigFileName();
 
 				} catch (Exception e) {
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 				}
 			}
 		});
@@ -286,7 +291,8 @@ public class VPX_ETHWindow extends JFrame
 
 		loadComponents();
 
-		updateLog(rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
+		VPXLogger.updateLog(
+				rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version") + " Started");
 
 		addWindowListener(this);
 
@@ -366,7 +372,7 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
 
-		updateLog("Memory Browser opened");
+		VPXLogger.updateLog("Memory Browser opened");
 	}
 
 	public void reindexMemoryBrowserIndex() {
@@ -434,7 +440,7 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
 
-		updateLog("Memory Plot opened");
+		VPXLogger.updateLog("Memory Plot opened");
 	}
 
 	public void reindexMemoryPlotIndex() {
@@ -495,7 +501,7 @@ public class VPX_ETHWindow extends JFrame
 
 				readWaterfall(ip);
 
-				updateLog("Waterfall graph for " + ip + " opened ");
+				VPXLogger.updateLog("Waterfall graph for " + ip + " opened ");
 
 				break;
 			}
@@ -572,7 +578,7 @@ public class VPX_ETHWindow extends JFrame
 
 				readAmplitude(ip);
 
-				updateLog("Amplitude graph for " + ip + " opened ");
+				VPXLogger.updateLog("Amplitude graph for " + ip + " opened ");
 
 				break;
 			}
@@ -1349,6 +1355,8 @@ public class VPX_ETHWindow extends JFrame
 
 		statusBar = new VPX_StatusBar();
 
+		VPXLogger.setStatusBar(statusBar);
+
 		statusBar.setPreferredSize(new Dimension(10, 30));
 
 		statusBar.setOpaque(true);
@@ -1379,6 +1387,8 @@ public class VPX_ETHWindow extends JFrame
 		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
 
 		logger = new VPX_LoggerPanel(this);
+
+		VPXLogger.setLoggerPanel(logger);
 
 		console = new VPX_ConsolePanel(this);
 
@@ -1510,23 +1520,6 @@ public class VPX_ETHWindow extends JFrame
 
 	public void updateProcessorTree() {
 		vpx_Processor_Tree.updateVPXSystemTree();
-	}
-
-	public void updateStatus(String stats) {
-		statusBar.updateStatus(stats);
-	}
-
-	public void updateLog(String logMsg) {
-
-		logger.updateLog(logMsg);
-
-		updateStatus(logMsg);
-	}
-
-	public void updateLog(int level, String logMsg) {
-		logger.updateLog(level, logMsg);
-
-		updateStatus(logMsg);
 	}
 
 	public void addTab(String tabName, JScrollPane comp) {
@@ -1764,7 +1757,7 @@ public class VPX_ETHWindow extends JFrame
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
-				updateLog("Ethernet Flash opened");
+				VPXLogger.updateLog("Ethernet Flash opened");
 
 			}
 		});
@@ -1787,7 +1780,7 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-		updateLog("Opening Amplitude Graph");
+		VPXLogger.updateLog("Opening Amplitude Graph");
 	}
 
 	public void showMAD() {
@@ -1806,13 +1799,13 @@ public class VPX_ETHWindow extends JFrame
 
 					vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
-					updateLog("MAD utility opened");
+					VPXLogger.updateLog("MAD utility opened");
 
 				} else {
 
 					vpx_Content_Tabbed_Pane_Right.setSelectedIndex(i);
 
-					updateLog("MAD utility already opened");
+					VPXLogger.updateLog("MAD utility already opened");
 				}
 
 			}
@@ -1831,7 +1824,7 @@ public class VPX_ETHWindow extends JFrame
 
 				bootWindow.showBootoption(ip);
 
-				updateLog("Opening boot option");
+				VPXLogger.updateLog("Opening boot option");
 			}
 		});
 
@@ -1841,7 +1834,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showBIST() {
 
-		updateLog("Starting Built in Self Test");
+		VPXLogger.updateLog("Starting Built in Self Test");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -1851,7 +1844,7 @@ public class VPX_ETHWindow extends JFrame
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem());
 
-				updateLog("Built in Self Test Completed");
+				VPXLogger.updateLog("Built in Self Test Completed");
 
 			}
 		});
@@ -1862,7 +1855,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void setReboot(String ip, int processor, int flashdevice, int page) {
 
-		updateLog("P2020 " + ip + " is set to Reboot");
+		VPXLogger.updateLog("P2020 " + ip + " is set to Reboot");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -1886,6 +1879,13 @@ public class VPX_ETHWindow extends JFrame
 			public void run() {
 
 				udpMonitor.sendInterrupt(ip, PROCESSOR_LIST.PROCESSOR_DSP1);
+				
+				if(tftpMonitor != null){
+					
+					tftpMonitor.shutdown();
+					
+					tftpMonitor = null;
+				}
 			}
 		});
 
@@ -1909,13 +1909,13 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-		updateLog("Opening Execution Window");
+		VPXLogger.updateLog("Opening Execution Window");
 
 	}
 
 	public void showFlashWizard() {
 
-		updateLog("Opening flash wizard window");
+		VPXLogger.updateLog("Opening flash wizard window");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -1939,7 +1939,7 @@ public class VPX_ETHWindow extends JFrame
 
 		paswordWindow.setVisible(true);
 
-		updateLog("Asking Super user password for VLAN Configuration");
+		VPXLogger.updateLog("Asking Super user password for VLAN Configuration");
 
 		if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
 
@@ -1992,7 +1992,7 @@ public class VPX_ETHWindow extends JFrame
 			frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80) + 1,
 					(int) (VPXUtilities.getScreenHeight() * .70) + 1);
 
-			updateLog("VLAN Configuration opened");
+			VPXLogger.updateLog("VLAN Configuration opened");
 
 		} else {
 
@@ -2002,14 +2002,14 @@ public class VPX_ETHWindow extends JFrame
 
 			showVLAN(tab);
 
-			updateLog("Invalid Password");
+			VPXLogger.updateLog("Invalid Password");
 		}
 
 	}
 
 	public void showChangePassword() {
 
-		updateLog("Opening change password");
+		VPXLogger.updateLog("Opening change password");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2027,7 +2027,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showChangePeriodicity() {
 
-		updateLog("Opening change periodicity");
+		VPXLogger.updateLog("Opening change periodicity");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2045,7 +2045,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showPrefrences() {
 
-		updateLog("Opening Preference window");
+		VPXLogger.updateLog("Opening Preference window");
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2255,12 +2255,12 @@ public class VPX_ETHWindow extends JFrame
 
 						memoryPlotWindow[plotID].populateValues(lineID, buffer);
 
-						//memoryPlotWindow[plotID].setVisible(true);
+						// memoryPlotWindow[plotID].setVisible(true);
 					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 				}
 
 			}
@@ -2282,12 +2282,12 @@ public class VPX_ETHWindow extends JFrame
 
 						memoryBrowserWindow[memID].setBytes(startAddress, buffer);
 
-						//memoryBrowserWindow[memID].setVisible(true);
+						// memoryBrowserWindow[memID].setVisible(true);
 					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 				}
 
 			}
@@ -2335,7 +2335,7 @@ public class VPX_ETHWindow extends JFrame
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 				}
 
 			}
@@ -2389,7 +2389,7 @@ public class VPX_ETHWindow extends JFrame
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 				}
 
 			}
@@ -2439,6 +2439,47 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void sendTFTPFile(String ip, String filename, VPX_FlashProgressWindow flashingWindow, int fileType) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					File file = new File(filename);
+
+					if (tftpMonitor == null)
+						tftpMonitor = new VPXTFTPMonitor(new File("D:/tftp"), VPXTFTPMonitor.ServerMode.GET_ONLY);
+
+					udpMonitor.setTFTPServer(tftpMonitor);
+					
+					udpMonitor.sendTFTP(ip, flashingWindow, VPXSessionManager.getCurrentIP(), file.getName(), fileType);
+
+					tftpMonitor.setProgressWindow(flashingWindow);
+
+					long size = file.length();
+
+					int tot = (int) (size / 512);
+
+					int rem = (int) (size % 512);
+
+					if (rem > 0)
+						tot++;
+
+					tftpMonitor.setTotalPackets(tot);
+
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		th.start();
+
+	}
+
 	public void sendMemoryFile(String ip, String filename, long startAddress,
 			VPX_MemoryLoadProgressWindow flashingWindow) {
 
@@ -2452,7 +2493,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Processor_Tree.updateProcessorResponse(ip, msg);
 
-		updateStatus("Advertisement received from " + ip);
+		VPXLogger.updateStatus("Advertisement received from " + ip);
 
 	}
 
@@ -2471,7 +2512,6 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	public class VPX_CloseProgressWindow extends JDialog {
-		
 
 		/**
 		 * 

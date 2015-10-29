@@ -32,6 +32,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -320,14 +321,14 @@ public class VPX_MADPanel extends JPanel {
 
 					madTab.setSelectedIndex(1);
 
-					parent.updateLog("Configured Susccessfully");
+					VPXLogger.updateLog("Configured Susccessfully");
 				} else {
 
 					JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 
-					parent.updateLog("Configuration error");
+					VPXLogger.updateLog("Configuration error");
 
-					parent.updateLog(error);
+					VPXLogger.updateLog(error);
 				}
 			}
 		});
@@ -566,7 +567,7 @@ public class VPX_MADPanel extends JPanel {
 
 				if (error.length() == 0) {
 
-					parent.updateLog("MAD Compilation started");
+					VPXLogger.updateLog("MAD Compilation started");
 
 					if (isFileCreated) {
 
@@ -588,7 +589,7 @@ public class VPX_MADPanel extends JPanel {
 
 					madProcessWindow.setVisible(true);
 
-					parent.updateLog("MAD Compilation Completed");
+					VPXLogger.updateLog("MAD Compilation Completed");
 
 					btnCompileApply.setEnabled(true);
 				} else {
@@ -597,9 +598,9 @@ public class VPX_MADPanel extends JPanel {
 
 					btnCompileApply.setEnabled(true);
 
-					parent.updateLog("MAD out files error");
+					VPXLogger.updateLog("MAD out files error");
 
-					parent.updateLog(error);
+					VPXLogger.updateLog(error);
 				}
 
 			}
@@ -1047,9 +1048,9 @@ public class VPX_MADPanel extends JPanel {
 				folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
 		// String cmd = String.format("cmd /c ping 192.168.0.102");
 
-		parent.updateLog("Creating deployment files");
+		VPXLogger.updateLog("Creating deployment files");
 
-		parent.updateLog("Creating deployment configuration files");
+		VPXLogger.updateLog("Creating deployment configuration files");
 
 		try {
 
@@ -1063,7 +1064,7 @@ public class VPX_MADPanel extends JPanel {
 
 				madProcessWindow.updateGeneratingMessage(s);
 
-				parent.updateLog(s);
+				VPXLogger.updateLog(s);
 
 				if (s.contains("Error")) {
 					ret = false;
@@ -1081,7 +1082,7 @@ public class VPX_MADPanel extends JPanel {
 
 				JOptionPane.showMessageDialog(madProcessWindow, "Error in generating out file");
 
-				parent.updateLog("Error in generating out file");
+				VPXLogger.updateLog("Error in generating out file");
 			}
 
 			VPXUtilities.deleteAllGeneratedFilesAndFlders(folderPath, VPXConstants.ResourceFields.DEPLOYMENTFILE,
@@ -1094,7 +1095,7 @@ public class VPX_MADPanel extends JPanel {
 			ret = false;
 			e.printStackTrace();
 
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 		}
 
 		return ret;
@@ -1336,7 +1337,7 @@ public class VPX_MADPanel extends JPanel {
 				this.dispose();
 
 			} catch (IOException e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 			}
 		}
 

@@ -8,6 +8,7 @@ import javax.swing.UIManager;
 import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_SplashWindow;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
 
 public class VPX_Dual_ADT {
@@ -29,7 +30,7 @@ public class VPX_Dual_ADT {
 
 					} else {
 						 VPX_AppModeWindow window = new
-						 VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
+						VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),VPXUtilities.getSerialPorts());
 
 						 window.showWindow();
 
@@ -43,7 +44,9 @@ public class VPX_Dual_ADT {
 							JOptionPane.ERROR_MESSAGE);
 
 					e.printStackTrace();
-					VPXUtilities.updateError(e);
+					
+					VPXLogger.updateError(e);
+					
 					System.exit(0);
 				}
 			}

@@ -37,6 +37,7 @@ import javax.swing.text.NumberFormatter;
 
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -115,7 +116,7 @@ public class VPX_AppModeWindow extends JFrame {
 							VPXUtilities.getSerialPorts());
 					frame.setVisible(true);
 				} catch (Exception e) {
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 					e.printStackTrace();
 				}
 			}
@@ -831,13 +832,13 @@ public class VPX_AppModeWindow extends JFrame {
 
 						if (isValueChanged()) {
 
-							window.updateLog(String.format(
+							VPXLogger.updateLog(String.format(
 									"%s has configured and connected successfully. IPv4 Address : %s Subnet Mask : %s Default Gateway : %s",
 									cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
 									txtSubnet.getText(), txtGateway.getText()));
 
 						} else {
-							window.updateLog(String.format(
+							VPXLogger.updateLog(String.format(
 									"%s has connected successfully. IPv4 Address : %s Subnet Mask : %s Default Gateway : %s",
 									cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
 									txtSubnet.getText(), txtGateway.getText()));
@@ -853,7 +854,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 						e.printStackTrace();
 
-						VPXUtilities.updateError(e);
+						VPXLogger.updateError(e);
 
 						System.exit(0);
 					}

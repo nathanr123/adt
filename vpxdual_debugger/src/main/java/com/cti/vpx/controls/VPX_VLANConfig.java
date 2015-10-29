@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import com.cti.vpx.util.VPXUtilities;
+import com.cti.vpx.util.VPXLogger;
 
 /**
  * Implementation of an AWT {@link Canvas} that embeds an SWT {@link Browser} component.
@@ -108,7 +108,7 @@ public final class VPX_VLANConfig extends Canvas {
         catch (InterruptedException e) {
             e.printStackTrace();
             result = false;
-            VPXUtilities.updateError(e);
+            VPXLogger.updateError(e);
         }
         return result;
     }
@@ -159,7 +159,7 @@ public final class VPX_VLANConfig extends Canvas {
                 shell.redraw();
             }
             catch (Exception e) {   
-            	VPXUtilities.updateError(e);
+            	VPXLogger.updateError(e);
                 return;
             }
             finally {
@@ -183,7 +183,7 @@ public final class VPX_VLANConfig extends Canvas {
                 display.dispose();
             }
             catch (Exception e) {    
-            	VPXUtilities.updateError(e);
+            	VPXLogger.updateError(e);
                 interrupt();
             }
         }

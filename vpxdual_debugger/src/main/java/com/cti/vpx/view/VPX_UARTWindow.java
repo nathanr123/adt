@@ -49,6 +49,7 @@ import com.cti.vpx.controls.VPX_AppModeWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -125,7 +126,7 @@ public class VPX_UARTWindow extends JFrame {
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
-					VPXUtilities.updateError(e);
+					VPXLogger.updateError(e);
 				}
 			}
 		});
@@ -156,7 +157,7 @@ public class VPX_UARTWindow extends JFrame {
 		try {
 			connect(commport);
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			JOptionPane.showMessageDialog(this, "Error in connecting..", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -526,7 +527,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -551,7 +552,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (IOException e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}
@@ -622,7 +623,7 @@ public class VPX_UARTWindow extends JFrame {
 				}
 
 			} catch (IOException e) {
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 				txtAConsole.append("\n");
 
 			}
@@ -650,7 +651,7 @@ public class VPX_UARTWindow extends JFrame {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-				VPXUtilities.updateError(e);
+				VPXLogger.updateError(e);
 				System.exit(-1);
 			}
 		}
@@ -739,7 +740,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 
@@ -911,7 +912,7 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
 	}

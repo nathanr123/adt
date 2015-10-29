@@ -42,6 +42,7 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -1058,7 +1059,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 							Thread.sleep(currentThreadSleepTime);
 
 						} catch (Exception e) {
-							VPXUtilities.updateError(e);
+							VPXLogger.updateError(e);
 							e.printStackTrace();
 
 						}
@@ -1177,7 +1178,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 			}
 
 		} catch (Exception e) {
-			VPXUtilities.updateError(e);
+			VPXLogger.updateError(e);
 			retval = false;
 		}
 
