@@ -1353,6 +1353,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(vpx_Cxt_Reboot);
 
+				vpx_contextMenu.add(vpx_Cxt_EthFlash);
+				
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
 				vpx_contextMenu.add(vpx_Cxt_Refresh);

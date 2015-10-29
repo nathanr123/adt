@@ -23,6 +23,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -30,6 +31,7 @@ import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_EthernetFlashPanel extends JPanel {
 	/**
@@ -106,8 +108,6 @@ public class VPX_EthernetFlashPanel extends JPanel {
 	private void init() {
 
 		setLayout(new BorderLayout(0, 0));
-
-		setPreferredSize(new Dimension(800, 496));
 	}
 
 	public void interruptFlash() {
@@ -122,8 +122,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
 		add(flashPanl, BorderLayout.CENTER);
-
-		flashPanl.setLayout(null);
+		flashPanl.setLayout(new BorderLayout(0, 0));
 
 		JPanel notePanel = new JPanel();
 
@@ -133,9 +132,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		notePanel.setBorder(new TitledBorder(null, "Note", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		notePanel.setBounds(10, 317, 780, 119);
-
-		flashPanl.add(notePanel);
+		flashPanl.add(notePanel, BorderLayout.SOUTH);
 
 		JLabel lblNote = new JLabel(ETHNOTE);
 
@@ -143,29 +140,21 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		JPanel flashOptionPanel = new JPanel();
 
-		flashOptionPanel.setBounds(10, 22, 780, 284);
-
 		flashPanl.add(flashOptionPanel);
-
-		flashOptionPanel.setLayout(null);
+		flashOptionPanel.setLayout(new MigLayout("", "[114px][406px,center][91px,center]",
+				"[22px,grow][22px,grow][22px,grow][22px,grow][24px,grow][23px,grow]"));
 
 		JLabel lblBinFile = new JLabel("Bin File");
 
-		lblBinFile.setBounds(15, 193, 114, 22);
-
-		flashOptionPanel.add(lblBinFile);
+		flashOptionPanel.add(lblBinFile, "cell 0 4,growx,aligny center");
 
 		JLabel lblOffset = new JLabel("Page");
 
-		lblOffset.setBounds(15, 150, 114, 22);
-
-		flashOptionPanel.add(lblOffset);
+		flashOptionPanel.add(lblOffset, "cell 0 3,growx,aligny center");
 
 		JLabel lblFlashDevice = new JLabel("Flash Device");
 
-		lblFlashDevice.setBounds(15, 107, 114, 22);
-
-		flashOptionPanel.add(lblFlashDevice);
+		flashOptionPanel.add(lblFlashDevice, "cell 0 2,growx,aligny center");
 
 		btnFlash = new JButton("Flash");
 
@@ -184,7 +173,8 @@ public class VPX_EthernetFlashPanel extends JPanel {
 						flashIP = cmbFlshProcessors.getSelectedItem().toString();
 					}
 
-					parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(), cmbOffset.getSelectedIndex());
+					parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(),
+							cmbOffset.getSelectedIndex());
 
 				} else {
 
@@ -196,39 +186,29 @@ public class VPX_EthernetFlashPanel extends JPanel {
 			}
 		});
 
-		btnFlash.setBounds(153, 236, 68, 23);
-
-		flashOptionPanel.add(btnFlash);
+		flashOptionPanel.add(btnFlash, "cell 1 5,alignx left,aligny top");
 
 		txtBinFilePath = new JTextField();
 
 		txtBinFilePath.setColumns(10);
 
-		txtBinFilePath.setBounds(153, 193, 406, 22);
-
-		flashOptionPanel.add(txtBinFilePath);
+		flashOptionPanel.add(txtBinFilePath, "cell 1 4,growx,aligny center");
 
 		JButton btnBinFileBrowse = new JButton(new BrowseAction("Browse", txtBinFilePath));
 
-		btnBinFileBrowse.setBounds(564, 191, 91, 23);
-
-		flashOptionPanel.add(btnBinFileBrowse);
+		flashOptionPanel.add(btnBinFileBrowse, "cell 2 4,growx,aligny center");
 
 		cmbOffset = new JComboBox<String>();
 
 		cmbOffset.setPreferredSize(new Dimension(175, 22));
 
-		cmbOffset.setBounds(153, 150, 175, 22);
-
-		flashOptionPanel.add(cmbOffset);
+		flashOptionPanel.add(cmbOffset, "cell 1 3,alignx left,aligny center");
 
 		cmbFlshDevice = new JComboBox<String>();
 
 		cmbFlshDevice.setPreferredSize(new Dimension(175, 22));
 
-		cmbFlshDevice.setBounds(153, 107, 175, 22);
-
-		flashOptionPanel.add(cmbFlshDevice);
+		flashOptionPanel.add(cmbFlshDevice, "cell 1 2,alignx left,aligny center");
 
 		cmbSubSystem = new JComboBox<String>();
 
@@ -251,29 +231,48 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 		cmbSubSystem.setPreferredSize(new Dimension(175, 22));
 
-		cmbSubSystem.setBounds(153, 21, 175, 22);
-
-		flashOptionPanel.add(cmbSubSystem);
+		flashOptionPanel.add(cmbSubSystem, "cell 1 0,alignx left,aligny center");
 
 		JLabel lblSubSystem = new JLabel("Sub System");
 
-		lblSubSystem.setBounds(15, 21, 114, 22);
-
-		flashOptionPanel.add(lblSubSystem);
+		flashOptionPanel.add(lblSubSystem, "cell 0 0,growx,aligny center");
 
 		cmbFlshProcessors = new JComboBox<String>();
 
 		cmbFlshProcessors.setPreferredSize(new Dimension(175, 22));
 
-		cmbFlshProcessors.setBounds(153, 64, 175, 22);
+		cmbFlshProcessors.addItemListener(new ItemListener() {
 
-		flashOptionPanel.add(cmbFlshProcessors);
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbFlshProcessors)) {
+
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
+						setProcessorDetail();						
+						
+					}
+				}
+			}
+		});
+
+		flashOptionPanel.add(cmbFlshProcessors, "cell 1 1,alignx left,aligny center");
 
 		JLabel lblProcessor = new JLabel("Processor");
 
-		lblProcessor.setBounds(15, 64, 114, 22);
-
-		flashOptionPanel.add(lblProcessor);
+		flashOptionPanel.add(lblProcessor, "cell 0 1,growx,aligny center");
+	}
+	
+	public void setProcessorDetail(){
+		
+		if (VPXSessionManager.getCurrentProcType().equals("P2020")) {
+		
+			//System.out.println(cmbFlshProcessors.getSelectedItem().toString());
+		}else{
+			
+		}
+		
 	}
 
 	public void setProcessor(String ip) {
@@ -393,10 +392,10 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 				Processor processor = iterator.next();
 
-				if (!processor.getName().contains("P2020")) {
+				// if (!processor.getName().contains("P2020")) {
 
-					cmbFlshProcessors.addItem(processor.getiP_Addresses());
-				}
+				cmbFlshProcessors.addItem(processor.getiP_Addresses());
+				// }
 			}
 
 		} else {
@@ -409,7 +408,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 				if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
 
-					// cmbFlshProcessors.addItem(vpxSubSystem.getIpP2020());
+					cmbFlshProcessors.addItem(vpxSubSystem.getIpP2020());
 
 					cmbFlshProcessors.addItem(vpxSubSystem.getIpDSP1());
 

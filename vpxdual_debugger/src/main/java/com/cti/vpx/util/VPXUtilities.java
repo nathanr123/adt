@@ -699,7 +699,7 @@ public class VPXUtilities {
 			// Log Tab Settings
 
 			prop.setProperty(VPXConstants.ResourceFields.WORKSPACE_PATH,
-					System.getProperty("user.home") + "\\workspace");
+					System.getProperty("user.home") + "\\vpxworkspace");
 
 			prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
 
