@@ -176,11 +176,13 @@ public class VPX_EthernetFlashPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(VPX_EthernetFlashPanel.this);
-
-				dialog.setVisible(true);
-
 				if (VPXUtilities.isFileValid(txtBinFilePath.getText().trim())) {
+
+					VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(VPX_EthernetFlashPanel.this);
+
+					dialog.setLoadingTFTPFileProcess(new File(txtBinFilePath.getText().trim()).getName());
+
+					dialog.setVisible(true);
 
 					if (flashIP.length() == 0) {
 
@@ -205,6 +207,8 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 									FileUtils.copyFileToDirectory(new File(txtBinFilePath.getText().trim()),
 											new File(VPXSessionManager.getTFTPPath()));
+									
+									dialog.setIndeterminate(false);
 
 								} catch (IOException e1) {
 

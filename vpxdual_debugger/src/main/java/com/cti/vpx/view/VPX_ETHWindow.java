@@ -2449,7 +2449,7 @@ public class VPX_ETHWindow extends JFrame
 					File file = new File(filename);
 
 					if (tftpMonitor == null)
-						tftpMonitor = new VPXTFTPMonitor(new File("D:/tftp"), VPXTFTPMonitor.ServerMode.GET_ONLY);
+						tftpMonitor = new VPXTFTPMonitor(new File(VPXSessionManager.getTFTPPath()), VPXTFTPMonitor.ServerMode.GET_ONLY);
 
 					udpMonitor.setTFTPServer(tftpMonitor);
 					

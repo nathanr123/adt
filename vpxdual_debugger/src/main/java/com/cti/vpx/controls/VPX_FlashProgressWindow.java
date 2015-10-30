@@ -97,7 +97,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		progressPanel.add(progressFileSent, "cell 0 1 3 1,growx,aligny top");
 
-		lblElapsedTimeVal = new JLabel("00:00:03");
+		lblElapsedTimeVal = new JLabel("");
 
 		progressPanel.add(lblElapsedTimeVal, "cell 1 0,alignx left,growy");
 	}
@@ -200,6 +200,19 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	}
 
+	public void setLoadingTFTPFileProcess(String name) {
+
+		lblFlashing.setText("Loading file " + name + " on progress");
+		
+		progressFileSent.setString("");
+
+		progressFileSent.setIndeterminate(true);
+	}
+
+	public void setIndeterminate(boolean val) {
+
+		progressFileSent.setIndeterminate(val);
+	}
 	public void flashFile() {
 
 		isFlashingStatred = true;
