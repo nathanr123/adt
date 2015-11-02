@@ -674,13 +674,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		lblPlot1Stride = new JLabel("Stride");
 
-		lblPlot1Stride.setVisible(false);
-
 		plot1MemoryAddressPanel.add(lblPlot1Stride, "cell 5 0,alignx right,aligny center");
 
 		txtPlot1MemoryStride = new JTextField();
-
-		txtPlot1MemoryStride.setVisible(false);
 
 		txtPlot1MemoryStride.setPreferredSize(new Dimension(20, 20));
 
@@ -1292,13 +1288,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		lblPlot2Stride = new JLabel("Stride");
 
-		lblPlot2Stride.setVisible(false);
-
 		plot2MemoryAddressPanel.add(lblPlot2Stride, "cell 5 0,alignx right,aligny center");
 
 		txtPlot2MemoryStride = new JTextField();
-
-		txtPlot2MemoryStride.setVisible(false);
 
 		txtPlot2MemoryStride.setPreferredSize(new Dimension(20, 20));
 

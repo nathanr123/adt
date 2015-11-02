@@ -40,6 +40,7 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_AppModeWindow;
+import com.cti.vpx.controls.VPX_BISTLauncher;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_BootWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
@@ -1840,10 +1841,28 @@ public class VPX_ETHWindow extends JFrame
 
 			@Override
 			public void run() {
+
+				new VPX_BISTLauncher(VPX_ETHWindow.this).setVisible(true);
+
+			}
+		});
+
+		th.start();
+
+	}
+
+	public void startBist() {
+
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
 				bistWindow.showBISTWindow();
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem());
-
+				
 				VPXLogger.updateLog("Built in Self Test Completed");
 
 			}
@@ -1851,6 +1870,7 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
+	
 	}
 
 	public void setReboot(String ip, int processor, int flashdevice, int page) {
@@ -1879,11 +1899,11 @@ public class VPX_ETHWindow extends JFrame
 			public void run() {
 
 				udpMonitor.sendInterrupt(ip, PROCESSOR_LIST.PROCESSOR_DSP1);
-				
-				if(tftpMonitor != null){
-					
+
+				if (tftpMonitor != null) {
+
 					tftpMonitor.shutdown();
-					
+
 					tftpMonitor = null;
 				}
 			}
@@ -2449,10 +2469,11 @@ public class VPX_ETHWindow extends JFrame
 					File file = new File(filename);
 
 					if (tftpMonitor == null)
-						tftpMonitor = new VPXTFTPMonitor(new File(VPXSessionManager.getTFTPPath()), VPXTFTPMonitor.ServerMode.GET_ONLY);
+						tftpMonitor = new VPXTFTPMonitor(new File(VPXSessionManager.getTFTPPath()),
+								VPXTFTPMonitor.ServerMode.GET_ONLY);
 
 					udpMonitor.setTFTPServer(tftpMonitor);
-					
+
 					udpMonitor.sendTFTP(ip, flashingWindow, VPXSessionManager.getCurrentIP(), file.getName(), fileType);
 
 					tftpMonitor.setProgressWindow(flashingWindow);

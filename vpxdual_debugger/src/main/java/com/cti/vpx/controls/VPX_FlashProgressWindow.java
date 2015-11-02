@@ -69,6 +69,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		setSize(500, 104);
 
+		setAlwaysOnTop(true);
+
 		setLocationRelativeTo(parent);
 
 		getContentPane().setLayout(new BorderLayout(0, 0));
@@ -203,7 +205,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	public void setLoadingTFTPFileProcess(String name) {
 
 		lblFlashing.setText("Loading file " + name + " on progress");
-		
+
 		progressFileSent.setString("");
 
 		progressFileSent.setIndeterminate(true);
@@ -213,6 +215,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		progressFileSent.setIndeterminate(val);
 	}
+
 	public void flashFile() {
 
 		isFlashingStatred = true;

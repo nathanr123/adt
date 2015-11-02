@@ -1070,6 +1070,10 @@ public class VPXUDPMonitor {
 
 			msg.params.memoryinfo.length.set(Integer.valueOf(filter.getMemoryLength()));
 
+			msg.params.memoryinfo.stride.set(Integer.valueOf(filter.getMemoryStride()));
+
+			msg.params.memoryinfo.byteZero.set(Integer.valueOf(filter.getSize()));
+
 			msg.params.memoryinfo.memIndex.set(filter.getMemoryBrowserID());
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
@@ -1140,7 +1144,7 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						memOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - memOffset0;
 
@@ -1148,7 +1152,7 @@ public class VPXUDPMonitor {
 
 					} else if (index == 1) {
 
-						memOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - memOffset1;
 
@@ -1156,7 +1160,7 @@ public class VPXUDPMonitor {
 
 					} else if (index == 2) {
 
-						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - memOffset2;
 
@@ -1164,7 +1168,7 @@ public class VPXUDPMonitor {
 
 					} else if (index == 3) {
 
-						memOffset3 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						memOffset3 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - memOffset3;
 
@@ -1178,25 +1182,25 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						memOffset0 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset0 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, memoryBuff0, memOffset0, b.length);
 
 					} else if (index == 1) {
 
-						memOffset1 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset1 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, memoryBuff1, memOffset1, b.length);
 
 					} else if (index == 2) {
 
-						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, memoryBuff0, memOffset2, b.length);
 
 					} else if (index == 3) {
 
-						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						memOffset2 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, memoryBuff2, memOffset3, b.length);
 
@@ -1468,7 +1472,7 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						plotOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						plotOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - plotOffset0;
 
@@ -1476,7 +1480,7 @@ public class VPXUDPMonitor {
 
 					} else if (index == 1) {
 
-						plotOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						plotOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - plotOffset1;
 
@@ -1484,7 +1488,7 @@ public class VPXUDPMonitor {
 
 					} else if (index == 2) {
 
-						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
+						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * ATP.DEFAULTBUFFERSIZE;
 
 						int len = (int) msg.params.memoryinfo.length.get() - plotOffset2;
 
@@ -1498,19 +1502,19 @@ public class VPXUDPMonitor {
 
 					if (index == 0) {
 
-						plotOffset0 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						plotOffset0 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, plotBuff0, plotOffset0, b.length);
 
 					} else if (index == 1) {
 
-						plotOffset1 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						plotOffset1 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, plotBuff1, plotOffset1, b.length);
 
 					} else if (index == 2) {
 
-						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() * 1024);
+						plotOffset2 = (int) (msg.params.flash_info.currentpacket.get() * ATP.DEFAULTBUFFERSIZE);
 
 						System.arraycopy(b, 0, plotBuff2, plotOffset2, b.length);
 
@@ -2437,7 +2441,9 @@ public class VPXUDPMonitor {
 					Thread.sleep(500);
 
 				} catch (Exception e) {
+					
 					VPXLogger.updateError(e);
+					
 					e.printStackTrace();
 				}
 			}
@@ -2589,8 +2595,6 @@ public class VPXUDPMonitor {
 		int ret = -1;
 
 		for (int i = 0; i < amplitudeIPs.length; i++) {
-
-			// System.out.println(amplitudeIPs[i] + " -- " + i);
 
 			if (amplitudeIPs[i].equals(ip)) {
 

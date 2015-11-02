@@ -759,31 +759,27 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private boolean validateWorkspaceSettings() {
 
+		boolean b = VPXUtilities.createWorkspaceDirs(txtWorkspacePath.getText().trim());
 		try {
 
-			File root = new File(txtWorkspacePath.getText().trim());
-
-			if (!root.exists()) {
-
-				root.mkdirs();
+			if (b) {
 
 				VPXUtilities.updateProperties(VPXConstants.ResourceFields.WORKSPACE_PATH,
 						txtWorkspacePath.getText().trim());
 
-				VPXUtilities.createWorkspaceDirs(txtWorkspacePath.getText().trim());
+				VPXSessionManager.setWorkspacePath(txtWorkspacePath.getText().trim());
 
+				VPXUtilities.setEnableLog(true);
 			}
-
-			VPXSessionManager.setWorkspacePath(txtWorkspacePath.getText().trim());
-
-			VPXUtilities.setEnableLog(true);
 
 		} catch (Exception e) {
 
 			e.printStackTrace();
+
+			return false;
 		}
 
-		return true;
+		return b;
 	}
 
 	private boolean isValueChanged() {

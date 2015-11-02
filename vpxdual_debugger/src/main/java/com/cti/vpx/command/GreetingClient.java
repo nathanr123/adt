@@ -777,7 +777,8 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		 * e.printStackTrace(); }
 		 */
 
-		sendPeriodicity("172.17.10.1", 5, PROCESSOR_LIST.PROCESSOR_P2020);
+		sendPeriodicity("172.17.10.3", 5, PROCESSOR_LIST.PROCESSOR_P2020);
+		sendPeriodicity("172.17.10.132", 5, PROCESSOR_LIST.PROCESSOR_DSP1);
 
 	}
 

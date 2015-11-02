@@ -65,11 +65,17 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 	private VPXSubSystem currentSubSystem = null;
 
 	private VPXSystem sub;
+
 	private JButton btnAdd;
+
 	private JButton btnDelete;
+
 	private JButton btnUpdate;
+
 	private JButton btnClearAll;
+
 	private JButton btnReset;
+
 	private JButton btnSave;
 
 	/**
@@ -680,8 +686,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 				VPXLogger.updateLog(subSystem + " deleted ");
 
-				String msg = currentSubSystem.getSubSystem()
-						+ " deleted successfully!";
+				String msg = currentSubSystem.getSubSystem() + " deleted successfully!";
 
 				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
 
@@ -902,11 +907,12 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 			parent.updateProcessorTree();
 
-			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Saved in to the file system successfully !.\nDo you want close?",
-					"Confirmation", JOptionPane.YES_NO_OPTION);
+			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this,
+					"Saved in to the file system successfully !.\nDo you want close?", "Confirmation",
+					JOptionPane.YES_NO_OPTION);
 
 			if (option == JOptionPane.YES_OPTION) {
-				
+
 				VPX_AliasConfigWindow.this.dispose();
 			}
 

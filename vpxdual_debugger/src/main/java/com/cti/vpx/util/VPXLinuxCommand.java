@@ -118,9 +118,6 @@ public class VPXLinuxCommand {
 		
 		String password = VPXLinuxCommand.getPasswdForRoot();
 		
-		System.out.println("stdout of 'id':");
-		
-		
 		Process p = VPXLinuxCommand.runFromRoot("id", password);
 		
 		System.out.print(streamToString(p.getInputStream()));

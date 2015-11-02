@@ -69,6 +69,8 @@ public interface ATP {
 	public static final int DATA_TYPE_SIZE_BIT16 = 0x01;
 
 	public static final int DATA_TYPE_SIZE_BIT32 = 0x02;
+	
+	public static final int DATA_TYPE_SIZE_BIT64 = 0x03;
 
 	// Enums
 	public enum PROCESSOR_TYPE {
@@ -170,6 +172,6 @@ public interface ATP {
 
 	public static final ByteOrder BYTEORDER_DSP = ByteOrder.LITTLE_ENDIAN;
 
-	public static final int DEFAULTBUFFERSIZE = 1024;
+	public static final int DEFAULTBUFFERSIZE = 1024 * 4;
 
 }

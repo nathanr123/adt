@@ -14,6 +14,8 @@ public class MemoryViewFilter {
 
 	private int timeinterval;
 
+	private int size;
+
 	private boolean isUseMapFile;
 
 	private String mapPath;
@@ -167,6 +169,14 @@ public class MemoryViewFilter {
 
 	public void setMemoryBrowserID(int memoryBrowserID) {
 		this.memoryBrowserID = memoryBrowserID;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
 	}
 
 }

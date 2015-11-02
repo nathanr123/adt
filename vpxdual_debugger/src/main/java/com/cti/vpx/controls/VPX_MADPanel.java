@@ -1158,6 +1158,8 @@ public class VPX_MADPanel extends JPanel {
 
 		private JButton btnOpen;
 
+		private JButton btnBackup;
+
 		private JButton btnCancel;
 
 		private String path = null;
@@ -1294,6 +1296,24 @@ public class VPX_MADPanel extends JPanel {
 
 			getRootPane().setDefaultButton(btnOpen);
 
+			btnBackup = new JButton("Backup");
+
+			btnBackup.setActionCommand("OK");
+
+			btnBackup.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					backupOutFiles();
+
+				}
+			});
+
+			btnBackup.setEnabled(false);
+
+			buttonPane.add(btnBackup);
+
 			btnCancel = new JButton("Close");
 
 			btnCancel.addActionListener(new ActionListener() {
@@ -1328,6 +1348,15 @@ public class VPX_MADPanel extends JPanel {
 			setLocation(dx, dy);
 		}
 
+		private void backupOutFiles() {
+
+			try {
+
+			} catch (Exception e) {
+				VPXLogger.updateError(e);
+			}
+		}
+
 		private void openFolder() {
 
 			try {
@@ -1358,6 +1387,8 @@ public class VPX_MADPanel extends JPanel {
 			btnCancel.setEnabled(true);
 
 			lblOpenFolder.setEnabled(true);
+
+			btnBackup.setEnabled(true);
 		}
 
 		public void setFailure() {
@@ -1367,6 +1398,8 @@ public class VPX_MADPanel extends JPanel {
 			btnCancel.setEnabled(true);
 
 			lblOpenFolder.setEnabled(false);
+
+			btnBackup.setEnabled(false);
 		}
 	}
 }

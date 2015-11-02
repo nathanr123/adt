@@ -28,12 +28,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
@@ -48,6 +51,7 @@ import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 import net.miginfocom.swing.MigLayout;
+import javax.swing.SwingConstants;
 
 public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
@@ -56,11 +60,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = -2851744765165677816L;
 
-	private int MINUTE = 5 * 1000;
+	private int MINUTE = 60 * 1000;
 
 	private JPanel contentPane;
-
-	private JSpinner spinAutoRefresh;
 
 	private JTextField txtMapFilePath;
 
@@ -68,7 +70,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	private JTextField txtMemoryLength;
 
-	private JTextField txtMemoryStride;
+	private JSpinner spinMemoryStride;
 
 	private JComboBox<String> cmbSubSystem;
 
@@ -89,8 +91,6 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JButton btnNewWindow;
 
 	private JButton btnClear;
-
-	private SpinnerNumberModel periodicitySpinnerModel;
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
@@ -125,6 +125,19 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private boolean isAutoRefresh = false;
 
 	private JDialog dialog;
+
+	private JSlider slideAutoRefresh;
+
+	private JLabel lblAutoRefreshValue;
+	private JLabel lblMins;
+	private JLabel lblSize;
+	private JComboBox<String> cmbSize;
+
+	private SpinnerNumberModel strideSpinnerModel;
+
+	public static void main(String[] args) {
+		new VPX_MemoryBrowserWindow(0).setVisible(true);
+	}
 
 	/**
 	 * Create the frame.
@@ -201,7 +214,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		filterPanel.add(subSystemPanel);
 
 		subSystemPanel.setLayout(new MigLayout("",
-				"[46px][100px][46px][100px,fill][46px][100px,fill][97px][86px][46px][grow,fill]", "[23px,grow,fill]"));
+				"[46px][100px][46px][100px,fill][46px][100px,fill][97px][][fill][grow,fill]", "[23px,grow,fill]"));
 
 		JLabel lblSubSystem = new JLabel("Sub System");
 
@@ -263,13 +276,15 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		subSystemPanel.add(cmbCores, "cell 5 0,alignx left,aligny center");
 
-		chkAutoRefresh = new JCheckBox("Auto Refresh in every");
+		chkAutoRefresh = new JCheckBox("Auto Refresh");
 
 		chkAutoRefresh.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
-				spinAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+				slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+				lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
+				lblMins.setEnabled(chkAutoRefresh.isSelected());
 			}
 		});
 
@@ -277,31 +292,56 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		subSystemPanel.add(chkAutoRefresh, "cell 6 0,alignx center,aligny top");
 
-		periodicitySpinnerModel = new SpinnerNumberModel(1, 1, 10, 1);
+		slideAutoRefresh = new JSlider();
+		slideAutoRefresh.setEnabled(false);
 
-		spinAutoRefresh = new JSpinner(periodicitySpinnerModel);
+		slideAutoRefresh.setMinimum(30);
 
-		JFormattedTextField txt = ((JSpinner.NumberEditor) spinAutoRefresh.getEditor()).getTextField();
+		slideAutoRefresh.setMaximum(960);
 
-		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+		subSystemPanel.add(slideAutoRefresh, "cell 7 0,grow");
 
-		spinAutoRefresh.setEnabled(false);
+		lblAutoRefreshValue = new JLabel("30");
+		lblAutoRefreshValue.setEnabled(false);
+		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
+		subSystemPanel.add(lblAutoRefreshValue, "cell 8 0,growx");
 
-		subSystemPanel.add(spinAutoRefresh, "cell 7 0,growx,aligny center");
+		lblMins = new JLabel("Secs");
+		lblMins.setEnabled(false);
+		lblMins.setPreferredSize(new Dimension(35, 25));
 
-		JLabel lblMins = new JLabel("Mins");
+		subSystemPanel.add(lblMins, "cell 9 0,alignx left,aligny center");
 
-		subSystemPanel.add(lblMins, "cell 8 0,alignx left,aligny center");
+		slideAutoRefresh.addChangeListener(new ChangeListener() {
 
-		JLabel lblEmpty = new JLabel("");
+			@Override
+			public void stateChanged(ChangeEvent e) {
 
-		subSystemPanel.add(lblEmpty, "cell 9 0");
+				JSlider source = (JSlider) e.getSource();
+
+				int fps = (int) source.getValue();
+
+				if (fps <= 59) {
+
+					lblAutoRefreshValue.setText("" + fps);
+
+					lblMins.setText("Secs");
+
+				} else {
+
+					lblAutoRefreshValue.setText("" + (fps / 60));
+
+					lblMins.setText("Mins");
+				}
+
+			}
+		});
 
 		JPanel mapPanel = new JPanel();
 
 		filterPanel.add(mapPanel);
 
-		mapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][120px]", "[23px]"));
+		mapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][pref!,center]", "[23px]"));
 
 		radUseMap = new JRadioButton("Use Map File");
 
@@ -362,6 +402,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		mapPanel.add(btnMapFileBrowse, "cell 3 0,alignx left,aligny top");
 
 		cmbMemoryVariables = new VPX_FilterComboBox();
+		cmbMemoryVariables.setPreferredSize(new Dimension(75, 25));
 
 		cmbMemoryVariables.addItemListener(new ItemListener() {
 
@@ -390,11 +431,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		filterPanel.add(memoryAddressPanel);
 
-		memoryAddressPanel.setLayout(new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][46px][126px]",
+		memoryAddressPanel.setLayout(
+				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][right][fill][46px][126px]", "[23px]"));
 
-		"[23px]"));
-
-		radUserAddress = new JRadioButton("Use Direct Memory Address");
+		radUserAddress = new JRadioButton("Use Direct Memory");
 
 		radUserAddress.addActionListener(new ActionListener() {
 
@@ -438,21 +478,39 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		memoryAddressPanel.add(txtMemoryLength, "cell 4 0,alignx left,aligny center");
 
+		lblSize = new JLabel("Size");
+		lblSize.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		memoryAddressPanel.add(lblSize, "cell 5 0,alignx trailing");
+
+		cmbSize = new JComboBox<String>();
+
+		cmbSize.addItem("Byte"); // 8 Bit * 1
+
+		cmbSize.addItem("Word"); // 16 Bit * 2
+
+		cmbSize.addItem("DWord"); // 32 Bit * 4
+
+		cmbSize.addItem("QWord"); // 64 Bit * 8
+
+		memoryAddressPanel.add(cmbSize, "cell 6 0,growx");
+
 		JLabel lblStride = new JLabel("Stride");
+		lblStride.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		lblStride.setVisible(false);
+		memoryAddressPanel.add(lblStride, "cell 7 0,alignx right,aligny center");
 
-		memoryAddressPanel.add(lblStride, "cell 5 0,alignx left,aligny center");
+		strideSpinnerModel = new SpinnerNumberModel(0, 0, 512, 1);
 
-		txtMemoryStride = new JTextField();
+		spinMemoryStride = new JSpinner(strideSpinnerModel);
 
-		txtMemoryStride.setVisible(false);
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinMemoryStride.getEditor()).getTextField();
 
-		txtMemoryStride.setPreferredSize(new Dimension(20, 20));
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 
-		txtMemoryStride.setColumns(15);
+		spinMemoryStride.setPreferredSize(new Dimension(20, 20));
 
-		memoryAddressPanel.add(txtMemoryStride, "cell 6 0,alignx left,aligny center");
+		memoryAddressPanel.add(spinMemoryStride, "cell 8 0,alignx left,aligny center");
 
 		JPanel controlsPanel = new JPanel();
 
@@ -512,7 +570,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		cmbMemoryVariables.removeAllItems();
 
 		// cmbMemoryVariables.addItem("");
-		
+
 		txtMapFilePath.setText(fileName);
 
 		memVariables = VPXUtilities.getMemoryAddressVariables(fileName);
@@ -560,7 +618,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		filter.setAutoRefresh(chkAutoRefresh.isSelected());
 
-		filter.setTimeinterval(Integer.parseInt(spinAutoRefresh.getValue().toString().trim()));
+		filter.setTimeinterval(slideAutoRefresh.getValue());
 
 		filter.setUseMapFile(radUseMap.isSelected());
 
@@ -578,24 +636,60 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		filter.setMemoryAddress(txtMemoryAddres.getText());
 
-		filter.setMemoryLength(txtMemoryLength.getText());
+		filter.setSize(cmbSize.getSelectedIndex());
 
-		filter.setMemoryStride(txtMemoryStride.getText());
+		filter.setMemoryLength(getLengthAsString(filter.getSize()));
+
+		filter.setMemoryStride(spinMemoryStride.getValue().toString());
 
 		filter.setMemoryBrowserID(memoryBrowserID);
 
 	}
 
+	private String getLengthAsString(int size) {
+
+		long length = 0;
+
+		try {
+
+			length = Long.parseLong(txtMemoryLength.getText().trim());
+
+		} catch (Exception e) {
+
+			length = 0;
+		}
+
+		if (size == ATP.DATA_TYPE_SIZE_BIT8) {
+
+			length = length * 1;
+
+		} else if (size == ATP.DATA_TYPE_SIZE_BIT16) {
+
+			length = length * 2;
+
+		} else if (size == ATP.DATA_TYPE_SIZE_BIT32) {
+
+			length = length * 4;
+
+		} else if (size == ATP.DATA_TYPE_SIZE_BIT64) {
+
+			length = length * 8;
+
+		}
+
+		return String.valueOf(length);
+	}
+
 	public void showMemoryBrowser() {
 
 		loadFilters();
-		
-		byte[] b = {0};
-		
+
+		byte[] b = { 0 };
+
 		setBytes(0, b);
 
 		applyFilters();
-		
+
 		btnClear.doClick();
 
 		setVisible(true);
@@ -683,9 +777,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			chkAutoRefresh.setSelected(memoryFilter.isAutoRefresh());
 
-			spinAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+			slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
 
-			spinAutoRefresh.setValue(memoryFilter.getTimeinterval());
+			slideAutoRefresh.setValue(memoryFilter.getTimeinterval());
 
 			radUseMap.setSelected(memoryFilter.isUseMapFile());
 
@@ -699,7 +793,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			txtMemoryLength.setText(memoryFilter.getMemoryLength());
 
-			txtMemoryStride.setText(memoryFilter.getMemoryStride());
+			spinMemoryStride.setValue(memoryFilter.getMemoryStride());
 
 			enableMemoryFields();
 		}
@@ -941,7 +1035,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		if (chkAutoRefresh.isSelected()) {
 
-			currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * MINUTE;
+			loadCurrentThreadSleepTime(slideAutoRefresh.getValue());
 
 			isAutoRefresh = true;
 
@@ -951,6 +1045,18 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			isAutoRefresh = false;
 		}
+	}
+
+	private void loadCurrentThreadSleepTime(int value) {
+
+		if (value < 60) {
+
+			currentThreadSleepTime = value * 1000;
+		} else {
+
+			currentThreadSleepTime = (value / 60) * MINUTE;
+		}
+
 	}
 
 	private String getAddressErrorMessage() {
@@ -1206,7 +1312,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		parent.reindexMemoryBrowserIndex();
 
 	}
-	
+
 	@Override
 	public void windowIconified(WindowEvent e) {
 

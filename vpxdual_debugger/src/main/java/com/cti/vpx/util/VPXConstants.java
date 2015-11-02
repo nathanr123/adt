@@ -107,6 +107,8 @@ public class VPXConstants {
 
 	public static final int MB = 1024 * 1024;
 
+	public static final int MAX_STRIDE = 512;
+
 	public static final int MAX_MEMORY_BROWSER = 4;
 
 	public static final int MAX_MEMORY_PLOT = 3;
@@ -123,7 +125,7 @@ public class VPXConstants {
 	 */
 
 	public static class ResourceFields {
-		
+
 		public static final String GENERAL_SPLASH = "general.splash";
 
 		public static final String GENERAL_MEMORY = "general.memorybar";
@@ -208,13 +210,7 @@ public class VPXConstants {
 
 		public static final String FOLDER_WORKSPACE_SUBSYSTEM = "folder.workspace.subsystem";
 
-		public static final String FOLDER_WORKSPACE_SUBSYSTEM_UNLISTED = "folder.workspace.subsystem.unlisted";
-
-		public static final String FOLDER_WORKSPACE_SUBSYSTEM_P2020 = "folder.workspace.subsystem.p2020";
-
-		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP1 = "folder.workspace.subsystem.dsp1";
-
-		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP2 = "folder.workspace.subsystem.dsp2";
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP = "folder.workspace.subsystem.dsp";
 
 		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE = "folder.workspace.subsystem.dsp.core";
 
