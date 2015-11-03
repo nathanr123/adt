@@ -236,7 +236,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		editor.addSelectionChangedListener(this);
 
-		//handleOpenFile("D:\\test1.bin", "0x0000000");
+		// handleOpenFile("D:\\test1.bin", "0x0000000");
 
 		add(editor);
 
@@ -1263,11 +1263,13 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	}
 
-	public void doFillMemory() {
+	public void doFillMemory(long currAddress) {
 
 		memStFillWindow.setMode(VPX_MemorySetWindow.FILLMEMORY);
 
 		memStFillWindow.setStartAddr(editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress());
+
+		memStFillWindow.setAddress(currAddress);
 
 		memStFillWindow.setTotalLength(getDocLength());
 

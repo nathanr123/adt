@@ -29,6 +29,7 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -38,6 +39,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.hex.ByteBuffer;
 import com.cti.vpx.controls.hex.HexEditor;
 
@@ -68,6 +70,8 @@ public class Hex64 extends AbstractTableModel {
 	 * for fast rendering.
 	 */
 	private String[] byteStrVals;
+
+	private BigInteger bi;
 
 	/**
 	 * Creates the model.
@@ -332,7 +336,9 @@ public class Hex64 extends AbstractTableModel {
 
 		replaceBytes(offset, 8, bArr);
 
-		//this.editor.getMemoryWindow().setMemory();
+		bi = new BigInteger(bArr);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT64, 1, bi.longValue());
 		
 		fireTableCellUpdated(row, col);
 

@@ -50,7 +50,11 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
-	private final FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Bin Files", "bin");
+	private final FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
+
+	private final FileNameExtensionFilter filterBoot = new FileNameExtensionFilter("Boot Files", "boot");
+
+	private final FileNameExtensionFilter filterDTB = new FileNameExtensionFilter("DTB Files", "dtb");
 
 	private JComboBox<String> cmbOffset;
 
@@ -126,6 +130,12 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 	}
 
+	public void shutdownTFTPServer() {
+
+		parent.setTFTPServerDown();
+
+	}
+
 	private void loadComponents() {
 
 		JPanel flashPanl = new JPanel();
@@ -134,6 +144,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
 		add(flashPanl, BorderLayout.CENTER);
+
 		flashPanl.setLayout(new BorderLayout(0, 0));
 
 		JPanel notePanel = new JPanel();
@@ -207,7 +218,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 									FileUtils.copyFileToDirectory(new File(txtBinFilePath.getText().trim()),
 											new File(VPXSessionManager.getTFTPPath()));
-									
+
 									dialog.setIndeterminate(false);
 
 								} catch (IOException e1) {
@@ -547,9 +558,42 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			// fileDialog.addChoosableFileFilter(filterOut);
+			
+			fileDialog.resetChoosableFileFilters();
+			
+			if (currentType == PROCESSOR_LIST.PROCESSOR_P2020) {
 
-			// fileDialog.setAcceptAllFileFilterUsed(false);
+				if (cmbOffset.getSelectedIndex() == 0) {
+
+					fileDialog.setAcceptAllFileFilterUsed(true);
+
+				} else if (cmbOffset.getSelectedIndex() == 1) {
+
+					fileDialog.addChoosableFileFilter(filterBoot);
+					
+					fileDialog.setAcceptAllFileFilterUsed(false);
+
+				} else if (cmbOffset.getSelectedIndex() == 2) {
+
+					fileDialog.addChoosableFileFilter(filterDTB);
+					
+					fileDialog.setAcceptAllFileFilterUsed(false);
+
+				} else if (cmbOffset.getSelectedIndex() == 3) {
+					
+					fileDialog.addChoosableFileFilter(filterBin);
+
+					fileDialog.setAcceptAllFileFilterUsed(false);
+
+				}
+
+			} else {
+
+				fileDialog.addChoosableFileFilter(filterBin);
+
+				fileDialog.setAcceptAllFileFilterUsed(false);
+
+			}
 
 			int returnVal = fileDialog.showOpenDialog(null);
 

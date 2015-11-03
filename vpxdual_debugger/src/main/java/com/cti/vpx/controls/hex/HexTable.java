@@ -175,7 +175,7 @@ class HexTable extends JTable {
 
 		// setDefaultEditor(Object.class, new CellEditor());
 
-		 setDefaultRenderer(Object.class, new CellRenderer());
+		setDefaultRenderer(Object.class, new CellRenderer());
 
 		getTableHeader().setReorderingAllowed(false);
 
@@ -229,18 +229,20 @@ class HexTable extends JTable {
 
 				if (me.isPopupTrigger()) { // if the event shows the menu
 
-					if (hexEditor.getCurrentModel() == HexEditor.UNSINGNEDFLOAT32) {
-						
-						vpx_Hex_Cxt_FillMemory.setEnabled(false);
-						vpx_Hex_Cxt_SetMemory.setEnabled(false);
-						
-					} else {
-
-						vpx_Hex_Cxt_FillMemory.setEnabled(true);
-						vpx_Hex_Cxt_SetMemory.setEnabled(true);
-
-					}
-
+					/*
+					 * if (hexEditor.getCurrentModel() ==
+					 * HexEditor.UNSINGNEDFLOAT32) {
+					 * 
+					 * vpx_Hex_Cxt_FillMemory.setEnabled(false);
+					 * vpx_Hex_Cxt_SetMemory.setEnabled(false);
+					 * 
+					 * } else {
+					 * 
+					 * vpx_Hex_Cxt_FillMemory.setEnabled(true);
+					 * vpx_Hex_Cxt_SetMemory.setEnabled(true);
+					 * 
+					 * }
+					 */
 					vpx_Hex_ContextMenu.show(table, me.getX(), me.getY()); // and
 																			// show
 																			// the
@@ -439,7 +441,8 @@ class HexTable extends JTable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				parent.doFillMemory();
+
+				parent.doFillMemory(currAddress + currCol);
 
 			}
 		});
@@ -1007,16 +1010,17 @@ class HexTable extends JTable {
 
 	public boolean isCellEditable(int row, int col) {
 
-		if (hexEditor.getCurrentModel() == HexEditor.UNSINGNEDFLOAT32 || hexEditor.getCurrentModel() == HexEditor.HEX64) {
-			return false;
-		} else {
-			return cellToOffset(row, col) > -1;
-		}
+		// if (hexEditor.getCurrentModel() == HexEditor.UNSINGNEDFLOAT32
+		// || hexEditor.getCurrentModel() == HexEditor.HEX64) {
+		// return false;
+		// } else {
+		return cellToOffset(row, col) > -1;
+		// }
 	}
 
 	public boolean isCellSelected(int row, int col) {
 		int offset = cellToOffset(row, col);
-		if (offset == -1) { 
+		if (offset == -1) {
 			return false;
 		}
 		int start = getSmallestSelectionIndex();

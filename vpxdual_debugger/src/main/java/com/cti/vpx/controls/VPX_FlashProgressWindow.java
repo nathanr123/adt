@@ -190,6 +190,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		JOptionPane.showMessageDialog(VPX_FlashProgressWindow.this, "Flash Completed");
 
+		parent.shutdownTFTPServer();
+
 		VPX_FlashProgressWindow.this.dispose();
 
 	}

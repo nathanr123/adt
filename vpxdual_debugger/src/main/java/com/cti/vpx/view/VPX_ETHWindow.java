@@ -1913,6 +1913,26 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void setTFTPServerDown() {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				if (tftpMonitor != null) {
+
+					tftpMonitor.shutdown();
+
+					tftpMonitor = null;
+				}
+			}
+		});
+
+		th.start();
+
+	}
+	
 	public void showExecution() {
 
 		Thread th = new Thread(new Runnable() {

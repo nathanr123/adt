@@ -29,6 +29,7 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.ByteOrder;
 import java.util.ResourceBundle;
 
@@ -39,6 +40,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.controls.hex.ByteBuffer;
 import com.cti.vpx.controls.hex.HexEditor;
 
@@ -69,6 +71,8 @@ public class Floating32 extends AbstractTableModel {
 	 * for fast rendering.
 	 */
 	private String[] byteStrVals;
+
+	private BigInteger bi;
 
 	/**
 	 * Creates the model.
@@ -307,7 +311,7 @@ public class Floating32 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 		
-		String val = Float.toHexString(Float.parseFloat(value.toString()));
+		String val = String.format("0x%08X", Float.floatToIntBits(Float.parseFloat(value.toString())));
 
 		byte[] bArr = new byte[4];
 
@@ -322,6 +326,10 @@ public class Floating32 extends AbstractTableModel {
 		int offset = editor.cellToOffset(row, col) * 4;
 
 		replaceBytes(offset, 4, bArr);
+		
+		bi = new BigInteger(bArr);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, bi.longValue());
 
 		fireTableCellUpdated(row, col);
 
