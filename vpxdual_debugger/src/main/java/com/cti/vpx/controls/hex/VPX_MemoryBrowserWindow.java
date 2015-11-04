@@ -299,9 +299,12 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		slideAutoRefresh.setMaximum(960);
 
+		slideAutoRefresh.setValue(30);
+
 		subSystemPanel.add(slideAutoRefresh, "cell 7 0,grow");
 
 		lblAutoRefreshValue = new JLabel("30");
+		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAutoRefreshValue.setEnabled(false);
 		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
 		subSystemPanel.add(lblAutoRefreshValue, "cell 8 0,growx");
@@ -432,7 +435,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		filterPanel.add(memoryAddressPanel);
 
 		memoryAddressPanel.setLayout(
-				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][right][fill][46px][126px]", "[23px]"));
+				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][right][grow][46px][126px]", "[23px]"));
 
 		radUserAddress = new JRadioButton("Use Direct Memory");
 

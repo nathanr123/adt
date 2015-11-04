@@ -310,30 +310,30 @@ public class Floating32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		
-		String val = String.format("0x%08X", Float.floatToIntBits(Float.parseFloat(value.toString())));
+
+		String val = String.format("%08X", Float.floatToIntBits(Float.parseFloat(value.toString())));
 
 		byte[] bArr = new byte[4];
 
-		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
-		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
 
-		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
 
-		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
 
 		int offset = editor.cellToOffset(row, col) * 4;
 
 		replaceBytes(offset, 4, bArr);
-		
+
 		bi = new BigInteger(bArr);
 
 		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, bi.longValue());
 
 		fireTableCellUpdated(row, col);
 
-		editor.fireHexEditorEvent(offset, 4, 4);		
+		editor.fireHexEditorEvent(offset, 4, 4);
 	}
 
 	/**

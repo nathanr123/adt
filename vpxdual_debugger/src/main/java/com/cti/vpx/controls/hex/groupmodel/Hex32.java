@@ -308,6 +308,21 @@ public class Hex32 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
+		/*
+		 * byte[] bArr1 = DatatypeConverter.parseHexBinary(value.toString());
+
+		byte[] bArr = new byte[4];
+
+		bArr[3] = bArr1[0];
+
+		bArr[2] = bArr1[1];
+
+		bArr[1] = bArr1[2];
+
+		bArr[0] = bArr1[3];
+		 * */
+		
+		
 		String val = String.format("%08x", Integer.parseInt(value.toString(), 16));
 
 		byte[] bArr = new byte[4];

@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -27,11 +29,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
@@ -55,7 +61,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = 8729031397351962182L;
 
-	private int MINUTE = 5 * 1000;
+	private int MINUTE = 60 * 1000;
 
 	private int memoryPlotID = -1;
 
@@ -65,15 +71,13 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JPanel plot1FilterPanel;
 
-	private JSpinner spinAutoRefresh;
-
 	private JTextField txtPlot1MapFilePath;
 
 	private JTextField txtPlot1MemoryAddres;
 
 	private JTextField txtPlot1MemoryLength;
 
-	private JTextField txtPlot1MemoryStride;
+	private JSpinner spinPlot1MemoryStride;
 
 	private JComboBox<String> cmbPlot1SubSystem;
 
@@ -81,7 +85,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JComboBox<String> cmbPlot1Cores;
 
-	private JCheckBox chkPlot1AutoRefresh;
+	private JCheckBox chkAutoRefresh;
 
 	private JRadioButton radPlot1UseMap;
 
@@ -99,23 +103,19 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JPanel plot2FilterPanel;
 
-	private JTextField txtPlot2AutoRefresh;
-
 	private JTextField txtPlot2MapFilePath;
 
 	private JTextField txtPlot2MemoryAddres;
 
 	private JTextField txtPlot2MemoryLength;
 
-	private JTextField txtPlot2MemoryStride;
+	private JSpinner spinPlot2MemoryStride;
 
 	private JComboBox<String> cmbPlot2SubSystem;
 
 	private JComboBox<String> cmbPlot2Processor;
 
 	private JComboBox<String> cmbPlot2Cores;
-
-	private JCheckBox chkPlot2AutoRefresh;
 
 	private JRadioButton radPlot2UseMap;
 
@@ -159,8 +159,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JLabel lblPlot1Core;
 
-	private JLabel lblPlot1Mins;
-
 	private JLabel lblPlot1Stride;
 
 	private JLabel lblPlot1Length;
@@ -171,13 +169,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private JLabel lblPlot2Core;
 
-	private JLabel lblPlot2Mins;
-
 	private JLabel lblPlot2Stride;
 
 	private JLabel lblPlot2Length;
-
-	private SpinnerNumberModel periodicitySpinnerModel;
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
@@ -198,6 +192,20 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	private Thread autoRefreshThread = null;
 
 	private VPX_MultipleLine multiLine = new VPX_MultipleLine();
+
+	private JSlider slideAutoRefresh;
+	
+	private JLabel lblAutoRefreshValue;
+	
+	private JLabel lblMins;
+	
+	private JLabel lblPlot1Size;
+	
+	private JComboBox<String> cmbPlot1MemSize;
+	
+	private JLabel lblPlot2Size;
+	
+	private JComboBox<String> cmbPlot2MemSize;
 
 	/**
 	 * 
@@ -247,10 +255,27 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .60), (int) (VPXUtilities.getScreenHeight() * .70));
-
+		setSize((int) (VPXUtilities.getScreenWidth() * .80), (int) (VPXUtilities.getScreenHeight() * .90));
+		
 		addWindowListener(this);
+		
+		centerFrame();
 
+	}
+	
+	private void centerFrame() {
+
+		Dimension windowSize = getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
 	}
 
 	public void setParent(VPX_ETHWindow prnt) {
@@ -446,7 +471,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		plot1FilterPanel.add(plot1SubSystemPanel);
 
 		plot1SubSystemPanel.setLayout(new MigLayout("",
-				"[46px][100px][46px][100px,fill][46px][100px,fill][97px][86px][46px][grow,fill]", "[23px,grow,fill]"));
+				"[46px][100px][46px][100px,fill][46px][100px,fill][97px][86px,grow,fill][pref!][pref!,fill]",
+				"[23px,grow,fill]"));
 
 		lblPlot1SubSystem = new JLabel("Sub System");
 
@@ -504,43 +530,72 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1SubSystemPanel.add(cmbPlot1Cores, "cell 5 0,alignx left,aligny center");
 
-		chkPlot1AutoRefresh = new JCheckBox("Auto Refresh in every");
+		chkAutoRefresh = new JCheckBox("Auto Refresh in every");
 
-		chkPlot1AutoRefresh.addActionListener(new ActionListener() {
+		chkAutoRefresh.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
-				spinAutoRefresh.setEnabled(chkPlot1AutoRefresh.isSelected());
+				slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+
+				lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
+
+				lblMins.setEnabled(chkAutoRefresh.isSelected());
 			}
 		});
 
-		plot1SubSystemPanel.add(chkPlot1AutoRefresh, "cell 6 0,alignx center,aligny top");
+		plot1SubSystemPanel.add(chkAutoRefresh, "cell 6 0,alignx center,aligny top");
 
-		periodicitySpinnerModel = new SpinnerNumberModel(1, 1, 10, 1);
+		slideAutoRefresh = new JSlider();
+		slideAutoRefresh.setMinimum(30);
 
-		spinAutoRefresh = new JSpinner(periodicitySpinnerModel);
+		slideAutoRefresh.setMaximum(960);
+		slideAutoRefresh.setValue(30);
 
-		JFormattedTextField txt = ((JSpinner.NumberEditor) spinAutoRefresh.getEditor()).getTextField();
+		slideAutoRefresh.setEnabled(false);
+		plot1SubSystemPanel.add(slideAutoRefresh, "cell 7 0");
 
-		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+		slideAutoRefresh.addChangeListener(new ChangeListener() {
 
-		spinAutoRefresh.setEnabled(false);
+			@Override
+			public void stateChanged(ChangeEvent e) {
 
-		plot1SubSystemPanel.add(spinAutoRefresh, "cell 7 0,growx,aligny center");
+				JSlider source = (JSlider) e.getSource();
 
-		lblPlot1Mins = new JLabel("Mins");
+				int fps = (int) source.getValue();
 
-		plot1SubSystemPanel.add(lblPlot1Mins, "cell 8 0,alignx left,aligny center");
+				if (fps <= 59) {
 
-		JLabel lblPlot1Empty = new JLabel("");
+					lblAutoRefreshValue.setText("" + fps);
 
-		plot1SubSystemPanel.add(lblPlot1Empty, "cell 9 0");
+					lblMins.setText("Secs");
+
+				} else {
+
+					lblAutoRefreshValue.setText("" + (fps / 60));
+
+					lblMins.setText("Mins");
+				}
+
+			}
+		});
+
+		lblAutoRefreshValue = new JLabel("30");
+		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAutoRefreshValue.setEnabled(false);
+		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
+		plot1SubSystemPanel.add(lblAutoRefreshValue, "cell 8 0");
+
+		lblMins = new JLabel("Secs");
+		lblMins.setEnabled(false);
+		lblMins.setPreferredSize(new Dimension(35, 25));
+		plot1SubSystemPanel.add(lblMins, "cell 9 0");
 
 		JPanel plot1MapPanel = new JPanel();
 
 		plot1FilterPanel.add(plot1MapPanel);
 
-		plot1MapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][]", "[23px]"));
+		plot1MapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][center]", "[23px]"));
 
 		radPlot1UseMap = new JRadioButton("Use Map File");
 
@@ -621,7 +676,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		cmbPlot1MemoryVariables.setEnabled(false);
 
-		cmbPlot1MemoryVariables.setPreferredSize(new Dimension(120, 20));
+		cmbPlot1MemoryVariables.setPreferredSize(new Dimension(250, 20));
 
 		plot1MapPanel.add(cmbPlot1MemoryVariables, "cell 4 0,alignx left,aligny center");
 
@@ -630,7 +685,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		plot1FilterPanel.add(plot1MemoryAddressPanel);
 
 		plot1MemoryAddressPanel.setLayout(
-				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][46px,right][126px]", "[23px]"));
+				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][][pref!][46px,right][126px]", "[23px]"));
 
 		radPlot1UserAddress = new JRadioButton("Use Direct Memory Address");
 
@@ -672,17 +727,37 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1MemoryAddressPanel.add(txtPlot1MemoryLength, "cell 4 0,alignx left,aligny center");
 
+		lblPlot1Size = new JLabel("Size");
+		plot1MemoryAddressPanel.add(lblPlot1Size, "cell 5 0,alignx trailing");
+
+		cmbPlot1MemSize = new JComboBox<String>();
+		cmbPlot1MemSize.setPreferredSize(new Dimension(120, 20));
+
+		cmbPlot1MemSize.addItem("Byte"); // 8 Bit * 1
+
+		cmbPlot1MemSize.addItem("Word"); // 16 Bit * 2
+
+		cmbPlot1MemSize.addItem("DWord"); // 32 Bit * 4
+
+		cmbPlot1MemSize.addItem("QWord"); // 64 Bit * 8
+
+		plot1MemoryAddressPanel.add(cmbPlot1MemSize, "cell 6 0,growx");
+
 		lblPlot1Stride = new JLabel("Stride");
 
-		plot1MemoryAddressPanel.add(lblPlot1Stride, "cell 5 0,alignx right,aligny center");
+		plot1MemoryAddressPanel.add(lblPlot1Stride, "cell 7 0,alignx right,aligny center");
 
-		txtPlot1MemoryStride = new JTextField();
+		SpinnerNumberModel strideSpinnerModel = new SpinnerNumberModel(0, 0, 512, 1);
 
-		txtPlot1MemoryStride.setPreferredSize(new Dimension(20, 20));
+		spinPlot1MemoryStride = new JSpinner(strideSpinnerModel);
 
-		txtPlot1MemoryStride.setColumns(15);
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinPlot1MemoryStride.getEditor()).getTextField();
 
-		plot1MemoryAddressPanel.add(txtPlot1MemoryStride, "cell 6 0,alignx left,aligny center");
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
+		spinPlot1MemoryStride.setPreferredSize(new Dimension(20, 20));
+
+		plot1MemoryAddressPanel.add(spinPlot1MemoryStride, "cell 8 0,alignx left,aligny center");
 	}
 
 	private void createPlot1Filters() {
@@ -707,13 +782,11 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			plot1MemoryFilter.setCore("0");
 		}
 
-		plot1MemoryFilter.setAutoRefresh(chkPlot1AutoRefresh.isSelected());
+		plot1MemoryFilter.setAutoRefresh(chkAutoRefresh.isSelected());
 
-		if (spinAutoRefresh.getValue().toString().length() > 0)
+		plot1MemoryFilter.setAutoRefresh(chkAutoRefresh.isSelected());
 
-			plot1MemoryFilter.setTimeinterval(Integer.parseInt(spinAutoRefresh.getValue().toString().trim()));
-		else
-			plot1MemoryFilter.setTimeinterval(0);
+		plot1MemoryFilter.setTimeinterval(slideAutoRefresh.getValue());
 
 		plot1MemoryFilter.setUseMapFile(radPlot1UseMap.isSelected());
 
@@ -729,11 +802,14 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1MemoryFilter.setDirectMemory(radPlot1UserAddress.isSelected());
 
+		plot1MemoryFilter.setSize(cmbPlot1MemSize.getSelectedIndex());
+
 		plot1MemoryFilter.setMemoryAddress(txtPlot1MemoryAddres.getText());
 
-		plot1MemoryFilter.setMemoryLength(txtPlot1MemoryLength.getText());
+		plot1MemoryFilter
+				.setMemoryLength(getLengthAsString(txtPlot1MemoryLength.getText(), plot1MemoryFilter.getSize()));
 
-		plot1MemoryFilter.setMemoryStride(txtPlot1MemoryStride.getText());
+		plot1MemoryFilter.setMemoryStride(spinPlot1MemoryStride.getValue().toString());
 
 	}
 
@@ -868,11 +944,15 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			}
 		}
 
-		chkPlot1AutoRefresh.setSelected(plot1MemoryFilter.isAutoRefresh());
+		chkAutoRefresh.setSelected(plot1MemoryFilter.isAutoRefresh());
 
-		spinAutoRefresh.setEnabled(chkPlot1AutoRefresh.isSelected());
+		slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
 
-		spinAutoRefresh.setValue(plot1MemoryFilter.getTimeinterval());
+		lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
+
+		lblMins.setEnabled(chkAutoRefresh.isSelected());
+
+		slideAutoRefresh.setValue(plot1MemoryFilter.getTimeinterval());
 
 		radPlot1UseMap.setSelected(plot1MemoryFilter.isUseMapFile());
 
@@ -886,7 +966,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		txtPlot1MemoryLength.setText(plot1MemoryFilter.getMemoryLength());
 
-		txtPlot1MemoryStride.setText(plot1MemoryFilter.getMemoryStride());
+		//spinPlot1MemoryStride.setValue(plot1MemoryFilter.getMemoryStride());
 
 		enablePlot1MemoryFields();
 
@@ -1115,36 +1195,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot2SubSystemPanel.add(cmbPlot2Cores, "cell 5 0,alignx left,aligny center");
 
-		chkPlot2AutoRefresh = new JCheckBox("Auto Refresh in every");
-
-		chkPlot2AutoRefresh.setVisible(false);
-
-		chkPlot2AutoRefresh.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-
-				txtPlot2AutoRefresh.setEnabled(chkPlot2AutoRefresh.isSelected());
-			}
-		});
-
-		plot2SubSystemPanel.add(chkPlot2AutoRefresh, "cell 6 0,alignx center,aligny top");
-
-		txtPlot2AutoRefresh = new JTextField();
-
-		txtPlot2AutoRefresh.setVisible(false);
-
-		txtPlot2AutoRefresh.setEnabled(false);
-
-		plot2SubSystemPanel.add(txtPlot2AutoRefresh, "cell 7 0,alignx left,aligny center");
-
-		txtPlot2AutoRefresh.setColumns(10);
-
-		lblPlot2Mins = new JLabel("Mins");
-
-		lblPlot2Mins.setVisible(false);
-
-		plot2SubSystemPanel.add(lblPlot2Mins, "cell 8 0,alignx left,aligny center");
-
 		JLabel lblPlot2Empty = new JLabel("");
 
 		plot2SubSystemPanel.add(lblPlot2Empty, "cell 9 0");
@@ -1242,9 +1292,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot2FilterPanel.add(plot2MemoryAddressPanel);
 
-		plot2MemoryAddressPanel.setLayout(new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][46px][126px]",
-
-		"[23px]"));
+		plot2MemoryAddressPanel.setLayout(
+				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][][pref!][46px][126px]", "[23px]"));
 
 		radPlot2UserAddress = new JRadioButton("Use Direct Memory Address");
 
@@ -1286,17 +1335,38 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot2MemoryAddressPanel.add(txtPlot2MemoryLength, "cell 4 0,alignx left,aligny center");
 
+		lblPlot2Size = new JLabel("Size");
+
+		plot2MemoryAddressPanel.add(lblPlot2Size, "cell 5 0");
+
+		cmbPlot2MemSize = new JComboBox<String>();
+		cmbPlot2MemSize.setPreferredSize(new Dimension(120, 20));
+
+		cmbPlot2MemSize.addItem("Byte"); // 8 Bit * 1
+
+		cmbPlot2MemSize.addItem("Word"); // 16 Bit * 2
+
+		cmbPlot2MemSize.addItem("DWord"); // 32 Bit * 4
+
+		cmbPlot2MemSize.addItem("QWord"); // 64 Bit * 8
+
+		plot2MemoryAddressPanel.add(cmbPlot2MemSize, "cell 6 0,growx");
+
 		lblPlot2Stride = new JLabel("Stride");
 
-		plot2MemoryAddressPanel.add(lblPlot2Stride, "cell 5 0,alignx right,aligny center");
+		plot2MemoryAddressPanel.add(lblPlot2Stride, "cell 7 0,alignx right,aligny center");
 
-		txtPlot2MemoryStride = new JTextField();
+		SpinnerNumberModel strideSpinnerModel = new SpinnerNumberModel(0, 0, 512, 1);
 
-		txtPlot2MemoryStride.setPreferredSize(new Dimension(20, 20));
+		spinPlot2MemoryStride = new JSpinner(strideSpinnerModel);
 
-		txtPlot2MemoryStride.setColumns(15);
+		JFormattedTextField txt = ((JSpinner.NumberEditor) spinPlot2MemoryStride.getEditor()).getTextField();
 
-		plot2MemoryAddressPanel.add(txtPlot2MemoryStride, "cell 6 0,alignx left,aligny center");
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
+		spinPlot1MemoryStride.setPreferredSize(new Dimension(20, 20));
+
+		plot2MemoryAddressPanel.add(spinPlot2MemoryStride, "cell 8 0,alignx left,aligny center");
 	}
 
 	private void createPlot2Filters() {
@@ -1321,14 +1391,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			plot2MemoryFilter.setCore("0");
 		}
 
-		plot2MemoryFilter.setAutoRefresh(chkPlot2AutoRefresh.isSelected());
-
-		if (txtPlot2AutoRefresh.getText().length() > 0)
-
-			plot2MemoryFilter.setTimeinterval(Integer.parseInt(txtPlot2AutoRefresh.getText().trim()));
-		else
-			plot2MemoryFilter.setTimeinterval(0);
-
 		plot2MemoryFilter.setUseMapFile(radPlot2UseMap.isSelected());
 
 		plot2MemoryFilter.setMapPath(txtPlot2MapFilePath.getText());
@@ -1341,14 +1403,51 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			plot2MemoryFilter.setMemoryName("");
 		}
 
+		plot2MemoryFilter.setSize(cmbPlot2MemSize.getSelectedIndex());
+
 		plot2MemoryFilter.setDirectMemory(radPlot2UserAddress.isSelected());
 
 		plot2MemoryFilter.setMemoryAddress(txtPlot2MemoryAddres.getText());
 
-		plot2MemoryFilter.setMemoryLength(txtPlot2MemoryLength.getText());
+		plot2MemoryFilter
+				.setMemoryLength(getLengthAsString(txtPlot2MemoryLength.getText(), plot2MemoryFilter.getSize()));
 
-		plot2MemoryFilter.setMemoryStride(txtPlot2MemoryStride.getText());
+		plot2MemoryFilter.setMemoryStride(spinPlot2MemoryStride.getValue().toString());
 
+	}
+
+	private String getLengthAsString(String value, int size) {
+
+		long length = 0;
+
+		try {
+
+			length = Long.parseLong(value.trim());
+
+		} catch (Exception e) {
+
+			length = 0;
+		}
+
+		if (size == ATP.DATA_TYPE_SIZE_BIT8) {
+
+			length = length * 1;
+
+		} else if (size == ATP.DATA_TYPE_SIZE_BIT16) {
+
+			length = length * 2;
+
+		} else if (size == ATP.DATA_TYPE_SIZE_BIT32) {
+
+			length = length * 4;
+
+		} else if (size == ATP.DATA_TYPE_SIZE_BIT64) {
+
+			length = length * 8;
+
+		}
+
+		return String.valueOf(length);
 	}
 
 	private void enablePlot2MemoryFields() {
@@ -1403,12 +1502,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			}
 		}
 
-		chkPlot2AutoRefresh.setSelected(plot2MemoryFilter.isAutoRefresh());
-
-		txtPlot2AutoRefresh.setEnabled(chkPlot2AutoRefresh.isSelected());
-
-		txtPlot2AutoRefresh.setText(plot2MemoryFilter.getTimeinterval() + "");
-
 		radPlot2UseMap.setSelected(plot2MemoryFilter.isUseMapFile());
 
 		radPlot2UserAddress.setSelected(plot2MemoryFilter.isDirectMemory());
@@ -1421,7 +1514,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		txtPlot2MemoryLength.setText(plot2MemoryFilter.getMemoryLength());
 
-		txtPlot2MemoryStride.setText(plot2MemoryFilter.getMemoryStride());
+		spinPlot2MemoryStride.setValue(plot2MemoryFilter.getMemoryStride());
 
 		enablePlot2MemoryFields();
 
@@ -1583,7 +1676,11 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1FilterPanel.setEnabled(isPlot1);
 
-		spinAutoRefresh.setEnabled(isPlot1);
+		slideAutoRefresh.setEnabled(isPlot1);
+
+		lblAutoRefreshValue.setEnabled(isPlot1);
+
+		lblMins.setEnabled(isPlot1);
 
 		txtPlot1MapFilePath.setEnabled(isPlot1);
 
@@ -1591,7 +1688,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		txtPlot1MemoryLength.setEnabled(isPlot1);
 
-		txtPlot1MemoryStride.setEnabled(isPlot1);
+		spinPlot1MemoryStride.setEnabled(isPlot1);
 
 		cmbPlot1SubSystem.setEnabled(isPlot1);
 
@@ -1599,7 +1696,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		cmbPlot1Cores.setEnabled(isPlot1);
 
-		chkPlot1AutoRefresh.setEnabled(isPlot1);
+		chkAutoRefresh.setEnabled(isPlot1);
 
 		radPlot1UseMap.setEnabled(isPlot1);
 
@@ -1618,8 +1715,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		lblPlot1Processors.setEnabled(isPlot1);
 
 		lblPlot1Core.setEnabled(isPlot1);
-
-		lblPlot1Mins.setEnabled(isPlot1);
 
 		lblPlot1Stride.setEnabled(isPlot1);
 
@@ -1653,7 +1748,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		cmbPlot1MemoryVariables.removeAllItems();
 
 		// cmbPlot1MemoryVariables.addItem("");
-		
+
 		txtPlot1MapFilePath.setText(fileName);
 
 		plot1MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
@@ -1685,7 +1780,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		cmbPlot2MemoryVariables.removeAllItems();
 
 		// cmbPlot2MemoryVariables.addItem("");
-		
+
 		txtPlot2MapFilePath.setText(fileName);
 
 		plot2MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
@@ -1702,23 +1797,19 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot2FilterPanel.setEnabled(isPlot2);
 
-		txtPlot2AutoRefresh.setEnabled(isPlot2);
-
 		txtPlot2MapFilePath.setEnabled(isPlot2);
 
 		txtPlot2MemoryAddres.setEnabled(isPlot2);
 
 		txtPlot2MemoryLength.setEnabled(isPlot2);
 
-		txtPlot2MemoryStride.setEnabled(isPlot2);
+		spinPlot2MemoryStride.setEnabled(isPlot2);
 
 		cmbPlot2SubSystem.setEnabled(isPlot2);
 
 		cmbPlot2Processor.setEnabled(isPlot2);
 
 		cmbPlot2Cores.setEnabled(isPlot2);
-
-		chkPlot2AutoRefresh.setEnabled(isPlot2);
 
 		radPlot2UseMap.setEnabled(isPlot2);
 
@@ -1737,8 +1828,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		lblPlot2Processors.setEnabled(isPlot2);
 
 		lblPlot2Core.setEnabled(isPlot2);
-
-		lblPlot2Mins.setEnabled(isPlot2);
 
 		lblPlot2Stride.setEnabled(isPlot2);
 
@@ -1871,9 +1960,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			readMemory();
 
-			if (chkPlot1AutoRefresh.isSelected()) {
+			if (chkAutoRefresh.isSelected()) {
 
-				currentThreadSleepTime = Integer.valueOf(spinAutoRefresh.getValue().toString()) * MINUTE;
+				loadCurrentThreadSleepTime(slideAutoRefresh.getValue());
 
 				isAutoRefresh = true;
 
@@ -1883,6 +1972,18 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 				isAutoRefresh = false;
 			}
+		}
+
+	}
+
+	private void loadCurrentThreadSleepTime(int value) {
+
+		if (value < 60) {
+
+			currentThreadSleepTime = value * 1000;
+		} else {
+
+			currentThreadSleepTime = (value / 60) * MINUTE;
 		}
 
 	}
