@@ -35,7 +35,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
@@ -1580,7 +1579,7 @@ public class VPX_ETHWindow extends JFrame
 
 			File file = fileDialog.getSelectedFile();
 
-			vpx_Content_Tabbed_Pane_Right.addTab("Log File - " + file.getAbsolutePath(),
+			vpx_Content_Tabbed_Pane_Right.addTab(file.getName(),
 					new VPX_LogFileViewPanel(file));
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);

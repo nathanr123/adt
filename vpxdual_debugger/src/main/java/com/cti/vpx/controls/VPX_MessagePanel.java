@@ -53,6 +53,8 @@ import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
+import java.awt.GridLayout;
+import javax.swing.JLabel;
 
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
@@ -139,8 +141,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void init() {
-
-		setLayout(new BorderLayout(5, 5));
 
 		loadMessageStyles();
 	}
@@ -331,6 +331,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void loadComponents() {
+		setLayout(new BorderLayout(0, 0));
 
 		JPanel base_Panel = VPXComponentFactory.createJPanel();
 
@@ -338,7 +339,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		add(base_Panel, BorderLayout.SOUTH);
 
-		base_Panel.setLayout(new BorderLayout(0, 0));
+		base_Panel.setLayout(new BorderLayout(20, 5));
 
 		JPanel btn_Panel = VPXComponentFactory.createJPanel();
 
@@ -428,11 +429,53 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		JPanel message_Panel = VPXComponentFactory.createJPanel();
 
-		add(message_Panel, BorderLayout.CENTER);
+		add(message_Panel);
+		message_Panel.setLayout(new GridLayout(2, 1, 0, 0));
 
-		message_Panel.setLayout(new BorderLayout());
+		UserMSGPanel = new JPanel();
+
+		UserMSGPanel
+				.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
+
+		message_Panel.add(UserMSGPanel);
+
+		UserMSGPanel.setLayout(new BorderLayout(0, 0));
+
+		scrl_User_Msg_Pane = VPXComponentFactory.createJScrollPane();
+
+		UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
+
+		txtP_User_Msg_Display = VPXComponentFactory.createJTextPane(VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT);
+
+		txtP_User_Msg_Display.setEditable(false);
+
+		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
+
+		ProcMSGPanel = new JPanel();
+
+		ProcMSGPanel.setBorder(
+				new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		ProcMSGPanel.setPreferredSize(new Dimension(10, 200));
+
+		message_Panel.add(ProcMSGPanel);
+
+		ProcMSGPanel.setLayout(new BorderLayout(0, 0));
+
+		scrl_Proc_Msg_Pane = VPXComponentFactory.createJScrollPane();
+
+		ProcMSGPanel.add(scrl_Proc_Msg_Pane);
+
+		txtP_Proc_Msg_Display = VPXComponentFactory.createJTextPane(VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT);
+
+		txtP_Proc_Msg_Display.setEditable(false);
+
+		scrl_Proc_Msg_Pane.setViewportView(txtP_Proc_Msg_Display);
 
 		controlsPanel = new JPanel();
+		add(controlsPanel, BorderLayout.NORTH);
 
 		FlowLayout fl_controlsPanel = (FlowLayout) controlsPanel.getLayout();
 
@@ -443,8 +486,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		fl_controlsPanel.setHgap(3);
 
 		fl_controlsPanel.setAlignment(FlowLayout.RIGHT);
-
-		message_Panel.add(controlsPanel, BorderLayout.NORTH);
 
 		cmbCores = new JComboBox<String>();
 
@@ -475,48 +516,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		btn_Msg_Save.setBorderPainted(false);
 
 		controlsPanel.add(btn_Msg_Save);
-
-		ProcMSGPanel = new JPanel();
-
-		ProcMSGPanel.setBorder(
-				new TitledBorder(null, "Processor Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-		ProcMSGPanel.setPreferredSize(new Dimension(10, 200));
-
-		message_Panel.add(ProcMSGPanel, BorderLayout.CENTER);
-
-		ProcMSGPanel.setLayout(new BorderLayout(0, 0));
-
-		scrl_Proc_Msg_Pane = VPXComponentFactory.createJScrollPane();
-
-		ProcMSGPanel.add(scrl_Proc_Msg_Pane);
-
-		txtP_Proc_Msg_Display = VPXComponentFactory.createJTextPane(VPXConstants.PROCESSOR_MESSAGE_DISPLAY_DOCUMENT);
-
-		txtP_Proc_Msg_Display.setEditable(false);
-
-		scrl_Proc_Msg_Pane.setViewportView(txtP_Proc_Msg_Display);
-
-		UserMSGPanel = new JPanel();
-
-		UserMSGPanel
-				.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
-
-		message_Panel.add(UserMSGPanel, BorderLayout.SOUTH);
-
-		UserMSGPanel.setLayout(new BorderLayout(0, 0));
-
-		scrl_User_Msg_Pane = VPXComponentFactory.createJScrollPane();
-
-		UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
-
-		txtP_User_Msg_Display = VPXComponentFactory.createJTextPane(VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT);
-
-		txtP_User_Msg_Display.setEditable(false);
-
-		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
 	}
 
 	private void loadMessageStyles() {

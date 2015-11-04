@@ -15,6 +15,9 @@ import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.view.VPX_ETHWindow;
+import javax.swing.UIManager;
+import java.awt.Color;
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_BISTLauncher extends JDialog {
 
@@ -65,7 +68,7 @@ public class VPX_BISTLauncher extends JDialog {
 
 		setResizable(false);
 
-		setBounds(100, 100, 281, 248);
+		setBounds(100, 100, 280, 220);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -76,23 +79,14 @@ public class VPX_BISTLauncher extends JDialog {
 	private void loadComponents() {
 
 		contentPanel.setBorder(
-				new TitledBorder(null, "Processors List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+				new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Select Processors to start BIST", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-
-		contentPanel.setLayout(null);
-
-		JLabel lblNewLabel_1 = new JLabel("Select Processors to start BIST");
-
-		lblNewLabel_1.setBounds(10, 12, 190, 23);
-
-		contentPanel.add(lblNewLabel_1);
+		contentPanel.setLayout(new MigLayout("", "[83px][162px]", "[24px][23px][23px][23px]"));
 
 		JComboBox comboBox = new JComboBox();
 
-		comboBox.setBounds(103, 47, 162, 23);
-
-		contentPanel.add(comboBox);
+		contentPanel.add(comboBox, "cell 1 0,grow");
 
 		JCheckBox chckbxNewCheckBox = new JCheckBox("P2020");
 
@@ -100,27 +94,19 @@ public class VPX_BISTLauncher extends JDialog {
 
 		chckbxNewCheckBox.setSelected(true);
 
-		chckbxNewCheckBox.setBounds(103, 82, 97, 23);
-
-		contentPanel.add(chckbxNewCheckBox);
+		contentPanel.add(chckbxNewCheckBox, "cell 1 1,alignx left,aligny top");
 
 		JCheckBox chckbxNewCheckBox_1 = new JCheckBox("DSP 1");
 
-		chckbxNewCheckBox_1.setBounds(103, 117, 97, 23);
-
-		contentPanel.add(chckbxNewCheckBox_1);
+		contentPanel.add(chckbxNewCheckBox_1, "cell 1 2,alignx left,aligny top");
 
 		JCheckBox chckbxNewCheckBox_2 = new JCheckBox("DSP 2");
 
-		chckbxNewCheckBox_2.setBounds(103, 152, 97, 23);
-
-		contentPanel.add(chckbxNewCheckBox_2);
+		contentPanel.add(chckbxNewCheckBox_2, "cell 1 3,alignx left,aligny top");
 
 		JLabel lblSubSystems = new JLabel("Sub Systems");
 
-		lblSubSystems.setBounds(10, 46, 83, 23);
-
-		contentPanel.add(lblSubSystems);
+		contentPanel.add(lblSubSystems, "cell 0 0,grow");
 
 		JPanel buttonPane = new JPanel();
 

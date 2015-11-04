@@ -54,7 +54,7 @@ public class VPX_LogFileViewPanel extends JPanel {
 
 		logFileText = new JTextArea(NUM_ROWS, NUM_COLS);
 
-		logFileText.setFont(new Font("System", Font.PLAIN, 24));
+		logFileText.setFont(new Font("Consolas", Font.PLAIN, 11));
 
 		JScrollPane textScroller = new JScrollPane(logFileText);
 
