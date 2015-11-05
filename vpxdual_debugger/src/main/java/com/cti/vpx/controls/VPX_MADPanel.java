@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
@@ -31,8 +32,11 @@ import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.commons.io.FileUtils;
+
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -102,6 +106,8 @@ public class VPX_MADPanel extends JPanel {
 	private VPX_ETHWindow parent;
 
 	private JButton btnCompileApply;
+
+	private JButton btnCompileLoad;
 
 	private JButton btnCompileClear;
 
@@ -526,6 +532,10 @@ public class VPX_MADPanel extends JPanel {
 
 		compileOutFilePanel.add(compileControlsPanel, BorderLayout.SOUTH);
 
+		btnCompileLoad = new JButton("Load from Workspace");
+
+		compileControlsPanel.add(btnCompileLoad);
+
 		btnCompileApply = new JButton("Compile");
 
 		compileControlsPanel.add(btnCompileApply);
@@ -553,6 +563,16 @@ public class VPX_MADPanel extends JPanel {
 		JButton btnCompileFinalOutFile = new JButton(new BrowseAction("Browse", txtCompilePathFinalOut));
 
 		compileFinalOutFilePanel.add(btnCompileFinalOutFile, "cell 4 0");
+
+		btnCompileLoad.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				loadCoreFilesFromWorkspace();
+
+			}
+		});
 
 		btnCompileApply.addActionListener(new ActionListener() {
 
@@ -614,6 +634,87 @@ public class VPX_MADPanel extends JPanel {
 
 			}
 		});
+
+	}
+
+	private void loadCoreFilesFromWorkspace() {
+
+		File f = null;
+
+		FilenameFilter filter = new FilenameFilter() {
+
+			public boolean accept(File file, String name) {
+				if (name.endsWith(".out")) {
+					// filters files whose extension is .out
+					return true;
+				} else {
+					return false;
+				}
+			}
+		};
+
+		String corePath = VPXSessionManager.getDSPPath() + "/"
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE);
+
+		for (int i = 0; i < 8; i++) {
+
+			f = new File(String.format("%s %d", corePath, i));
+
+			if (f.exists()) {
+
+				File[] fs = f.listFiles(filter);
+
+				if (fs.length > 0) {
+
+					switch (i) {
+
+					case 0:
+
+						txtCompilePathCore0.setText(fs[0].getAbsolutePath());
+
+						break;
+
+					case 1:
+
+						txtCompilePathCore1.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 2:
+
+						txtCompilePathCore2.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 3:
+
+						txtCompilePathCore3.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 4:
+
+						txtCompilePathCore4.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 5:
+
+						txtCompilePathCore5.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 6:
+
+						txtCompilePathCore6.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 7:
+
+						txtCompilePathCore7.setText(fs[0].getAbsolutePath());
+
+						break;
+
+					}
+
+				}
+			}
+		}
 
 	}
 
@@ -1170,6 +1271,8 @@ public class VPX_MADPanel extends JPanel {
 
 		private JScrollPane scrResult;
 
+		private FilenameFilter outFilter = null;
+
 		/**
 		 * Create the dialog.
 		 */
@@ -1350,11 +1453,114 @@ public class VPX_MADPanel extends JPanel {
 
 		private void backupOutFiles() {
 
+			String corePath = VPXSessionManager.getDSPPath() + "/"
+					+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE);
+
 			try {
+
+				getFileNameFilter();
+
+				String core0 = txtCompilePathCore0.getText().trim().replaceAll("\\\\", "/");
+				String core1 = txtCompilePathCore1.getText().trim().replaceAll("\\\\", "/");
+				String core2 = txtCompilePathCore2.getText().trim().replaceAll("\\\\", "/");
+				String core3 = txtCompilePathCore3.getText().trim().replaceAll("\\\\", "/");
+				String core4 = txtCompilePathCore4.getText().trim().replaceAll("\\\\", "/");
+				String core5 = txtCompilePathCore5.getText().trim().replaceAll("\\\\", "/");
+				String core6 = txtCompilePathCore6.getText().trim().replaceAll("\\\\", "/");
+				String core7 = txtCompilePathCore7.getText().trim().replaceAll("\\\\", "/");
+				String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
+
+				checkAndCopy(corePath, core0, 0, false);
+				checkAndCopy(corePath, core1, 1, false);
+				checkAndCopy(corePath, core2, 2, false);
+				checkAndCopy(corePath, core3, 3, false);
+				checkAndCopy(corePath, core4, 4, false);
+				checkAndCopy(corePath, core5, 5, false);
+				checkAndCopy(corePath, core6, 6, false);
+				checkAndCopy(corePath, core7, 7, false);
+				checkAndCopy(
+						VPXSessionManager.getDSPPath() + "/"
+								+ VPXUtilities
+										.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN),
+						bin, 0, true);
 
 			} catch (Exception e) {
 				VPXLogger.updateError(e);
 			}
+		}
+
+		private void checkAndCopy(String src, String dest, int coreID, boolean isBin) {
+
+			if (isBin) {
+
+				try {
+
+					FileUtils.copyFileToDirectory(new File(dest), new File(src));
+
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+
+			} else {
+
+				boolean isFound = false;
+
+				File coreFile = new File(dest);
+
+				File coreBFile = new File(src + " " + coreID);
+
+				File[] lists = coreBFile.listFiles(outFilter);
+
+				if (lists.length > 0) {
+
+					for (int i = 0; i < lists.length; i++) {
+
+						if (lists[i].equals(coreFile)) {
+
+							isFound = true;
+
+							break;
+						}
+					}
+				}
+				if (!isFound) {
+
+					try {
+
+						FileUtils.copyFileToDirectory(coreFile, coreBFile);
+
+					} catch (Exception e) {
+
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		private FilenameFilter getFileNameFilter() {
+
+			if (outFilter == null) {
+				outFilter = new FilenameFilter() {
+
+					public boolean accept(File file, String name) {
+						if (name.endsWith(".out")) {
+							// filters files whose extension is .mp3
+							return true;
+						} else {
+							return false;
+						}
+					}
+				};
+			}
+			return outFilter;
+
+		}
+
+		private boolean isSameFolder(String outFile, String workspacefolder) {
+
+			return (new File(workspacefolder)).equals((new File(outFile)).getParentFile());
+
 		}
 
 		private void openFolder() {

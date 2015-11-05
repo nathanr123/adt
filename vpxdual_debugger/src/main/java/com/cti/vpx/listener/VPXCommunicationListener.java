@@ -18,7 +18,7 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void readMemory(MemoryViewFilter filter);
 
-	public void populateMemory(int memID, long startAddress, byte[] buffer);
+	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer);
 
 	public void readPlot(MemoryViewFilter filter);
 
@@ -34,7 +34,7 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void readAmplitude(String ip);
 
-	public void populateAmplitude(String ip, float[] xAxis,float[] yAxis);
+	public void populateAmplitude(String ip, float[] xAxis, float[] yAxis);
 
 	public void sendAmplitudeInterrupt(String ip);
 }

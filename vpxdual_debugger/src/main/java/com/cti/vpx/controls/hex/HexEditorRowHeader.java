@@ -27,7 +27,6 @@
 package com.cti.vpx.controls.hex;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.AbstractListModel;
@@ -55,7 +54,7 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 	private RowHeaderListModel model;
 	private int currentFormat = HexEditor.HEX8;
 	private int currentGroup = HexEditor.HEX8;
-
+	private int curStride = 0;
 	private static final Border CELL_BORDER = BorderFactory.createEmptyBorder(0, 5, 0, 5);
 
 	/**
@@ -64,13 +63,15 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 	 * @param table
 	 *            The table displaying the hex content.
 	 */
-	public HexEditorRowHeader(long startAddress, HexTable table) {
+	public HexEditorRowHeader(long startAddress, int stride, HexTable table) {
 
 		this.table = table;
 
 		setCurrentFormat();
 
-		model = new RowHeaderListModel(startAddress);
+		this.curStride = stride;
+
+		model = new RowHeaderListModel(startAddress, stride);
 
 		setModel(model);
 
@@ -91,9 +92,46 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 		table.getModel().addTableModelListener(this);
 	}
 
-	public HexEditorRowHeader(HexTable table) {
+	public HexEditorRowHeader(long startAddress, HexTable table) {
 
-		this(0, table);
+		this.table = table;
+
+		setCurrentFormat();
+
+		int stride = 0;
+
+		if (model != null)
+			stride = model.getStride();
+
+		model = new RowHeaderListModel(startAddress, stride);
+
+		setModel(model);
+
+		setFocusable(false);
+
+		setFont(table.getFont());
+
+		setFixedCellHeight(table.getRowHeight());
+
+		setCellRenderer(new CellRenderer());
+
+		setBorder(new RowHeaderBorder());
+
+		setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+		syncRowCount(); // Initialize to initial size of table.
+
+		table.getModel().addTableModelListener(this);
+	}
+
+	public HexEditorRowHeader(HexTable table, int stride) {
+
+		this(0, stride, table);
+	}
+
+	public int getStride() {
+
+		return this.curStride;
 	}
 
 	public void addSelectionInterval(int anchor, int lead) {
@@ -172,17 +210,29 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 
 		private long start = 0;
 
+		private int stride = 0;
+
 		private int size;
 
-		public RowHeaderListModel(long startAddress) {
+		public RowHeaderListModel(long startAddress, int stride) {
 
 			this.start = startAddress;
+
+			this.stride = stride;
 
 		}
 
 		public Object getElementAt(int index) {
 
-			return "0x" + String.format("%08x", ((start) + ((index * currentGroup) * 16))).toUpperCase();
+			String str = "0x"
+					+ String.format("%08x", ((start) + ((index * currentGroup * getStrideValue()) * 16))).toUpperCase();
+
+			return str;
+		}
+
+		private int getStrideValue() {
+
+			return stride + 1;
 		}
 
 		public int getSize() {
@@ -203,6 +253,11 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 		public long getStartAddress() {
 
 			return start;
+		}
+
+		public int getStride() {
+
+			return stride;
 		}
 	}
 

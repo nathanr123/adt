@@ -93,16 +93,22 @@ import com.cti.vpx.util.VPXUtilities;
  * @author Robert Futrell
  * @version 1.0
  */
-class HexTable extends JTable {
+public class HexTable extends JTable {
 
 	private static final long serialVersionUID = 1L;
 
 	private final HexEditor hexEditor;
+
 	private Hex8 model;
+
 	int leadSelectionIndex;
+
 	int anchorSelectionIndex;
+
 	private int currRow;
+
 	private long currAddress;
+
 	private int currCol;
 
 	private ResourceBundle rBundle = VPXUtilities.getResourceBundle();
@@ -149,6 +155,7 @@ class HexTable extends JTable {
 		this(hexEditor, model);
 
 		this.parent = parnt;
+
 	}
 
 	public HexTable(HexEditor hexEditor, Hex8 model) {
@@ -161,11 +168,11 @@ class HexTable extends JTable {
 
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 
+		setAutoCreateColumnsFromModel(false);
+
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		setFont(new Font("Monospaced", Font.PLAIN, 14));
-
-		// setRowHeight(28);
 
 		setCellSelectionEnabled(true);
 
@@ -1097,42 +1104,42 @@ class HexTable extends JTable {
 		// model.setBytes(fileName); // Fires tableDataChanged event
 	}
 
-	public void open(byte[] bytes) throws IOException {
+	public void open(byte[] bytes, int stride) throws IOException {
 
 		TableModel model = getModel();
 
 		if (model instanceof Hex8) {
 
-			((Hex8) model).setBytes(bytes);
+			((Hex8) model).setBytes(bytes, stride);
 
 		} else if (model instanceof Hex16) {
-			((Hex16) model).setBytes(bytes);
+			((Hex16) model).setBytes(bytes, stride);
 
 		} else if (model instanceof Hex32) {
-			((Hex32) model).setBytes(bytes);
+			((Hex32) model).setBytes(bytes, stride);
 
 		} else if (model instanceof Hex64) {
 
-			((Hex64) model).setBytes(bytes);
+			((Hex64) model).setBytes(bytes, stride);
 
 		} else if (model instanceof SignedInt16) {
 
-			((SignedInt16) model).setBytes(bytes);
+			((SignedInt16) model).setBytes(bytes, stride);
 
 		} else if (model instanceof SignedInt32) {
 
-			((SignedInt32) model).setBytes(bytes);
+			((SignedInt32) model).setBytes(bytes, stride);
 
 		} else if (model instanceof UnSignedInt16) {
-			((UnSignedInt16) model).setBytes(bytes);
+			((UnSignedInt16) model).setBytes(bytes, stride);
 
 		} else if (model instanceof UnSignedInt32) {
 
-			((UnSignedInt32) model).setBytes(bytes);
+			((UnSignedInt32) model).setBytes(bytes, stride);
 
 		} else if (model instanceof Floating32) {
 
-			((Floating32) model).setBytes(bytes);
+			((Floating32) model).setBytes(bytes, stride);
 		}
 
 		// model.setBytes(bytes); // Fires tableDataChanged event
@@ -1200,8 +1207,12 @@ class HexTable extends JTable {
 			if (c != null) {
 				((JComponent) component).setToolTipText(String.format("<html>Address : %s<br>External : %s</html>",
 
-				("0x" + String.format("%08x", (Long.decode(c.getElementAt(row).toString()) + cols)).toUpperCase()),
-						value.toString().toUpperCase())); // For all format
+				("0x" + String
+						.format("%08x",
+								(Long.decode(c.getElementAt(row).toString()) + getColsWithStride(cols, c.getStride())))
+						.toUpperCase()), value.toString().toUpperCase())); // For
+																			// all
+																			// format
 			}
 		}
 
@@ -1210,6 +1221,11 @@ class HexTable extends JTable {
 
 		return component;
 
+	}
+
+	private int getColsWithStride(int col, int stride) {
+
+		return col * (stride + 1);
 	}
 
 	protected void processKeyEvent(java.awt.event.KeyEvent e) {

@@ -1910,7 +1910,7 @@ public class VPXUtilities {
 		FileUtils.forceMkdir(new File(rootPath + "/"
 				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/"
 				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP) + "/"
-				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_PROCESSOR_BIN)));
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN)));
 
 		// DSP core folders
 		for (int i = 0; i < 8; i++) {

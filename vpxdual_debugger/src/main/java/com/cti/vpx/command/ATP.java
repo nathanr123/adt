@@ -166,6 +166,19 @@ public interface ATP {
 	public static final long C7_L2SRAM_START_ADDRESS = 0x17800000l;
 
 	public static final long C7_L2SRAM_END_ADDRESS = 0x1787FFFFl;
+	
+	
+	/*
+	 * #define MSMC_START_ADDRESS	0x0C000000
+	#define MSMC_END_ADDRESS	0x0C3FFFFF
+
+	#define DDR3_START_ADDRESS 	0x80000000
+	#define DDR3_END_ADDRESS	0xBFFFFFFF
+
+
+	#define C0_L2SRAM_START_ADDRESS		0x00800000
+	#define C0_L2SRAM_END_ADDRESS		0x0087FFFF
+	 */
 
 	// Endianess ByteOrder
 	public static final ByteOrder BYTEORDER_P2020 = ByteOrder.BIG_ENDIAN;

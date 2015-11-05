@@ -1579,8 +1579,7 @@ public class VPX_ETHWindow extends JFrame
 
 			File file = fileDialog.getSelectedFile();
 
-			vpx_Content_Tabbed_Pane_Right.addTab(file.getName(),
-					new VPX_LogFileViewPanel(file));
+			vpx_Content_Tabbed_Pane_Right.addTab(file.getName(), new VPX_LogFileViewPanel(file));
 
 			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -1852,7 +1851,6 @@ public class VPX_ETHWindow extends JFrame
 
 	public void startBist() {
 
-
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -1861,7 +1859,7 @@ public class VPX_ETHWindow extends JFrame
 				bistWindow.showBISTWindow();
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem());
-				
+
 				VPXLogger.updateLog("Built in Self Test Completed");
 
 			}
@@ -1869,7 +1867,6 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
-	
 	}
 
 	public void setReboot(String ip, int processor, int flashdevice, int page) {
@@ -1931,7 +1928,7 @@ public class VPX_ETHWindow extends JFrame
 		th.start();
 
 	}
-	
+
 	public void showExecution() {
 
 		Thread th = new Thread(new Runnable() {
@@ -2310,7 +2307,7 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
-	public void populateMemory(int memID, long startAddress, byte[] buffer) {
+	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer) {
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -2319,7 +2316,7 @@ public class VPX_ETHWindow extends JFrame
 
 					if (memoryBrowserWindow[memID].isVisible()) {
 
-						memoryBrowserWindow[memID].setBytes(startAddress, buffer);
+						memoryBrowserWindow[memID].setBytes(startAddress, stride, buffer);
 
 						// memoryBrowserWindow[memID].setVisible(true);
 					}

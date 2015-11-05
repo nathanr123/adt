@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -176,7 +177,7 @@ public class SignedInt16 extends AbstractTableModel {
 		// & with 0xff to convert to unsigned
 
 		byte[] b = doc.getByteByGroup(pos, 2, false);
-		
+
 		return new BigInteger(b).intValue();
 
 	}
@@ -258,11 +259,29 @@ public class SignedInt16 extends AbstractTableModel {
 		this.doc = buff;
 	}
 
-	public void setBytes(byte[] bytes) throws IOException {
+	public void setBytes(byte[] bytes, int stride) throws IOException {
 		doc = new ByteBuffer(bytes);
 		undoManager.discardAllEdits();
+		setColumnHeaders(stride);
 		fireTableDataChanged();
 		editor.fireHexEditorEvent(0, doc.getSize(), 0);
+	}
+
+	private void setColumnHeaders(int stride) {
+
+		TableColumnModel header = editor.getTable().getTableHeader().getColumnModel();
+		int j = 0;
+
+		for (int i = 0; i < 16; i++) {
+
+			columnNames[i] = Integer.toHexString(j).toUpperCase();
+
+			header.getColumn(i).setHeaderValue(columnNames[i]);
+
+			j = j + (stride + 1);
+		}
+
+		editor.setShowColumnHeader(true);
 	}
 
 	/**
@@ -310,7 +329,7 @@ public class SignedInt16 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		
+
 		String val = String.format("%04x", Integer.parseInt(value.toString()));
 
 		byte[] bArr = new byte[2];
@@ -326,11 +345,11 @@ public class SignedInt16 extends AbstractTableModel {
 		bi = new BigInteger(bArr);
 
 		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, bi.longValue());
-		
+
 		fireTableCellUpdated(row, col);
 
 		editor.fireHexEditorEvent(offset, 2, 2);
-		
+
 	}
 
 	/**

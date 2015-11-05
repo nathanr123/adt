@@ -689,7 +689,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		byte[] b = { 0 };
 
-		setBytes(0, b);
+		setBytes(0, 0, b);
 
 		applyFilters();
 
@@ -996,6 +996,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		if (isSelectedProcessorValid && isSelectedCoreValid && isAddressValid && isLengthValid) {
 
 			createFilters();
+
+			hexPanel.getHexEditor().setCurrentStride(Integer.parseInt(memoryFilter.getMemoryStride()));
 
 			parent.readMemory(memoryFilter);
 
@@ -1344,11 +1346,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 				length, newValue);
 	}
 
-	public void setBytes(long startAddress, byte[] buf) {
+	public void setBytes(long startAddress, int stride, byte[] buf) {
 
 		closeLoadProcessingWindow();
 
-		hexPanel.setBytes(startAddress, buf);
+		hexPanel.setBytes(startAddress, stride, buf);
 	}
 
 	private void showLoadProcessingWindow(String msg) {

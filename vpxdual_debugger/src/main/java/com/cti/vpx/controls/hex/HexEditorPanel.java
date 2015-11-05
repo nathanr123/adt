@@ -258,7 +258,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		} else if (source == rowHeaderCB) {
 
-			editor.setShowRowHeader(0, rowHeaderCB.isSelected());
+			editor.setShowRowHeader(0, 0, rowHeaderCB.isSelected());
 
 		} else if (source == showGridCB) {
 
@@ -541,12 +541,12 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		return text;
 	}
 
-	public void handleRecievedBuffer(byte[] bytes) {
+	public void handleRecievedBuffer(byte[] bytes,int stride) {
 
 		try {
 
 			if (bytes.length > 0) { // In a jar
-				editor.open(bytes);
+				editor.open(bytes,stride);
 
 			} else { // In a jar
 				throw new IOException("byte array is not valid");
@@ -561,10 +561,10 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		}
 	}
 
-	public void setBytes(long startAddress, byte[] buffer) {
+	public void setBytes(long startAddress, int stride, byte[] buffer) {
 		try {
-			editor.open(buffer);
-			editor.setShowRowHeader(startAddress, true);
+			editor.open(buffer, stride);
+			editor.setShowRowHeader(startAddress, stride, true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -589,7 +589,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 					editor.open(fileName);
 
 					editor.setShowRowHeader(
-							(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress),
+							(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress), 0,
 							true);
 				} else { // In a jar
 					throw new IOException("Resource not found: " + fileName);

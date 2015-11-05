@@ -214,7 +214,7 @@ public class VPXConstants {
 
 		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE = "folder.workspace.subsystem.dsp.core";
 
-		public static final String FOLDER_WORKSPACE_SUBSYSTEM_PROCESSOR_BIN = "folder.workspace.subsystem.processor.bin";
+		public static final String FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN = "folder.workspace.subsystem.processor.bin";
 
 	}
 

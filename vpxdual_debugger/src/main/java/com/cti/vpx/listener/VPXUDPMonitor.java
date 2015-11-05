@@ -43,7 +43,7 @@ public class VPXUDPMonitor {
 
 	VPXUDPListener listener;
 
-	VPX_ETHWindow logger;
+	VPX_ETHWindow parent;
 
 	private static VPXSubnetFilter subnet = null;
 
@@ -148,11 +148,11 @@ public class VPXUDPMonitor {
 		createDefaultMonitors();
 	}
 
-	public VPXUDPMonitor(VPXUDPListener parent) throws Exception {
+	public VPXUDPMonitor(VPXUDPListener prent) throws Exception {
 
-		this.listener = parent;
+		this.listener = prent;
 
-		logger = ((VPX_ETHWindow) listener);
+		parent = ((VPX_ETHWindow) listener);
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
 
@@ -1265,7 +1265,8 @@ public class VPXUDPMonitor {
 					System.arraycopy(memoryBuff3, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
 				}
 
-				logger.populateMemory(index, msg.params.memoryinfo.address.get(), bb);
+				parent.populateMemory(index, msg.params.memoryinfo.address.get(),
+						(int) msg.params.memoryinfo.stride.get(), bb);
 
 			}
 		} catch (Exception e) {
@@ -1569,7 +1570,7 @@ public class VPXUDPMonitor {
 
 				}
 
-				logger.populatePlot(index, lineid, msg.params.memoryinfo.address.get(), bb);
+				parent.populatePlot(index, lineid, msg.params.memoryinfo.address.get(), bb);
 
 			}
 		} catch (Exception e) {
@@ -1658,7 +1659,7 @@ public class VPXUDPMonitor {
 
 		}
 
-		logger.populateWaterfall(ip, b);
+		parent.populateWaterfall(ip, b);
 
 	}
 
@@ -2141,19 +2142,19 @@ public class VPXUDPMonitor {
 
 				sendClose(vpxSubSystem.getIpP2020(), PROCESSOR_LIST.PROCESSOR_P2020);
 
-				logger.updateExit(i++);
+				parent.updateExit(i++);
 
 				Thread.sleep(150);
 
 				sendClose(vpxSubSystem.getIpDSP1(), PROCESSOR_LIST.PROCESSOR_DSP1);
 
-				logger.updateExit(i++);
+				parent.updateExit(i++);
 
 				Thread.sleep(150);
 
 				sendClose(vpxSubSystem.getIpDSP2(), PROCESSOR_LIST.PROCESSOR_DSP2);
 
-				logger.updateExit(i++);
+				parent.updateExit(i++);
 
 				Thread.sleep(150);
 
@@ -2175,7 +2176,7 @@ public class VPXUDPMonitor {
 
 				}
 
-				logger.updateExit(i++);
+				parent.updateExit(i++);
 
 				Thread.sleep(150);
 
@@ -2184,14 +2185,14 @@ public class VPXUDPMonitor {
 			VPXLogger.updateError(e);
 		}
 
-		logger.updateExit(-1);
+		parent.updateExit(-1);
 	}
 
 	public void addUDPListener(VPXUDPListener udpListener) {
 
 		this.listener = udpListener;
 
-		logger = ((VPX_ETHWindow) listener);
+		parent = ((VPX_ETHWindow) listener);
 
 	}
 
@@ -2441,9 +2442,9 @@ public class VPXUDPMonitor {
 					Thread.sleep(500);
 
 				} catch (Exception e) {
-					
+
 					VPXLogger.updateError(e);
-					
+
 					e.printStackTrace();
 				}
 			}

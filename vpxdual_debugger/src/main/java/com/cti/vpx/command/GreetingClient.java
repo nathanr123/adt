@@ -190,20 +190,20 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 				// getWaterFall();
 
-				//getAmplitude();
+				// getAmplitude();
 				startTFTP("172.17.10.1");
-				
+
 				try {
 					VPXTFTPMonitor tft = new VPXTFTPMonitor(new File("D:/tftp"), VPXTFTPMonitor.ServerMode.GET_ONLY);
-					
-					//tft.startTFTPServer();
-					
+
+					// tft.startTFTPServer();
+
 					tft.setProgressWindow(new VPX_FlashProgressWindow(null));
-					
+
 					tft.setTotalPackets(19);
-					
+
 				} catch (IOException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			}
@@ -1252,7 +1252,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	}
 
 	@Override
-	public void populateMemory(int memID, long startAddress, byte[] buffer) {
+	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer) {
 		// TODO Auto-generated method stub
 
 	}

@@ -62,7 +62,7 @@ public class HexEditorDemoApp extends JFrame {
 	}
 	
 	public void setBytes(int startAddress,byte[] buf){
-		cp.setBytes(startAddress,buf);
+		cp.setBytes(startAddress,0,buf);
 	}
 
 	/**

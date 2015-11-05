@@ -168,6 +168,18 @@ public class VPXSessionManager {
 		return currentWorkspacePath;
 	}
 
+	public static String getSubSystemPath() {
+
+		return getAsFullPath(currentWorkspacePath,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM));
+	}
+
+	public static String getDSPPath() {
+
+		return getAsFullPath(getSubSystemPath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP));
+	}
+
 	public static String getLogPath() {
 
 		return getAsFullPath(currentWorkspacePath,

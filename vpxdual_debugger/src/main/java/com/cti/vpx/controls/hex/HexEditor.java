@@ -130,6 +130,8 @@ public class HexEditor extends JScrollPane {
 
 	public int currentMode = HEX8;
 
+	public int currentStride = 0;
+
 	private HexTable table;
 
 	private boolean alternateRowBG;
@@ -177,7 +179,7 @@ public class HexEditor extends JScrollPane {
 
 		setShowColumnHeader(true);
 
-		setShowRowHeader(0, true);
+		setShowRowHeader(0, 0, true);
 
 		setAlternateRowBG(false);
 
@@ -308,9 +310,13 @@ public class HexEditor extends JScrollPane {
 
 		table.setCheckedSelectedFormat(currentMode);
 
-		setShowRowHeader(getHexEditorRowHeader().getRowHeaderModel().getStartAddress(), true);
+		setShowRowHeader(getHexEditorRowHeader().getRowHeaderModel().getStartAddress(), currentStride, true);
 	}
 
+	public void setCurrentStride(int stride){
+		this.currentStride = stride;
+	}
+	
 	private ByteBuffer getByteBuffer(TableModel model) {
 
 		ByteBuffer bb = null;
@@ -582,7 +588,7 @@ public class HexEditor extends JScrollPane {
 	 *
 	 * @return The table.
 	 */
-	HexTable getTable() {
+	public HexTable getTable() {
 		return table;
 	}
 
@@ -617,8 +623,8 @@ public class HexEditor extends JScrollPane {
 		table.open(fileName);
 	}
 
-	public void open(byte[] bytes) throws IOException {
-		table.open(bytes);
+	public void open(byte[] bytes, int stride) throws IOException {
+		table.open(bytes, stride);
 	}
 
 	/**
@@ -862,6 +868,20 @@ public class HexEditor extends JScrollPane {
 			table.setShowGrid(show);
 			firePropertyChange(PROPERTY_SHOW_GRID, !show, show);
 		}
+	}
+
+	/**
+	 * Toggles whether table's row header is visible.
+	 *
+	 * @param show
+	 *            Whether to show the table row header.
+	 * @see #setShowColumnHeader(boolean)
+	 */
+	public void setShowRowHeader(long startAddress, int stride, boolean show) {
+
+		rowHeader = show ? new HexEditorRowHeader(startAddress, stride, table) : null;
+
+		setRowHeaderView(rowHeader);
 	}
 
 	/**
