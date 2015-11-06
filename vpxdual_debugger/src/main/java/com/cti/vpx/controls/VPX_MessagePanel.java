@@ -432,27 +432,6 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		add(message_Panel);
 		message_Panel.setLayout(new GridLayout(2, 1, 0, 0));
 
-		UserMSGPanel = new JPanel();
-
-		UserMSGPanel
-				.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
-
-		message_Panel.add(UserMSGPanel);
-
-		UserMSGPanel.setLayout(new BorderLayout(0, 0));
-
-		scrl_User_Msg_Pane = VPXComponentFactory.createJScrollPane();
-
-		UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
-
-		txtP_User_Msg_Display = VPXComponentFactory.createJTextPane(VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT);
-
-		txtP_User_Msg_Display.setEditable(false);
-
-		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
-
 		ProcMSGPanel = new JPanel();
 
 		ProcMSGPanel.setBorder(
@@ -473,6 +452,27 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		txtP_Proc_Msg_Display.setEditable(false);
 
 		scrl_Proc_Msg_Pane.setViewportView(txtP_Proc_Msg_Display);
+
+		UserMSGPanel = new JPanel();
+
+		UserMSGPanel
+				.setBorder(new TitledBorder(null, "User Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		UserMSGPanel.setPreferredSize(new Dimension(10, 250));
+
+		message_Panel.add(UserMSGPanel);
+
+		UserMSGPanel.setLayout(new BorderLayout(0, 0));
+
+		scrl_User_Msg_Pane = VPXComponentFactory.createJScrollPane();
+
+		UserMSGPanel.add(scrl_User_Msg_Pane, BorderLayout.CENTER);
+
+		txtP_User_Msg_Display = VPXComponentFactory.createJTextPane(VPXConstants.USER_MESSAGE_DISPLAY_DOCUMENT);
+
+		txtP_User_Msg_Display.setEditable(false);
+
+		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
 
 		controlsPanel = new JPanel();
 		add(controlsPanel, BorderLayout.NORTH);
@@ -621,21 +621,28 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	public void updateProcessorMessage(String ip, MSGCommand msg) {
 
-		String procs = "";
+		try {
 
-		if (ip.equals(VPXSessionManager.getCurrentProcessor())) {
+			String procs = "";
 
-			procs = VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType();
+			if (ip.equals(VPXSessionManager.getCurrentProcessor())) {
 
-			if (!VPXSessionManager.getCurrentProcType().contains("P2020")) {
+				procs = VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType();
 
-				procs = procs + " Core " + msg.core.get();
+				if (!VPXSessionManager.getCurrentProcType().contains("P2020")) {
+
+					procs = procs + " Core " + msg.core.get();
+				}
+
+				updateProcessorMessage(procs + " : \n", proc_From_Style);
+
+				updateProcessorMessage("  " + msg.command_msg + "\n\n", proc_Msg_Style);
+
 			}
 
-			updateProcessorMessage(procs + " : \n", proc_From_Style);
+		} catch (Exception e) {
 
-			updateProcessorMessage("  " + msg.command_msg + "\n\n", proc_Msg_Style);
-
+			e.printStackTrace();
 		}
 	}
 

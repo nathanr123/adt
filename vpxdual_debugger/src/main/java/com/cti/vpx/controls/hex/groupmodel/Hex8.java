@@ -330,7 +330,7 @@ public class Hex8 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
-		byte b = (byte) Integer.parseInt((String) value, 16);
+		byte b = (byte) Integer.parseInt(value.toString(), 16);
 
 		int offset = editor.cellToOffset(row, col);
 

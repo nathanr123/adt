@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
@@ -34,8 +35,11 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.commons.io.FileUtils;
+
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -123,6 +127,12 @@ public class VPX_FlashWizardWindow extends JDialog {
 	protected JLabel lblConfigDummyOutFile;
 
 	protected JButton btnConfigBrowseDummyOut;
+
+	private FilenameFilter outFilter = null;
+
+	private VPX_FlashProgressWindow dialog;
+	private JButton btnLoadWorkspace;
+	private JButton btnBackup;
 
 	/**
 	 * Launch the application.
@@ -252,7 +262,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 		introPanel
 				.setBorder(new TitledBorder(null, "Introduction", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		//introPanel.setPreferredSize(new Dimension(800, 500));
+		// introPanel.setPreferredSize(new Dimension(800, 500));
 
 		introPanel.setLayout(new BorderLayout(0, 0));
 
@@ -556,7 +566,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 		compilePanel.add(compileOutFilePanel, BorderLayout.SOUTH);
 
 		compileOutFilePanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel compileFinalOutFilePanel = new JPanel();
 
 		compileOutFilePanel.add(compileFinalOutFilePanel, BorderLayout.CENTER);
@@ -601,19 +611,11 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		controlsPanel.setLayout(new BorderLayout(0, 0));
 
-		JPanel emptyPanel = new JPanel();
-
-		emptyPanel.setPreferredSize(new Dimension(150, 10));
-
-		controlsPanel.add(emptyPanel, BorderLayout.WEST);
-
 		JPanel navigationPanel = new JPanel();
 
 		FlowLayout fl_navigationPanel = (FlowLayout) navigationPanel.getLayout();
 
 		fl_navigationPanel.setVgap(12);
-
-		fl_navigationPanel.setAlignment(FlowLayout.LEFT);
 
 		controlsPanel.add(navigationPanel, BorderLayout.CENTER);
 
@@ -695,6 +697,47 @@ public class VPX_FlashWizardWindow extends JDialog {
 			}
 		});
 
+		btnLoadWorkspace = new JButton("Load from workspace");
+		
+		btnLoadWorkspace.setEnabled(false);
+
+		btnLoadWorkspace.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				loadCoreFilesFromWorkspace();
+
+			}
+		});
+
+		navigationPanel.add(btnLoadWorkspace);
+
+		btnBackup = new JButton("Backup");
+		
+		btnBackup.setEnabled(false);
+
+		btnBackup.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				Thread th = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+
+						backupOutFiles();
+
+					}
+				});
+
+				th.start();
+			}
+		});
+
+		navigationPanel.add(btnBackup);
+
 		navigationPanel.add(btnOpenFolder);
 
 		btnClose = new JButton("Close");
@@ -710,6 +753,209 @@ public class VPX_FlashWizardWindow extends JDialog {
 		});
 
 		navigationPanel.add(btnClose);
+
+	}
+
+	private void loadCoreFilesFromWorkspace() {
+
+		File f = null;
+
+		FilenameFilter filter = new FilenameFilter() {
+
+			public boolean accept(File file, String name) {
+				if (name.endsWith(".out")) {
+					// filters files whose extension is .out
+					return true;
+				} else {
+					return false;
+				}
+			}
+		};
+
+		String corePath = VPXSessionManager.getDSPPath() + "/"
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE);
+
+		for (int i = 0; i < 8; i++) {
+
+			f = new File(String.format("%s %d", corePath, i));
+
+			if (f.exists()) {
+
+				File[] fs = f.listFiles(filter);
+
+				if (fs.length > 0) {
+
+					switch (i) {
+
+					case 0:
+
+						txtCompilePathCore0.setText(fs[0].getAbsolutePath());
+
+						break;
+
+					case 1:
+
+						txtCompilePathCore1.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 2:
+
+						txtCompilePathCore2.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 3:
+
+						txtCompilePathCore3.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 4:
+
+						txtCompilePathCore4.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 5:
+
+						txtCompilePathCore5.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 6:
+
+						txtCompilePathCore6.setText(fs[0].getAbsolutePath());
+
+						break;
+					case 7:
+
+						txtCompilePathCore7.setText(fs[0].getAbsolutePath());
+
+						break;
+
+					}
+
+				}
+			}
+		}
+
+	}
+
+	private void backupOutFiles() {
+
+		dialog = new VPX_FlashProgressWindow();
+
+		dialog.setRangePackets(1, 9);
+
+		dialog.setVisible(true);
+
+		String corePath = VPXSessionManager.getDSPPath() + "/"
+				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE);
+
+		try {
+
+			getFileNameFilter();
+
+			String core0 = txtCompilePathCore0.getText().trim().replaceAll("\\\\", "/");
+			String core1 = txtCompilePathCore1.getText().trim().replaceAll("\\\\", "/");
+			String core2 = txtCompilePathCore2.getText().trim().replaceAll("\\\\", "/");
+			String core3 = txtCompilePathCore3.getText().trim().replaceAll("\\\\", "/");
+			String core4 = txtCompilePathCore4.getText().trim().replaceAll("\\\\", "/");
+			String core5 = txtCompilePathCore5.getText().trim().replaceAll("\\\\", "/");
+			String core6 = txtCompilePathCore6.getText().trim().replaceAll("\\\\", "/");
+			String core7 = txtCompilePathCore7.getText().trim().replaceAll("\\\\", "/");
+			String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
+
+			dialog.updatePackets(1, core0);
+			checkAndCopy(corePath, core0, 0, false);
+			dialog.updatePackets(2, core1);
+			checkAndCopy(corePath, core1, 1, false);
+			dialog.updatePackets(3, core2);
+			checkAndCopy(corePath, core2, 2, false);
+			dialog.updatePackets(4, core3);
+			checkAndCopy(corePath, core3, 3, false);
+			dialog.updatePackets(5, core4);
+			checkAndCopy(corePath, core4, 4, false);
+			dialog.updatePackets(6, core5);
+			checkAndCopy(corePath, core5, 5, false);
+			dialog.updatePackets(7, core6);
+			checkAndCopy(corePath, core6, 6, false);
+			dialog.updatePackets(8, core7);
+			checkAndCopy(corePath, core7, 7, false);
+			dialog.updatePackets(9, bin);
+			checkAndCopy(
+					VPXSessionManager.getDSPPath() + "/"
+							+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN),
+					bin, 0, true);
+
+		} catch (Exception e) {
+			VPXLogger.updateError(e);
+		}
+	}
+
+	private void checkAndCopy(String src, String dest, int coreID, boolean isBin) {
+
+		if (isBin) {
+
+			try {
+
+				FileUtils.copyFileToDirectory(new File(dest), new File(src));
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+
+		} else {
+
+			boolean isFound = false;
+
+			File coreFile = new File(dest);
+
+			File coreBFile = new File(src + " " + coreID);
+
+			File[] lists = coreBFile.listFiles(outFilter);
+
+			if (lists.length > 0) {
+
+				for (int i = 0; i < lists.length; i++) {
+
+					if (lists[i].equals(coreFile)) {
+
+						isFound = true;
+
+						break;
+					}
+				}
+			}
+			if (!isFound) {
+
+				try {
+
+					FileUtils.cleanDirectory(coreBFile);
+
+					FileUtils.copyFileToDirectory(coreFile, coreBFile);
+
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private FilenameFilter getFileNameFilter() {
+
+		if (outFilter == null) {
+			outFilter = new FilenameFilter() {
+
+				public boolean accept(File file, String name) {
+					if (name.endsWith(".out")) {
+						// filters files whose extension is .mp3
+						return true;
+					} else {
+						return false;
+					}
+				}
+			};
+		}
+		return outFilter;
 
 	}
 
@@ -796,6 +1042,10 @@ public class VPX_FlashWizardWindow extends JDialog {
 		btnClearFields.setEnabled(false);
 
 		btnOpenFolder.setEnabled(false);
+		
+		btnLoadWorkspace.setEnabled(false);
+		
+		btnBack.setEnabled(false);
 
 		btnBack.setEnabled(false);
 

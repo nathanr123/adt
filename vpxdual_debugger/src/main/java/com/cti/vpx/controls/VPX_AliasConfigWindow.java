@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
@@ -303,50 +302,48 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		});
 
 		alaisTable.getColumnModel().getColumn(0).setResizable(false);
+
 		alaisTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+
 		alaisTable.getColumnModel().getColumn(0).setMinWidth(50);
+
 		alaisTable.getColumnModel().getColumn(0).setMaxWidth(50);
 
 		alaisTable.getColumnModel().getColumn(1).setResizable(false);
+
 		alaisTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+
 		alaisTable.getColumnModel().getColumn(1).setMinWidth(200);
 
 		alaisTable.getColumnModel().getColumn(1).setMaxWidth(200);
+
 		alaisTable.getColumnModel().getColumn(2).setResizable(false);
+
 		alaisTable.getColumnModel().getColumn(2).setPreferredWidth(105);
+
 		alaisTable.getColumnModel().getColumn(2).setMinWidth(105);
+
 		alaisTable.getColumnModel().getColumn(2).setMaxWidth(105);
 
 		alaisTable.getColumnModel().getColumn(3).setResizable(false);
+
 		alaisTable.getColumnModel().getColumn(3).setPreferredWidth(105);
+
 		alaisTable.getColumnModel().getColumn(3).setMinWidth(105);
+
 		alaisTable.getColumnModel().getColumn(3).setMaxWidth(105);
 
 		alaisTable.getColumnModel().getColumn(4).setResizable(false);
+
 		alaisTable.getColumnModel().getColumn(4).setPreferredWidth(105);
+
 		alaisTable.getColumnModel().getColumn(4).setMinWidth(105);
+
 		alaisTable.getColumnModel().getColumn(4).setMaxWidth(105);
 
 		aliasTableScrollPanel.setViewportView(alaisTable);
 
 		aliasTableScrollPanel.getViewport().setBackground(Color.WHITE);
-
-		// loadToolBar();
-	}
-
-	private void loadToolBar() {
-
-		JToolBar aliasToolbar = VPXComponentFactory.createJToolBar();
-
-		aliasToolbar.setFloatable(false);
-
-		contentPane.add(aliasToolbar, BorderLayout.NORTH);
-
-		aliasToolbar.add(VPXComponentFactory
-				.createJToolBarButton(new ImportAliasFileAction("Import", VPXConstants.Icons.ICON_DOWNLOAD)), null);
-
-		aliasToolbar.add(VPXComponentFactory
-				.createJToolBarButton(new ExportAliasFileAction("Export", VPXConstants.Icons.ICON_UPLOAD)), null);
 
 	}
 
@@ -466,11 +463,15 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		boolean isValidName = (txtAliasName.getText().length() >= 3) ? VPXUtilities.isValidName(txtAliasName.getText())
 				: false;
 
+		String dsp1 = txtDSP1.getText().trim();
+
+		String dsp2 = txtDSP2.getText().trim();
+
 		boolean isValidP2020 = VPXUtilities.isValidIP(txtP2020.getText());
 
-		boolean isValidDSP1 = VPXUtilities.isValidIP(txtDSP1.getText());
+		boolean isValidDSP1 = (dsp1.length() == 0) ? true : VPXUtilities.isValidIP(txtDSP1.getText());
 
-		boolean isValidDSP2 = VPXUtilities.isValidIP(txtDSP2.getText());
+		boolean isValidDSP2 = (dsp2.length() == 0) ? true : VPXUtilities.isValidIP(txtDSP2.getText());
 
 		if (isValidName && isValidP2020 && isValidDSP1 && isValidDSP2) {
 
@@ -965,13 +966,7 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (VPXUtilities.writetoXLSFile(aliasTableModel.getSubSystem())) {
 
-				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Exported successfully!");
-			} else {
-				JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in Exporting ", "Export VPX System",
-						JOptionPane.ERROR_MESSAGE);
-			}
 		}
 	}
 

@@ -334,13 +334,13 @@ public class Floating32 extends AbstractTableModel {
 
 		byte[] bArr = new byte[4];
 
-		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
-		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
 
-		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
 
-		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
 
 		int offset = editor.cellToOffset(row, col) * 4;
 

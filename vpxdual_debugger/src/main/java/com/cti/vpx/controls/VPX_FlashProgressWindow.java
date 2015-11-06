@@ -59,6 +59,14 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	}
 
+	public VPX_FlashProgressWindow() {
+
+		init();
+
+		loadComponents();
+
+	}
+
 	private void init() {
 
 		setTitle("Flash Out File");
@@ -116,6 +124,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	public void updatePackets(long curpacket) {
 
+		setTitle("Backup Out files and Bin file");
+
 		if (curpacket == 1) {
 
 			lblFlashing.setText("Transferring File");
@@ -138,6 +148,32 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 			flashFile();
 
+		}
+
+		lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - starttime)));
+	}
+
+	public void updatePackets(long curpacket, String fileName) {
+
+		if (curpacket == 1) {
+
+			lblFlashing.setText("Copying file " + fileName);
+
+			starttime = System.currentTimeMillis();
+		}
+
+		progressFileSent.setValue((int) curpacket);
+
+		if (progressFileSent.getMaximum() == curpacket) {
+
+			try {
+
+				Thread.sleep(100);
+
+			} catch (Exception e) {
+			}
+
+			this.dispose();
 		}
 
 		lblElapsedTimeVal.setText(VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - starttime)));

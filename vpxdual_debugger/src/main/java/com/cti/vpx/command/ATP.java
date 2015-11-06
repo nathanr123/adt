@@ -44,6 +44,14 @@ public interface ATP {
 
 	public static final int MSG_TYPE_AMPLITUDE_INTERRUPTED = 0xD0;
 
+	public static final int MSG_TYPE_EXECUTE_START = 0xD1;
+
+	public static final int MSG_TYPE_EXECUTE_STOP = 0xD2;
+
+	public static final int MSG_TYPE_EXECUTE_PAUSE = 0xD3;
+
+	public static final int MSG_TYPE_EXECUTE_RESUME = 0xD4;
+
 	// Result
 	public static final int TFTP_FILEMODE_LINUX = 0x00;
 
@@ -69,7 +77,7 @@ public interface ATP {
 	public static final int DATA_TYPE_SIZE_BIT16 = 0x01;
 
 	public static final int DATA_TYPE_SIZE_BIT32 = 0x02;
-	
+
 	public static final int DATA_TYPE_SIZE_BIT64 = 0x03;
 
 	// Enums
@@ -166,18 +174,15 @@ public interface ATP {
 	public static final long C7_L2SRAM_START_ADDRESS = 0x17800000l;
 
 	public static final long C7_L2SRAM_END_ADDRESS = 0x1787FFFFl;
-	
-	
+
 	/*
-	 * #define MSMC_START_ADDRESS	0x0C000000
-	#define MSMC_END_ADDRESS	0x0C3FFFFF
-
-	#define DDR3_START_ADDRESS 	0x80000000
-	#define DDR3_END_ADDRESS	0xBFFFFFFF
-
-
-	#define C0_L2SRAM_START_ADDRESS		0x00800000
-	#define C0_L2SRAM_END_ADDRESS		0x0087FFFF
+	 * #define MSMC_START_ADDRESS 0x0C000000 #define MSMC_END_ADDRESS 0x0C3FFFFF
+	 * 
+	 * #define DDR3_START_ADDRESS 0x80000000 #define DDR3_END_ADDRESS 0xBFFFFFFF
+	 * 
+	 * 
+	 * #define C0_L2SRAM_START_ADDRESS 0x00800000 #define C0_L2SRAM_END_ADDRESS
+	 * 0x0087FFFF
 	 */
 
 	// Endianess ByteOrder

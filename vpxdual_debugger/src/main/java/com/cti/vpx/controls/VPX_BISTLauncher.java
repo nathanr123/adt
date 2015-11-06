@@ -32,7 +32,9 @@ public class VPX_BISTLauncher extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 
 	private VPX_ETHWindow parent;
+	
 	private JLabel lblSubSystemName;
+	
 	private JLabel lblIPVal;
 
 	/**
@@ -63,6 +65,9 @@ public class VPX_BISTLauncher extends JDialog {
 
 	}
 	
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public VPX_BISTLauncher(VPX_ETHWindow parnt,String ip,String subSystem) {
 
 		this.parent = parnt;
@@ -163,7 +168,7 @@ public class VPX_BISTLauncher extends JDialog {
 
 		getRootPane().setDefaultButton(okButton);
 
-		JButton cancelButton = new JButton("Cancel");
+		JButton cancelButton = new JButton("Close");
 
 		cancelButton.addActionListener(new ActionListener() {
 

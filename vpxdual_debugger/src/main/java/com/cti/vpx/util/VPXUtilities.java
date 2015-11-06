@@ -60,11 +60,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATPCommand;
@@ -590,89 +585,6 @@ public class VPXUtilities {
 
 	}
 
-	public static void writeToXMLFile(VPXSystem system) {
-		try {
-
-			File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
-
-			if (!folder.exists()) {
-
-				folder.mkdir();
-			}
-
-			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
-					+ resourceBundle.getString("Scan.processor.data.xml"));
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
-
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			// output pretty printed
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-			jaxbMarshaller.marshal(system, file);
-
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static boolean writetoXLSFile(VPXSystem system) {
-
-		File folder = new File(resourceBundle.getString("Scan.processor.data.path"));
-
-		if (!folder.exists()) {
-
-			folder.mkdir();
-		}
-
-		String FILE_PATH = resourceBundle.getString("Scan.processor.data.path") + "\\" + system.getName() + ".xls";
-
-		Workbook workbook = new XSSFWorkbook();
-
-		Sheet subsystemSheet = workbook.createSheet(system.getName());
-
-		List<VPXSubSystem> subSystems = system.getSubsystem();
-
-		int rowIndex = 0;
-
-		for (VPXSubSystem subsystem : subSystems) {
-
-			Row row = subsystemSheet.createRow(rowIndex++);
-
-			int cellIndex = 0;
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getId());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getSubSystem());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getIpP2020());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP1());
-
-			row.createCell(cellIndex++).setCellValue(subsystem.getIpDSP2());
-
-		}
-
-		try {
-
-			FileOutputStream fos = new FileOutputStream(FILE_PATH);
-
-			workbook.write(fos);
-
-			workbook.close();
-
-			fos.close();
-
-			return true;
-
-		} catch (Exception e) {
-			return false;
-		}
-
-	}
-
 	public static void writeProperties() {
 		OutputStream output = null;
 		try {
@@ -879,8 +791,8 @@ public class VPXUtilities {
 
 		try {
 
-			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
-					+ resourceBundle.getString("Scan.processor.data.xml"));
+			File file = new File(
+					VPXSessionManager.getDataPath() + "/" + resourceBundle.getString("Scan.processor.data.xml"));
 
 			if (file.exists()) {
 				JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
@@ -899,90 +811,30 @@ public class VPXUtilities {
 		return cag;
 	}
 
-	public static VPXSystem readFromXLSFile() {
-
-		String FILE_PATH = "data\\VPXSystem.xls";
-
-		VPXSystem vpx = new VPXSystem();
-
-		List<VPXSubSystem> subsystems = new ArrayList<VPXSubSystem>();
-
-		FileInputStream fis = null;
-
+	public static void writeToXMLFile(VPXSystem system) {
 		try {
-			fis = new FileInputStream(FILE_PATH);
 
-			Workbook workbook = new XSSFWorkbook(fis);
+			File folder = new File(VPXSessionManager.getDataPath());
 
-			int numberOfSheets = workbook.getNumberOfSheets();
+			if (!folder.exists()) {
 
-			for (int i = 0; i < numberOfSheets; i++) {
-
-				Sheet sheet = workbook.getSheetAt(i);
-
-				Iterator<Row> rowIterator = sheet.iterator();
-
-				while (rowIterator.hasNext()) {
-
-					VPXSubSystem subsystem = new VPXSubSystem();
-
-					Row row = rowIterator.next();
-
-					Iterator<Cell> cellIterator = row.cellIterator();
-
-					while (cellIterator.hasNext()) {
-
-						Cell cell = cellIterator.next();
-
-						switch (cell.getColumnIndex()) {
-						case 0:
-
-							subsystem.setId((int) cell.getNumericCellValue());
-
-							break;
-
-						case 1:
-
-							subsystem.setSubSystem(cell.getStringCellValue());
-
-							break;
-
-						case 2:
-
-							subsystem.setIpP2020(cell.getStringCellValue());
-
-							break;
-
-						case 3:
-
-							subsystem.setIpDSP1(cell.getStringCellValue());
-
-							break;
-
-						case 4:
-
-							subsystem.setIpDSP2(cell.getStringCellValue());
-
-							break;
-						}
-
-					}
-
-					subsystems.add(subsystem);
-				}
-
+				folder.mkdir();
 			}
 
-			workbook.close();
+			File file = new File(
+					VPXSessionManager.getDataPath() + "/" + resourceBundle.getString("Scan.processor.data.xml"));
 
-			fis.close();
+			JAXBContext jaxbContext = JAXBContext.newInstance(VPXSystem.class);
 
-			vpx.setSubsystem(subsystems);
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
-			return vpx;
+			// output pretty printed
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-		} catch (Exception e) {
-			return null;
+			jaxbMarshaller.marshal(system, file);
+
+		} catch (JAXBException e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -1851,7 +1703,7 @@ public class VPXUtilities {
 
 			if (isWritable) {
 
-				root.mkdir();//FileUtils.forceMkdir(root);
+				root.mkdir();// FileUtils.forceMkdir(root);
 
 				FileUtils.forceMkdir(new File(
 						rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG)));
@@ -1907,10 +1759,10 @@ public class VPXUtilities {
 						+ "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP)));
 
 		// DSP bin folder
-		FileUtils.forceMkdir(new File(rootPath + "/"
-				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM) + "/"
-				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP) + "/"
-				+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN)));
+		FileUtils.forceMkdir(
+				new File(rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM)
+						+ "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP) + "/"
+						+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN)));
 
 		// DSP core folders
 		for (int i = 0; i < 8; i++) {

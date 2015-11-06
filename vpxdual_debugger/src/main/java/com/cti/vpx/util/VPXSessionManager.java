@@ -18,8 +18,6 @@ public class VPXSessionManager {
 
 	private static String currentWorkspacePath;
 
-	private static String currentLogFile;
-
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
 	private static VPXSystem vpxSystem = null;
@@ -178,6 +176,12 @@ public class VPXSessionManager {
 
 		return getAsFullPath(getSubSystemPath(),
 				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP));
+	}
+
+	public static String getDataPath() {
+
+		return getAsFullPath(currentWorkspacePath,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_DATA));
 	}
 
 	public static String getLogPath() {

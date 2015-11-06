@@ -526,6 +526,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void loadSystemRootNode() {
 
+		VPX_ProcessorNode p2020Node = null;
+
+		VPX_ProcessorNode dsp1Node = null;
+
+		VPX_ProcessorNode dsp2Node = null;
+
 		systemRootNode.removeAllChildren();
 
 		List<VPXSubSystem> subSystems = this.system.getSubsystem();
@@ -539,22 +545,32 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				VPX_ProcessorNode subSystemNode = new VPX_ProcessorNode(VPX_ProcessorNode.SUBSYSTEM_NODE,
 						subSystem.getSubSystem());
 
-				VPX_ProcessorNode p2020Node = new VPX_ProcessorNode(subSystem.getIpP2020(), subSystemNode.getNodeName(),
+				p2020Node = new VPX_ProcessorNode(subSystem.getIpP2020(), subSystemNode.getNodeName(),
 						PROCESSOR_LIST.PROCESSOR_P2020, false);
 
-				VPX_ProcessorNode dsp1Node = new VPX_ProcessorNode(subSystem.getIpDSP1(), subSystemNode.getNodeName(),
-						PROCESSOR_LIST.PROCESSOR_DSP1, false, false, false);
+				if (!subSystem.getIpDSP1().isEmpty())
+					dsp1Node = new VPX_ProcessorNode(subSystem.getIpDSP1(), subSystemNode.getNodeName(),
+							PROCESSOR_LIST.PROCESSOR_DSP1, false, false, false);
 
-				VPX_ProcessorNode dsp2Node = new VPX_ProcessorNode(subSystem.getIpDSP2(), subSystemNode.getNodeName(),
-						PROCESSOR_LIST.PROCESSOR_DSP2, false, false, false);
+				if (!subSystem.getIpDSP2().isEmpty())
+					dsp2Node = new VPX_ProcessorNode(subSystem.getIpDSP2(), subSystemNode.getNodeName(),
+							PROCESSOR_LIST.PROCESSOR_DSP2, false, false, false);
 
 				subSystemNode.add(p2020Node);
 
-				subSystemNode.add(dsp1Node);
+				if (dsp1Node != null)
+					subSystemNode.add(dsp1Node);
 
-				subSystemNode.add(dsp2Node);
+				if (dsp2Node != null)
+					subSystemNode.add(dsp2Node);
 
 				systemRootNode.add(subSystemNode);
+
+				p2020Node = null;
+
+				dsp1Node = null;
+
+				dsp2Node = null;
 			}
 		}
 
@@ -580,6 +596,12 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private void reload() {
 
+		VPX_ProcessorNode p2020Node = null;
+
+		VPX_ProcessorNode dsp1Node = null;
+
+		VPX_ProcessorNode dsp2Node = null;
+
 		systemRootNode.removeAllChildren();
 
 		List<VPXSubSystem> subSystems = system.getSubsystem();
@@ -595,22 +617,32 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				VPX_ProcessorNode subSystemNode = new VPX_ProcessorNode(VPX_ProcessorNode.SUBSYSTEM_NODE,
 						subSystem.getSubSystem());
 
-				VPX_ProcessorNode p2020Node = new VPX_ProcessorNode(subSystem.getIpP2020(), subSystemNode.getNodeName(),
+				p2020Node = new VPX_ProcessorNode(subSystem.getIpP2020(), subSystemNode.getNodeName(),
 						PROCESSOR_LIST.PROCESSOR_P2020, false);
 
-				VPX_ProcessorNode dsp1Node = new VPX_ProcessorNode(subSystem.getIpDSP1(), subSystemNode.getNodeName(),
-						PROCESSOR_LIST.PROCESSOR_DSP1, false, false, false);
+				if (!subSystem.getIpDSP1().isEmpty())
+					dsp1Node = new VPX_ProcessorNode(subSystem.getIpDSP1(), subSystemNode.getNodeName(),
+							PROCESSOR_LIST.PROCESSOR_DSP1, false, false, false);
 
-				VPX_ProcessorNode dsp2Node = new VPX_ProcessorNode(subSystem.getIpDSP2(), subSystemNode.getNodeName(),
-						PROCESSOR_LIST.PROCESSOR_DSP2, false, false, false);
+				if (!subSystem.getIpDSP2().isEmpty())
+					dsp2Node = new VPX_ProcessorNode(subSystem.getIpDSP2(), subSystemNode.getNodeName(),
+							PROCESSOR_LIST.PROCESSOR_DSP2, false, false, false);
 
 				subSystemNode.add(p2020Node);
 
-				subSystemNode.add(dsp1Node);
+				if (dsp1Node != null)
+					subSystemNode.add(dsp1Node);
 
-				subSystemNode.add(dsp2Node);
+				if (dsp2Node != null)
+					subSystemNode.add(dsp2Node);
 
 				systemRootNode.add(subSystemNode);
+
+				p2020Node = null;
+
+				dsp1Node = null;
+
+				dsp2Node = null;
 			}
 		}
 
@@ -1275,7 +1307,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				// Tools Menu Items
 				vpx_contextMenu.add(vpx_Cxt_ChangePWD);
 
-				//vpx_contextMenu.add(vpx_Cxt_Refresh);
+				// vpx_contextMenu.add(vpx_Cxt_Refresh);
 
 				vpx_contextMenu.add(vpx_Cxt_Reload);
 
@@ -1354,7 +1386,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				vpx_contextMenu.add(vpx_Cxt_Reboot);
 
 				vpx_contextMenu.add(vpx_Cxt_EthFlash);
-				
+
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
 				vpx_contextMenu.add(vpx_Cxt_Refresh);

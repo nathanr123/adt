@@ -1273,6 +1273,8 @@ public class VPX_MADPanel extends JPanel {
 
 		private FilenameFilter outFilter = null;
 
+		private VPX_FlashProgressWindow dialog;
+
 		/**
 		 * Create the dialog.
 		 */
@@ -1408,8 +1410,17 @@ public class VPX_MADPanel extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					backupOutFiles();
+					Thread th = new Thread(new Runnable() {
 
+						@Override
+						public void run() {
+
+							backupOutFiles();
+
+						}
+					});
+
+					th.start();
 				}
 			});
 
@@ -1453,6 +1464,12 @@ public class VPX_MADPanel extends JPanel {
 
 		private void backupOutFiles() {
 
+			dialog = new VPX_FlashProgressWindow();
+
+			dialog.setRangePackets(1, 9);
+
+			dialog.setVisible(true);
+
 			String corePath = VPXSessionManager.getDSPPath() + "/"
 					+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE);
 
@@ -1469,15 +1486,24 @@ public class VPX_MADPanel extends JPanel {
 				String core6 = txtCompilePathCore6.getText().trim().replaceAll("\\\\", "/");
 				String core7 = txtCompilePathCore7.getText().trim().replaceAll("\\\\", "/");
 				String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
-
+				
+				dialog.updatePackets(1, core0);
 				checkAndCopy(corePath, core0, 0, false);
+				dialog.updatePackets(2, core1);
 				checkAndCopy(corePath, core1, 1, false);
+				dialog.updatePackets(3, core2);
 				checkAndCopy(corePath, core2, 2, false);
+				dialog.updatePackets(4, core3);
 				checkAndCopy(corePath, core3, 3, false);
+				dialog.updatePackets(5, core4);
 				checkAndCopy(corePath, core4, 4, false);
+				dialog.updatePackets(6, core5);
 				checkAndCopy(corePath, core5, 5, false);
+				dialog.updatePackets(7, core6);
 				checkAndCopy(corePath, core6, 6, false);
+				dialog.updatePackets(8, core7);
 				checkAndCopy(corePath, core7, 7, false);
+				dialog.updatePackets(9, bin);
 				checkAndCopy(
 						VPXSessionManager.getDSPPath() + "/"
 								+ VPXUtilities
