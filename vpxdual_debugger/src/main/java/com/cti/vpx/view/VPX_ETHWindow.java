@@ -1840,7 +1840,8 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				new VPX_BISTLauncher(VPX_ETHWindow.this).setVisible(true);
+				new VPX_BISTLauncher(VPX_ETHWindow.this, VPXSessionManager.getCurrentProcessor(),
+						VPXSessionManager.getCurrentSubSystem()).setVisible(true);
 
 			}
 		});

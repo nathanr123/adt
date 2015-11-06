@@ -1528,6 +1528,8 @@ public class VPX_MADPanel extends JPanel {
 
 					try {
 
+						FileUtils.cleanDirectory(coreBFile);
+
 						FileUtils.copyFileToDirectory(coreFile, coreBFile);
 
 					} catch (Exception e) {
