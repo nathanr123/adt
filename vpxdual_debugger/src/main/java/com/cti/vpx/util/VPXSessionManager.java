@@ -1,5 +1,9 @@
 package com.cti.vpx.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.cti.vpx.model.VPX;
 import com.cti.vpx.model.VPXSystem;
 
 public class VPXSessionManager {
@@ -19,6 +23,8 @@ public class VPXSessionManager {
 	private static String currentWorkspacePath;
 
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
+
+	private static List<VPX.PROCESSOR_LIST> bistProcessors = new ArrayList<VPX.PROCESSOR_LIST>();
 
 	private static VPXSystem vpxSystem = null;
 
@@ -218,6 +224,18 @@ public class VPXSessionManager {
 
 		return getAsFullPath(getWorkspacePath(),
 				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_TFTP));
+	}
+
+	public static void addBISTProcessor(VPX.PROCESSOR_LIST processor) {
+
+		bistProcessors.add(processor);
+
+	}
+
+	public static List<VPX.PROCESSOR_LIST> getBISTProcessor() {
+
+		return bistProcessors;
+
 	}
 
 	private static String getAsFullPath(String parent, String child) {

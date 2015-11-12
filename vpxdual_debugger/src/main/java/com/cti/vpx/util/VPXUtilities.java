@@ -1703,7 +1703,7 @@ public class VPXUtilities {
 
 			if (isWritable) {
 
-				root.mkdir();// FileUtils.forceMkdir(root);
+				root.mkdirs();// FileUtils.forceMkdir(root);
 
 				FileUtils.forceMkdir(new File(
 						rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG)));

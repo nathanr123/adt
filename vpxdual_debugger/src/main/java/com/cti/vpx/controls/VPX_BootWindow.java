@@ -28,7 +28,9 @@ public class VPX_BootWindow extends JDialog {
 	 */
 	private static final long serialVersionUID = -4001514154495393537L;
 
-	private static String P2020NOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots full board</left></body></html>";
+	private static String BOARDNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots full board</left></body></html>";
+	
+	private static String P2020NOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots P2020 only</left></body></html>";
 
 	private static String DSP1NOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots DSP 1 Processor only</left></body></html>";
 
@@ -243,6 +245,8 @@ public class VPX_BootWindow extends JDialog {
 
 		cmbProcessor.addItem("Board");
 
+		cmbProcessor.addItem("P2020");
+		
 		cmbProcessor.addItem("DSP 1");
 
 		cmbProcessor.addItem("DSP 2");
@@ -271,7 +275,7 @@ public class VPX_BootWindow extends JDialog {
 
 			cmbPage.setEnabled(false);
 
-			lblNote.setText(P2020NOTE);
+			lblNote.setText(BOARDNOTE);
 
 		} else if (index == 1) {
 
@@ -279,9 +283,17 @@ public class VPX_BootWindow extends JDialog {
 
 			cmbPage.setEnabled(true);
 
-			lblNote.setText(DSP1NOTE);
+			lblNote.setText(P2020NOTE);
 
 		} else if (index == 2) {
+
+			cmbFlashDevice.setEnabled(true);
+
+			cmbPage.setEnabled(true);
+
+			lblNote.setText(DSP1NOTE);
+
+		} else if (index == 3) {
 
 			cmbFlashDevice.setEnabled(true);
 

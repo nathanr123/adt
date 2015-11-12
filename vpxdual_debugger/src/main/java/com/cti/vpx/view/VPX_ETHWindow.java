@@ -1978,68 +1978,70 @@ public class VPX_ETHWindow extends JFrame
 
 		VPXLogger.updateLog("Asking Super user password for VLAN Configuration");
 
-		if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
+		if (paswordWindow.isAccepted()) {
+			if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
 
-			paswordWindow.dispose();
+				paswordWindow.dispose();
 
-			final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+				final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
 
-			JPanel contentPane = new JPanel();
+				JPanel contentPane = new JPanel();
 
-			contentPane.setLayout(new BorderLayout());
+				contentPane.setLayout(new BorderLayout());
 
-			contentPane.add(browserCanvas, BorderLayout.CENTER);
+				contentPane.add(browserCanvas, BorderLayout.CENTER);
 
-			JDialog frame = new JDialog(this, "VLAN Configuration");
+				JDialog frame = new JDialog(this, "VLAN Configuration");
 
-			frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80),
-					(int) (VPXUtilities.getScreenHeight() * .70));
+				frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80),
+						(int) (VPXUtilities.getScreenHeight() * .70));
 
-			frame.setLocationRelativeTo(VPX_ETHWindow.this);
+				frame.setLocationRelativeTo(VPX_ETHWindow.this);
 
-			frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-			frame.setContentPane(contentPane);
+				frame.setContentPane(contentPane);
 
-			frame.setResizable(true);
+				frame.setResizable(true);
 
-			frame.addWindowListener(new WindowAdapter() {
+				frame.addWindowListener(new WindowAdapter() {
 
-				@Override
-				public void windowClosing(WindowEvent e) {
+					@Override
+					public void windowClosing(WindowEvent e) {
 
-					browserCanvas.dispose();
+						browserCanvas.dispose();
+					}
+				});
+
+				frame.setVisible(true);
+
+				if (browserCanvas.initialise()) {
+
+					if (tab == 1) {
+
+						browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+
+					} else {
+
+						browserCanvas.setUrl("http://192.168.10.1/cgi-bin/ipsetting.cgi");
+					}
+
 				}
-			});
+				frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80) + 1,
+						(int) (VPXUtilities.getScreenHeight() * .70) + 1);
 
-			frame.setVisible(true);
+				VPXLogger.updateLog("VLAN Configuration opened");
 
-			if (browserCanvas.initialise()) {
+			} else {
 
-				if (tab == 1) {
+				JOptionPane.showMessageDialog(this, "Pasword invalid", "Authentication", JOptionPane.ERROR_MESSAGE);
 
-					browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+				paswordWindow.dispose();
 
-				} else {
+				showVLAN(tab);
 
-					browserCanvas.setUrl("http://192.168.10.1/cgi-bin/ipsetting.cgi");
-				}
-
+				VPXLogger.updateLog("Invalid Password");
 			}
-			frame.setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .80) + 1,
-					(int) (VPXUtilities.getScreenHeight() * .70) + 1);
-
-			VPXLogger.updateLog("VLAN Configuration opened");
-
-		} else {
-
-			JOptionPane.showMessageDialog(this, "Pasword invalid", "Authentication", JOptionPane.ERROR_MESSAGE);
-
-			paswordWindow.dispose();
-
-			showVLAN(tab);
-
-			VPXLogger.updateLog("Invalid Password");
 		}
 
 	}

@@ -906,7 +906,7 @@ public class VPX_AppModeWindow extends JFrame {
 			}
 
 		} else {
-			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please enter the valid log filename", "Error Log",
+			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please select valid workspace", "Error Workspace Launcher",
 					JOptionPane.ERROR_MESSAGE);
 
 			txtWorkspacePath.requestFocusInWindow();

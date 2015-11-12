@@ -7,6 +7,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -19,7 +21,7 @@ import com.cti.vpx.util.VPXUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
-public class VPX_PasswordWindow extends JDialog {
+public class VPX_PasswordWindow extends JDialog implements WindowListener{
 
 	/**
 	 * 
@@ -30,6 +32,8 @@ public class VPX_PasswordWindow extends JDialog {
 
 	private JPasswordField pwdAdminPassword;
 
+	private boolean isAccepted = false;
+
 	/**
 	 * Create the dialog.
 	 */
@@ -38,7 +42,7 @@ public class VPX_PasswordWindow extends JDialog {
 		init();
 
 		loadComponents();
-		
+
 		centerFrame();
 
 	}
@@ -46,22 +50,24 @@ public class VPX_PasswordWindow extends JDialog {
 	private void init() {
 
 		setResizable(false);
-		
+
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setTitle("Authentication");
 
 		setBounds(100, 100, 350, 130);
-		
+
 		setModal(true);
 
 		getContentPane().setLayout(new BorderLayout());
+		
+		addWindowListener(this);
 	}
 
-	public void resetPassword(){
+	public void resetPassword() {
 		pwdAdminPassword.setText("");
 	}
-	
+
 	private void loadComponents() {
 
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -87,14 +93,16 @@ public class VPX_PasswordWindow extends JDialog {
 		JButton btnOK = new JButton("OK");
 
 		btnOK.setActionCommand("OK");
-		
+
 		btnOK.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
+				isAccepted = true;
+
 				VPX_PasswordWindow.this.dispose();
-				
+
 			}
 		});
 
@@ -105,16 +113,18 @@ public class VPX_PasswordWindow extends JDialog {
 		JButton btnCancel = new JButton("Cancel");
 
 		btnCancel.setActionCommand("Cancel");
-		
+
 		btnCancel.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				pwdAdminPassword.setText("");
-				
+
+				isAccepted = false;
+
 				VPX_PasswordWindow.this.dispose();
-				
+
 			}
 		});
 
@@ -124,7 +134,7 @@ public class VPX_PasswordWindow extends JDialog {
 	public String getPasword() {
 		return new String(this.pwdAdminPassword.getPassword());
 	}
-	
+
 	private void centerFrame() {
 
 		Dimension windowSize = getSize();
@@ -140,5 +150,49 @@ public class VPX_PasswordWindow extends JDialog {
 		setLocation(dx, dy);
 	}
 
+	public boolean isAccepted() {
+		return this.isAccepted;
+	}
 
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		isAccepted = false;
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

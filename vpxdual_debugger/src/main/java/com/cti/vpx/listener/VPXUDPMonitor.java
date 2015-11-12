@@ -29,6 +29,7 @@ import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPX;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -2036,13 +2037,37 @@ public class VPXUDPMonitor {
 				((VPXCommunicationListener) listener).updateBIST(bist);
 			}
 
-			if (loop == VPXConstants.MAX_PROCESSOR) {
+			if (loop == VPXSessionManager.getBISTProcessor().size()) {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
 
 				VPXLogger.updateLog(String.format("Built In Self Test completed"));
 			}
 		}
+	}
+
+	private boolean isAllProcessorsCompletedBIST(BIST bit) {
+
+		List<VPX.PROCESSOR_LIST> proc = VPXSessionManager.getBISTProcessor();
+
+		if (loop == proc.size()) {
+
+			for (Iterator<PROCESSOR_LIST> iterator = proc.iterator(); iterator.hasNext();) {
+
+				PROCESSOR_LIST processor_LIST = iterator.next();
+
+				if (processor_LIST == PROCESSOR_LIST.PROCESSOR_P2020) {
+
+				} else if (processor_LIST == PROCESSOR_LIST.PROCESSOR_DSP1) {
+
+				} else if (processor_LIST == PROCESSOR_LIST.PROCESSOR_DSP2) {
+
+				}
+
+			}
+		}
+
+		return false;
 	}
 
 	private String getResultInColor(long res, int type) {

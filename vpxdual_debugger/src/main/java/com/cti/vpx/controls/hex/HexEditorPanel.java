@@ -108,7 +108,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	private JCheckBox colHeaderCB;
 
-	private JComboBox<String> formatBytes;
+	private JComboBox<String> cmbFormatBytes;
 
 	private JCheckBox rowHeaderCB;
 
@@ -148,9 +148,13 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	private DumpAction dumpAction;
 
+	private DumpAsAction dumpAsAction;
+
 	private JButton btnOpenAction;
 
 	private JButton btnDumpAction;
+
+	private JButton btnDumpAsAction;
 
 	private JButton btnCutAction;
 
@@ -309,6 +313,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		settingsAction = new SettingsAction();
 
 		dumpAction = new DumpAction();
+
+		dumpAsAction = new DumpAsAction();
 	}
 
 	/**
@@ -322,16 +328,16 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		toolbar.setFloatable(false);
 
-		formatBytes = new JComboBox<String>(
+		cmbFormatBytes = new JComboBox<String>(
 				new DefaultComboBoxModel<String>(new String[] { "8 Bit Hex", "16 Bit Hex", "32 Bit Hex", "64 Bit Hex",
 						"16 Bit Signed", "32 Bit Signed", "16 Bit Unsigned", "32 Bit Unsigned", "32 Bit Floating" }));
 
-		formatBytes.addItemListener(new ItemListener() {
+		cmbFormatBytes.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 
-				if (e.getSource().equals(formatBytes)) {
+				if (e.getSource().equals(cmbFormatBytes)) {
 
 					if (e.getStateChange() == ItemEvent.SELECTED) {
 
@@ -341,9 +347,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			}
 		});
 
-		formatBytes.setMaximumSize(new Dimension(200, 25));
+		cmbFormatBytes.setMaximumSize(new Dimension(200, 25));
 
-		toolbar.add(formatBytes);
+		toolbar.add(cmbFormatBytes);
 
 		toolbar.addSeparator();
 
@@ -352,6 +358,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		toolbar.add(btnOpenAction);
 
 		toolbar.add(btnDumpAction);
+
+		toolbar.add(btnDumpAsAction);
 
 		toolbar.addSeparator();
 
@@ -379,7 +387,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	private void loadGroupingModel() {
 
-		editor.setHexModel(formatBytes.getSelectedIndex());
+		editor.setHexModel(cmbFormatBytes.getSelectedIndex());
 	}
 
 	public HexEditor getHexEditor() {
@@ -400,6 +408,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		btnDumpAction = new JButton(dumpAction);
 		btnDumpAction.setText(null);
+
+		btnDumpAsAction = new JButton(dumpAsAction);
+		btnDumpAsAction.setText(null);
 
 		btnCutAction = new JButton(cutAction);
 		btnCutAction.setText(null);
@@ -439,9 +450,22 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	public void dumpToFile() {
 		try {
-			int rc = getFileChooser("Specify a file to save").showSaveDialog(this);
+
+			if (chooser == null) {
+
+				chooser = new JFileChooser();
+			}
+
+			chooser.setAcceptAllFileFilterUsed(false);
+
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter("Bin Files", "bin"));
+
+			chooser.setDialogTitle("Specify a file to save");
+
+			int rc = chooser.showSaveDialog(this);
 
 			if (rc == JFileChooser.APPROVE_OPTION) {
+
 				String path = chooser.getSelectedFile().getPath();
 
 				if (!path.endsWith(".bin")) {
@@ -459,6 +483,80 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
+	}
+
+	public void dumpToTextFile() {
+		try {
+
+			if (chooser == null) {
+
+				chooser = new JFileChooser();
+			}
+
+			chooser.setAcceptAllFileFilterUsed(false);
+
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter("txt Files", "txt"));
+
+			chooser.setDialogTitle("Specify a file to save");
+
+			int rc = chooser.showSaveDialog(this);
+
+			if (rc == JFileChooser.APPROVE_OPTION) {
+
+				String path = chooser.getSelectedFile().getPath();
+
+				if (!path.endsWith(".txt")) {
+					path += ".txt";
+				}
+
+				FileOutputStream fos = new FileOutputStream(path);
+
+				fos.write(getAsFormattedString(getClipboardContents().getBytes()));
+
+				fos.close();
+
+			}
+		} catch (Exception e) {
+			VPXLogger.updateError(e);
+			e.printStackTrace();
+		}
+	}
+
+	private byte[] getAsFormattedString(byte[] values) {
+
+		String str = "";
+
+		byte[] formattedString = null;
+
+		if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX8) {
+
+			for (int i = 0; i < values.length; i++) {
+
+				str = str + String.format("%02x", values[i])
+						+ ((((i + 1) % 16) == 0) ? System.getProperty("line.separator") : " ");
+			}
+
+			formattedString = str.getBytes();
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX16) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX32) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX64) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
+
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
+
+		}
+
+		return formattedString;
 	}
 
 	/**
@@ -491,38 +589,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	}
 
-	/**
-	 * Returns the file chooser for opening files, lazily creating it if
-	 * necessary.
-	 *
-	 * @return The file chooser.
-	 */
-	private JFileChooser getFileChooser(String title) {
-
-		FileNameExtensionFilter filterDat = new FileNameExtensionFilter("Dat Files", "dat");
-
-		FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Bin Files", "bin");
-
-		FileNameExtensionFilter filterOut = new FileNameExtensionFilter("Out Files", "out");
-
-		if (chooser == null) {
-
-			chooser = new JFileChooser();
-		}
-
-		chooser.setAcceptAllFileFilterUsed(false);
-
-		chooser.addChoosableFileFilter(filterOut);
-
-		chooser.addChoosableFileFilter(filterBin);
-
-		chooser.addChoosableFileFilter(filterDat);
-
-		chooser.setDialogTitle(title);
-
-		return chooser;
-	}
-
 	private String getInfoString(String key, int offs, int param) {
 
 		String text = msg.getString(key);
@@ -541,12 +607,12 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		return text;
 	}
 
-	public void handleRecievedBuffer(byte[] bytes,int stride) {
+	public void handleRecievedBuffer(byte[] bytes, int stride) {
 
 		try {
 
 			if (bytes.length > 0) { // In a jar
-				editor.open(bytes,stride);
+				editor.open(bytes, stride);
 
 			} else { // In a jar
 				throw new IOException("byte array is not valid");
@@ -940,6 +1006,33 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 		return result;
 	}
 
+	private class DumpAsAction extends ActionBase {
+
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent e) {
+			try {
+				editor.copy();
+
+				dumpToTextFile();
+
+			} catch (Exception e1) {
+				VPXLogger.updateError(e1);
+				e1.printStackTrace();
+			}
+
+		}
+
+		protected String getNameKey() {
+			return "Action.DumpAs.Name";
+		}
+
+		protected String getIconKey() {
+			return VPXConstants.Icons.ICON_SAVEAS_NAME;
+		}
+
+	}
+
 	/**
 	 * Copies the currently selected bytes to the clipboard.
 	 *
@@ -1138,39 +1231,39 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		long retValue = 0;
 
-		if (formatBytes.getSelectedIndex() == HexEditor.HEX8) {
+		if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX8) {
 
 			retValue = ((Hex8) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX16) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX16) {
 
 			retValue = ((Hex16) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX32) {
 
 			retValue = ((Hex32) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX64) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX64) {
 
 			retValue = ((Hex64) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
 
 			retValue = ((SignedInt16) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
 
 			retValue = ((SignedInt32) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
 
 			retValue = ((UnSignedInt16) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
 
 			retValue = ((UnSignedInt32) editor.getTable().getModel()).getByteCount();
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
 
 			retValue = ((Floating32) editor.getTable().getModel()).getByteCount();
 
@@ -1183,39 +1276,39 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		String d = data;// Long.toHexString(Long.decode(data)).toUpperCase();
 
-		if (formatBytes.getSelectedIndex() == HexEditor.HEX8) {
+		if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX8) {
 
 			((Hex8) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX16) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX16) {
 
 			((Hex16) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX32) {
 
 			((Hex32) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.HEX64) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX64) {
 
 			((Hex64) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
 
 			((SignedInt16) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
 
 			((SignedInt32) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
 
 			((UnSignedInt16) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
 
 			((UnSignedInt32) editor.getTable().getModel()).setValueAt(d, row, col);
 
-		} else if (formatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
+		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
 
 			((Floating32) editor.getTable().getModel()).setValueAt(d, row, col);
 
@@ -1231,7 +1324,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		memStFillWindow.setCurrentValue(currentValue);
 
-		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
+		memStFillWindow.setTypeSize(cmbFormatBytes.getSelectedItem().toString());
 
 		int rc = memStFillWindow.showFillMemoryWinow();
 
@@ -1273,7 +1366,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		memStFillWindow.setTotalLength(getDocLength());
 
-		memStFillWindow.setTypeSize(formatBytes.getSelectedItem().toString());
+		memStFillWindow.setTypeSize(cmbFormatBytes.getSelectedItem().toString());
 
 		int rc = memStFillWindow.showFillMemoryWinow();
 
@@ -1325,7 +1418,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	public void doFormatSelectionAction(int index) {
 
-		formatBytes.setSelectedIndex(index);
+		cmbFormatBytes.setSelectedIndex(index);
 	}
 
 	public void doCutAction() {

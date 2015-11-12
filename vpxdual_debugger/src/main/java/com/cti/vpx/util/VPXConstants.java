@@ -224,6 +224,8 @@ public class VPXConstants {
 
 		public static final String ICON_SAVE_NAME = "save.gif";
 
+		public static final String ICON_SAVEAS_NAME = "saveas.gif";
+
 		public static final String ICON_COPY_NAME = "copy.gif";
 
 		public static final String ICON_CUT_NAME = "cut.gif";
@@ -309,6 +311,8 @@ public class VPXConstants {
 		public static final ImageIcon ICON_SETTINGS = VPXUtilities.getImageIcon(ICON_SETTINGS_NAME, 14, 14);
 
 		public static final ImageIcon ICON_SAVE = VPXUtilities.getImageIcon(ICON_SAVE_NAME, 14, 14);
+
+		public static final ImageIcon ICON_SAVEAS = VPXUtilities.getImageIcon(ICON_SAVEAS_NAME, 14, 14);
 
 		public static final ImageIcon ICON_COPY = VPXUtilities.getImageIcon(ICON_COPY_NAME, 14, 14);
 

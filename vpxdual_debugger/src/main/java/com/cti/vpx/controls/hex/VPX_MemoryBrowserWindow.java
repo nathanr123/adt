@@ -129,8 +129,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JSlider slideAutoRefresh;
 
 	private JLabel lblAutoRefreshValue;
+	
 	private JLabel lblMins;
+	
 	private JLabel lblSize;
+	
 	private JComboBox<String> cmbSize;
 
 	private SpinnerNumberModel strideSpinnerModel;
