@@ -3,6 +3,7 @@ package com.cti.vpx.controls;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -53,8 +54,6 @@ import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
-import java.awt.GridLayout;
-import javax.swing.JLabel;
 
 public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	/**
@@ -770,20 +769,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private void saveLogtoFile() {
 
-		// JFileChooser chooser;
-
 		try {
-
-			// chooser = new JFileChooser();
-
-			// chooser.setCurrentDirectory(new java.io.File("."));
-
-			// chooser.setDialogTitle("Select folder to save");
-
-			// chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-			// if (chooser.showSaveDialog(parent) ==
-			// JFileChooser.APPROVE_OPTION) {
 
 			String path = VPXSessionManager.getMessagePath() + "\\Messages_"
 					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".log";

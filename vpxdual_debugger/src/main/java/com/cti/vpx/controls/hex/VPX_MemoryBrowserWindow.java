@@ -129,11 +129,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JSlider slideAutoRefresh;
 
 	private JLabel lblAutoRefreshValue;
-	
+
 	private JLabel lblMins;
-	
+
 	private JLabel lblSize;
-	
+
 	private JComboBox<String> cmbSize;
 
 	private SpinnerNumberModel strideSpinnerModel;
@@ -281,13 +281,17 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		chkAutoRefresh = new JCheckBox("Auto Refresh");
 
-		chkAutoRefresh.addActionListener(new ActionListener() {
+		chkAutoRefresh.addItemListener(new ItemListener() {
 
-			public void actionPerformed(ActionEvent e) {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
 
 				slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+
 				lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
+
 				lblMins.setEnabled(chkAutoRefresh.isSelected());
+
 			}
 		});
 
@@ -296,6 +300,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		subSystemPanel.add(chkAutoRefresh, "cell 6 0,alignx center,aligny top");
 
 		slideAutoRefresh = new JSlider();
+
 		slideAutoRefresh.setEnabled(false);
 
 		slideAutoRefresh.setMinimum(30);
@@ -307,13 +312,19 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		subSystemPanel.add(slideAutoRefresh, "cell 7 0,grow");
 
 		lblAutoRefreshValue = new JLabel("30");
+
 		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
+
 		lblAutoRefreshValue.setEnabled(false);
+
 		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
+
 		subSystemPanel.add(lblAutoRefreshValue, "cell 8 0,growx");
 
 		lblMins = new JLabel("Secs");
+
 		lblMins.setEnabled(false);
+
 		lblMins.setPreferredSize(new Dimension(35, 25));
 
 		subSystemPanel.add(lblMins, "cell 9 0,alignx left,aligny center");
@@ -350,14 +361,6 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		mapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][pref!,center]", "[23px]"));
 
 		radUseMap = new JRadioButton("Use Map File");
-
-		radUseMap.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-
-				enableMemoryFields();
-			}
-		});
 
 		buttonGroup.add(radUseMap);
 
@@ -441,14 +444,6 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 				new MigLayout("", "[109px][46px][206px,grow,fill][46px][126px][right][grow][46px][126px]", "[23px]"));
 
 		radUserAddress = new JRadioButton("Use Direct Memory");
-
-		radUserAddress.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-
-				enableMemoryFields();
-			}
-		});
 
 		radUserAddress.setSelected(true);
 
@@ -555,7 +550,44 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		btnClear = new JButton("Clear");
 
+		btnClear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				clearFields();
+
+			}
+		});
+
 		controlsPanel.add(btnClear);
+
+		radUseMap.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+
+					enableMemoryFields();
+				}
+
+			}
+		});
+
+		radUserAddress.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+
+					enableMemoryFields();
+				}
+
+			}
+		});
+
 	}
 
 	private void createHexPanel() {
@@ -1064,6 +1096,34 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			currentThreadSleepTime = (value / 60) * MINUTE;
 		}
+
+	}
+
+	private void clearFields() {
+
+		cmbSubSystem.setSelectedIndex(0);
+
+		cmbSize.setSelectedIndex(0);
+
+		cmbMemoryVariables.removeAllItems();
+		
+		cmbMemoryVariables.setEditable(false);
+		
+		cmbMemoryVariables.setEnabled(false);
+		
+		chkAutoRefresh.setSelected(false);
+		
+		slideAutoRefresh.setValue(30);
+
+		radUserAddress.setSelected(true);
+
+		txtMapFilePath.setText("");
+
+		txtMemoryAddres.setText("");
+
+		txtMemoryLength.setText("");
+
+		spinMemoryStride.setValue(0);
 
 	}
 

@@ -1312,6 +1312,8 @@ public class VPXUDPMonitor {
 
 			msg.params.memoryinfo.length.set(Integer.valueOf(filter.getMemoryLength()));
 
+			msg.params.memoryinfo.stride.set(Integer.valueOf(filter.getMemoryStride()));
+
 			msg.params.memoryinfo.memIndex.set(filter.getMemoryBrowserID());
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
@@ -1366,6 +1368,8 @@ public class VPXUDPMonitor {
 
 			msg.params.memoryinfo.length.set(Integer.valueOf(filter1.getMemoryLength()));
 
+			msg.params.memoryinfo.stride.set(Integer.valueOf(filter1.getMemoryStride()));
+
 			msg.params.memoryinfo.memIndex.set(filter1.getMemoryBrowserID());
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
@@ -1404,6 +1408,8 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.core.set(Integer.parseInt(filter2.getCore()));
 
 			msg.params.memoryinfo.length.set(Integer.valueOf(filter2.getMemoryLength()));
+
+			msg.params.memoryinfo.stride.set(Integer.valueOf(filter2.getMemoryStride()));
 
 			msg.params.memoryinfo.memIndex.set(filter2.getMemoryBrowserID());
 

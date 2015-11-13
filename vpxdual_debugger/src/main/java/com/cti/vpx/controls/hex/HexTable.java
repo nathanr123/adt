@@ -1334,6 +1334,11 @@ public class HexTable extends JTable {
 					e.consume();
 					break;
 
+				case KeyEvent.VK_A:
+					setSelectedRows(0, getModel().getRowCount() - 1);
+					e.consume();
+					break;
+
 				}
 			}
 		}

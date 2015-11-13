@@ -2766,7 +2766,7 @@ public class VPX_ETHWindow extends JFrame
 
 			btnBIST.setEnabled(true);
 
-			btnFlash.setEnabled(false);
+			btnFlash.setEnabled(true);
 
 			btnExecute.setEnabled(false);
 

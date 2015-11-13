@@ -1364,7 +1364,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 
-		spinPlot1MemoryStride.setPreferredSize(new Dimension(20, 20));
+		spinPlot2MemoryStride.setPreferredSize(new Dimension(20, 20));
 
 		plot2MemoryAddressPanel.add(spinPlot2MemoryStride, "cell 8 0,alignx left,aligny center");
 	}
@@ -1514,7 +1514,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		txtPlot2MemoryLength.setText(plot2MemoryFilter.getMemoryLength());
 
-		spinPlot2MemoryStride.setValue(plot2MemoryFilter.getMemoryStride());
+		//spinPlot2MemoryStride.setValue(plot2MemoryFilter.getMemoryStride());
 
 		enablePlot2MemoryFields();
 

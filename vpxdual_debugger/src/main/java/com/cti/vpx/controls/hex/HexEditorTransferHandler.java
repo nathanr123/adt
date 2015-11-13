@@ -1,6 +1,5 @@
 package com.cti.vpx.controls.hex;
 
-
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -30,14 +29,92 @@ class HexEditorTransferHandler extends TransferHandler {
 	}
 
 	protected Transferable createTransferable(JComponent c) {
+
+		byte[] array = null;
+
+		int size = 0;
+
+		int length = 1;
+
+		int end = 0;
+
+		int start = 0;
+
+		ByteArrayTransferable bat = null;
+
 		HexEditor e = (HexEditor) c;
-		int start = e.getSmallestSelectionIndex();
-		int end = e.getLargestSelectionIndex();
-		byte[] array = new byte[end - start + 1];
+
+		int start1 = e.getSmallestSelectionIndex();
+
+		int end1 = e.getLargestSelectionIndex();
+
+		int currentModel = e.getCurrentModel();
+
+		switch (currentModel) {
+
+		case HexEditor.HEX8:
+
+			end = end1;
+
+			start = start1;
+
+			size = (end1 - start1 + 1) * 1;
+
+			length = 1;
+
+			break;
+
+		case HexEditor.HEX16:
+		case HexEditor.SINGNEDINT16:
+		case HexEditor.UNSINGNEDINT16:
+
+			end = (end1 * 2) + 1;
+
+			start = start1 * 2;
+
+			size = (end1 - start1 + 1) * 2;
+
+			length = length * 2;
+
+			break;
+
+		case HexEditor.HEX32:
+		case HexEditor.SINGNEDINT32:
+		case HexEditor.UNSINGNEDINT32:
+		case HexEditor.UNSINGNEDFLOAT32:
+
+			end = (end1 * 4) + 3;
+
+			start = start1 * 4;
+
+			size = (end1 - start1 + 1) * 4;
+
+			length = length * 4;
+
+			break;
+
+		case HexEditor.HEX64:
+
+			end = (end1 * 8) + 7;
+
+			start = start1 * 8;
+
+			size = (end1 - start1 + 1) * 8;
+
+			length = length * 8;
+
+			break;
+		}
+
+		array = new byte[size];
+
 		for (int i = end; i >= start; i--) {
+
 			array[i - start] = e.getByte(i);
 		}
-		ByteArrayTransferable bat = new ByteArrayTransferable(start, array);
+
+		bat = new ByteArrayTransferable(start, array);
+
 		return bat;
 	}
 

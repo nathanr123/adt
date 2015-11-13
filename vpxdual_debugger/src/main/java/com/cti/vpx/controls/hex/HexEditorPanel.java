@@ -540,6 +540,33 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX16) {
 
+			for (int i = 0; i < values.length; i = i + 2) {
+
+				if ((i + 1) < values.length) {
+
+					str = str + String.format("%02x%02x", values[i + 1], values[i]);
+
+					if (i > 0) {
+
+						if (((i + 2) % 32) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.getBytes();
+
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX32) {
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX64) {
