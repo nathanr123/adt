@@ -109,6 +109,8 @@ public class VPXConstants {
 
 	public static final int MAX_STRIDE = 512;
 
+	public static final int MAX_SPECTRUM = 6;
+
 	public static final int MAX_MEMORY_BROWSER = 4;
 
 	public static final int MAX_MEMORY_PLOT = 3;

@@ -13,6 +13,7 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ResourceBundle;
 
+import javax.management.openmbean.OpenDataException;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -61,8 +62,7 @@ import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
-import com.cti.vpx.controls.graph.VPX_AmpWindow;
-import com.cti.vpx.controls.graph.VPX_WaterfallWindow;
+import com.cti.vpx.controls.graph.VPX_SpectrumWindow;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryBrowserWindow;
 import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
@@ -135,9 +135,7 @@ public class VPX_ETHWindow extends JFrame
 
 	private JMenuItem vpx_Menu_Window_EthFlash;
 
-	private JMenuItem vpx_Menu_Window_Amplitude;
-
-	private JMenuItem vpx_Menu_Window_Waterfall;
+	private JMenuItem vpx_Menu_Window_Spectrum;
 
 	private JMenuItem vpx_Menu_Window_MAD;
 
@@ -201,9 +199,11 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_MemoryBrowserWindow[] memoryBrowserWindow;
 
-	private VPX_WaterfallWindow[] waterfallWindow;
+	private VPX_SpectrumWindow[] spectrumWindow;
 
-	private VPX_AmpWindow[] amplitudeWindow;
+	// private VPX_WaterfallWindow[] waterfallWindow;
+
+	// private VPX_AmpWindow[] amplitudeWindow;
 
 	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
@@ -237,9 +237,7 @@ public class VPX_ETHWindow extends JFrame
 
 	public static int currentNoofMemoryPlot;
 
-	public static int currentNoofWaterfall;
-
-	public static int currentNoofAmplitude;
+	public static int currentNoofSpectrum;
 
 	/**
 	 * Create the frame.
@@ -312,10 +310,15 @@ public class VPX_ETHWindow extends JFrame
 
 		createMemoryPlots();
 
-		createWaterfallWindows();
-
-		createAmplitudeWindows();
+		createSpectrumWindow();
 	}
+
+	public void applyMask(String mask) {
+
+		udpMonitor.applyFilterbySubnet(mask);
+	}
+
+	// Memory Window
 
 	public void createMemoryBrowsers() {
 
@@ -328,13 +331,6 @@ public class VPX_ETHWindow extends JFrame
 			memoryBrowserWindow[i].setParent(this);
 		}
 	}
-
-	public void applyMask(String mask) {
-
-		udpMonitor.applyFilterbySubnet(mask);
-	}
-
-	// Memory Window
 
 	public void openMemoryBrowser(MemoryViewFilter filter) {
 
@@ -460,159 +456,74 @@ public class VPX_ETHWindow extends JFrame
 				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
 	}
 
-	// Waterfall Window
+	// Spectrum Window
 
-	private void createWaterfallWindows() {
+	public void createSpectrumWindow() {
 
-		waterfallWindow = new VPX_WaterfallWindow[VPXConstants.MAX_WATERFALL];
+		spectrumWindow = new VPX_SpectrumWindow[VPXConstants.MAX_SPECTRUM];
 
-		for (int i = 0; i < VPXConstants.MAX_WATERFALL; i++) {
+		for (int i = 0; i < VPXConstants.MAX_SPECTRUM; i++) {
 
-			waterfallWindow[i] = new VPX_WaterfallWindow(this, i);
-
+			spectrumWindow[i] = new VPX_SpectrumWindow(this, i);
 		}
-
 	}
 
-	public void openWaterfall(String ip) {
+	public void openSpectrumWindow() {
 
-		currentNoofWaterfall++;
+		currentNoofSpectrum++;
 
-		if (currentNoofWaterfall > VPXConstants.MAX_WATERFALL) {
+		if (currentNoofSpectrum > VPXConstants.MAX_SPECTRUM) {
 
-			JOptionPane.showMessageDialog(this, "Maximum 3 waterfall graphs are allowed.You are exceeding the limit",
+			JOptionPane.showMessageDialog(this, "Maximum 6 data analysis are allowed.You are exceeding the limit",
 					"Maximum Reached", JOptionPane.ERROR_MESSAGE);
 
-			currentNoofWaterfall = VPXConstants.MAX_WATERFALL;
+			currentNoofSpectrum = VPXConstants.MAX_SPECTRUM;
 		}
 
-		for (int i = 0; i < VPXConstants.MAX_WATERFALL; i++) {
+		for (int i = 0; i < VPXConstants.MAX_SPECTRUM; i++) {
 
-			if (waterfallWindow[i].getIP().equals(ip)) {
+			if (!spectrumWindow[i].isVisible()) {
 
-				currentNoofWaterfall--;
+				// memoryBrowserWindow[i].setMemoryFilter(filter);
 
-				break;
-			}
+				// memoryBrowserWindow[i].showMemoryBrowser();
 
-			if (!waterfallWindow[i].isVisible()) {
-
-				waterfallWindow[i].showWaterFall(ip);
-
-				readWaterfall(ip);
-
-				VPXLogger.updateLog("Waterfall graph for " + ip + " opened ");
+				spectrumWindow[i].showSpectrumWindow();
 
 				break;
 			}
 		}
 
-		if (currentNoofWaterfall == VPXConstants.MAX_WATERFALL) {
+		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
 
-			vpx_Menu_Window_Waterfall.setEnabled(false);
-
-		} else {
-
-			vpx_Menu_Window_Waterfall.setEnabled(true);
-		}
-
-		vpx_Menu_Window_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
-				+ (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ");
-
-	}
-
-	public void reindexWaterfallIndex() {
-
-		currentNoofWaterfall--;
-
-		if (currentNoofWaterfall == VPXConstants.MAX_WATERFALL) {
-
-			vpx_Menu_Window_Waterfall.setEnabled(false);
+			vpx_Menu_Window_Spectrum.setEnabled(false);
 
 		} else {
 
-			vpx_Menu_Window_Waterfall.setEnabled(true);
+			vpx_Menu_Window_Spectrum.setEnabled(true);
 		}
 
-		vpx_Menu_Window_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
-				+ (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ");
+		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
+				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
+
+		VPXLogger.updateLog("Data analyser opened");
 	}
 
-	// Amplitude Window
+	public void reindexSpectrumWindowIndex() {
 
-	private void createAmplitudeWindows() {
+		currentNoofSpectrum--;
 
-		amplitudeWindow = new VPX_AmpWindow[VPXConstants.MAX_AMPLITUDE];
+		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
 
-		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
-
-			amplitudeWindow[i] = new VPX_AmpWindow(this, i);
-
-		}
-
-	}
-
-	public void openAmplitude(String ip) {
-
-		currentNoofAmplitude++;
-
-		if (currentNoofAmplitude > VPXConstants.MAX_AMPLITUDE) {
-
-			JOptionPane.showMessageDialog(this, "Maximum 3 amplitude graphs are allowed.You are exceeding the limit",
-					"Maximum Reached", JOptionPane.ERROR_MESSAGE);
-
-			currentNoofAmplitude = VPXConstants.MAX_AMPLITUDE;
-		}
-
-		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
-
-			if (amplitudeWindow[i].getIP().equals(ip)) {
-
-				currentNoofAmplitude--;
-
-				break;
-			}
-			if (!amplitudeWindow[i].isVisible()) {
-
-				amplitudeWindow[i].showAmplitude(ip);
-
-				readAmplitude(ip);
-
-				VPXLogger.updateLog("Amplitude graph for " + ip + " opened ");
-
-				break;
-			}
-		}
-
-		if (currentNoofAmplitude == VPXConstants.MAX_AMPLITUDE) {
-
-			vpx_Menu_Window_Amplitude.setEnabled(false);
+			vpx_Menu_Window_Spectrum.setEnabled(false);
 
 		} else {
 
-			vpx_Menu_Window_Amplitude.setEnabled(true);
+			vpx_Menu_Window_Spectrum.setEnabled(true);
 		}
 
-		vpx_Menu_Window_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
-				+ (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ");
-
-	}
-
-	public void reindexAmplitudeIndex() {
-
-		currentNoofAmplitude--;
-
-		if (currentNoofAmplitude == VPXConstants.MAX_AMPLITUDE) {
-
-			vpx_Menu_Window_Amplitude.setEnabled(false);
-
-		} else {
-
-			vpx_Menu_Window_Amplitude.setEnabled(true);
-		}
-
-		vpx_Menu_Window_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
-				+ (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ");
+		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
+				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
 	}
 
 	public void reloadVPXSystem() {
@@ -769,27 +680,15 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		vpx_Menu_Window_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude")
-				+ " ( " + (VPXConstants.MAX_AMPLITUDE - currentNoofAmplitude) + " ) ", VPXConstants.Icons.ICON_EMPTY);
+		vpx_Menu_Window_Spectrum = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Spectrum") + " ( "
+				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ", VPXConstants.Icons.ICON_EMPTY);
 
-		vpx_Menu_Window_Amplitude.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				showAmplitude(VPXSessionManager.getCurrentIP());
-
-			}
-		});
-		vpx_Menu_Window_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall")
-				+ " ( " + (VPXConstants.MAX_WATERFALL - currentNoofWaterfall) + " ) ", VPXConstants.Icons.ICON_EMPTY);
-
-		vpx_Menu_Window_Waterfall.addActionListener(new ActionListener() {
+		vpx_Menu_Window_Spectrum.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				showWaterfall(VPXSessionManager.getCurrentIP());
+				showDataAnalyzer(VPXSessionManager.getCurrentIP());
 
 			}
 		});
@@ -1077,9 +976,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_Window.add(vpx_Menu_Window_MemoryPlot);
 
-		vpx_Menu_Window.add(vpx_Menu_Window_Amplitude);
-
-		vpx_Menu_Window.add(vpx_Menu_Window_Waterfall);
+		vpx_Menu_Window.add(vpx_Menu_Window_Spectrum);
 
 		vpx_Menu_Window.add(VPXComponentFactory.createJSeparator());
 
@@ -1732,7 +1629,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				openWaterfall(ip);
+				// openWaterfall(ip);
 
 			}
 		});
@@ -1765,14 +1662,14 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void showAmplitude(String ip) {
+	public void showDataAnalyzer(String ip) {
 
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				openAmplitude(ip);
+				openSpectrumWindow();
 
 			}
 		});
@@ -2337,14 +2234,13 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
-	public void readWaterfall(String ip) {
+	public void readAnalyticalData(String ip, int core, int id) {
 
-		udpMonitor.readWaterfallData(ip);
-
+		udpMonitor.readSpectrum(ip, core, id);
 	}
 
 	@Override
-	public void populateWaterfall(String ip, byte[] bytes) {
+	public void populateAnalyticalData(String ip, int core, int id, float[] yAxis) {
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2352,24 +2248,9 @@ public class VPX_ETHWindow extends JFrame
 			public void run() {
 				try {
 
-					int idx = -1;
+					if (spectrumWindow[id].isVisible()) {
 
-					for (int i = 0; i < waterfallWindow.length; i++) {
-
-						if (waterfallWindow[i].getIP().equals(ip)) {
-
-							idx = i;
-
-							break;
-						}
-					}
-					if (idx >= 0) {
-
-						if (waterfallWindow[idx].isVisible()) {
-
-							waterfallWindow[idx].loadData(bytes);
-
-						}
+						spectrumWindow[id].loadData(core, yAxis);
 					}
 
 				} catch (Exception e) {
@@ -2385,63 +2266,9 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
-	public void sendWaterfallInterrupt(String ip) {
+	public void sendAnalyticalDataInterrupt(String ip) {
 
-		udpMonitor.setWaterfallInterrupted(ip);
-
-	}
-
-	@Override
-	public void readAmplitude(String ip) {
-
-		udpMonitor.readAmplitudeData(ip);
-
-	}
-
-	@Override
-	public void populateAmplitude(String ip, float[] xAxis, float[] yAxis) {
-
-		Thread th = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-
-					int idx = -1;
-
-					for (int i = 0; i < amplitudeWindow.length; i++) {
-
-						if (amplitudeWindow[i].getIP().equals(ip)) {
-
-							idx = i;
-
-							break;
-						}
-					}
-
-					if (idx >= 0) {
-						if (amplitudeWindow[idx].isVisible()) {
-
-							amplitudeWindow[idx].loadData(xAxis, yAxis);
-						}
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					VPXLogger.updateError(e);
-				}
-
-			}
-		});
-
-		th.start();
-
-	}
-
-	@Override
-	public void sendAmplitudeInterrupt(String ip) {
-
-		udpMonitor.setAmplitudeInterrupted(ip);
+		udpMonitor.setSpectrumInterrupted(ip);
 
 	}
 
@@ -2653,9 +2480,8 @@ public class VPX_ETHWindow extends JFrame
 		if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP1
 				|| node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP2) {
 
-			vpx_Menu_Window_Amplitude.setEnabled(node.isAmplitude());
+			vpx_Menu_Window_Spectrum.setEnabled(true);// node.isAmplitude());
 
-			vpx_Menu_Window_Waterfall.setEnabled(node.isWaterfall());
 		}
 
 	}
@@ -2675,9 +2501,7 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_Execution.setEnabled(false);
 
-			vpx_Menu_Window_Amplitude.setEnabled(false);
-
-			vpx_Menu_Window_Waterfall.setEnabled(false);
+			vpx_Menu_Window_Spectrum.setEnabled(false);
 
 			vpx_Menu_Window_BIST.setEnabled(false);
 
@@ -2711,9 +2535,7 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_Execution.setEnabled(true);
 
-			vpx_Menu_Window_Amplitude.setEnabled(true);
-
-			vpx_Menu_Window_Waterfall.setEnabled(true);
+			vpx_Menu_Window_Spectrum.setEnabled(true);
 
 			vpx_Menu_Window_BIST.setEnabled(false);
 
@@ -2746,9 +2568,7 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_Execution.setEnabled(false);
 
-			vpx_Menu_Window_Amplitude.setEnabled(false);
-
-			vpx_Menu_Window_Waterfall.setEnabled(false);
+			vpx_Menu_Window_Spectrum.setEnabled(false);
 
 			vpx_Menu_Window_BIST.setEnabled(true);
 
@@ -2782,9 +2602,7 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_Execution.setEnabled(false);
 
-			vpx_Menu_Window_Amplitude.setEnabled(false);
-
-			vpx_Menu_Window_Waterfall.setEnabled(false);
+			vpx_Menu_Window_Spectrum.setEnabled(false);
 
 			vpx_Menu_Window_BIST.setEnabled(false);
 

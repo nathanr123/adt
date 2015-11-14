@@ -26,15 +26,10 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer);
 
-	public void readWaterfall(String ip);
+	public void readAnalyticalData(String ip, int core, int id);
 
-	public void populateWaterfall(String ip, byte[] bytes);
+	public void populateAnalyticalData(String ip, int core, int id, float[] yAxis);
 
-	public void sendWaterfallInterrupt(String ip);
+	public void sendAnalyticalDataInterrupt(String ip);
 
-	public void readAmplitude(String ip);
-
-	public void populateAmplitude(String ip, float[] xAxis, float[] yAxis);
-
-	public void sendAmplitudeInterrupt(String ip);
 }

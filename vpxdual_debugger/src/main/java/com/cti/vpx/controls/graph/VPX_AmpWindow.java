@@ -324,7 +324,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		parent.sendAmplitudeInterrupt(currentip);
+		//parent.sendAmplitudeInterrupt(currentip);
 
 	}
 
@@ -333,7 +333,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 		this.currentip = "";
 		
-		parent.reindexAmplitudeIndex();
+		//parent.reindexAmplitudeIndex();
 
 	}
 

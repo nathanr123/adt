@@ -1,6 +1,7 @@
 package com.cti.vpx.controls.graph.example;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import com.cti.vpx.controls.graph.sharedlibs.dsphostl.TimeStamp;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.waterfallGraph.IntensityWaterfallGraph;
@@ -33,23 +34,23 @@ public class WaterfallGraphPanel extends javax.swing.JPanel {
 
 		lineGraph.setThresholdValues(10, 200);
 
-		lineGraph.setGridVisible(true);
+		lineGraph.setGridVisible(false);
 
-		lineGraph.setZoomEnabled(true);
+		lineGraph.setZoomEnabled(false);
 
 		graphWrapper = new com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.GraphWrapper(lineGraph);
 
 		graphWrapper.replaceYAxis(lineGraph.getWaterfallIntensityAxis());
 
-		graphWrapper.setXAxisLabelVisible(true);
+		graphWrapper.setXAxisLabelVisible(false);
 
-		graphWrapper.setXAxisScaleVisible(true);
+		graphWrapper.setXAxisScaleVisible(false);
 
-		graphWrapper.setCursorCoordinatesVisible(true);
+		graphWrapper.setCursorCoordinatesVisible(false);
 
-		graphWrapper.getXAxisExtraPanel().setVisible(true);
+		graphWrapper.getXAxisExtraPanel().setVisible(false);
 
-		graphWrapper.setYAxisLabelVisible(true);
+		graphWrapper.setYAxisLabelVisible(false);
 
 		graphWrapper.setYAxisScaleVisible(false);
 
@@ -64,11 +65,16 @@ public class WaterfallGraphPanel extends javax.swing.JPanel {
 
 	}
 
-	public void addAmplitudeData(byte[] bytes) {
+	public void addWaterfallData(byte[] bytes) {
 
 		final float[] data = toFloatArray(bytes);
 
 		lineGraph.setAmplitudeData(new TimeStamp(), data);
+	}
+
+	public void addWaterfallData(float[] values) {
+
+		lineGraph.setAmplitudeData(new TimeStamp(), values);
 	}
 
 	private static float[] toFloatArray(byte[] bytes) {
@@ -92,9 +98,15 @@ public class WaterfallGraphPanel extends javax.swing.JPanel {
 	// Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
+		setBackground(Color.BLACK);
+
 		graphPanel = new javax.swing.JPanel();
 
+		graphPanel.setBackground(Color.BLACK);
+
 		controlPanel = new javax.swing.JPanel();
+
+		controlPanel.setBackground(Color.BLACK);
 
 		setLayout(new java.awt.BorderLayout());
 

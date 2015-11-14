@@ -69,9 +69,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private JMenuItem vpx_Cxt_EthFlash;
 
-	private JMenuItem vpx_Cxt_Amplitude;
-
-	private JMenuItem vpx_Cxt_Waterfall;
+	private JMenuItem vpx_Cxt_Spectrum;
 
 	private JMenuItem vpx_Cxt_MAD;
 
@@ -964,34 +962,21 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Amplitude = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Amplitude") + " ( "
-				+ (VPXConstants.MAX_AMPLITUDE - VPX_ETHWindow.currentNoofAmplitude) + " ) ");
+		vpx_Cxt_Spectrum = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Spectrum") + " ( "
+				+ (VPXConstants.MAX_SPECTRUM - VPX_ETHWindow.currentNoofSpectrum) + " ) ");
 
-		vpx_Cxt_Amplitude.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) getSelectionPath().getLastPathComponent();
-
-				parent.showAmplitude(rightClickedNode.getNodeIP());
-
-			}
-		});
-		vpx_Cxt_Waterfall = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Waterfall") + " ( "
-				+ (VPXConstants.MAX_WATERFALL - VPX_ETHWindow.currentNoofWaterfall) + " ) ");
-
-		vpx_Cxt_Waterfall.addActionListener(new ActionListener() {
+		vpx_Cxt_Spectrum.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				VPX_ProcessorNode rightClickedNode = (VPX_ProcessorNode) getSelectionPath().getLastPathComponent();
 
-				parent.showWaterfall(rightClickedNode.getNodeIP());
+				parent.showDataAnalyzer(rightClickedNode.getNodeIP());
 
 			}
 		});
+	
 
 		vpx_Cxt_MAD = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"),
 				VPXConstants.Icons.ICON_MAD);
@@ -1268,12 +1253,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_Cxt_MemoryPlot.setText((rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 					+ (VPXConstants.MAX_MEMORY_PLOT - VPX_ETHWindow.currentNoofMemoryPlot) + " ) "));
+		
 
-			vpx_Cxt_Waterfall.setText(rBundle.getString("Menu.Window.Waterfall") + " ( "
-					+ (VPXConstants.MAX_WATERFALL - VPX_ETHWindow.currentNoofWaterfall) + " ) ");
-
-			vpx_Cxt_Amplitude.setText(rBundle.getString("Menu.Window.Amplitude") + " ( "
-					+ (VPXConstants.MAX_AMPLITUDE - VPX_ETHWindow.currentNoofAmplitude) + " ) ");
+			vpx_Cxt_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
+					+ (VPXConstants.MAX_SPECTRUM - VPX_ETHWindow.currentNoofSpectrum) + " ) ");
 
 			if (nodeLevel == 0) { // VPXSystem - Root Node
 
@@ -1288,9 +1271,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
-				vpx_contextMenu.add(vpx_Cxt_Amplitude);
-
-				vpx_contextMenu.add(vpx_Cxt_Waterfall);
+				vpx_contextMenu.add(vpx_Cxt_Spectrum);
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
@@ -1353,9 +1334,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
-				vpx_contextMenu.add(vpx_Cxt_Amplitude);
-
-				vpx_contextMenu.add(vpx_Cxt_Waterfall);
+				vpx_contextMenu.add(vpx_Cxt_Spectrum);
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 

@@ -190,7 +190,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		setMinMaxValues(bytes);
 
-		newWaterfallGraph.addAmplitudeData(bytes);
+		newWaterfallGraph.addWaterfallData(bytes);
 	}
 
 	private void setMinMaxValues(byte[] bytes) {
@@ -241,7 +241,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		parent.sendWaterfallInterrupt(currentip);
+		//parent.sendWaterfallInterrupt(currentip);
 
 	}
 
@@ -250,7 +250,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		this.currentip = "";
 
-		parent.reindexWaterfallIndex();
+		//parent.reindexWaterfallIndex();
 	}
 
 	@Override

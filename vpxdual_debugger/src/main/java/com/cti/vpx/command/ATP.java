@@ -36,21 +36,17 @@ public interface ATP {
 
 	public static final int MSG_TYPE_LOADMEMORY_DONE = 0xCC;
 
-	public static final int MSG_TYPE_WATERFALL = 0xCD;
+	public static final int MSG_TYPE_DATA_ANALYSIS = 0xCD;
 
-	public static final int MSG_TYPE_AMPLITUDE = 0xCE;
+	public static final int MSG_TYPE_DATA_ANALYSISL_INTERRUPTED = 0xCE;
 
-	public static final int MSG_TYPE_WATERFALL_INTERRUPTED = 0xCF;
+	public static final int MSG_TYPE_EXECUTE_START = 0xD0;
 
-	public static final int MSG_TYPE_AMPLITUDE_INTERRUPTED = 0xD0;
+	public static final int MSG_TYPE_EXECUTE_STOP = 0xD1;
 
-	public static final int MSG_TYPE_EXECUTE_START = 0xD1;
+	public static final int MSG_TYPE_EXECUTE_PAUSE = 0xD2;
 
-	public static final int MSG_TYPE_EXECUTE_STOP = 0xD2;
-
-	public static final int MSG_TYPE_EXECUTE_PAUSE = 0xD3;
-
-	public static final int MSG_TYPE_EXECUTE_RESUME = 0xD4;
+	public static final int MSG_TYPE_EXECUTE_RESUME = 0xD3;
 
 	// Result
 	public static final int TFTP_FILEMODE_LINUX = 0x00;

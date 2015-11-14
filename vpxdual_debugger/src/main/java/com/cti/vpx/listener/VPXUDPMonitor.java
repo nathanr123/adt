@@ -33,7 +33,6 @@ import com.cti.vpx.model.VPX;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
-import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXSubnetFilter;
@@ -122,29 +121,37 @@ public class VPXUDPMonitor {
 
 	private byte[] plotBuff2;
 
-	// Amplitude Window
+	// Spectrum Window
 
-	private String[] amplitudeIPs = new String[VPXConstants.MAX_AMPLITUDE];
+	// spectrum offset
+	private static int spectrumOffset0 = 0;
 
-	// amplitude offset
-	private static int amplitudeOffset0 = 0;
+	private static int spectrumOffset1 = 0;
 
-	private static int amplitudeOffset1 = 0;
+	private static int spectrumOffset2 = 0;
 
-	private static int amplitudeOffset2 = 0;
+	private static int spectrumOffset3 = 0;
 
-	// amplitude buffer
-	private byte[] amplitudeBuff0;
+	private static int spectrumOffset4 = 0;
 
-	private byte[] amplitudeBuff1;
+	private static int spectrumOffset5 = 0;
 
-	private byte[] amplitudeBuff2;
+	// spectrum buffer
+	private byte[] spectrumBuff0;
+
+	private byte[] spectrumBuff1;
+
+	private byte[] spectrumBuff2;
+
+	private byte[] spectrumBuff3;
+
+	private byte[] spectrumBuff4;
+
+	private byte[] spectrumBuff5;
 
 	public VPXUDPMonitor() throws Exception {
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
-
-		init();
 
 		createDefaultMonitors();
 	}
@@ -156,8 +163,6 @@ public class VPXUDPMonitor {
 		parent = ((VPX_ETHWindow) listener);
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
-
-		init();
 
 		createDefaultMonitors();
 
@@ -218,16 +223,6 @@ public class VPXUDPMonitor {
 		advertisementMonitor.stopMonitor();
 
 		communicationMonitor.stopMonitor();
-
-	}
-
-	private void init() {
-
-		// Initialize amplitude ips
-		for (int i = 0; i < VPXConstants.MAX_AMPLITUDE; i++) {
-
-			amplitudeIPs[i] = "";
-		}
 
 	}
 
@@ -1586,14 +1581,16 @@ public class VPXUDPMonitor {
 		}
 	}
 
-	public void readWaterfallData(String ip) {
+	public void readSpectrum(String ip, int core, int id) {
 
 		DatagramSocket datagramSocket;
 
 		try {
 			datagramSocket = new DatagramSocket();
 
-			DSPATPCommand msg = new DSPATPCommand();
+			PROCESSOR_LIST procesor = vpxSystem.getProcessorTypeByIP(ip);
+
+			ATPCommand msg = (procesor == PROCESSOR_LIST.PROCESSOR_P2020) ? new P2020ATPCommand() : new DSPATPCommand();
 
 			byte[] buffer = new byte[msg.size()];
 
@@ -1605,14 +1602,18 @@ public class VPXUDPMonitor {
 
 			msg.msgID.set(ATP.MSG_ID_GET);
 
-			msg.msgType.set(ATP.MSG_TYPE_WATERFALL);
+			msg.msgType.set(ATP.MSG_TYPE_DATA_ANALYSIS);
+
+			msg.params.memoryinfo.memIndex.set(id);
+
+			msg.params.memoryinfo.core.set(core);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
-			VPXLogger.updateLog(String.format("Read waterfall from %s", ip));
+			VPXLogger.updateLog("Data read from " + ip);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -1621,7 +1622,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void setWaterfallInterrupted(String ip) {
+	public void setSpectrumInterrupted(String ip) {
 
 		DatagramSocket datagramSocket;
 
@@ -1640,14 +1641,14 @@ public class VPXUDPMonitor {
 
 			msg.msgID.set(ATP.MSG_ID_SET);
 
-			msg.msgType.set(ATP.MSG_TYPE_WATERFALL_INTERRUPTED);
+			msg.msgType.set(ATP.MSG_TYPE_DATA_ANALYSISL_INTERRUPTED);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
 					VPXUDPListener.COMM_PORTNO);
 
 			datagramSocket.send(packet);
 
-			VPXLogger.updateLog(String.format("Reading waterfall from %s interrupted", ip));
+			VPXLogger.updateLog(String.format("Reading data from %s interrupted", ip));
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -1656,273 +1657,34 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void populateWaterfallData(String ip, ATPCommand msg) {
-
-		byte[] b = new byte[msg.params.memoryinfo.buffer.length];
-
-		for (int i = 0; i < b.length; i++) {
-
-			b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
-
-		}
-
-		parent.populateWaterfall(ip, b);
-
-	}
-
-	public void readAmplitudeData(String ip) {
-
-		DatagramSocket datagramSocket;
+	public void populateSpectrum(String ip, ATPCommand msg) {
 
 		try {
 
-			if (isContainingAmplitudeIP(ip) < 0) {
-				addAmplitudeIP(ip);
-			}
+			int index = (int) msg.params.memoryinfo.memIndex.get();
 
-			datagramSocket = new DatagramSocket();
+			byte[] b = new byte[(int) msg.params.memoryinfo.length.get() * 4];
 
-			DSPATPCommand msg = new DSPATPCommand();
-
-			byte[] buffer = new byte[msg.size()];
-
-			ByteBuffer bf = ByteBuffer.wrap(buffer);
-
-			bf.order(msg.byteOrder());
-
-			msg.setByteBuffer(bf, 0);
-
-			msg.msgID.set(ATP.MSG_ID_GET);
-
-			msg.msgType.set(ATP.MSG_TYPE_AMPLITUDE);
-
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
-
-			VPXLogger.updateLog(String.format("Read amplitude from %s", ip));
-
-		} catch (Exception e) {
-
-			removeAmplitudeIP(ip);
-			VPXLogger.updateError(e);
-			e.printStackTrace();
-		}
-
-	}
-
-	public void setAmplitudeInterrupted(String ip) {
-
-		DatagramSocket datagramSocket;
-
-		try {
-			datagramSocket = new DatagramSocket();
-
-			DSPATPCommand msg = new DSPATPCommand();
-
-			byte[] buffer = new byte[msg.size()];
-
-			ByteBuffer bf = ByteBuffer.wrap(buffer);
-
-			bf.order(msg.byteOrder());
-
-			msg.setByteBuffer(bf, 0);
-
-			msg.msgID.set(ATP.MSG_ID_SET);
-
-			msg.msgType.set(ATP.MSG_TYPE_AMPLITUDE_INTERRUPTED);
-
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
-
-			datagramSocket.send(packet);
-
-			removeAmplitudeIP(ip);
-
-			VPXLogger.updateLog(String.format("Reading amplitude from %s interrupted", ip));
-
-		} catch (Exception e) {
-			VPXLogger.updateError(e);
-			e.printStackTrace();
-		}
-
-	}
-
-	public synchronized void populateAmplitudeData(String ip, ATPCommand msg) {
-
-		try {
-			boolean isComplete = false;
-
-			int index = isContainingAmplitudeIP(ip);
-
-			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
+			float[] fl = new float[(int) msg.params.memoryinfo.length.get()];
 
 			for (int i = 0; i < b.length; i++) {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
-
-				// if(ip.endsWith("140")){
-				// printBytes(b[i], i);
-				// }
+				
+			//	printBytes(b[i], i);
 
 			}
 
-			float[] f0 = new float[b.length / 4];
+			ByteBuffer.wrap(b).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(fl);
 
-			ByteBuffer.wrap(b).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(f0);
+			parent.populateAnalyticalData(ip, (int) msg.params.memoryinfo.core.get(), index, fl);
 
-			if (msg.params.flash_info.totalnoofpackets.get() > 1) {
-
-				if (msg.params.flash_info.currentpacket.get() == 1) {
-
-					if (index == 0) {
-
-						amplitudeBuff0 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
-
-						System.arraycopy(b, 0, amplitudeBuff0, 0, b.length);
-
-					} else if (index == 1) {
-
-						amplitudeBuff1 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
-
-						System.arraycopy(b, 0, amplitudeBuff1, 0, b.length);
-
-					} else if (index == 2) {
-
-						amplitudeBuff2 = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
-
-						System.arraycopy(b, 0, amplitudeBuff2, 0, b.length);
-
-					}
-
-					isComplete = false;
-
-				} else if (msg.params.flash_info.currentpacket.get() == msg.params.flash_info.totalnoofpackets.get()) {
-
-					if (index == 0) {
-
-						amplitudeOffset0 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
-
-						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
-
-					} else if (index == 1) {
-
-						amplitudeOffset1 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
-
-						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
-
-					} else if (index == 2) {
-
-						amplitudeOffset2 = (int) (msg.params.flash_info.currentpacket.get() - 1) * 1024;
-
-						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
-
-					}
-
-					isComplete = true;
-
-				} else {
-
-					if (index == 0) {
-
-						amplitudeOffset0 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
-
-						System.arraycopy(b, 0, amplitudeBuff0, amplitudeOffset0, b.length);
-
-					} else if (index == 1) {
-
-						amplitudeOffset1 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
-
-						System.arraycopy(b, 0, amplitudeBuff1, amplitudeOffset1, b.length);
-
-					} else if (index == 2) {
-
-						amplitudeOffset2 = (int) ((msg.params.flash_info.currentpacket.get() - 1) * 1024);
-
-						System.arraycopy(b, 0, amplitudeBuff2, amplitudeOffset2, b.length);
-
-					}
-
-					isComplete = false;
-				}
-
-			} else {
-
-				int len = (int) (msg.params.flash_info.totalnoofpackets.get() * 1024);
-
-				if (index == 0) {
-
-					amplitudeBuff0 = new byte[len];
-
-					amplitudeOffset0 = 0;
-
-					System.arraycopy(b, amplitudeOffset0, amplitudeBuff0, 0, len);
-
-				} else if (index == 1) {
-
-					amplitudeBuff1 = new byte[len];
-
-					amplitudeOffset1 = 0;
-
-					System.arraycopy(b, amplitudeOffset1, amplitudeBuff1, 0, len);
-
-				} else if (index == 2) {
-
-					amplitudeBuff2 = new byte[len];
-
-					amplitudeOffset2 = 0;
-
-					System.arraycopy(b, amplitudeOffset2, amplitudeBuff2, 0, len);
-
-				}
-
-				isComplete = true;
-			}
-
-			if (isComplete) {
-
-				float[] fl = new float[(int) msg.params.flash_info.totalfilesize.get() * 2];
-
-				byte[] bb = new byte[(int) (msg.params.flash_info.totalnoofpackets.get() * 1024)];
-
-				if (index == 0) {
-					System.arraycopy(amplitudeBuff0, 0, bb, 0, bb.length);
-
-				} else if (index == 1) {
-					System.arraycopy(amplitudeBuff1, 0, bb, 0, bb.length);
-
-				} else if (index == 2) {
-					System.arraycopy(amplitudeBuff2, 0, bb, 0, bb.length);
-
-				}
-
-				ByteBuffer.wrap(bb).order(ATP.BYTEORDER_DSP).asFloatBuffer().get(fl);
-
-				float x[] = new float[fl.length / 2];
-
-				float y[] = new float[fl.length / 2];
-
-				int k = 0;
-
-				for (int i = 0; i < fl.length; i += 2) {
-
-					x[k] = fl[i];
-
-					y[k] = fl[i + 1];
-
-					k++;
-
-				}
-
-				((VPX_ETHWindow) listener).populateAmplitude(ip, x, y);
-
-			}
 		} catch (Exception e) {
+
 			VPXLogger.updateError(e);
+
 			e.printStackTrace();
 		}
-
 	}
 
 	public void populateBISTResult(String ip, ATPCommand msg) {
@@ -2329,15 +2091,9 @@ public class VPXUDPMonitor {
 
 				break;
 
-			case ATP.MSG_TYPE_WATERFALL:
+			case ATP.MSG_TYPE_DATA_ANALYSIS:
 
-				populateWaterfallData(ip, msgCommand);
-
-				break;
-
-			case ATP.MSG_TYPE_AMPLITUDE:
-
-				populateAmplitudeData(ip, msgCommand);
+				populateSpectrum(ip, msgCommand);
 
 				break;
 
@@ -2575,68 +2331,6 @@ public class VPXUDPMonitor {
 		public void stopMonitor() {
 			cancel(true);
 		}
-	}
-
-	private void addAmplitudeIP(String ip) {
-
-		int idx = -1;
-
-		for (int i = 0; i < amplitudeIPs.length; i++) {
-
-			if (amplitudeIPs[i].equals(ip)) {
-
-				idx = -1;
-
-				break;
-			} else {
-
-				if (amplitudeIPs[i].equals("")) {
-
-					idx = i;
-
-					break;
-
-				}
-
-			}
-
-		}
-
-		if (idx > -1) {
-			amplitudeIPs[idx] = ip;
-		}
-
-	}
-
-	private void removeAmplitudeIP(String ip) {
-
-		for (int i = 0; i < amplitudeIPs.length; i++) {
-
-			if (amplitudeIPs[i].equals(ip)) {
-
-				amplitudeIPs[i] = "";
-
-				break;
-			}
-		}
-
-	}
-
-	private int isContainingAmplitudeIP(String ip) {
-
-		int ret = -1;
-
-		for (int i = 0; i < amplitudeIPs.length; i++) {
-
-			if (amplitudeIPs[i].equals(ip)) {
-
-				ret = i;
-
-				break;
-			}
-		}
-
-		return ret;
 	}
 
 	private void printBytes(byte byteVal, int i) {

@@ -7,11 +7,18 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -33,28 +40,29 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.cti.vpx.controls.graph.example.WaterfallGraphPanel;
+import com.cti.vpx.model.Processor;
+import com.cti.vpx.model.VPXSubSystem;
+import com.cti.vpx.model.VPXSystem;
+import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 import net.miginfocom.swing.MigLayout;
 
-public class VPX_SpectrumWindow extends JDialog {
+public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7945447785324008590L;
 
-	private String currentSubSystem;
+	private String currentSubSystem = "";
 
-	private String currentProcIP;
+	private String currentProcIP = "";
 
 	private final JPanel contentPanel = new JPanel();
-
-	private JLabel lblSubSystemVal;
-
-	private JLabel lblProcessorVal;
 
 	private JLabel lblMins;
 
@@ -77,7 +85,22 @@ public class VPX_SpectrumWindow extends JDialog {
 	private int spectrumID = -1;
 
 	private Thread autoRefreshThread = null;
+
 	private JSlider slideAutoRefresh;
+
+	private VPX_ETHWindow parent;
+
+	private VPXSystem vpxSystem;
+
+	private JComboBox<String> cmbSubSystem;
+
+	private JComboBox<String> cmbProcessor;
+
+	private JLabel lblMinVal;
+
+	private JLabel lblMaxVal;
+
+	private JCheckBox chkWaterfall;
 
 	/**
 	 * Launch the application.
@@ -94,8 +117,37 @@ public class VPX_SpectrumWindow extends JDialog {
 
 	/**
 	 * Create the dialog.
+	 * 
+	 * @wbp.parser.constructor
 	 */
+	public VPX_SpectrumWindow(VPX_ETHWindow parent, int id) {
+
+		this.spectrumID = id;
+
+		this.parent = parent;
+
+		setTitle("Data Graph " + (spectrumID + 1));
+
+		newWaterfallGraph = new WaterfallGraphPanel();
+
+		init();
+
+		loadComponents();
+
+		updateProcessorDetail();
+
+		loadGraphObjects();
+
+		centerFrame();
+
+	}
+
 	public VPX_SpectrumWindow(VPX_ETHWindow parent, String subsystem, String ip) {
+
+		this.parent = parent;
+
+		this.spectrumID = -1;
+
 		setTitle("Data Graph");
 
 		this.currentProcIP = ip;
@@ -128,6 +180,10 @@ public class VPX_SpectrumWindow extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
 		contentPanel.setLayout(new BorderLayout(0, 0));
+
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+		addWindowListener(this);
 	}
 
 	private void loadComponents() {
@@ -141,32 +197,48 @@ public class VPX_SpectrumWindow extends JDialog {
 
 		contentPanel.add(panelFilter, BorderLayout.NORTH);
 
-		panelFilter.setLayout(
-				new MigLayout("", "[88px][69px][85px][10px][214px][21px][49px][57px][][][][]", "[29px][30px,center]"));
+		panelFilter.setLayout(new MigLayout("",
+				"[88px,left][pref!,grow][85px,fill][10px][214px][21px][49px][57px][][][][]", "[29px][30px,center]"));
 
 		JLabel lblSubSystem = new JLabel("Sub System");
+		lblSubSystem.setHorizontalAlignment(SwingConstants.LEFT);
 
-		panelFilter.add(lblSubSystem, "cell 0 0,grow");
+		panelFilter.add(lblSubSystem, "cell 0 0,alignx trailing,growy");
 
-		lblSubSystemVal = new JLabel("Unlisted");
+		cmbSubSystem = new JComboBox<String>();
 
-		panelFilter.add(lblSubSystemVal, "cell 1 0,grow");
+		cmbSubSystem.setPreferredSize(new Dimension(120, 20));
 
-		JLabel lblMinVal = new JLabel("66");
+		cmbSubSystem.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbSubSystem)) {
+
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
+						loadProcessors();
+					}
+				}
+			}
+		});
+
+		panelFilter.add(cmbSubSystem, "cell 1 0,growx");
+
+		lblMinVal = new JLabel("66");
 
 		lblMinVal.setPreferredSize(new Dimension(45, 25));
 
 		panelFilter.add(lblMinVal, "cell 11 0");
 
 		JLabel lblProcessor = new JLabel("Processor");
+		lblProcessor.setHorizontalAlignment(SwingConstants.LEFT);
 
-		panelFilter.add(lblProcessor, "cell 0 1,alignx left,growy");
-
-		lblProcessorVal = new JLabel("172.17.1.2");
-
-		panelFilter.add(lblProcessorVal, "cell 1 1,alignx left,growy");
+		panelFilter.add(lblProcessor, "cell 0 1,alignx trailing,growy");
 
 		JLabel lblGraphObject = new JLabel("Graph Object");
+		lblGraphObject.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		panelFilter.add(lblGraphObject, "cell 2 0,grow");
 
@@ -174,9 +246,14 @@ public class VPX_SpectrumWindow extends JDialog {
 
 		panelFilter.add(cmbGraphObject, "cell 4 0,growx,aligny center");
 
-		JLabel lblAutoRefresh = new JLabel("Auto Refresh");
+		cmbProcessor = new JComboBox<String>();
+		cmbProcessor.setPreferredSize(new Dimension(120, 20));
+		panelFilter.add(cmbProcessor, "cell 1 1,growx");
 
-		panelFilter.add(lblAutoRefresh, "cell 2 1 3 1,alignx left,growy");
+		JLabel lblAutoRefresh = new JLabel("Auto Refresh");
+		lblAutoRefresh.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		panelFilter.add(lblAutoRefresh, "cell 2 1,alignx left,growy");
 
 		slideAutoRefresh = new JSlider();
 
@@ -216,7 +293,7 @@ public class VPX_SpectrumWindow extends JDialog {
 
 		panelFilter.add(btnStart, "cell 7 1,alignx center,aligny center");
 
-		JCheckBox chkWaterfall = new JCheckBox("Waterfall");
+		chkWaterfall = new JCheckBox("Waterfall");
 
 		panelFilter.add(chkWaterfall, "cell 5 0 2 1,alignx left,aligny center");
 
@@ -228,7 +305,7 @@ public class VPX_SpectrumWindow extends JDialog {
 
 		panelFilter.add(lblMin, "cell 9 0");
 
-		JLabel lblMaxVal = new JLabel("4A");
+		lblMaxVal = new JLabel("4A");
 
 		lblMaxVal.setPreferredSize(new Dimension(45, 25));
 
@@ -253,7 +330,7 @@ public class VPX_SpectrumWindow extends JDialog {
 		panelWaterfall.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Waterfall",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
 
-		panelWaterfall.setPreferredSize(new Dimension(10, 250));
+		panelWaterfall.setPreferredSize(new Dimension(10, 350));
 
 		panelWaterfall.setLayout(new BorderLayout(0, 0));
 
@@ -277,7 +354,7 @@ public class VPX_SpectrumWindow extends JDialog {
 		final JFreeChart chart = createChart(dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
-
+		
 		chartPanel.setPopupMenu(null);
 
 		panelAmplitude.add(chartPanel, BorderLayout.CENTER);
@@ -309,6 +386,22 @@ public class VPX_SpectrumWindow extends JDialog {
 			}
 		});
 
+		cmbProcessor.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbProcessor)) {
+
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
+						loadGraphObjects();
+					}
+				}
+			}
+		});
+
+		loadSubSystems();
 	}
 
 	private JFreeChart createChart(final XYDataset dataset) {
@@ -353,10 +446,6 @@ public class VPX_SpectrumWindow extends JDialog {
 
 	private void updateProcessorDetail() {
 
-		lblProcessorVal.setText(currentProcIP);
-
-		lblSubSystemVal.setText(currentSubSystem);
-
 	}
 
 	private void loadGraphObjects() {
@@ -388,6 +477,8 @@ public class VPX_SpectrumWindow extends JDialog {
 	private void startPopulateData() {
 
 		// send command to to populate data
+
+		doReadData();
 
 		isStarted = true;
 
@@ -424,6 +515,7 @@ public class VPX_SpectrumWindow extends JDialog {
 						try {
 
 							// send command to to populate data
+							doReadData();
 
 							Thread.sleep(currentThreadSleepTime);
 
@@ -440,6 +532,224 @@ public class VPX_SpectrumWindow extends JDialog {
 
 			autoRefreshThread.start();
 		}
+
+	}
+
+	public void showSpectrumWindow() {
+
+		loadSubSystems();
+
+		cmbSubSystem.setSelectedItem(VPXSessionManager.getCurrentSubSystem());
+
+		cmbProcessor.setSelectedItem(VPXSessionManager.getCurrentProcessor());
+
+		setVisible(true);
+	}
+
+	private void loadSubSystems() {
+
+		vpxSystem = VPXSessionManager.getVPXSystem();
+
+		cmbSubSystem.removeAllItems();
+
+		cmbSubSystem.addItem("Select SubSystem");
+
+		List<VPXSubSystem> subsystem = vpxSystem.getSubsystem();
+
+		if (subsystem.size() > 0) {
+
+			for (Iterator<VPXSubSystem> iterator = subsystem.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				cmbSubSystem.addItem(vpxSubSystem.getSubSystem());
+			}
+		}
+
+		List<Processor> unlist = vpxSystem.getUnListed();
+
+		if (unlist.size() > 0) {
+
+			cmbSubSystem.addItem(VPXConstants.VPXUNLIST);
+		}
+
+	}
+
+	private void loadProcessors() {
+
+		cmbProcessor.removeAllItems();
+
+		cmbProcessor.addItem("Select Processor");
+
+		if (cmbSubSystem.getSelectedIndex() > 0) {
+
+			VPXSubSystem curProcFilter = vpxSystem.getSubSystemByName(cmbSubSystem.getSelectedItem().toString());
+
+			List<VPXSubSystem> s = vpxSystem.getSubsystem();
+
+			for (Iterator<VPXSubSystem> iterator = s.iterator(); iterator.hasNext();) {
+
+				VPXSubSystem vpxSubSystem = iterator.next();
+
+				if (vpxSubSystem.getSubSystem().equals(cmbSubSystem.getSelectedItem().toString())) {
+
+					curProcFilter = vpxSubSystem;
+
+					// cmbProcessor.addItem(vpxSubSystem.getIpP2020());
+
+					cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
+
+					cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
+
+					break;
+
+				}
+
+			}
+
+			if (curProcFilter == null) {
+
+				List<Processor> p = vpxSystem.getUnListed();
+
+				for (Iterator<Processor> iterator = p.iterator(); iterator.hasNext();) {
+
+					Processor processor = iterator.next();
+
+					if (!processor.getName().contains("P2020")) {
+
+						cmbProcessor.addItem(processor.getiP_Addresses());
+					}
+				}
+
+			}
+		}
+
+	}
+
+	private void doReadData() {
+
+		parent.readAnalyticalData(cmbProcessor.getSelectedItem().toString(), cmbGraphObject.getSelectedIndex(),
+				spectrumID);
+	}
+
+	public void loadData(int core, float yAxis[]) {
+
+		float[] f = new float[1024];
+
+		this.series.clear();
+
+		this.dataset.removeSeries(series);
+
+		for (int i = 0; i < yAxis.length; i++) {
+			yAxis[i] = ((Float.isNaN(yAxis[i])) ? 0 : yAxis[i]);
+		}
+
+		for (int i = 0; i < yAxis.length; i++) {
+
+			final double x = i;
+
+			final double y = yAxis[i];
+
+			this.series.addOrUpdate(x, y);
+		}
+
+		this.dataset.addSeries(series);
+
+		if (chkWaterfall.isSelected()) {
+
+			if (yAxis.length != 1024) {
+
+				for (int i = 0; i < yAxis.length; i++) {
+
+					f[i] = yAxis[i];
+				}
+
+				for (int i = yAxis.length; i < 1024; i++) {
+
+					f[i] = 0;
+				}
+
+				newWaterfallGraph.addWaterfallData(f);
+
+			} else {
+
+				newWaterfallGraph.addWaterfallData(yAxis);
+			}
+
+		}
+
+		setMinMaxValues(yAxis);
+
+	}
+
+	private void setMinMaxValues(float[] yValues) {
+
+		if (yValues.length > 0) {
+
+			// assign first element of an array to largest and smallest
+			double smallest = yValues[0];
+
+			double largetst = yValues[0];
+
+			for (int i = 1; i < yValues.length; i++) {
+
+				double b = yValues[i];
+
+				if (b > largetst)
+					largetst = b;
+				else if (b < smallest)
+					smallest = b;
+
+			}
+
+			lblMaxVal.setText("" + largetst);
+
+			lblMinVal.setText("" + smallest);
+		}
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+
+		parent.sendAnalyticalDataInterrupt(currentProcIP);
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+
+		parent.reindexSpectrumWindowIndex();
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 

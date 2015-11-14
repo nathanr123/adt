@@ -256,7 +256,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			msg.msgID.set(ATP.MSG_ID_GET);
 
-			msg.msgType.set(ATP.MSG_TYPE_WATERFALL);
+			msg.msgType.set(ATP.MSG_TYPE_DATA_ANALYSIS);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName("172.17.10.130"),
 					VPXUDPListener.COMM_PORTNO);
@@ -274,7 +274,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 	public void getAmplitude() {
 
-		udp.readAmplitudeData("172.17.10.130");
+		// udp.readAmplitudeData("172.17.10.130");
 		/*
 		 * 
 		 * DatagramSocket datagramSocket;
@@ -1270,39 +1270,21 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 	}
 
 	@Override
-	public void readWaterfall(String ip) {
+	public void sendAnalyticalDataInterrupt(String ip) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void populateWaterfall(String ip, byte[] bytes) {
+	public void readAnalyticalData(String ip, int core, int id) {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
-	public void sendWaterfallInterrupt(String ip) {
+	public void populateAnalyticalData(String ip, int core, int id, float[] yAxis) {
 		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void readAmplitude(String ip) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void populateAmplitude(String ip, float[] xAxis, float[] yAxis) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendAmplitudeInterrupt(String ip) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 }
