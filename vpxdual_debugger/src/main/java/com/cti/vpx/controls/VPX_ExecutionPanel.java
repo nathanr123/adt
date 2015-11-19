@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
+import com.cti.vpx.view.VPX_ETHWindow;
 
 public class VPX_ExecutionPanel extends JPanel {
 
@@ -66,6 +68,10 @@ public class VPX_ExecutionPanel extends JPanel {
 
 	private JPanel basePanel;
 
+	private VPX_ETHWindow parent;
+
+	private VPX_ExecutionFileTransferingWindow processingWindow = new VPX_ExecutionFileTransferingWindow(this);
+
 	public static void main(String[] args) {
 
 		try {
@@ -80,8 +86,10 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			f.getContentPane().setLayout(new BorderLayout());
 
-			f.getContentPane().add(new VPX_ExecutionPanel());
+			f.getContentPane().add(new VPX_ExecutionPanel(null));
+
 			f.setVisible(true);
+
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
 		}
@@ -90,7 +98,12 @@ public class VPX_ExecutionPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public VPX_ExecutionPanel() {
+	public VPX_ExecutionPanel(VPX_ETHWindow prnt) {
+
+		this.parent = prnt;
+
+		processingWindow.setParent(parent);
+
 		init();
 
 		loadComponents();
@@ -108,8 +121,8 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		basePanel = new JPanel();
 
-		basePanel.setBorder(new TitledBorder(null, "Out File Configuration", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
+		basePanel.setBorder(
+				new TitledBorder(null, "Out File Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		add(basePanel, BorderLayout.CENTER);
 
@@ -717,6 +730,22 @@ public class VPX_ExecutionPanel extends JPanel {
 		basePanel.add(batchControlPanel);
 
 		JButton btnBatchDL = new JButton("Batch Download");
+
+		btnBatchDL.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				String[] fileArray = { "D:/outs/EXECUTE_OUT0.out", "D:/outs/EXECUTE_OUT1.out",
+						"D:/outs/EXECUTE_OUT2.out", "D:/outs/EXECUTE_OUT3.out", "D:/outs/EXECUTE_OUT4.out",
+						"D:/outs/EXECUTE_OUT5.out", "D:/outs/EXECUTE_OUT6.out", "D:/outs/EXECUTE_OUT7.out" };
+
+				processingWindow.setFiles(fileArray);
+
+				processingWindow.showProgress();
+
+			}
+		});
 
 		btnBatchDL.setSize(111, 26);
 

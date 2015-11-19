@@ -220,6 +220,16 @@ public class VPXSessionManager {
 				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG_MESSAGE));
 	}
 
+	public static String getExecutePath() {
+
+		
+		return "C:\\Users\\kamalanathan\\vpxWorkspace\\execute";
+		/*
+		return getAsFullPath(currentWorkspacePath,
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_EXECUTE));
+*/
+	}
+
 	public static String getTFTPPath() {
 
 		return getAsFullPath(getWorkspacePath(),

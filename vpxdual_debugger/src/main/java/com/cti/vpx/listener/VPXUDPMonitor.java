@@ -18,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import com.cti.vpx.command.ATP;
 import com.cti.vpx.command.ATP.MESSAGE_MODE;
 import com.cti.vpx.command.ATPCommand;
+import com.cti.vpx.command.BISTCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.DSPMSGCommand;
 import com.cti.vpx.command.MSGCommand;
@@ -29,7 +30,6 @@ import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
-import com.cti.vpx.model.VPX;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -120,34 +120,6 @@ public class VPXUDPMonitor {
 	private byte[] plotBuff1;
 
 	private byte[] plotBuff2;
-
-	// Spectrum Window
-
-	// spectrum offset
-	private static int spectrumOffset0 = 0;
-
-	private static int spectrumOffset1 = 0;
-
-	private static int spectrumOffset2 = 0;
-
-	private static int spectrumOffset3 = 0;
-
-	private static int spectrumOffset4 = 0;
-
-	private static int spectrumOffset5 = 0;
-
-	// spectrum buffer
-	private byte[] spectrumBuff0;
-
-	private byte[] spectrumBuff1;
-
-	private byte[] spectrumBuff2;
-
-	private byte[] spectrumBuff3;
-
-	private byte[] spectrumBuff4;
-
-	private byte[] spectrumBuff5;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -383,7 +355,7 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, "172.17.1.130", VPXUDPListener.COMM_PORTNO, false);
 
 			VPXLogger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
 
@@ -939,9 +911,9 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void startBist(String ip, String SubSystem) {
+	public void startBist(String ip, String SubSystem, BIST bit) {
 
-		bist = new BIST();
+		bist = bit;// new BIST();
 
 		pass = 0;
 
@@ -1670,8 +1642,8 @@ public class VPXUDPMonitor {
 			for (int i = 0; i < b.length; i++) {
 
 				b[i] = (byte) msg.params.memoryinfo.buffer[i].get();
-				
-			//	printBytes(b[i], i);
+
+				// printBytes(b[i], i);
 
 			}
 
@@ -1776,7 +1748,140 @@ public class VPXUDPMonitor {
 				bist.setDSP2Completed(true);
 			}
 
-			if (bist.isDSP1Completed() && bist.isP2020Completed() && bist.isDSP2Completed()) {
+			// if (bist.isAllCompleted()) {// (bist.isDSP1Completed() &&
+			// bist.isP2020Completed() &&
+			// bist.isDSP2Completed()) {
+
+			bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
+
+			bist.setResultTestFailed(String.format("%d Tests", fail));
+
+			if (fail == 0) {
+
+				bist.setResultTestStatus("Success !");
+
+				VPXLogger.updateLog("Built In Self Test Success");
+
+			} else {
+
+				bist.setResultTestStatus("Failed !");
+
+				VPXLogger.updateLog("Built In Self Test Failed");
+			}
+
+			bist.setResultTestPassed(String.format("%d Tests", pass));
+
+			bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
+
+			bist.setResultTestDuration(
+					VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
+
+			((VPXCommunicationListener) listener).updateBIST(bist);
+			// }
+
+			// if (loop == VPXSessionManager.getBISTProcessor().size()) {
+
+			// ((VPXCommunicationListener)
+			// listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
+
+			// VPXLogger.updateLog(String.format("Built In Self Test
+			// completed"));
+			// }
+		}
+	}
+
+	public void populateBISTResult(String ip, BISTCommand msg) {
+
+		if (bist != null) {
+
+			if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_P2020) {
+
+				bist.setResultP2020Processor(getResultInColor(msg.test.RESULT_P2020_PROCESSOR.get(), 0));
+
+				bist.setResultP2020DDR3(getResultInColor(msg.test.RESULT_P2020_DDR3.get(), 0));
+
+				bist.setResultP2020NORFlash(getResultInColor(msg.test.RESULT_P2020_NORFLASH.get(), 0));
+
+				bist.setResultP2020Ethernet(getResultInColor(msg.test.RESULT_P2020_ETHERNET.get(), 0));
+
+				bist.setResultP2020SRIO(getResultInColor(msg.test.RESULT_P2020_SRIO.get(), 0));
+
+				bist.setResultP2020PCIe(getResultInColor(msg.test.RESULT_P2020_PCIE.get(), 0));
+
+				bist.setResultP2020Temprature1(getResultInColor(msg.test.RESULT_P2020_TEMP1.get(), 1));
+
+				bist.setResultP2020Temprature2(getResultInColor(msg.test.RESULT_P2020_TEMP2.get(), 1));
+
+				bist.setResultP2020Temprature3(getResultInColor(msg.test.RESULT_P2020_TEMP3.get(), 1));
+
+				bist.setResultP2020Voltage1(getResultInColor(msg.test.RESULT_P2020_VOLT1_3p3.get(), 2));
+
+				bist.setResultP2020Voltage2(getResultInColor(msg.test.RESULT_P2020_VOLT2_2p5.get(), 2));
+
+				bist.setResultP2020Voltage3(getResultInColor(msg.test.RESULT_P2020_VOLT3_1p8.get(), 2));
+
+				bist.setResultP2020Voltage4(getResultInColor(msg.test.RESULT_P2020_VOLT4_1p5.get(), 2));
+
+				bist.setResultP2020Voltage5(getResultInColor(msg.test.RESULT_P2020_VOLT5_1p2.get(), 2));
+
+				bist.setResultP2020Voltage6(getResultInColor(msg.test.RESULT_P2020_VOLT6_1p0.get(), 2));
+
+				bist.setResultP2020Voltage7(getResultInColor(msg.test.RESULT_P2020_VOLT7_1p05.get(), 2));
+
+				bist.setTestP2020IP(ip);
+
+				loop++;
+
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, loop);
+
+				VPXLogger.updateLog(String.format("P2020 (%s) test is completed", ip));
+
+				bist.setP2020Completed(true);
+
+			} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP1) {
+
+				bist.setResultDSP1DDR3(getResultInColor(msg.test.RESULT_DSP_DDR3.get(), 0));
+
+				bist.setResultDSP1NAND(getResultInColor(msg.test.RESULT_DSP_NAND.get(), 0));
+
+				bist.setResultDSP1NOR(getResultInColor(msg.test.RESULT_DSP_NOR.get(), 0));
+
+				bist.setResultDSP1Processor(getResultInColor(msg.test.RESULT_DSP_PROCESSOR.get(), 0));
+
+				bist.setTestDSP1IP(ip);
+
+				loop++;
+
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP1, loop);
+
+				VPXLogger.updateLog(String.format("DSP 1 (%s) test is completed", ip));
+
+				bist.setDSP1Completed(true);
+
+			} else if (msg.processorTYPE.get() == ATP.PROCESSOR_TYPE.PROCESSOR_DSP2) {
+
+				bist.setResultDSP2DDR3(getResultInColor(msg.test.RESULT_DSP_DDR3.get(), 0));
+
+				bist.setResultDSP2NAND(getResultInColor(msg.test.RESULT_DSP_NAND.get(), 0));
+
+				bist.setResultDSP2NOR(getResultInColor(msg.test.RESULT_DSP_NOR.get(), 0));
+
+				bist.setResultDSP2Processor(getResultInColor(msg.test.RESULT_DSP_PROCESSOR.get(), 0));
+
+				bist.setTestDSP2IP(ip);
+
+				loop++;
+
+				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_DSP2, loop);
+
+				VPXLogger.updateLog(String.format("DSP 2 (%s) test is completed", ip));
+
+				bist.setDSP2Completed(true);
+			}
+
+			if (bist.isAllCompleted()) {// (bist.isDSP1Completed() &&
+										// bist.isP2020Completed() &&
+										// bist.isDSP2Completed()) {
 
 				bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
 
@@ -1805,37 +1910,13 @@ public class VPXUDPMonitor {
 				((VPXCommunicationListener) listener).updateBIST(bist);
 			}
 
-			if (loop == VPXSessionManager.getBISTProcessor().size()) {
+			if (loop == bist.getTotalProcessor()) {
 
 				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
 
 				VPXLogger.updateLog(String.format("Built In Self Test completed"));
 			}
 		}
-	}
-
-	private boolean isAllProcessorsCompletedBIST(BIST bit) {
-
-		List<VPX.PROCESSOR_LIST> proc = VPXSessionManager.getBISTProcessor();
-
-		if (loop == proc.size()) {
-
-			for (Iterator<PROCESSOR_LIST> iterator = proc.iterator(); iterator.hasNext();) {
-
-				PROCESSOR_LIST processor_LIST = iterator.next();
-
-				if (processor_LIST == PROCESSOR_LIST.PROCESSOR_P2020) {
-
-				} else if (processor_LIST == PROCESSOR_LIST.PROCESSOR_DSP1) {
-
-				} else if (processor_LIST == PROCESSOR_LIST.PROCESSOR_DSP2) {
-
-				}
-
-			}
-		}
-
-		return false;
 	}
 
 	private String getResultInColor(long res, int type) {
@@ -2103,6 +2184,22 @@ public class VPXUDPMonitor {
 
 	}
 
+	private synchronized void parseCommunicationPacket(String ip, BISTCommand msgCommand) {
+
+		int msgID = (int) msgCommand.msgID.get();
+
+		int msgType = (int) msgCommand.msgType.get();
+
+		if (msgID == ATP.MSG_ID_GET) {
+
+			if (msgType == ATP.MSG_TYPE_BIST) {
+
+				populateBISTResult(ip, msgCommand);
+			}
+
+		}
+	}
+
 	// Parsing Advertisement Packets
 	private synchronized void parseAdvertisementPacket(String ip, String msg) {
 
@@ -2163,6 +2260,29 @@ public class VPXUDPMonitor {
 		msgCommand.getByteBuffer().put(bf);
 
 		return msgCommand;
+	}
+
+	private BISTCommand createBISTCommand(String ip, byte[] recvdBytes) {
+
+		BISTCommand bistCommand = new BISTCommand();
+
+		byte[] b = new byte[bistCommand.size()];
+
+		System.arraycopy(recvdBytes, 0, b, 0, b.length);
+
+		ByteBuffer bf = ByteBuffer.allocate(b.length);// istCommand.size());
+
+		bf.clear();
+
+		bf.put(b);
+
+		bf.flip();
+
+		bistCommand.getByteBuffer().clear();
+
+		bistCommand.getByteBuffer().put(bf);
+
+		return bistCommand;
 	}
 
 	private MSGCommand createMSGCommand(String ip, byte[] recvdBytes) {
@@ -2247,7 +2367,7 @@ public class VPXUDPMonitor {
 
 		ATPCommand cmd = new ATPCommand();
 
-		byte[] commandData = new byte[cmd.size()];
+		byte[] commandData = new byte[((ATPCommand) cmd).size()];
 
 		DatagramPacket messagePacket = new DatagramPacket(commandData, commandData.length);
 
@@ -2267,7 +2387,11 @@ public class VPXUDPMonitor {
 
 					String ip = messagePacket.getAddress().getHostAddress();
 
-					parseCommunicationPacket(ip, createATPCommand(ip, commandData));
+					if (messagePacket.getLength() > 64)
+
+						parseCommunicationPacket(ip, createATPCommand(ip, commandData));
+					else
+						parseCommunicationPacket(ip, createBISTCommand(ip, commandData));
 
 					Thread.sleep(10);
 

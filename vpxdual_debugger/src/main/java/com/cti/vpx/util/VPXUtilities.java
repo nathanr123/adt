@@ -1495,7 +1495,8 @@ public class VPXUtilities {
 		Map<String, String> memVars = new TreeMap<String, String>();
 
 		memVars.put("", "");
-		String str = readMapFile(filename);
+
+		String str = readFile(filename, VPXConstants.DELIMITER_MAP);
 
 		String vars = str.substring(str.lastIndexOf("--------   ----"));
 
@@ -1503,7 +1504,7 @@ public class VPXUtilities {
 
 		for (int i = 1; i < varArray.length - 1; i++) {
 
-			if (!(varArray[i].trim().equals("--------   ----") && varArray[i].contains("symbols]"))) {
+			if (!(varArray[i].trim().equals("--------   ----") && varArray[i].contains(VPXConstants.DELIMITER_MAP))) {
 
 				if (varArray[i].trim().length() > 0) {
 
@@ -1518,39 +1519,82 @@ public class VPXUtilities {
 		return memVars;
 	}
 
-	public static String readMapFile(String filename) {
+	public static void createOutArrayFile(String outFile, String headerFile) {
+
 		try {
-			final String CHARSET = "UTF-8";
 
-			final String DELIMITER = "symbols]";
+			// create run.bat
 
-			File file = new File(filename);
+			String run = readFile("execute/run.data", VPXConstants.DELIMITER_FILE);
 
-			@SuppressWarnings("resource")
-			Scanner scanner = new Scanner(file, CHARSET).useDelimiter(DELIMITER);
+			run = run.replace("outfile", outFile);
 
-			String content = null;
+			run = run.replace("headerfile", headerFile);
 
-			if (scanner.hasNext())
-				content = scanner.next();
+			writeFile("execute/run.bat", run);
 
-			return content;
+			// start run.bat
+
+			String[] batchArg = { "cmd", "/k", "cd /d " + System.getProperty("user.dir") + "\\execute & run.bat" };
+
+			Thread.sleep(50);
+			
+			Process p = Runtime.getRuntime().exec(batchArg);
+			/*
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			String s=null;
+			
+			while ((s = stdInput.readLine()) != null) {
+				
+				System.out.println(s);
+				
+			}
+			*/
+			// delete run.bat, and other extra files
+
+			deleteDeploymentFiles(System.getProperty("user.dir") + "\\execute\\bootimage.bin",
+					System.getProperty("user.dir") + "\\execute\\bootimage.btbl", false);
+
+			deleteDeploymentFiles(System.getProperty("user.dir") + "\\execute\\bootimage.h",
+					System.getProperty("user.dir") + "\\execute\\run.bat", false);
 
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static String[] getOutFileAsArray(String filename) {
+
+		String[] varArray = null;
+
+		String str = readFile(filename, VPXConstants.DELIMITER_ARRAY);
+	
+		String vars = str.substring(str.lastIndexOf("[] = {")).trim().replaceAll("0x", "").replaceAll("0X", "");
+
+		if (vars != null) {
+
+			varArray = vars.split(",");
+
+			return varArray;
+
+		} else {
+
 			return null;
 		}
 	}
 
-	public static String readFile(String filename) {
+	public static String readFile(String filename, String delimiter) {
 		try {
 			final String CHARSET = "UTF-8";
 
-			final String DELIMITER = "==end==";
+			// final String DELIMITER = "==end==";
 
 			File file = new File(filename);
 
 			@SuppressWarnings("resource")
-			Scanner scanner = new Scanner(file, CHARSET).useDelimiter(DELIMITER);
+			Scanner scanner = new Scanner(file, CHARSET).useDelimiter(delimiter);
 
 			String content = null;
 
@@ -1644,7 +1688,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
+			//	System.out.println(s);
 			}
 
 		} catch (Exception e) {
@@ -1707,6 +1751,9 @@ public class VPXUtilities {
 
 				FileUtils.forceMkdir(new File(
 						rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG)));
+
+				FileUtils.forceMkdir(new File(
+						rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_EXECUTE)));
 
 				FileUtils.forceMkdir(new File(
 						rootPath + "/" + VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_LOG) + "/"

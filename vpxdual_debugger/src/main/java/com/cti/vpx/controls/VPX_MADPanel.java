@@ -1070,7 +1070,7 @@ public class VPX_MADPanel extends JPanel {
 
 		currMapPath = mapTool;
 
-		currentdployCfg = VPXUtilities.readFile("deploy/config.data");
+		currentdployCfg = VPXUtilities.readFile("deploy/config.data", VPXConstants.DELIMITER_FILE);
 
 		currentdployCfg = currentdployCfg.replace("prelinkpath", prelinker);
 
@@ -1086,7 +1086,7 @@ public class VPX_MADPanel extends JPanel {
 	public void createDeploymentFile(String outfilename, String out1Path, String out2Path, String out3Path,
 			String out4Path, String out5Path, String out6Path, String out7Path, String out8Path) {
 
-		String str = VPXUtilities.readFile("deploy/deployment.data");
+		String str = VPXUtilities.readFile("deploy/deployment.data", VPXConstants.DELIMITER_FILE);
 
 		str = str.replace("out1", out1Path.replaceAll("\\\\", "/"));
 
@@ -1486,7 +1486,7 @@ public class VPX_MADPanel extends JPanel {
 				String core6 = txtCompilePathCore6.getText().trim().replaceAll("\\\\", "/");
 				String core7 = txtCompilePathCore7.getText().trim().replaceAll("\\\\", "/");
 				String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
-				
+
 				dialog.updatePackets(1, core0);
 				checkAndCopy(corePath, core0, 0, false);
 				dialog.updatePackets(2, core1);

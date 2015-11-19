@@ -87,7 +87,7 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				sendCMD();
+				// sendCMD();
 
 				/*
 				 * VPXSystem vpx = new VPXSystem();
@@ -103,6 +103,13 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 				 * 
 				 * setPeriodicityByUnicast(4);
 				 */
+
+				// VPXUtilities.getOutFileAsArray("D:/pcieBootCode_dsp1.h");
+
+				// BISTCommand cmd = new BISTCommand();
+
+				// System.out.println(cmd.size());
+				VPXUtilities.createOutArrayFile("D:\\outs\\EXECUTE_OUT.out", "D:\\outs\\EXECUTE_OUT.h");
 
 			}
 		});
@@ -788,14 +795,14 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 
 			@Override
 			public void run() {
-				bistWindow.showBISTWindow();
+				bistWindow.showBISTWindow(0);
 
 			}
 		});
 
 		th.start();
 
-		udp.startBist("172.17.10.1", "Sub");
+		udp.startBist("172.17.10.1", "Sub", new BIST(true, true, true));
 
 	}
 
@@ -1280,11 +1287,11 @@ public class GreetingClient implements VPXAdvertisementListener, VPXMessageListe
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
 	public void populateAnalyticalData(String ip, int core, int id, float[] yAxis) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

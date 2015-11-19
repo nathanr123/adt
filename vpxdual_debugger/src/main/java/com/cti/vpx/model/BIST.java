@@ -18,91 +18,124 @@ public class BIST implements Serializable {
 
 	private String testSubSystem = "";
 
-	private String testP2020IP = "";
+	private String testP2020IP = "NA";
 
-	private String testDSP1IP = "";
+	private String testDSP1IP = "NA";
 
-	private String testDSP2IP = "";
+	private String testDSP2IP = "NA";
 
 	private String testDate = VPXUtilities.getCurrentTime(1);
 
 	private String testTime = VPXUtilities.getCurrentTime(2);
 
 	// Result detail
-	private String resultTestNoofTests = "";
+	private String resultTestNoofTests = "NA";
 
-	private String resultTestPassed = "";
+	private String resultTestPassed = "NA";
 
-	private String resultTestFailed = "";
+	private String resultTestFailed = "NA";
 
 	private String resultTestStartedAt = VPXUtilities.getCurrentTime(2);
 
 	private String resultTestCompletedAt = VPXUtilities.getCurrentTime(2);
 
-	private String resultTestDuration = "";
+	private String resultTestDuration = "NA";
 
-	private String resultTestStatus = "";
+	private String resultTestStatus = "NA";
 
 	// P2020 Test Result
-	private String resultP2020Processor = "";
+	private String resultP2020Processor = "NA";
 
-	private String resultP2020DDR3 = "";
+	private String resultP2020DDR3 = "NA";
 
-	private String resultP2020NORFlash = "";
+	private String resultP2020NORFlash = "NA";
 
-	private String resultP2020Ethernet = "";
+	private String resultP2020Ethernet = "NA";
 
-	private String resultP2020PCIe = "";
+	private String resultP2020PCIe = "NA";
 
-	private String resultP2020SRIO = "";
+	private String resultP2020SRIO = "NA";
 
-	private String resultP2020Temprature1 = "";
+	private String resultP2020Temprature1 = "NA";
 
-	private String resultP2020Temprature2 = "";
+	private String resultP2020Temprature2 = "NA";
 
-	private String resultP2020Temprature3 = "";
+	private String resultP2020Temprature3 = "NA";
 
-	private String resultP2020Voltage1 = "";
+	private String resultP2020Voltage1 = "NA";
 
-	private String resultP2020Voltage2 = "";
+	private String resultP2020Voltage2 = "NA";
 
-	private String resultP2020Voltage3 = "";
+	private String resultP2020Voltage3 = "NA";
 
-	private String resultP2020Voltage4 = "";
+	private String resultP2020Voltage4 = "NA";
 
-	private String resultP2020Voltage5 = "";
+	private String resultP2020Voltage5 = "NA";
 
-	private String resultP2020Voltage6 = "";
+	private String resultP2020Voltage6 = "NA";
 
-	private String resultP2020Voltage7 = "";
+	private String resultP2020Voltage7 = "NA";
 
 	private boolean isP2020Completed = false;
 
 	// DSP 1 Test Result
-	private String resultDSP1Processor = "";
+	private String resultDSP1Processor = "NA";
 
-	private String resultDSP1DDR3 = "";
+	private String resultDSP1DDR3 = "NA";
 
-	private String resultDSP1NAND = "";
+	private String resultDSP1NAND = "NA";
 
-	private String resultDSP1NOR = "";
+	private String resultDSP1NOR = "NA";
 
 	private boolean isDSP1Completed = false;
 
 	// DSP 2 Test Result
-	private String resultDSP2Processor = "";
+	private String resultDSP2Processor = "NA";
 
-	private String resultDSP2DDR3 = "";
+	private String resultDSP2DDR3 = "NA";
 
-	private String resultDSP2NAND = "";
+	private String resultDSP2NAND = "NA";
 
-	private String resultDSP2NOR = "";
+	private String resultDSP2NOR = "NA";
 
 	private boolean isDSP2Completed = false;
 
+	private boolean isP2020Available = true;
+
+	private boolean isDSP1Available = true;
+
+	private boolean isDSP2Available = true;
+
 	private long startTime;
 
+	private int totalProcessor = 0;
+
 	public BIST() {
+
+		startTime = System.currentTimeMillis();
+
+		testDate = VPXUtilities.getCurrentTime(1);
+
+		testTime = VPXUtilities.getCurrentTime(2);
+
+		resultTestStartedAt = VPXUtilities.getCurrentTime(2);
+
+	}
+
+	public BIST(boolean isP2020, boolean isDSP1, boolean isDSP2) {
+
+		this.isP2020Available = isP2020;
+
+		this.isDSP1Available = isDSP1;
+
+		this.isDSP2Available = isDSP2;
+
+		if (isP2020Available)
+			totalProcessor++;
+		if (isDSP1Available)
+			totalProcessor++;
+		if (isDSP2Available)
+			totalProcessor++;
 
 		startTime = System.currentTimeMillis();
 
@@ -551,4 +584,44 @@ public class BIST implements Serializable {
 		this.startTime = startTime;
 	}
 
+	public boolean isP2020Available() {
+		return isP2020Available;
+	}
+
+	public void setP2020Available(boolean isP2020Available) {
+		this.isP2020Available = isP2020Available;
+	}
+
+	public boolean isDSP1Available() {
+		return isDSP1Available;
+	}
+
+	public void setDSP1Available(boolean isDSP1Available) {
+		this.isDSP1Available = isDSP1Available;
+	}
+
+	public boolean isDSP2Available() {
+		return isDSP2Available;
+	}
+
+	public void setDSP2Available(boolean isDSP2Available) {
+		this.isDSP2Available = isDSP2Available;
+	}
+
+	public boolean isAllCompleted() {
+
+		if ((isP2020Available && isP2020Completed) && (isDSP1Available && isDSP1Completed)
+				&& (isDSP2Available && isDSP2Completed)) {
+
+			return true;
+		}
+
+		return false;
+
+	}
+
+	public int getTotalProcessor() {
+
+		return this.totalProcessor;
+	}
 }

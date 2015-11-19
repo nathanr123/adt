@@ -40,6 +40,12 @@ public interface ATP {
 
 	public static final int MSG_TYPE_DATA_ANALYSISL_INTERRUPTED = 0xCE;
 
+	public static final int MSG_TYPE_EXECUTE = 0xCF;
+	
+	public static final int MSG_TYPE_EXECUTE_ACK = 0xD4;
+	
+	public static final int MSG_TYPE_EXECUTE_DONE = 0xD5;
+
 	public static final int MSG_TYPE_EXECUTE_START = 0xD0;
 
 	public static final int MSG_TYPE_EXECUTE_STOP = 0xD1;

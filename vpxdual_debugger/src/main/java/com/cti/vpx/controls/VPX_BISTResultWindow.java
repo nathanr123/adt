@@ -891,7 +891,7 @@ public class VPX_BISTResultWindow extends JDialog {
 		controlsPanel.add(btnClose);
 	}
 
-	public void showBISTWindow() {
+	public void showBISTWindow(int count) {
 
 		clearAllFields();
 
@@ -907,7 +907,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		th.start();
 
-		progress.showProgressWindow();
+		//progress.showProgressWindow(count);
 	}
 
 	public void setResult(BIST result) {
@@ -1197,9 +1197,9 @@ public class VPX_BISTResultWindow extends JDialog {
 			}
 
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			
+
 			VPXLogger.updateError(e);
-			
+
 			e.printStackTrace();
 		}
 
@@ -1207,7 +1207,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
 
-		progress.updateTestProgress(pType, val);
+		//progress.updateTestProgress(pType, val);
 
 	}
 
@@ -1298,18 +1298,22 @@ public class VPX_BISTResultWindow extends JDialog {
 			detailPanel.add(lblExitingApplication);
 		}
 
-		public void showProgressWindow() {
+		public void showProgressWindow(int count) {
 
 			setVisible(true);
+
+			progressFileSent.setMaximum(count);
 
 			progressFileSent.setValue(0);
 		}
 
 		public void updateTestProgress(PROCESSOR_LIST pType, int value) {
 
+			System.out.println(value);
+
 			if (value == -1) {
 
-				VPX_TestProgressWindow.this.dispose();
+				//VPX_TestProgressWindow.this.dispose();
 
 			} else {
 

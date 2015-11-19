@@ -1,0 +1,5 @@
+hex6x -order L bootimage.rmd outfile
+Bttbl2Hfile bootimage.btbl bootimage.h bootimage.bin
+hfile2array bootimage.h headerfile bootCode
+exit
+==end==

@@ -33,6 +33,12 @@ public class VPXConstants {
 
 	public static final String RUNASADMIN = "";// "elevate ";
 
+	public static final String DELIMITER_MAP = "symbols]";// "elevate ";
+
+	public static final String DELIMITER_FILE = "==end==";// "elevate ";
+
+	public static final String DELIMITER_ARRAY = "};";// "elevate ";
+
 	public static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
@@ -195,6 +201,8 @@ public class VPXConstants {
 		public static final String DEPLOYMENTCONFIGFILE = "maptoolCfg_C678.json";
 
 		public static final String FOLDER_WORKSPACE_DEFAULT = "folder.workspace.default";
+
+		public static final String FOLDER_WORKSPACE_EXECUTE = "folder.workspace.execute";
 
 		public static final String FOLDER_WORKSPACE_LOG = "folder.workspace.log";
 

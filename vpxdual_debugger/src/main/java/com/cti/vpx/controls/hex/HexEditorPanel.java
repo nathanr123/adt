@@ -52,6 +52,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -536,7 +537,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 						+ ((((i + 1) % 16) == 0) ? System.getProperty("line.separator") : " ");
 			}
 
-			formattedString = str.getBytes();
+			formattedString = str.toUpperCase().getBytes();
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX16) {
 
@@ -565,22 +566,245 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			}
 
-			formattedString = str.getBytes();
+			formattedString = str.toUpperCase().getBytes();
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX32) {
 
+			for (int i = 0; i < values.length; i = i + 4) {
+
+				if ((i + 3) < values.length) {
+
+					str = str
+							+ String.format("%02x%02x%02x%02x", values[i + 3], values[i + 2], values[i + 1], values[i]);
+
+					if (i > 0) {
+
+						if (((i + 4) % 64) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.toUpperCase().getBytes();
+
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.HEX64) {
+
+			for (int i = 0; i < values.length; i = i + 8) {
+
+				if ((i + 7) < values.length) {
+
+					str = str + String.format("%02x%02x%02x%02x%02x%02x%02x%02x", values[i + 7], values[i + 6],
+							values[i + 5], values[i + 4], values[i + 3], values[i + 2], values[i + 1], values[i]);
+
+					if (i > 0) {
+
+						if (((i + 4) % 128) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.toUpperCase().getBytes();
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT16) {
 
+			byte[] b = new byte[2];
+
+			for (int i = 0; i < values.length; i = i + 2) {
+
+				if ((i + 1) < values.length) {
+
+					b[0] = values[i + 1];
+
+					b[1] = values[i];
+
+					str = str + String.format("%d", new BigInteger(b).intValue());
+
+					if (i > 0) {
+
+						if (((i + 2) % 32) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.getBytes();
+
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.SINGNEDINT32) {
+
+			byte[] b = new byte[4];
+
+			for (int i = 0; i < values.length; i = i + 4) {
+
+				if ((i + 3) < values.length) {
+
+					b[0] = values[i + 3];
+					b[1] = values[i + 2];
+					b[2] = values[i + 1];
+					b[3] = values[i];
+
+					str = str + String.format("%d", new BigInteger(b).intValue());
+
+					if (i > 0) {
+
+						if (((i + 4) % 64) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.getBytes();
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT16) {
 
+			byte[] b = new byte[2];
+
+			for (int i = 0; i < values.length; i = i + 2) {
+
+				if ((i + 1) < values.length) {
+
+					b[0] = values[i + 1];
+
+					b[1] = values[i];
+
+					str = str + String.format("%d", new BigInteger(b).intValue());
+
+					if (i > 0) {
+
+						if (((i + 2) % 32) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.getBytes();
+
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDINT32) {
+
+			byte[] b = new byte[4];
+
+			for (int i = 0; i < values.length; i = i + 4) {
+
+				if ((i + 3) < values.length) {
+
+					b[0] = values[i + 3];
+					b[1] = values[i + 2];
+					b[2] = values[i + 1];
+					b[3] = values[i];
+
+					str = str + String.format("%d", new BigInteger(b).intValue());
+
+					if (i > 0) {
+
+						if (((i + 4) % 64) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.getBytes();
 
 		} else if (cmbFormatBytes.getSelectedIndex() == HexEditor.UNSINGNEDFLOAT32) {
 
+			byte[] b = new byte[4];
+
+			for (int i = 0; i < values.length; i = i + 4) {
+
+				if ((i + 3) < values.length) {
+
+					b[0] = values[i + 3];
+					b[1] = values[i + 2];
+					b[2] = values[i + 1];
+					b[3] = values[i];
+
+					str = str + String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat());
+
+					if (i > 0) {
+
+						if (((i + 4) % 64) == 0) {
+
+							str = str + System.getProperty("line.separator");
+
+						} else {
+
+							str = str + " ";
+						}
+					} else {
+
+						str = str + " ";
+					}
+
+				}
+
+			}
+
+			formattedString = str.getBytes();
 		}
 
 		return formattedString;

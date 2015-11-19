@@ -32,10 +32,13 @@ public class VPX_BISTLauncher extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 
 	private VPX_ETHWindow parent;
-	
+
 	private JLabel lblSubSystemName;
-	
+
 	private JLabel lblIPVal;
+	private JCheckBox chkDSP2;
+	private JCheckBox chkDSP1;
+	private JCheckBox chkP2020;
 
 	/**
 	 * Launch the application.
@@ -60,15 +63,15 @@ public class VPX_BISTLauncher extends JDialog {
 		init();
 
 		loadComponents();
-		
+
 		centerFrame();
 
 	}
-	
+
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public VPX_BISTLauncher(VPX_ETHWindow parnt,String ip,String subSystem) {
+	public VPX_BISTLauncher(VPX_ETHWindow parnt, String ip, String subSystem) {
 
 		this.parent = parnt;
 
@@ -77,9 +80,9 @@ public class VPX_BISTLauncher extends JDialog {
 		loadComponents();
 
 		lblSubSystemName.setText(subSystem);
-		
+
 		lblIPVal.setText(ip);
-		
+
 		centerFrame();
 	}
 
@@ -110,35 +113,36 @@ public class VPX_BISTLauncher extends JDialog {
 
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-		contentPanel.setLayout(new MigLayout("", "[83px][162px]", "[24px,grow,fill][grow,fill][23px,grow,fill][23px,grow,fill][23px,grow,fill]"));
+		contentPanel.setLayout(new MigLayout("", "[83px][162px]",
+				"[24px,grow,fill][grow,fill][23px,grow,fill][23px,grow,fill][23px,grow,fill]"));
 
 		lblSubSystemName = new JLabel("Sub System Name");
 
 		contentPanel.add(lblSubSystemName, "cell 1 0");
-		
+
 		JLabel lblIp = new JLabel("IP Address");
-		
+
 		contentPanel.add(lblIp, "cell 0 1");
-		
+
 		lblIPVal = new JLabel("172.17.1.28");
-		
+
 		contentPanel.add(lblIPVal, "cell 1 1");
 
-		JCheckBox chckbxNewCheckBox = new JCheckBox("P2020");
+		chkP2020 = new JCheckBox("P2020");
 
-		chckbxNewCheckBox.setEnabled(false);
+		chkP2020.setEnabled(false);
 
-		chckbxNewCheckBox.setSelected(true);
+		chkP2020.setSelected(true);
 
-		contentPanel.add(chckbxNewCheckBox, "cell 1 2,alignx left,aligny top");
+		contentPanel.add(chkP2020, "cell 1 2,alignx left,aligny top");
 
-		JCheckBox chckbxNewCheckBox_1 = new JCheckBox("DSP 1");
+		chkDSP1 = new JCheckBox("DSP 1");
 
-		contentPanel.add(chckbxNewCheckBox_1, "cell 1 3,alignx left,aligny top");
+		contentPanel.add(chkDSP1, "cell 1 3,alignx left,aligny top");
 
-		JCheckBox chckbxNewCheckBox_2 = new JCheckBox("DSP 2");
+		chkDSP2 = new JCheckBox("DSP 2");
 
-		contentPanel.add(chckbxNewCheckBox_2, "cell 1 4,alignx left,aligny top");
+		contentPanel.add(chkDSP2, "cell 1 4,alignx left,aligny top");
 
 		JLabel lblSubSystems = new JLabel("Sub Systems");
 
@@ -159,7 +163,7 @@ public class VPX_BISTLauncher extends JDialog {
 
 				VPX_BISTLauncher.this.dispose();
 
-				parent.startBist();
+				parent.startBist(chkP2020.isSelected(), chkDSP1.isSelected(), chkDSP2.isSelected());
 
 			}
 		});
@@ -180,7 +184,7 @@ public class VPX_BISTLauncher extends JDialog {
 		});
 		buttonPane.add(cancelButton);
 	}
-	
+
 	private void centerFrame() {
 
 		Dimension windowSize = getSize();
@@ -195,7 +199,6 @@ public class VPX_BISTLauncher extends JDialog {
 
 		setLocation(dx, dy);
 	}
-
 
 	public void setSubSystemName(String sub) {
 

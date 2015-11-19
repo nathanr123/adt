@@ -327,8 +327,8 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelWaterfall.setBackground(Color.BLACK);
 
-		panelWaterfall.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Waterfall",
-				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
+		//panelWaterfall.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Waterfall",
+		//		TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
 
 		panelWaterfall.setPreferredSize(new Dimension(10, 350));
 
@@ -344,8 +344,8 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelAmplitude.setBackground(Color.BLACK);
 
-		panelAmplitude.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Amplitude",
-				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
+	//	panelAmplitude.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Amplitude",
+	//			TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
 
 		series = new XYSeries("Amplitude", true, true);
 

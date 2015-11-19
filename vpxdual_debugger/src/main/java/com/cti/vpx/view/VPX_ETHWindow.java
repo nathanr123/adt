@@ -11,9 +11,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Map.Entry;
 
-import javax.management.openmbean.OpenDataException;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -1747,16 +1750,19 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void startBist() {
+	public void startBist(boolean isP2020, boolean isDSP1, boolean isDSP2) {
 
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				bistWindow.showBISTWindow();
+				BIST bist = new BIST(isP2020, isDSP1, isDSP2);
 
-				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem());
+				bistWindow.showBISTWindow(bist.getTotalProcessor());
+
+				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem(),
+						bist);
 
 				VPXLogger.updateLog("Built in Self Test Completed");
 
@@ -1827,6 +1833,55 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void startDownloadingApplication(Map<String, byte[]> hexFileArray) {
+
+		/*
+		Set<Entry<String, byte[]>> set = hexFileArray.entrySet();
+
+		Iterator<Entry<String, byte[]>> iter = set.iterator();
+
+		int ii = 0;
+
+		setTotalMaxFiles(hexFileArray.size());
+
+		while (iter.hasNext()) {
+
+			Entry<String, byte[]> e = iter.next();
+
+			lblTotalTransfer.setText("Downloading " + e.getKey());
+
+			lblCurrentTransfer.setText("Transfering " + e.getKey());
+
+			updateOverallProgress(ii + 1);
+
+			byte[] b = e.getValue();
+
+			setCurrentMaxPackets(b.length);
+
+			for (int i = 0; i < b.length; i++) {
+
+				updateCurrentProgress(i + 1);
+
+			}
+
+			lblCurrentTransfer.setText("Transfering Completed");
+
+			progressCurrent.setValue(0);
+
+			progressCurrent.setString("");
+
+			ii++;
+		}
+
+		lblTotalTransfer.setText("Downloading Completed");
+
+		progressTotal.setValue(0);
+
+		progressTotal.setString("");
+		
+		*/
+	}
+
 	public void showExecution() {
 
 		Thread th = new Thread(new Runnable() {
@@ -1834,7 +1889,8 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				vpx_Content_Tabbed_Pane_Right.addTab("Execution", new JScrollPane(new VPX_ExecutionPanel()));
+				vpx_Content_Tabbed_Pane_Right.addTab("Execution",
+						new JScrollPane(new VPX_ExecutionPanel(VPX_ETHWindow.this)));
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
