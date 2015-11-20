@@ -41,9 +41,9 @@ public interface ATP {
 	public static final int MSG_TYPE_DATA_ANALYSISL_INTERRUPTED = 0xCE;
 
 	public static final int MSG_TYPE_EXECUTE = 0xCF;
-	
+
 	public static final int MSG_TYPE_EXECUTE_ACK = 0xD4;
-	
+
 	public static final int MSG_TYPE_EXECUTE_DONE = 0xD5;
 
 	public static final int MSG_TYPE_EXECUTE_START = 0xD0;
@@ -81,6 +81,25 @@ public interface ATP {
 	public static final int DATA_TYPE_SIZE_BIT32 = 0x02;
 
 	public static final int DATA_TYPE_SIZE_BIT64 = 0x03;
+
+	// Execution cores
+	public static final int EXECUTE_CORE_0 = 0x00;
+
+	public static final int EXECUTE_CORE_1 = 0x01;
+
+	public static final int EXECUTE_CORE_2 = 0x02;
+
+	public static final int EXECUTE_CORE_3 = 0x03;
+
+	public static final int EXECUTE_CORE_4 = 0x04;
+
+	public static final int EXECUTE_CORE_5 = 0x05;
+
+	public static final int EXECUTE_CORE_6 = 0x06;
+
+	public static final int EXECUTE_CORE_7 = 0x07;
+
+	public static final int EXECUTE_CORE_ALL = 0x08;
 
 	// Enums
 	public enum PROCESSOR_TYPE {
