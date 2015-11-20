@@ -4,11 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -16,6 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.io.FileUtils;
+
+import com.cti.vpx.model.ExecutionHexArray;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -43,13 +44,18 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 	private String[] filesDL = null;
 
-	private Map<String, byte[]> hexFileArray = new TreeMap<String, byte[]>();
+	// private Map<String, byte[]> hexFileArray = new TreeMap<String, byte[]>();
+
+	private List<ExecutionHexArray> hexFileArray = new ArrayList<ExecutionHexArray>();// TreeMap<String,
+																						// byte[]>();
 
 	private JLabel lblProcessing;
 
 	private VPX_ExecutionPanel executionPanel;
 
 	private VPX_ETHWindow parent;
+
+	private String currentIP;
 
 	/**
 	 * Launch the application.
@@ -71,7 +77,7 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 					dialog.setFiles(fileArray);
 
-					dialog.showProgress();
+					dialog.showProgress("");
 
 				}
 			});
@@ -89,7 +95,7 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 	public VPX_ExecutionFileTransferingWindow(VPX_ExecutionPanel parentPanel) {
 
 		this.executionPanel = parentPanel;
-		
+
 		init();
 
 		loadComponents();
@@ -103,8 +109,8 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 		setResizable(false);
 
-		setPreferredSize(new Dimension(660, 200));
-		
+		setSize(new Dimension(660, 200));
+
 		setLocationRelativeTo(executionPanel);
 
 		getContentPane().setLayout(new BorderLayout());
@@ -151,7 +157,6 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 		contentPanel.add(progressProcessing, "cell 0 1,growx,aligny top");
 	}
 
-	
 	private void centerFrame() {
 
 		Dimension windowSize = getSize();
@@ -165,6 +170,14 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 		int dy = centerPoint.y - windowSize.height / 2;
 
 		setLocation(dx, dy);
+	}
+
+	public void setCurrentIP(String ip) {
+
+		this.currentIP = ip;
+
+		setTitle("Downloading file to " + ip);
+
 	}
 
 	public void setTotalMaxFiles(int totalFiles) {
@@ -227,74 +240,74 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 	public void doProcessFile() {
 
-		String[] byteStringArray = null;
-
-		byte[] byteArray = null;
-
-		for (int i = 0; i < filesDL.length; i++) {
-
-			lblProcessing.setText("Loading " + filesDL[i]);
-
-			VPXUtilities.createOutArrayFile(filesDL[i],
-					VPXSessionManager.getExecutePath() + "\\" + String.format("core%d.h", i));
-
-			try {
-
-				Thread.sleep(250);
-
-			} catch (Exception e) {
-
-			}
-		}
-
 		try {
 
-			Thread.sleep(250);
+			String[] byteStringArray = null;
 
-		} catch (Exception e) {
+			byte[] byteArray = null;
 
-		}
+			FileUtils.cleanDirectory(new java.io.File(VPXSessionManager.getExecutePath()));
 
-		for (int i = 0; i < filesDL.length; i++) {
+			for (int i = 0; i < filesDL.length; i++) {
 
-			lblProcessing.setText("Processing " + filesDL[i]);
+				if (filesDL[i].length() > 0) {
 
-			byteStringArray = VPXUtilities
-					.getOutFileAsArray(VPXSessionManager.getExecutePath() + "\\" + String.format("core%d.h", i));
+					lblProcessing.setText("Loading " + filesDL[i]);
 
-			setProcessMaxBytes(byteStringArray.length);
-
-			byteArray = new byte[byteStringArray.length];
-
-			for (int j = 0; j < byteStringArray.length; j++) {
-
-				updateProcessingProgress(j);
-
-				if (byteStringArray[j].length() == 2) {
-
-					byteArray[j] = Byte.parseByte(byteStringArray[j]);
+					VPXUtilities.createOutArrayFile(filesDL[i],
+							VPXSessionManager.getExecutePath() + "\\" + String.format("%d.h", i));
 				}
 
+				Thread.sleep(500);
 			}
 
-			hexFileArray.put(filesDL[i], byteArray);
+			Thread.sleep(500);
 
+			java.io.File[] f = (new java.io.File(VPXSessionManager.getExecutePath())).listFiles();
+
+			for (int i = 0; i < f.length; i++) {
+
+				lblProcessing.setText("Processing " + f[i].getName());
+
+				byteStringArray = VPXUtilities.getOutFileAsArray(f[i].getAbsolutePath());
+
+				setProcessMaxBytes(byteStringArray.length);
+
+				byteArray = new byte[byteStringArray.length];
+
+				for (int j = 0; j < byteStringArray.length; j++) {
+
+					updateProcessingProgress(j);
+
+					byteArray[j] = (byte) Integer.parseInt(byteStringArray[j].trim(), 16);
+
+				}
+
+				hexFileArray.add(new ExecutionHexArray(f[i].getAbsolutePath(), byteArray));
+
+			}
+
+			progressProcessing.setValue(0);
+
+			progressProcessing.setString("");
+
+			lblProcessing.setText("Processing Completed");
+
+			parent.startDownloadingApplication(this, hexFileArray, currentIP);
+
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
 		}
-
-		progressProcessing.setValue(0);
-
-		progressProcessing.setString("");
-
-		lblProcessing.setText("Processing Completed");
-
-		startDownloadingFile();
 	}
 
-	public void showProgress() {
+	public void showProgress(String ip) {
+
+		this.currentIP = ip;
 
 		try {
 
-			Thread.sleep(500);
+			setVisible(true);
 
 			Thread th = new Thread(new Runnable() {
 
@@ -308,8 +321,6 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 			th.start();
 
-			setVisible(true);
-
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -317,44 +328,23 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 	}
 
-	public void startDownloadingFile() {
+	public void updateCurrentFile(String filename) {
 
-		Set<Entry<String, byte[]>> set = hexFileArray.entrySet();
+		lblTotalTransfer.setText("Downloading " + filename);
 
-		Iterator<Entry<String, byte[]>> iter = set.iterator();
+		lblCurrentTransfer.setText("Transfering " + filename);
+	}
 
-		int ii = 0;
+	public void resetCurrentProcess() {
 
-		setTotalMaxFiles(hexFileArray.size());
+		lblCurrentTransfer.setText("Transfering Completed");
 
-		while (iter.hasNext()) {
+		progressCurrent.setValue(0);
 
-			Entry<String, byte[]> e = iter.next();
+		progressCurrent.setString("");
+	}
 
-			lblTotalTransfer.setText("Downloading " + e.getKey());
-
-			lblCurrentTransfer.setText("Transfering " + e.getKey());
-
-			updateOverallProgress(ii + 1);
-
-			byte[] b = e.getValue();
-
-			setCurrentMaxPackets(b.length);
-
-			for (int i = 0; i < b.length; i++) {
-
-				updateCurrentProgress(i + 1);
-
-			}
-
-			lblCurrentTransfer.setText("Transfering Completed");
-
-			progressCurrent.setValue(0);
-
-			progressCurrent.setString("");
-
-			ii++;
-		}
+	public void resetTotalProcess() {
 
 		lblTotalTransfer.setText("Downloading Completed");
 
@@ -362,6 +352,44 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 		progressTotal.setString("");
 
+		this.dispose();
+	}
+
+	public void startDownloadingFile() {
+
+		/*
+		 * Set<Entry<String, byte[]>> set = hexFileArray.entrySet();
+		 * 
+		 * Iterator<Entry<String, byte[]>> iter = set.iterator();
+		 * 
+		 * int ii = 0;
+		 * 
+		 * setTotalMaxFiles(hexFileArray.size());
+		 * 
+		 * while (iter.hasNext()) {
+		 * 
+		 * Entry<String, byte[]> e = iter.next();
+		 * 
+		 * updateCurrentFile(e.getKey());
+		 * 
+		 * updateOverallProgress(ii + 1);
+		 * 
+		 * byte[] b = e.getValue();
+		 * 
+		 * setCurrentMaxPackets(b.length);
+		 * 
+		 * for (int i = 0; i < b.length; i++) {
+		 * 
+		 * updateCurrentProgress(i + 1);
+		 * 
+		 * }
+		 * 
+		 * resetCurrentProcess();
+		 * 
+		 * ii++; }
+		 * 
+		 * resetTotalProcess();
+		 */
 	}
 
 }

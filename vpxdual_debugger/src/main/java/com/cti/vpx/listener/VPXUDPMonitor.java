@@ -24,10 +24,12 @@ import com.cti.vpx.command.DSPMSGCommand;
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.command.P2020MSGCommand;
+import com.cti.vpx.controls.VPX_ExecutionFileTransferingWindow;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.controls.hex.VPX_MemoryLoadProgressWindow;
 import com.cti.vpx.model.BIST;
+import com.cti.vpx.model.ExecutionHexArray;
 import com.cti.vpx.model.FileBytesToSend;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
@@ -67,6 +69,10 @@ public class VPXUDPMonitor {
 
 	private VPX_MemoryLoadProgressWindow memLoadDialog;
 
+	private VPX_ExecutionFileTransferingWindow executionLoadingDialog;
+
+	private List<ExecutionHexArray> executionCoreHexArray = null;
+
 	private VPXTFTPMonitor tftp;
 
 	private FileBytesToSend fb;
@@ -80,6 +86,8 @@ public class VPXUDPMonitor {
 	private int loop = 0;
 
 	private static boolean isFlashingStatred = false;
+
+	private static boolean isExecutionDownloadStatred = false;
 
 	private static boolean isLoingMemoryStatred = false;
 
@@ -120,6 +128,14 @@ public class VPXUDPMonitor {
 	private byte[] plotBuff1;
 
 	private byte[] plotBuff2;
+
+	private int currentFileIndex;
+
+	private byte[] currentbyteArray;
+
+	private int currentbyteTotalpckt;
+
+	private int currentCore;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -355,7 +371,7 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			send(buffer, "172.17.1.130", VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
 
 			VPXLogger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
 
@@ -462,6 +478,190 @@ public class VPXUDPMonitor {
 	public void sendMessageToProcessor(String ip, String msg) {
 
 		send(msg.getBytes(), ip, VPXUDPListener.CONSOLE_MSG_PORTNO, false);
+
+	}
+
+	// Sending hex array to processors to execution
+
+	public void startDownloading(VPX_ExecutionFileTransferingWindow exeProgressWindow, String ip,
+			List<ExecutionHexArray> hexArray) {
+
+		this.executionCoreHexArray = hexArray;
+
+		this.executionLoadingDialog = exeProgressWindow;
+
+		currentFileIndex = -1;
+
+		currentbyteArray = null;
+
+		executionLoadingDialog.setTotalMaxFiles(executionCoreHexArray.size());
+
+		isExecutionDownloadStatred = true;
+
+		DSPATPCommand atp = new DSPATPCommand();
+
+		atp.msgID.set(ATP.MSG_ID_SET);
+
+		atp.msgType.set(ATP.MSG_TYPE_EXECUTE);
+
+		sendNextFile(ip, atp);
+
+	}
+
+	private void sendNextFile(String ip, ATPCommand command) {
+
+		String filename = null;
+
+		currentFileIndex++;
+
+		if (currentFileIndex < executionCoreHexArray.size()) {
+
+			executionLoadingDialog.resetCurrentProcess();
+
+			ExecutionHexArray e = executionCoreHexArray.get(currentFileIndex);
+
+			filename = e.getFileName();
+
+			currentCore = Integer.parseInt(filename.substring(filename.length() - 3, filename.length() - 2));
+
+			command.params.memoryinfo.core.set(currentCore);
+
+			executionLoadingDialog.updateCurrentFile(filename);
+
+			executionLoadingDialog.updateOverallProgress(currentFileIndex + 1);
+
+			currentbyteArray = e.getHexArray();
+
+			System.out.println(currentbyteArray.length);
+
+			currentbyteTotalpckt = currentbyteArray.length / ATP.DEFAULTBUFFERSIZE;
+
+			currentbyteTotalpckt = (currentbyteArray.length % ATP.DEFAULTBUFFERSIZE) == 0 ? currentbyteTotalpckt
+					: currentbyteTotalpckt++;
+
+			command.params.flash_info.totalnoofpackets.set(currentbyteTotalpckt);
+
+			command.params.flash_info.totalfilesize.set(currentbyteArray.length);
+
+			executionLoadingDialog.setCurrentMaxPackets(currentbyteTotalpckt);
+
+			sendNextArray(ip, command, -1);
+		} else {
+
+			executionLoadingDialog.resetTotalProcess();
+
+			isExecutionDownloadStatred = false;
+		}
+
+	}
+
+	private void sendNextArray(String ip, ATPCommand command, int currArrPacket) {
+
+		int cur = currArrPacket + 1;
+
+		int start = cur * ATP.DEFAULTBUFFERSIZE;
+
+		int end = start + ATP.DEFAULTBUFFERSIZE;
+
+		if (end > currentbyteArray.length) {
+
+			end = currentbyteArray.length;
+		}
+
+		byte[] b = new byte[end - start];
+
+		int j = 0;
+
+		for (int i = start; i < end; i++) {
+
+			b[j] = currentbyteArray[i];
+
+			//printBytes(b[j], j);
+
+			j++;
+		}
+
+		command.params.flash_info.currentpacket.set(cur);
+
+		System.out.println(cur);
+
+		executionLoadingDialog.updateCurrentProgress(cur);
+
+		sendHexArrayToProcessor(ip, cur, command.params.flash_info.totalnoofpackets.get(),
+				command.params.flash_info.totalfilesize.get(), (int) command.params.memoryinfo.core.get(), b);
+	}
+
+	public void sendHexArrayToProcessor(String ip, int currentPacket, long totalPacket, long arrayLenth, int core,
+			byte[] buf) {
+		try {
+
+			if (currentPacket < totalPacket) {
+
+				ATPCommand msg = new DSPATPCommand();
+
+				byte[] buffer = new byte[msg.size()];
+
+				ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+				bf.order(msg.byteOrder());
+
+				msg.setByteBuffer(bf, 0);
+
+				msg.msgID.set(ATP.MSG_ID_SET);
+
+				msg.msgType.set(ATP.MSG_TYPE_EXECUTE);
+
+				msg.params.flash_info.totalfilesize.set(arrayLenth);
+
+				msg.params.flash_info.totalnoofpackets.set(totalPacket);
+
+				for (int i = 0; i < buf.length; i++) {
+
+					msg.params.memoryinfo.buffer[i].set(buf[i]);
+
+				}
+
+				msg.params.memoryinfo.core.set(core);
+
+				msg.params.memoryinfo.length.set(buf.length);
+
+				msg.params.flash_info.currentpacket.set(currentPacket);
+
+				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+			}
+		} catch (Exception e) {
+			VPXLogger.updateError(e);
+			e.printStackTrace();
+		}
+
+	}
+
+	public void sendExecutionCommand(String ip, int core, int command) {
+
+		try {
+
+			ATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(command);
+
+			msg.params.memoryinfo.core.set(core);
+
+			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+
+		} catch (Exception e) {
+			VPXLogger.updateError(e);
+			e.printStackTrace();
+		}
 
 	}
 
@@ -573,8 +773,6 @@ public class VPXUDPMonitor {
 		ByteBuffer bf = null;
 
 		try {
-
-			System.out.println(serverIP + " " + filename);
 
 			this.dialog = parentDialog;
 
@@ -1879,43 +2077,45 @@ public class VPXUDPMonitor {
 				bist.setDSP2Completed(true);
 			}
 
-			if (bist.isAllCompleted()) {// (bist.isDSP1Completed() &&
-										// bist.isP2020Completed() &&
-										// bist.isDSP2Completed()) {
+			// if (bist.isAllCompleted()) {// (bist.isDSP1Completed() &&
+			// bist.isP2020Completed() &&
+			// bist.isDSP2Completed()) {
 
-				bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
+			bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
 
-				bist.setResultTestFailed(String.format("%d Tests", fail));
+			bist.setResultTestFailed(String.format("%d Tests", fail));
 
-				if (fail == 0) {
+			if (fail == 0) {
 
-					bist.setResultTestStatus("Success !");
+				bist.setResultTestStatus("Success !");
 
-					VPXLogger.updateLog("Built In Self Test Success");
+				VPXLogger.updateLog("Built In Self Test Success");
 
-				} else {
+			} else {
 
-					bist.setResultTestStatus("Failed !");
+				bist.setResultTestStatus("Failed !");
 
-					VPXLogger.updateLog("Built In Self Test Failed");
-				}
-
-				bist.setResultTestPassed(String.format("%d Tests", pass));
-
-				bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
-
-				bist.setResultTestDuration(
-						VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
-
-				((VPXCommunicationListener) listener).updateBIST(bist);
+				VPXLogger.updateLog("Built In Self Test Failed");
 			}
 
-			if (loop == bist.getTotalProcessor()) {
+			bist.setResultTestPassed(String.format("%d Tests", pass));
 
-				((VPXCommunicationListener) listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
+			bist.setResultTestCompletedAt(VPXUtilities.getCurrentTime(2));
 
-				VPXLogger.updateLog(String.format("Built In Self Test completed"));
-			}
+			bist.setResultTestDuration(
+					VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
+
+			((VPXCommunicationListener) listener).updateBIST(bist);
+			// }
+
+			// if (loop == bist.getTotalProcessor()) {
+
+			// ((VPXCommunicationListener)
+			// listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
+
+			// VPXLogger.updateLog(String.format("Built In Self Test
+			// completed"));
+			// }
 		}
 	}
 
@@ -2090,6 +2290,26 @@ public class VPXUDPMonitor {
 				if (isFlashingStatred) {
 
 					sendNextPacket(ip, msgCommand);
+
+				}
+
+				break;
+
+			case ATP.MSG_TYPE_EXECUTE_ACK:
+
+				if (isExecutionDownloadStatred) {
+
+					sendNextArray(ip, msgCommand, (int) msgCommand.params.flash_info.currentpacket.get());
+
+				}
+
+				break;
+
+			case ATP.MSG_TYPE_EXECUTE_DONE:
+
+				if (isExecutionDownloadStatred) {
+
+					sendNextFile(ip, msgCommand);
 
 				}
 

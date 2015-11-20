@@ -11,11 +11,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -51,6 +48,7 @@ import com.cti.vpx.controls.VPX_ChangePeriodicityWindow;
 import com.cti.vpx.controls.VPX_ConsolePanel;
 import com.cti.vpx.controls.VPX_DetailWindow;
 import com.cti.vpx.controls.VPX_EthernetFlashPanel;
+import com.cti.vpx.controls.VPX_ExecutionFileTransferingWindow;
 import com.cti.vpx.controls.VPX_ExecutionPanel;
 import com.cti.vpx.controls.VPX_FlashProgressWindow;
 import com.cti.vpx.controls.VPX_FlashWizardWindow;
@@ -77,6 +75,7 @@ import com.cti.vpx.listener.VPXMessageListener;
 import com.cti.vpx.listener.VPXTFTPMonitor;
 import com.cti.vpx.listener.VPXUDPMonitor;
 import com.cti.vpx.model.BIST;
+import com.cti.vpx.model.ExecutionHexArray;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
@@ -1833,53 +1832,21 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void startDownloadingApplication(Map<String, byte[]> hexFileArray) {
+	public void startDownloadingApplication(VPX_ExecutionFileTransferingWindow dialog,
+			List<ExecutionHexArray> hexFileArray, String ip) {
 
-		/*
-		Set<Entry<String, byte[]>> set = hexFileArray.entrySet();
+		Thread th = new Thread(new Runnable() {
 
-		Iterator<Entry<String, byte[]>> iter = set.iterator();
+			@Override
+			public void run() {
 
-		int ii = 0;
-
-		setTotalMaxFiles(hexFileArray.size());
-
-		while (iter.hasNext()) {
-
-			Entry<String, byte[]> e = iter.next();
-
-			lblTotalTransfer.setText("Downloading " + e.getKey());
-
-			lblCurrentTransfer.setText("Transfering " + e.getKey());
-
-			updateOverallProgress(ii + 1);
-
-			byte[] b = e.getValue();
-
-			setCurrentMaxPackets(b.length);
-
-			for (int i = 0; i < b.length; i++) {
-
-				updateCurrentProgress(i + 1);
+				udpMonitor.startDownloading(dialog, ip, hexFileArray);
 
 			}
+		});
 
-			lblCurrentTransfer.setText("Transfering Completed");
+		th.start();
 
-			progressCurrent.setValue(0);
-
-			progressCurrent.setString("");
-
-			ii++;
-		}
-
-		lblTotalTransfer.setText("Downloading Completed");
-
-		progressTotal.setValue(0);
-
-		progressTotal.setString("");
-		
-		*/
 	}
 
 	public void showExecution() {
@@ -1889,8 +1856,11 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				vpx_Content_Tabbed_Pane_Right.addTab("Execution",
-						new JScrollPane(new VPX_ExecutionPanel(VPX_ETHWindow.this)));
+				vpx_Content_Tabbed_Pane_Right
+						.addTab("Execution",
+								new JScrollPane(new VPX_ExecutionPanel(VPX_ETHWindow.this,
+										VPXSessionManager.getCurrentSubSystem(),
+										VPXSessionManager.getCurrentProcessor())));
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
@@ -2103,6 +2073,11 @@ public class VPX_ETHWindow extends JFrame
 
 		th.start();
 
+	}
+
+	public void sendExecuteCommand(String ip, int core, int command) {
+
+		udpMonitor.sendExecutionCommand(ip, core, command);
 	}
 
 	@Override

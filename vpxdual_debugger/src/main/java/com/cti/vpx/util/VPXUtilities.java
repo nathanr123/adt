@@ -66,6 +66,7 @@ import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.model.NWInterface;
+import com.cti.vpx.model.VPX;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -1525,6 +1526,8 @@ public class VPXUtilities {
 
 			// create run.bat
 
+			Thread.sleep(150);
+
 			String run = readFile("execute/run.data", VPXConstants.DELIMITER_FILE);
 
 			run = run.replace("outfile", outFile);
@@ -1537,20 +1540,20 @@ public class VPXUtilities {
 
 			String[] batchArg = { "cmd", "/k", "cd /d " + System.getProperty("user.dir") + "\\execute & run.bat" };
 
-			Thread.sleep(50);
-			
+			Thread.sleep(250);
+
 			Process p = Runtime.getRuntime().exec(batchArg);
-			/*
+
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-			String s=null;
-			
+			String s = null;
+
 			while ((s = stdInput.readLine()) != null) {
-				
-				System.out.println(s);
-				
+
+				VPXLogger.updateLog(s);
+
 			}
-			*/
+
 			// delete run.bat, and other extra files
 
 			deleteDeploymentFiles(System.getProperty("user.dir") + "\\execute\\bootimage.bin",
@@ -1570,8 +1573,10 @@ public class VPXUtilities {
 		String[] varArray = null;
 
 		String str = readFile(filename, VPXConstants.DELIMITER_ARRAY);
-	
+
 		String vars = str.substring(str.lastIndexOf("[] = {")).trim().replaceAll("0x", "").replaceAll("0X", "");
+
+		vars = vars.replace("[] = {", "");
 
 		if (vars != null) {
 
@@ -1688,7 +1693,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-			//	System.out.println(s);
+				// System.out.println(s);
 			}
 
 		} catch (Exception e) {
