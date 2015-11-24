@@ -1554,6 +1554,8 @@ public class VPXUtilities {
 
 			}
 
+			System.out.println("Exit Code : "+p.exitValue());
+
 			// delete run.bat, and other extra files
 
 			deleteDeploymentFiles(System.getProperty("user.dir") + "\\execute\\bootimage.bin",
@@ -1605,6 +1607,8 @@ public class VPXUtilities {
 
 			if (scanner.hasNext())
 				content = scanner.next();
+
+			scanner.close();
 
 			return content;
 

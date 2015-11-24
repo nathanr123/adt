@@ -245,7 +245,7 @@ public class VPX_BootWindow extends JDialog {
 
 		cmbProcessor.addItem("Board");
 
-		cmbProcessor.addItem("P2020");
+		//cmbProcessor.addItem("P2020");
 		
 		cmbProcessor.addItem("DSP 1");
 
@@ -277,15 +277,7 @@ public class VPX_BootWindow extends JDialog {
 
 			lblNote.setText(BOARDNOTE);
 
-		} else if (index == 1) {
-
-			cmbFlashDevice.setEnabled(true);
-
-			cmbPage.setEnabled(true);
-
-			lblNote.setText(P2020NOTE);
-
-		} else if (index == 2) {
+		}  else if (index == 1) {
 
 			cmbFlashDevice.setEnabled(true);
 
@@ -293,7 +285,7 @@ public class VPX_BootWindow extends JDialog {
 
 			lblNote.setText(DSP1NOTE);
 
-		} else if (index == 3) {
+		} else if (index == 2) {
 
 			cmbFlashDevice.setEnabled(true);
 

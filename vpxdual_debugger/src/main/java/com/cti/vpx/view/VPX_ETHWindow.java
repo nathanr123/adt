@@ -40,7 +40,6 @@ import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_AppModeWindow;
-import com.cti.vpx.controls.VPX_BISTLauncher;
 import com.cti.vpx.controls.VPX_BISTResultWindow;
 import com.cti.vpx.controls.VPX_BootWindow;
 import com.cti.vpx.controls.VPX_ChangePasswordWindow;
@@ -1739,8 +1738,11 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void run() {
 
-				new VPX_BISTLauncher(VPX_ETHWindow.this, VPXSessionManager.getCurrentProcessor(),
-						VPXSessionManager.getCurrentSubSystem()).setVisible(true);
+				// new VPX_BISTLauncher(VPX_ETHWindow.this,
+				// VPXSessionManager.getCurrentProcessor(),
+				// VPXSessionManager.getCurrentSubSystem()).setVisible(true);
+
+				startBist(true, true, true);
 
 			}
 		});
@@ -1762,9 +1764,7 @@ public class VPX_ETHWindow extends JFrame
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem(),
 						bist);
-
-				VPXLogger.updateLog("Built in Self Test Completed");
-
+				
 			}
 		});
 

@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +118,7 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 
 	private void loadComponents() {
@@ -136,7 +135,7 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 		contentPanel.add(progressTotal, "cell 0 3,growx,aligny top");
 
-		lblCurrentTransfer = new JLabel("Transferring temp.out ");
+		lblCurrentTransfer = new JLabel("");
 
 		contentPanel.add(lblCurrentTransfer, "cell 0 4,grow");
 
@@ -242,6 +241,8 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 		try {
 
+			hexFileArray.clear();
+
 			String[] byteStringArray = null;
 
 			byte[] byteArray = null;
@@ -279,7 +280,13 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 					updateProcessingProgress(j);
 
-					byteArray[j] = (byte) Integer.parseInt(byteStringArray[j].trim(), 16);
+					String s = byteStringArray[j].trim();
+
+					if (s.length() == 2) {
+						byteArray[j] = (byte) Integer.parseInt(byteStringArray[j].trim(), 16);
+					} else {
+						System.out.println("S " + s);
+					}
 
 				}
 
@@ -301,7 +308,31 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 		}
 	}
 
+	public void clearContents() {
+
+		lblCurrentTransfer.setText("");
+
+		progressCurrent.setValue(0);
+
+		progressCurrent.setString("");
+
+		lblTotalTransfer.setText("");
+
+		progressTotal.setValue(0);
+
+		progressTotal.setString("");
+
+		progressProcessing.setValue(0);
+
+		progressProcessing.setString("");
+
+		lblProcessing.setText("");
+
+	}
+
 	public void showProgress(String ip) {
+
+		clearContents();
 
 		this.currentIP = ip;
 

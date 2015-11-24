@@ -137,6 +137,8 @@ public class VPXUDPMonitor {
 
 	private int currentCore;
 
+	private String bytes = "";
+
 	public VPXUDPMonitor() throws Exception {
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
@@ -536,8 +538,10 @@ public class VPXUDPMonitor {
 
 			currentbyteTotalpckt = currentbyteArray.length / ATP.DEFAULTBUFFERSIZE;
 
-			currentbyteTotalpckt = (currentbyteArray.length % ATP.DEFAULTBUFFERSIZE) == 0 ? currentbyteTotalpckt
-					: currentbyteTotalpckt++;
+			int rem = (int) (currentbyteArray.length % ATP.DEFAULTBUFFERSIZE);
+
+			if (rem > 0)
+				currentbyteTotalpckt++;
 
 			command.params.flash_info.totalnoofpackets.set(currentbyteTotalpckt);
 
@@ -548,9 +552,15 @@ public class VPXUDPMonitor {
 			sendNextArray(ip, command, -1);
 		} else {
 
+			executionLoadingDialog.resetCurrentProcess();
+
 			executionLoadingDialog.resetTotalProcess();
 
+			this.executionCoreHexArray.clear();
+
 			isExecutionDownloadStatred = false;
+
+			VPXUtilities.writeFile("D:\\sample.txt", bytes);
 		}
 
 	}
@@ -576,14 +586,14 @@ public class VPXUDPMonitor {
 
 			b[j] = currentbyteArray[i];
 
-			//printBytes(b[j], j);
+			addBytes(b[j], j);
 
 			j++;
 		}
 
 		command.params.flash_info.currentpacket.set(cur);
 
-		System.out.println(cur);
+		// System.out.println(cur);
 
 		executionLoadingDialog.updateCurrentProgress(cur);
 
@@ -2684,6 +2694,20 @@ public class VPXUDPMonitor {
 		if (((i + 1) % 16) == 0) {
 
 			System.out.println();
+		}
+
+	}
+
+	private void addBytes(byte byteVal, int i) {
+
+		bytes = bytes + String.format("%02x ", byteVal).toUpperCase();
+
+		if (((i + 1) % 16) == 0) {
+
+			bytes = bytes + System.getProperty("line.separator");
+
+		} else {
+			bytes = bytes + " ";
 		}
 
 	}
