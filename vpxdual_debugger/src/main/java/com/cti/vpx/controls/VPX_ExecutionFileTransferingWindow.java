@@ -209,6 +209,8 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 	public void updateOverallProgress(int currentFile) {
 
 		progressTotal.setValue(currentFile);
+
+		progressTotal.setString(currentFile + "");
 	}
 
 	public void updateCurrentProgress(int currentPacket) {
@@ -283,9 +285,9 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 					String s = byteStringArray[j].trim();
 
 					if (s.length() == 2) {
+
 						byteArray[j] = (byte) Integer.parseInt(byteStringArray[j].trim(), 16);
-					} else {
-						System.out.println("S " + s);
+
 					}
 
 				}
@@ -336,6 +338,8 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 		this.currentIP = ip;
 
+		setTitle("Downloading file to " + currentIP);
+
 		try {
 
 			setVisible(true);
@@ -361,7 +365,8 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 	public void updateCurrentFile(String filename) {
 
-		lblTotalTransfer.setText("Downloading " + filename);
+		lblTotalTransfer.setText(String.format("Downloading (%d / %d)    %s", (progressTotal.getValue()+1),
+				progressTotal.getMaximum(), filename));
 
 		lblCurrentTransfer.setText("Transfering " + filename);
 	}
@@ -384,43 +389,6 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 		progressTotal.setString("");
 
 		this.dispose();
-	}
-
-	public void startDownloadingFile() {
-
-		/*
-		 * Set<Entry<String, byte[]>> set = hexFileArray.entrySet();
-		 * 
-		 * Iterator<Entry<String, byte[]>> iter = set.iterator();
-		 * 
-		 * int ii = 0;
-		 * 
-		 * setTotalMaxFiles(hexFileArray.size());
-		 * 
-		 * while (iter.hasNext()) {
-		 * 
-		 * Entry<String, byte[]> e = iter.next();
-		 * 
-		 * updateCurrentFile(e.getKey());
-		 * 
-		 * updateOverallProgress(ii + 1);
-		 * 
-		 * byte[] b = e.getValue();
-		 * 
-		 * setCurrentMaxPackets(b.length);
-		 * 
-		 * for (int i = 0; i < b.length; i++) {
-		 * 
-		 * updateCurrentProgress(i + 1);
-		 * 
-		 * }
-		 * 
-		 * resetCurrentProcess();
-		 * 
-		 * ii++; }
-		 * 
-		 * resetTotalProcess();
-		 */
 	}
 
 }

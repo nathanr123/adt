@@ -534,7 +534,7 @@ public class VPXUDPMonitor {
 
 			currentbyteArray = e.getHexArray();
 
-			System.out.println(currentbyteArray.length);
+			//System.out.println(currentbyteArray.length);
 
 			currentbyteTotalpckt = currentbyteArray.length / ATP.DEFAULTBUFFERSIZE;
 
@@ -586,7 +586,7 @@ public class VPXUDPMonitor {
 
 			b[j] = currentbyteArray[i];
 
-			addBytes(b[j], j);
+			// addBytes(b[j], j);
 
 			j++;
 		}

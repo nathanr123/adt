@@ -1554,7 +1554,7 @@ public class VPXUtilities {
 
 			}
 
-			System.out.println("Exit Code : "+p.exitValue());
+			//System.out.println("Exit Code : "+p.exitValue());
 
 			// delete run.bat, and other extra files
 
