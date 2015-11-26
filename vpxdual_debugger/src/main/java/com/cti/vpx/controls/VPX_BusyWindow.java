@@ -118,6 +118,9 @@ public class VPX_BusyWindow extends JDialog {
 	}
 
 	public void close() {
+		
+		parent.setAlwaysOnTop(true);
+		
 		VPX_BusyWindow.this.dispose();
 	}
 

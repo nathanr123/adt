@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -824,6 +823,7 @@ public class VPX_AppModeWindow extends JFrame {
 					VPXSessionManager.setCurrentIP(txtIPAddress.getText());
 
 					try {
+						@SuppressWarnings("unused")
 						VPX_ETHWindow window = new VPX_ETHWindow();
 
 						if (isValueChanged()) {

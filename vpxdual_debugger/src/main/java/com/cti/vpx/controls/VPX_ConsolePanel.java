@@ -65,6 +65,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	List<String> ips = new ArrayList<String>();
 
+	@SuppressWarnings("unused")
 	private VPX_ETHWindow parent;
 
 	private int coreindex;

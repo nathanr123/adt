@@ -962,8 +962,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			}
 		});
 
-		vpx_Cxt_Spectrum = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Spectrum") + " ( "
-				+ (VPXConstants.MAX_SPECTRUM - VPX_ETHWindow.currentNoofSpectrum) + " ) ");
+		vpx_Cxt_Spectrum = VPXComponentFactory.createJMenuItem(
+				rBundle.getString("Menu.Window.Spectrum") + " ( "
+						+ (VPXConstants.MAX_SPECTRUM - VPX_ETHWindow.currentNoofSpectrum) + " ) ",
+				VPXConstants.Icons.ICON_SPECTRUM);
 
 		vpx_Cxt_Spectrum.addActionListener(new ActionListener() {
 
@@ -976,7 +978,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			}
 		});
-	
 
 		vpx_Cxt_MAD = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.MAD"),
 				VPXConstants.Icons.ICON_MAD);
@@ -1253,7 +1254,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			vpx_Cxt_MemoryPlot.setText((rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 					+ (VPXConstants.MAX_MEMORY_PLOT - VPX_ETHWindow.currentNoofMemoryPlot) + " ) "));
-		
 
 			vpx_Cxt_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
 					+ (VPXConstants.MAX_SPECTRUM - VPX_ETHWindow.currentNoofSpectrum) + " ) ");

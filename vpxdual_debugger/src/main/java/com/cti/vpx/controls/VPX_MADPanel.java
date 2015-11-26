@@ -103,6 +103,7 @@ public class VPX_MADPanel extends JPanel {
 
 	private static String folderPath;
 
+	@SuppressWarnings("unused")
 	private VPX_ETHWindow parent;
 
 	private JButton btnCompileApply;
@@ -1585,6 +1586,7 @@ public class VPX_MADPanel extends JPanel {
 
 		}
 
+		@SuppressWarnings("unused")
 		private boolean isSameFolder(String outFile, String workspacefolder) {
 
 			return (new File(workspacefolder)).equals((new File(outFile)).getParentFile());

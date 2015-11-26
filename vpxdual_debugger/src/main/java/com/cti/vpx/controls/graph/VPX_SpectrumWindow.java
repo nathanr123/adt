@@ -2,6 +2,7 @@ package com.cti.vpx.controls.graph;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -40,6 +41,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.cti.vpx.controls.graph.example.WaterfallGraphPanel;
+import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.DrawSurface;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -58,6 +60,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = -7945447785324008590L;
 
+	@SuppressWarnings("unused")
 	private String currentSubSystem = "";
 
 	private String currentProcIP = "";
@@ -171,6 +174,8 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		setResizable(false);
 
+		setIconImage(VPXConstants.Icons.ICON_SPECTRUM.getImage());
+
 		setSize((int) (VPXUtilities.getScreenWidth() * .80), (int) (VPXUtilities.getScreenHeight() * .90));
 
 		getContentPane().setLayout(new BorderLayout());
@@ -233,11 +238,13 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelFilter.add(lblMinVal, "cell 11 0");
 
 		JLabel lblProcessor = new JLabel("Processor");
+
 		lblProcessor.setHorizontalAlignment(SwingConstants.LEFT);
 
 		panelFilter.add(lblProcessor, "cell 0 1,alignx trailing,growy");
 
 		JLabel lblGraphObject = new JLabel("Graph Object");
+
 		lblGraphObject.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		panelFilter.add(lblGraphObject, "cell 2 0,grow");
@@ -247,10 +254,13 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelFilter.add(cmbGraphObject, "cell 4 0,growx,aligny center");
 
 		cmbProcessor = new JComboBox<String>();
+
 		cmbProcessor.setPreferredSize(new Dimension(120, 20));
+
 		panelFilter.add(cmbProcessor, "cell 1 1,growx");
 
 		JLabel lblAutoRefresh = new JLabel("Auto Refresh");
+
 		lblAutoRefresh.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		panelFilter.add(lblAutoRefresh, "cell 2 1,alignx left,growy");
@@ -327,8 +337,10 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelWaterfall.setBackground(Color.BLACK);
 
-		//panelWaterfall.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Waterfall",
-		//		TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
+		// panelWaterfall.setBorder(new
+		// TitledBorder(UIManager.getBorder("TitledBorder.border"), "Waterfall",
+		// TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255,
+		// 255)));
 
 		panelWaterfall.setPreferredSize(new Dimension(10, 350));
 
@@ -344,8 +356,10 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelAmplitude.setBackground(Color.BLACK);
 
-	//	panelAmplitude.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Amplitude",
-	//			TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
+		// panelAmplitude.setBorder(new
+		// TitledBorder(UIManager.getBorder("TitledBorder.border"), "Amplitude",
+		// TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255,
+		// 255)));
 
 		series = new XYSeries("Amplitude", true, true);
 
@@ -354,7 +368,9 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		final JFreeChart chart = createChart(dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		
+
+		chartPanel.setCursor(DrawSurface.getDefaultCrossHairCursor());
+
 		chartPanel.setPopupMenu(null);
 
 		panelAmplitude.add(chartPanel, BorderLayout.CENTER);

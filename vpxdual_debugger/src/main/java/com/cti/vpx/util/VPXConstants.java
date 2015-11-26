@@ -304,9 +304,7 @@ public class VPXConstants {
 
 		public static final String ICON_ABOUT_NAME = "detail.png";
 
-		public static final String ICON_WATERFALL_NAME = "waterfall.png";
-
-		public static final String ICON_AMPLITUDE_NAME = "amplitude.png";
+		public static final String ICON_SPECTRUM_NAME = "sepctrum.png";
 
 		// Icons
 
@@ -386,9 +384,7 @@ public class VPXConstants {
 
 		public static final ImageIcon IMAGE_BG = VPXUtilities.getImageIcon(IMAGE_BG_NAME, 596, 596);
 
-		public static final ImageIcon ICON_WATERFALL = VPXUtilities.getImageIcon(ICON_WATERFALL_NAME, 14, 14);
-
-		public static final ImageIcon ICON_AMPLITUDE = VPXUtilities.getImageIcon(ICON_AMPLITUDE_NAME, 596, 596);
+		public static final ImageIcon ICON_SPECTRUM = VPXUtilities.getImageIcon(ICON_SPECTRUM_NAME, 14, 14);
 
 	}
 

@@ -45,6 +45,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 	private boolean isRunning = false;
 
+	@SuppressWarnings("unused")
 	private VPX_ETHWindow parent;
 
 	/**

@@ -99,7 +99,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 		setBounds(100, 100, (int) (VPXUtilities.getScreenWidth() * .60), (int) (VPXUtilities.getScreenHeight() * .70));
 
-		setIconImage(VPXConstants.Icons.ICON_WATERFALL.getImage());
+		setIconImage(VPXConstants.Icons.ICON_SPECTRUM.getImage());
 
 		addWindowListener(this);
 

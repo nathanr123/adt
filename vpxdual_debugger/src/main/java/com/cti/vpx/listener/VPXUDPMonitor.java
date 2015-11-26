@@ -534,7 +534,7 @@ public class VPXUDPMonitor {
 
 			currentbyteArray = e.getHexArray();
 
-			//System.out.println(currentbyteArray.length);
+			// System.out.println(currentbyteArray.length);
 
 			currentbyteTotalpckt = currentbyteArray.length / ATP.DEFAULTBUFFERSIZE;
 
@@ -1956,10 +1956,6 @@ public class VPXUDPMonitor {
 				bist.setDSP2Completed(true);
 			}
 
-			// if (bist.isAllCompleted()) {// (bist.isDSP1Completed() &&
-			// bist.isP2020Completed() &&
-			// bist.isDSP2Completed()) {
-
 			bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
 
 			bist.setResultTestFailed(String.format("%d Tests", fail));
@@ -1985,16 +1981,7 @@ public class VPXUDPMonitor {
 					VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
 
 			((VPXCommunicationListener) listener).updateBIST(bist);
-			// }
 
-			// if (loop == VPXSessionManager.getBISTProcessor().size()) {
-
-			// ((VPXCommunicationListener)
-			// listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
-
-			// VPXLogger.updateLog(String.format("Built In Self Test
-			// completed"));
-			// }
 		}
 	}
 
@@ -2087,10 +2074,6 @@ public class VPXUDPMonitor {
 				bist.setDSP2Completed(true);
 			}
 
-			// if (bist.isAllCompleted()) {// (bist.isDSP1Completed() &&
-			// bist.isP2020Completed() &&
-			// bist.isDSP2Completed()) {
-
 			bist.setResultTestNoofTests(String.format("%d Tests", (pass + fail)));
 
 			bist.setResultTestFailed(String.format("%d Tests", fail));
@@ -2116,16 +2099,6 @@ public class VPXUDPMonitor {
 					VPXUtilities.getCurrentTime(2, System.currentTimeMillis() - bist.getStartTime()));
 
 			((VPXCommunicationListener) listener).updateBIST(bist);
-			// }
-
-			// if (loop == bist.getTotalProcessor()) {
-
-			// ((VPXCommunicationListener)
-			// listener).updateTestProgress(PROCESSOR_LIST.PROCESSOR_P2020, -1);
-
-			// VPXLogger.updateLog(String.format("Built In Self Test
-			// completed"));
-			// }
 		}
 	}
 

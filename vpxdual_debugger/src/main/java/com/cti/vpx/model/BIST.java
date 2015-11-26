@@ -11,6 +11,8 @@ public class BIST implements Serializable {
 	 */
 	private static final long serialVersionUID = 5873062208817223775L;
 
+	private static final String NA = "<html><font color='gray'>NA</font></html>";
+
 	// Test Detail
 	private String test = "Built In Self Test";
 
@@ -18,85 +20,85 @@ public class BIST implements Serializable {
 
 	private String testSubSystem = "";
 
-	private String testP2020IP = "NA";
+	private String testP2020IP = NA;
 
-	private String testDSP1IP = "NA";
+	private String testDSP1IP = NA;
 
-	private String testDSP2IP = "NA";
+	private String testDSP2IP = NA;
 
 	private String testDate = VPXUtilities.getCurrentTime(1);
 
 	private String testTime = VPXUtilities.getCurrentTime(2);
 
 	// Result detail
-	private String resultTestNoofTests = "NA";
+	private String resultTestNoofTests = NA;
 
-	private String resultTestPassed = "NA";
+	private String resultTestPassed = NA;
 
-	private String resultTestFailed = "NA";
+	private String resultTestFailed = NA;
 
 	private String resultTestStartedAt = VPXUtilities.getCurrentTime(2);
 
 	private String resultTestCompletedAt = VPXUtilities.getCurrentTime(2);
 
-	private String resultTestDuration = "NA";
+	private String resultTestDuration = NA;
 
-	private String resultTestStatus = "NA";
+	private String resultTestStatus = NA;
 
 	// P2020 Test Result
-	private String resultP2020Processor = "NA";
+	private String resultP2020Processor = NA;
 
-	private String resultP2020DDR3 = "NA";
+	private String resultP2020DDR3 = NA;
 
-	private String resultP2020NORFlash = "NA";
+	private String resultP2020NORFlash = NA;
 
-	private String resultP2020Ethernet = "NA";
+	private String resultP2020Ethernet = NA;
 
-	private String resultP2020PCIe = "NA";
+	private String resultP2020PCIe = NA;
 
-	private String resultP2020SRIO = "NA";
+	private String resultP2020SRIO = NA;
 
-	private String resultP2020Temprature1 = "NA";
+	private String resultP2020Temprature1 = NA;
 
-	private String resultP2020Temprature2 = "NA";
+	private String resultP2020Temprature2 = NA;
 
-	private String resultP2020Temprature3 = "NA";
+	private String resultP2020Temprature3 = NA;
 
-	private String resultP2020Voltage1 = "NA";
+	private String resultP2020Voltage1 = NA;
 
-	private String resultP2020Voltage2 = "NA";
+	private String resultP2020Voltage2 = NA;
 
-	private String resultP2020Voltage3 = "NA";
+	private String resultP2020Voltage3 = NA;
 
-	private String resultP2020Voltage4 = "NA";
+	private String resultP2020Voltage4 = NA;
 
-	private String resultP2020Voltage5 = "NA";
+	private String resultP2020Voltage5 = NA;
 
-	private String resultP2020Voltage6 = "NA";
+	private String resultP2020Voltage6 = NA;
 
-	private String resultP2020Voltage7 = "NA";
+	private String resultP2020Voltage7 = NA;
 
 	private boolean isP2020Completed = false;
 
 	// DSP 1 Test Result
-	private String resultDSP1Processor = "NA";
+	private String resultDSP1Processor = NA;
 
-	private String resultDSP1DDR3 = "NA";
+	private String resultDSP1DDR3 = NA;
 
-	private String resultDSP1NAND = "NA";
+	private String resultDSP1NAND = NA;
 
-	private String resultDSP1NOR = "NA";
+	private String resultDSP1NOR = NA;
 
 	private boolean isDSP1Completed = false;
 
 	// DSP 2 Test Result
-	private String resultDSP2Processor = "NA";
+	private String resultDSP2Processor = NA;
 
-	private String resultDSP2DDR3 = "NA";
+	private String resultDSP2DDR3 = NA;
 
-	private String resultDSP2NAND = "NA";
+	private String resultDSP2NAND = NA;
 
-	private String resultDSP2NOR = "NA";
+	private String resultDSP2NOR = NA;
 
 	private boolean isDSP2Completed = false;
 

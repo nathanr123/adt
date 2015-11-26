@@ -28,6 +28,8 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
+import javax.swing.SwingConstants;
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_BISTResultWindow extends JDialog {
 
@@ -857,38 +859,38 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		controlsPanel.setBackground(Color.WHITE);
 
-		controlsPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-
 		getContentPane().add(controlsPanel, BorderLayout.SOUTH);
-
-		JButton btnSave = new JButton("Save");
-
-		btnSave.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-
-				savetoFile();
-			}
-		});
-
-		btnSave.setActionCommand("OK");
-
-		controlsPanel.add(btnSave);
-
-		getRootPane().setDefaultButton(btnSave);
-
-		JButton btnClose = new JButton("Close");
-
-		btnClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				VPX_BISTResultWindow.this.dispose();
-			}
-		});
-
-		btnClose.setActionCommand("Cancel");
-
-		controlsPanel.add(btnClose);
+		controlsPanel.setLayout(new MigLayout("", "[296.00px,center][447px]", "[33px]"));
+																								
+																										JButton btnSave = new JButton("Save");
+																										controlsPanel.add(btnSave, "flowx,cell 0 0");
+																										
+																												btnSave.addActionListener(new ActionListener() {
+																										
+																													public void actionPerformed(ActionEvent e) {
+																										
+																														savetoFile();
+																													}
+																												});
+																												
+																														btnSave.setActionCommand("OK");
+																														
+																																getRootPane().setDefaultButton(btnSave);
+																												
+																												JLabel lblNote = new JLabel("Please wait until desired processors to complete test.");
+																												controlsPanel.add(lblNote, "cell 1 0");
+																												
+																														JButton btnClose = new JButton("Close");
+																														controlsPanel.add(btnClose, "cell 0 0,alignx center,aligny center");
+																														
+																																btnClose.addActionListener(new ActionListener() {
+																																	public void actionPerformed(ActionEvent e) {
+																														
+																																		VPX_BISTResultWindow.this.dispose();
+																																	}
+																																});
+																																
+																																		btnClose.setActionCommand("Cancel");
 	}
 
 	public void showBISTWindow(int count) {

@@ -202,10 +202,6 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_SpectrumWindow[] spectrumWindow;
 
-	// private VPX_WaterfallWindow[] waterfallWindow;
-
-	// private VPX_AmpWindow[] amplitudeWindow;
-
 	private VPX_MemoryPlotWindow[] memoryPlotWindow;
 
 	private JPanel baseTreePanel;
@@ -485,10 +481,6 @@ public class VPX_ETHWindow extends JFrame
 
 			if (!spectrumWindow[i].isVisible()) {
 
-				// memoryBrowserWindow[i].setMemoryFilter(filter);
-
-				// memoryBrowserWindow[i].showMemoryBrowser();
-
 				spectrumWindow[i].showSpectrumWindow();
 
 				break;
@@ -682,7 +674,7 @@ public class VPX_ETHWindow extends JFrame
 		});
 
 		vpx_Menu_Window_Spectrum = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Window.Spectrum") + " ( "
-				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ", VPXConstants.Icons.ICON_EMPTY);
+				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ", VPXConstants.Icons.ICON_SPECTRUM);
 
 		vpx_Menu_Window_Spectrum.addActionListener(new ActionListener() {
 
@@ -1764,7 +1756,7 @@ public class VPX_ETHWindow extends JFrame
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem(),
 						bist);
-				
+
 			}
 		});
 
