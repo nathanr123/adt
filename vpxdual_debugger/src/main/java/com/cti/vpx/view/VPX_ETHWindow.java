@@ -1565,7 +1565,7 @@ public class VPX_ETHWindow extends JFrame
 
 		int PromptResult = JOptionPane.showOptionDialog(null, "Are you sure you want to exit?",
 				rBundle.getString("App.title.name") + " - " + rBundle.getString("App.title.version"),
-				JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
+				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
 
 		if (PromptResult == 0) {
 
