@@ -293,7 +293,7 @@ public class VPX_UARTWindow extends JFrame {
 
 		cmbMessagesCoresFilter.removeAll();
 
-		cmbConsoleCoresFilter.addItem("All Cores");
+		cmbConsoleCoresFilter.addItem("Any Core");
 
 		for (int i = 0; i < 8; i++) {
 
@@ -335,8 +335,6 @@ public class VPX_UARTWindow extends JFrame {
 		consolePanel.add(consoleFilterPanel, BorderLayout.NORTH);
 
 		cmbConsoleCoresFilter = new JComboBox<String>();
-
-		cmbConsoleCoresFilter.setVisible(false);
 
 		cmbConsoleCoresFilter.setPreferredSize(new Dimension(130, 20));
 
@@ -383,9 +381,14 @@ public class VPX_UARTWindow extends JFrame {
 
 		sendOptionPanel.setLayout(new MigLayout("", "[grow,fill]", "[]"));
 
+		cmbMessagesCoresFilter = new JComboBox<String>();
+		sendOptionPanel.add(cmbMessagesCoresFilter, "flowx,cell 0 0,alignx center");
+
+		cmbMessagesCoresFilter.setPreferredSize(new Dimension(130, 20));
+
 		txtConsoleMsg = new JTextField();
 
-		sendOptionPanel.add(txtConsoleMsg, "cell 0 0");
+		sendOptionPanel.add(txtConsoleMsg, "cell 0 0,growx");
 
 		txtConsoleMsg.setColumns(10);
 
@@ -445,12 +448,6 @@ public class VPX_UARTWindow extends JFrame {
 		btnSend.setHorizontalAlignment(SwingConstants.LEFT);
 
 		buttonPanel.add(btnSend);
-
-		cmbMessagesCoresFilter = new JComboBox<String>();
-		cmbMessagesCoresFilter.setVisible(false);
-		buttonPanel.add(cmbMessagesCoresFilter);
-
-		cmbMessagesCoresFilter.setPreferredSize(new Dimension(130, 20));
 	}
 
 	private void centerFrame() {
@@ -536,7 +533,7 @@ public class VPX_UARTWindow extends JFrame {
 
 		try {
 
-			String data = txtConsoleMsg.getText().trim();
+			String data = cmbMessagesCoresFilter.getSelectedIndex()+ "::" + txtConsoleMsg.getText().trim();
 
 			if (data.length() > 0) {
 
@@ -589,6 +586,20 @@ public class VPX_UARTWindow extends JFrame {
 
 				if (msg1.length() > 0) {
 
+					String msg = msg1.split("::")[1];
+
+					if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
+
+						if (msg1.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
+
+							txtAConsole.append(msg + "\n");
+						}
+
+					} else {
+
+						txtAConsole.append(msg + "\n");
+					}
+
 					/*
 					 * if (msg1.trim().startsWith("~ #")) {
 					 * 
@@ -601,11 +612,6 @@ public class VPX_UARTWindow extends JFrame {
 					// txtAConsole.append(String.format(" %s\\> %s",
 					// this.currCommport, data) + "\n");
 
-					txtAConsole.append(msg1 + "\n");
-
-					txtAConsole.setCaretPosition(txtAConsole.getText().length());
-
-					updateLog(msg1);
 					/*
 					 * String msg = msg1.split("::")[1];
 					 * 
@@ -740,7 +746,9 @@ public class VPX_UARTWindow extends JFrame {
 			}
 
 		} catch (Exception e) {
+
 			VPXLogger.updateError(e);
+
 			e.printStackTrace();
 		}
 

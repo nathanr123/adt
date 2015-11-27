@@ -906,8 +906,8 @@ public class VPX_AppModeWindow extends JFrame {
 			}
 
 		} else {
-			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please select valid workspace", "Error Workspace Launcher",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(VPX_AppModeWindow.this, "Please select valid workspace",
+					"Error Workspace Launcher", JOptionPane.ERROR_MESSAGE);
 
 			txtWorkspacePath.requestFocusInWindow();
 		}
@@ -941,6 +941,12 @@ public class VPX_AppModeWindow extends JFrame {
 
 		VPXSessionManager.setCurrentErrorLogFileName("Error_" + curTime + ".log");
 
+		if (currentMode == VPXConstants.UARTMODE) {
+
+			flnmae = "UART_" + flnmae;
+			
+			VPXSessionManager.setCurrentErrorLogFileName("UART_Error_" + curTime + ".log");
+		}
 		VPXSessionManager.setCurrentLogFileName(flnmae);
 
 		VPXUtilities.setEnableLog(true);
