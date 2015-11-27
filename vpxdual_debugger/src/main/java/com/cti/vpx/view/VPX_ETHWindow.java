@@ -1752,7 +1752,7 @@ public class VPX_ETHWindow extends JFrame
 
 				BIST bist = new BIST(isP2020, isDSP1, isDSP2);
 
-				bistWindow.showBISTWindow(bist.getTotalProcessor());
+				bistWindow.showBISTWindow(VPX_ETHWindow.this,bist.getTotalProcessor());
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem(),
 						bist);

@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.SystemColor;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
@@ -183,11 +185,9 @@ public class VPX_SplashWindow extends JWindow {
 
 		container.add(progressBar, BorderLayout.SOUTH);
 
-		setBounds(600, 600, 499, 300);
+		setSize(499, 300);
 
-		// pack();
-
-		setLocationRelativeTo(null);
+		centerFrame();
 
 		setVisible(true);
 
@@ -203,8 +203,25 @@ public class VPX_SplashWindow extends JWindow {
 
 	private void createAndShowADTWindow() {
 
-		VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(), VPXUtilities.getSerialPorts());
+		VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),
+				VPXUtilities.getSerialPorts());
 
 		window.showWindow();
 	}
+
+	private void centerFrame() {
+
+		Dimension windowSize = getSize();
+
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+		Point centerPoint = ge.getCenterPoint();
+
+		int dx = centerPoint.x - windowSize.width / 2;
+
+		int dy = centerPoint.y - windowSize.height / 2;
+
+		setLocation(dx, dy);
+	}
+
 }

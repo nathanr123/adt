@@ -11,7 +11,7 @@ public class BIST implements Serializable {
 	 */
 	private static final long serialVersionUID = 5873062208817223775L;
 
-	private static final String NA = "<html><font color='gray'>NA</font></html>";
+	public static final String NA = "<html><font color='gray'>NA</font></html>";
 
 	// Test Detail
 	private String test = "Built In Self Test";

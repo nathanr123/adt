@@ -262,6 +262,12 @@ public class VPXUtilities {
 
 			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
+		}else if (format == 5) {
+
+			VPXConstants.DATEFORMAT_TIME12.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+			ret = VPXConstants.DATEFORMAT_TIME12.format(millis);
+
 		}
 
 		return ret;

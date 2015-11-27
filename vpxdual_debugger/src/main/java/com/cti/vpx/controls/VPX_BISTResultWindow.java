@@ -3,12 +3,13 @@ package com.cti.vpx.controls;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -23,15 +24,17 @@ import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import com.cti.vpx.command.ATP;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
-import javax.swing.SwingConstants;
+import com.cti.vpx.view.VPX_ETHWindow;
+
 import net.miginfocom.swing.MigLayout;
 
-public class VPX_BISTResultWindow extends JDialog {
+public class VPX_BISTResultWindow extends JDialog implements WindowListener {
 
 	/**
 	 * 
@@ -128,6 +131,10 @@ public class VPX_BISTResultWindow extends JDialog {
 
 	private VPX_TestProgressWindow progress;
 
+	private VPX_ETHWindow parent;
+
+	private JButton btnReboot;
+
 	/**
 	 * Create the dialog.
 	 */
@@ -140,9 +147,11 @@ public class VPX_BISTResultWindow extends JDialog {
 		centerFrame();
 	}
 
-	public VPX_BISTResultWindow(BIST bist) {
+	public VPX_BISTResultWindow(VPX_ETHWindow parent, BIST bist) {
 
 		this();
+
+		this.parent = parent;
 
 		setResult(bist);
 
@@ -861,39 +870,68 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		getContentPane().add(controlsPanel, BorderLayout.SOUTH);
 		controlsPanel.setLayout(new MigLayout("", "[296.00px,center][447px]", "[33px]"));
-																								
-																										JButton btnSave = new JButton("Save");
-																										controlsPanel.add(btnSave, "flowx,cell 0 0");
-																										
-																												btnSave.addActionListener(new ActionListener() {
-																										
-																													public void actionPerformed(ActionEvent e) {
-																										
-																														savetoFile();
-																													}
-																												});
-																												
-																														btnSave.setActionCommand("OK");
-																														
-																																getRootPane().setDefaultButton(btnSave);
-																												
-																												JLabel lblNote = new JLabel("Please wait until desired processors to complete test.");
-																												controlsPanel.add(lblNote, "cell 1 0");
-																												
-																														JButton btnClose = new JButton("Close");
-																														controlsPanel.add(btnClose, "cell 0 0,alignx center,aligny center");
-																														
-																																btnClose.addActionListener(new ActionListener() {
-																																	public void actionPerformed(ActionEvent e) {
-																														
-																																		VPX_BISTResultWindow.this.dispose();
-																																	}
-																																});
-																																
-																																		btnClose.setActionCommand("Cancel");
+
+		JButton btnSave = new JButton("Save");
+		controlsPanel.add(btnSave, "flowx,cell 0 0");
+
+		btnSave.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				savetoFile();
+			}
+		});
+
+		btnSave.setActionCommand("OK");
+
+		getRootPane().setDefaultButton(btnSave);
+
+		JLabel lblNote = new JLabel("Please wait until desired processors to complete test.");
+
+		controlsPanel.add(lblNote, "cell 1 0");
+
+		btnReboot = new JButton("Reboot");
+
+		btnReboot.setEnabled(false);
+
+		btnReboot.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				if (!lblTestDetailP2020IPVal.getText().trim().equals(BIST.NA)) {
+
+					int option = JOptionPane.showConfirmDialog(VPX_BISTResultWindow.this,
+							"Do you want to reboot the system?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+					if (option == JOptionPane.YES_OPTION) {
+
+						parent.setReboot(lblTestDetailP2020IPVal.getText().trim(), 0, ATP.FLASH_DEVICE_NAND, 0);
+					}
+				} else {
+
+					JOptionPane.showMessageDialog(VPX_BISTResultWindow.this, "No P2020 found", "Not found",
+							JOptionPane.ERROR_MESSAGE);
+				}
+
+			}
+		});
+		controlsPanel.add(btnReboot, "cell 0 0");
+
+		JButton btnClose = new JButton("Close");
+		controlsPanel.add(btnClose, "cell 0 0,alignx center,aligny center");
+
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				VPX_BISTResultWindow.this.dispose();
+			}
+		});
+
+		btnClose.setActionCommand("Cancel");
 	}
 
-	public void showBISTWindow(int count) {
+	public void showBISTWindow(VPX_ETHWindow prnt, int count) {
+
+		this.parent = prnt;
 
 		clearAllFields();
 
@@ -909,7 +947,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		th.start();
 
-		//progress.showProgressWindow(count);
+		// progress.showProgressWindow(count);
 	}
 
 	public void setResult(BIST result) {
@@ -1009,6 +1047,10 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		lblResultDetailTestDurationVal.setText(testResult.getResultTestDuration());
 
+		if (testResult.isP2020Completed()) {
+
+			btnReboot.setEnabled(true);
+		}
 	}
 
 	private void centerFrame() {
@@ -1209,7 +1251,7 @@ public class VPX_BISTResultWindow extends JDialog {
 
 	public void updateTestProgress(PROCESSOR_LIST pType, int val) {
 
-		//progress.updateTestProgress(pType, val);
+		// progress.updateTestProgress(pType, val);
 
 	}
 
@@ -1311,11 +1353,9 @@ public class VPX_BISTResultWindow extends JDialog {
 
 		public void updateTestProgress(PROCESSOR_LIST pType, int value) {
 
-			System.out.println(value);
-
 			if (value == -1) {
 
-				//VPX_TestProgressWindow.this.dispose();
+				// VPX_TestProgressWindow.this.dispose();
 
 			} else {
 
@@ -1342,6 +1382,8 @@ public class VPX_BISTResultWindow extends JDialog {
 	}
 
 	private void clearAllFields() {
+
+		btnReboot.setEnabled(false);
 
 		progress.lblExitingApplication.setText("Built in Self Testing in progress...");
 
@@ -1432,6 +1474,60 @@ public class VPX_BISTResultWindow extends JDialog {
 		lblResultDetailTestCompletedAtVal.setText("");
 
 		lblResultDetailTestDurationVal.setText("");
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+
+		if (!lblTestDetailP2020IPVal.getText().trim().equals(BIST.NA)) {
+
+			int option = JOptionPane.showConfirmDialog(VPX_BISTResultWindow.this,
+					"Do you want to reboot the system before close?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+			if (option == JOptionPane.YES_OPTION) {
+
+				parent.setReboot(lblTestDetailP2020IPVal.getText().trim(), 0, ATP.FLASH_DEVICE_NAND, 0);
+
+				VPX_BISTResultWindow.this.dispose();
+			}
+		}
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 }

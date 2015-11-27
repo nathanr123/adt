@@ -235,6 +235,8 @@ public class VPX_EthernetFlashPanel extends JPanel {
 						t.start();
 
 					} else {
+						
+						dialog.setIndeterminate(false);
 
 						parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(),
 								cmbOffset.getSelectedIndex());

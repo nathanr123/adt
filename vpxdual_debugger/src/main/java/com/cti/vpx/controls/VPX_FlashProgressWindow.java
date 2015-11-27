@@ -74,6 +74,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		
+		setResizable(false);
 
 		setSize(500, 104);
 
@@ -103,6 +105,8 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		progressFileSent = new JProgressBar();
 
+		progressFileSent.setIndeterminate(false);
+		
 		progressFileSent.setStringPainted(true);
 
 		progressPanel.add(progressFileSent, "cell 0 1 3 1,growx,aligny top");
@@ -182,7 +186,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 	public void updatePackets(long size, long totpkt, long curpacket, long bytesRcvd, long currBufferSize) {
 
 		long cur = curpacket;
-
+	
 		if (cur == 0) {
 
 			progressFileSent.setMaximum((int) totpkt);
@@ -197,7 +201,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		cur = cur + 1;
 
 		progressFileSent.setValue((int) cur);
-
+		
 		long remain = (totpkt - cur);
 
 		if (remain == 0) {

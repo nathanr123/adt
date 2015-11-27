@@ -58,6 +58,8 @@ public class VPXConstants {
 	public static final DateFormat DATEFORMAT_TIME = new SimpleDateFormat("HH:mm:ss");
 
 	public static final DateFormat DATEFORMAT_TIMEFULL = new SimpleDateFormat("HH:mm:ss.SSS");
+	
+	public static final DateFormat DATEFORMAT_TIME12 = new SimpleDateFormat("hh:mm:ss a");
 
 	public static final int UARTMODE = 0;
 
