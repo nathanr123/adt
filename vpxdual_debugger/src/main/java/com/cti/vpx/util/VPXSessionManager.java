@@ -247,6 +247,6 @@ public class VPXSessionManager {
 
 	private static String getAsFullPath(String parent, String child) {
 
-		return parent + "\\" + child;
+		return parent + "/" + child;
 	}
 }

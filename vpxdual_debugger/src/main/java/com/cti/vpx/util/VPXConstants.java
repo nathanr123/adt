@@ -262,7 +262,7 @@ public class VPXConstants {
 
 		public static final String ICON_DOWNLOADOUT_NAME = "download1.png";
 
-		public static final String ICON_RUN_NAME = "play.png";
+		public static final String ICON_RUN_NAME = "Play.png";
 
 		public static final String ICON_PAUSE_NAME = "pause.png";
 

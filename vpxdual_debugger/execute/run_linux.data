@@ -1,0 +1,8 @@
+#!/bin/sh
+cd $(pwd)/execute 
+$(pwd)/hex6x -order L $(pwd)/bootimage.rmd outfile
+$(pwd)/Bttbl2Hfile $(pwd)/bootimage.btbl $(pwd)/bootimage.h $(pwd)/bootimage.bin
+$(pwd)/hfile2array $(pwd)/bootimage.h headerfile bootCode
+
+exit 0
+==end==

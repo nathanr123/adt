@@ -258,7 +258,7 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 					lblProcessing.setText("Loading " + filesDL[i]);
 
 					VPXUtilities.createOutArrayFile(filesDL[i],
-							VPXSessionManager.getExecutePath() + "\\" + String.format("%d.h", i));
+							VPXSessionManager.getExecutePath() + "/" + String.format("%d.h", i));
 				}
 
 				Thread.sleep(500);

@@ -810,7 +810,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 				if (ip && sub && gateway) {
 
-					if (isValueChanged()) {
+					if (!isValueChanged()) {
 
 						VPXUtilities.setEthernetPort(cmbNWIface.getSelectedItem().toString(), txtIPAddress.getText(),
 								txtSubnet.getText(), txtGateway.getText());

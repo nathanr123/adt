@@ -1144,21 +1144,39 @@ public class VPX_MADPanel extends JPanel {
 
 		boolean ret = true;
 
+		Process proc = null;
+
+		String cmd = "";
+
 		Properties p = VPXUtilities.readProperties();
 
-		String cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(VPXConstants.ResourceFields.PATH_MAP),
-				folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
-		// String cmd = String.format("cmd /c ping 192.168.0.102");
-
-		VPXLogger.updateLog("Creating deployment files");
-
-		VPXLogger.updateLog("Creating deployment configuration files");
+		String os = System.getProperty("os.name");
 
 		try {
 
-			Process proc = Runtime.getRuntime().exec(cmd);
+			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
+
+				cmd = String.format("cmd /c %s %s bypass-prelink", p.getProperty(VPXConstants.ResourceFields.PATH_MAP),
+						folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
+
+				proc = Runtime.getRuntime().exec(cmd);
+
+			} else {
+				cmd = String.format("python %s %s bypass-prelink", p.getProperty(VPXConstants.ResourceFields.PATH_MAP),
+						folderPath + "/" + VPXConstants.ResourceFields.DEPLOYMENTCONFIGFILE);
+
+				proc = Runtime.getRuntime().exec(new String[] { "sh", "-c", cmd });
+			}
+
+			System.out.println(cmd);
+			
+			VPXLogger.updateLog("Creating deployment files");
+
+			VPXLogger.updateLog("Creating deployment configuration files");
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			
+			BufferedReader stdErroInput = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 			String s = null;
 
@@ -1168,10 +1186,21 @@ public class VPX_MADPanel extends JPanel {
 
 				VPXLogger.updateLog(s);
 
-				if (s.contains("Error")) {
+				if (s.toLowerCase().contains("error")) {
 					ret = false;
 				}
 
+			}
+			
+			String sError = null;
+
+			while ((sError = stdErroInput.readLine()) != null) {
+
+				madProcessWindow.updateGeneratingMessage(sError);
+
+				VPXLogger.updateLog(sError);
+
+			
 			}
 
 			if (ret) {
@@ -1597,7 +1626,7 @@ public class VPX_MADPanel extends JPanel {
 
 			try {
 
-				Desktop.getDesktop().open(new File(path.substring(0, path.lastIndexOf("\\"))));
+				Desktop.getDesktop().open(new File(path.substring(0, path.lastIndexOf("/"))));
 
 				this.dispose();
 

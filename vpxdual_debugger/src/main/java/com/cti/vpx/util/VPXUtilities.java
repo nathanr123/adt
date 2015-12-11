@@ -262,7 +262,7 @@ public class VPXUtilities {
 
 			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
-		}else if (format == 5) {
+		} else if (format == 5) {
 
 			VPXConstants.DATEFORMAT_TIME12.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -608,7 +608,7 @@ public class VPXUtilities {
 			// Log Tab Settings
 
 			prop.setProperty(VPXConstants.ResourceFields.WORKSPACE_PATH,
-					System.getProperty("user.home") + "\\vpxworkspace");
+					System.getProperty("user.home") + "/vpxworkspace");
 
 			prop.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(true));
 
@@ -774,7 +774,7 @@ public class VPXUtilities {
 
 		try {
 
-			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "\\"
+			File file = new File(resourceBundle.getString("Scan.processor.data.path") + "/"
 					+ resourceBundle.getString("Scan.processor.data.xml"));
 
 			if (file.exists()) {
@@ -1529,45 +1529,112 @@ public class VPXUtilities {
 
 		try {
 
-			// create run.bat
+			String os = System.getProperty("os.name");
 
-			Thread.sleep(150);
+			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
 
-			String run = readFile("execute/run.data", VPXConstants.DELIMITER_FILE);
+				// create run.bat
 
-			run = run.replace("outfile", outFile);
+				Thread.sleep(150);
 
-			run = run.replace("headerfile", headerFile);
+				String run = readFile("execute/run.data", VPXConstants.DELIMITER_FILE);
 
-			writeFile("execute/run.bat", run);
+				run = run.replace("outfile", outFile);
 
-			// start run.bat
+				run = run.replace("headerfile", headerFile);
 
-			String[] batchArg = { "cmd", "/k", "cd /d " + System.getProperty("user.dir") + "\\execute & run.bat" };
+				writeFile("execute/run.bat", run);
 
-			Thread.sleep(250);
+				// start run.bat
 
-			Process p = Runtime.getRuntime().exec(batchArg);
+				String[] batchArg = { "cmd", "/k", "cd /d " + System.getProperty("user.dir") + "\\execute & run.bat" };
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				Thread.sleep(250);
 
-			String s = null;
+				Process p = Runtime.getRuntime().exec(batchArg);
 
-			while ((s = stdInput.readLine()) != null) {
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-				VPXLogger.updateLog(s);
+				String s = null;
+
+				while ((s = stdInput.readLine()) != null) {
+
+					VPXLogger.updateLog(s);
+
+				}
+
+				// System.out.println("Exit Code : "+p.exitValue());
+
+				// delete run.bat, and other extra files
+
+				deleteDeploymentFiles(System.getProperty("user.dir") + "/execute/bootimage.bin",
+						System.getProperty("user.dir") + "/execute/bootimage.btbl", false);
+
+				deleteDeploymentFiles(System.getProperty("user.dir") + "/execute/bootimage.h",
+						System.getProperty("user.dir") + "/execute/run.bat", false);
+
+			} else {
+
+				// create run.bat
+
+				Thread.sleep(150);
+
+				String run = readFile("execute/run_linux.data", VPXConstants.DELIMITER_FILE);
+
+				run = run.replace("outfile", outFile);
+
+				run = run.replace("headerfile", headerFile);
+
+				//run = run.replace("pathtochange", "execute/");
+
+				writeFile("execute/run.sh", run);
+
+				setExecutePermission("execute/run.sh");
+				
+				setPermission("execute/");
+
+				// start run.bat
+
+				// String[] batchArg = { "cmd", "/k", "cd /d " +
+				// System.getProperty("user.dir") + "\\execute & run.bat" };
+
+				Thread.sleep(250);
+
+				Process p = Runtime.getRuntime().exec(new String[] { "sh", "-c", "execute/run.sh" });
+
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+				String s = null;
+
+				while ((s = stdInput.readLine()) != null) {
+
+					VPXLogger.updateLog(s);
+
+				}
+				
+				BufferedReader stdErrInput = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+				String sErr = null;
+
+				while ((sErr = stdErrInput.readLine()) != null) {
+
+					VPXLogger.updateLog(sErr);
+
+				}
+				
+				
+
+				// System.out.println("Exit Code : "+p.exitValue());
+
+				// delete run.bat, and other extra files
+
+				deleteDeploymentFiles(System.getProperty("user.dir") + "/execute/bootimage.bin",
+						System.getProperty("user.dir") + "/execute/bootimage.btbl", false);
+
+				deleteDeploymentFiles(System.getProperty("user.dir") + "/execute/bootimage.h",
+						System.getProperty("user.dir") + "/execute/run.sh", false);
 
 			}
-
-			//System.out.println("Exit Code : "+p.exitValue());
-
-			// delete run.bat, and other extra files
-
-			deleteDeploymentFiles(System.getProperty("user.dir") + "\\execute\\bootimage.bin",
-					System.getProperty("user.dir") + "\\execute\\bootimage.btbl", false);
-
-			deleteDeploymentFiles(System.getProperty("user.dir") + "\\execute\\bootimage.h",
-					System.getProperty("user.dir") + "\\execute\\run.bat", false);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1659,7 +1726,7 @@ public class VPXUtilities {
 				return false;
 
 			if (isDirectory) {
-				fileName = fileName.substring(0, fileName.lastIndexOf("\\"));
+				fileName = fileName.substring(0, fileName.lastIndexOf("/"));
 			}
 
 			File f = new File(fileName);
@@ -1682,15 +1749,77 @@ public class VPXUtilities {
 		deleteDeploymentFiles("tmp", "", true);
 	}
 
+	private static void setPermission(String fileName) {
+
+		String s = null;
+
+		try {
+
+			String cmd = String.format("chmod -R 777 %s", fileName);
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+				System.out.println(s);
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void setExecutePermission(String fileName) {
+
+		String s = null;
+
+		try {
+
+			String cmd = String.format("chmod +x %s", fileName);
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+				System.out.println(s);
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
 	private static void deleteDeploymentFiles(String deployFile, String cfgFile, boolean isdirectory) {
 
 		String cmd = "";
 
-		if (isdirectory) {
-			cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
+		String os = System.getProperty("os.name");
+
+		if (os.startsWith(VPXConstants.WIN_OSNAME)) {
+
+			if (isdirectory) {
+				cmd = String.format("cmd /c rmdir /S /Q %s %s", deployFile, cfgFile);
+			} else {
+				cmd = String.format("cmd /c del /F %s %s", deployFile.replaceAll("/", "\\\\"),
+						cfgFile.replaceAll("/", "\\\\"));
+			}
 		} else {
-			cmd = String.format("cmd /c del /F %s %s", deployFile.replaceAll("/", "\\\\"),
-					cfgFile.replaceAll("/", "\\\\"));
+
+			if (isdirectory) {
+
+				// setPermission(deployFile);
+
+				cmd = String.format("rm -rf %s %s", deployFile, cfgFile);
+			} else {
+				cmd = String.format("rm -rf %s %s", deployFile, cfgFile);
+			}
+
 		}
 
 		String s = null;
@@ -1702,7 +1831,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-				// System.out.println(s);
+				System.out.println(s);
 			}
 
 		} catch (Exception e) {
@@ -1744,19 +1873,29 @@ public class VPXUtilities {
 
 			File root = new File(rootPath);
 
-			File[] s = File.listRoots();
+			String os = System.getProperty("os.name");
 
-			for (int i = 0; i < s.length; i++) {
+			if (os.startsWith(VPXConstants.WIN_OSNAME)) {
 
-				if (s[i].canWrite()) {
+				File[] s = File.listRoots();
 
-					if (root.getPath().startsWith(s[i].getPath())) {
+				for (int i = 0; i < s.length; i++) {
 
-						isWritable = true;
+					if (s[i].canWrite()) {
 
-						break;
+						if (root.getPath().startsWith(s[i].getPath())) {
+
+							isWritable = true;
+
+							break;
+						}
 					}
 				}
+
+			} else {
+
+				isWritable = true;
+
 			}
 
 			if (isWritable) {

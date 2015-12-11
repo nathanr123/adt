@@ -134,8 +134,10 @@ public class BIST implements Serializable {
 
 		if (isP2020Available)
 			totalProcessor++;
+		
 		if (isDSP1Available)
 			totalProcessor++;
+		
 		if (isDSP2Available)
 			totalProcessor++;
 

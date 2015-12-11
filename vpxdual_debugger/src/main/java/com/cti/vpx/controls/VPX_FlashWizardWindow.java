@@ -131,7 +131,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 	private FilenameFilter outFilter = null;
 
 	private VPX_FlashProgressWindow dialog;
+	
 	private JButton btnLoadWorkspace;
+	
 	private JButton btnBackup;
 
 	/**
