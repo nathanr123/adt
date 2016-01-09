@@ -793,27 +793,29 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			String sub = currentSubSystem.getSubSystem();
+			if (currentSubSystem != null) {
 
-			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want delete " + sub + " ?",
-					"Confirmation", JOptionPane.YES_NO_OPTION);
+				String sub = currentSubSystem.getSubSystem();
 
-			if (option == JOptionPane.YES_OPTION) {
+				int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this,
+						"Do you want delete " + sub + " ?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-				if (currentSubSystem != null)
+				if (option == JOptionPane.YES_OPTION) {
 
-					if (aliasTableModel.deleteSubSystem(currentSubSystem.getId())) {
+					if (currentSubSystem != null)
 
-						String msg = sub + " deleted successfully!\nPlease click Save button to take effect !.";
+						if (aliasTableModel.deleteSubSystem(currentSubSystem.getId())) {
 
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
+							String msg = sub + " deleted successfully!\nPlease click Save button to take effect !.";
 
-					} else {
-						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting " + sub,
-								"Deletion", JOptionPane.ERROR_MESSAGE);
-					}
+							JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, msg);
+
+						} else {
+							JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting " + sub,
+									"Deletion", JOptionPane.ERROR_MESSAGE);
+						}
+				}
 			}
-
 		}
 	}
 
@@ -839,17 +841,20 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			String sub = currentSubSystem.getSubSystem();
+			if (currentSubSystem != null) {
 
-			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want update " + sub + " ?",
-					"Confirmation", JOptionPane.YES_NO_OPTION);
+				String sub = currentSubSystem.getSubSystem();
 
-			if (option == JOptionPane.YES_OPTION) {
+				int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this,
+						"Do you want update " + sub + " ?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-				if (currentSubSystem != null)
+				if (option == JOptionPane.YES_OPTION) {
 
-					addorSaveSubSystem();
+					if (currentSubSystem != null)
 
+						addorSaveSubSystem();
+
+				}
 			}
 		}
 	}
@@ -991,21 +996,25 @@ public class VPX_AliasConfigWindow extends JFrame implements WindowListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want delete all ?",
-					"Confirmation", JOptionPane.YES_NO_OPTION);
 
-			if (option == JOptionPane.YES_OPTION) {
+			if (aliasTableModel.getSubSystem().getSubsystem().size() > 0) {
 
-				if (VPXUtilities.deleteXMLFile()) {
+				int option = JOptionPane.showConfirmDialog(VPX_AliasConfigWindow.this, "Do you want delete all ?",
+						"Confirmation", JOptionPane.YES_NO_OPTION);
 
-					aliasTableModel.clearAllSubSystem();
+				if (option == JOptionPane.YES_OPTION) {
 
-					JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Deleted successfully!");
+					if (VPXUtilities.deleteXMLFile()) {
 
-				} else {
+						aliasTableModel.clearAllSubSystem();
 
-					JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting ", "Deletion",
-							JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Deleted successfully!");
+
+					} else {
+
+						JOptionPane.showMessageDialog(VPX_AliasConfigWindow.this, "Error in deleting ", "Deletion",
+								JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		}

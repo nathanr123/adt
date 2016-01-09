@@ -40,8 +40,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ActionMapUIResource;
@@ -89,10 +87,6 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 
 	protected static final int WIDTHDELTA = 5;
 
-	private static final Border PRESSEDBORDER = new SoftBevelBorder(SoftBevelBorder.LOWERED);
-
-	private static final Border OVERBORDER = new SoftBevelBorder(SoftBevelBorder.RAISED);
-
 	private BufferedImage closeImgB;
 
 	private BufferedImage maxImgB;
@@ -123,6 +117,10 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 
 	protected JMenuItem closeItem;
 
+	protected JMenuItem closeAllItem;
+
+	protected JMenuItem closeOthersItem;
+
 	public VPX_BasicTabPaneUI() {
 
 		super();
@@ -136,11 +134,11 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 		maxImgI = new BufferedImage(BUTTONSIZE, BUTTONSIZE, BufferedImage.TYPE_4BYTE_ABGR);
 
 		closeB = new JRadioButton(ICON_CLOSE_DEFAULT);
-		
+
 		closeB.setFocusPainted(false);
-		
+
 		closeB.setBorder(null);
-		
+
 		closeB.setBorderPainted(false);
 
 		closeB.setActionCommand("CLOSE");
@@ -157,7 +155,11 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 
 		maxItem = new JMenuItem("Detach");
 
-		closeItem = new JMenuItem("Close");
+		closeItem = new JMenuItem("Close This");
+
+		closeAllItem = new JMenuItem("Close All");
+
+		closeOthersItem = new JMenuItem("Close Others");
 
 		maxItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -172,49 +174,85 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 			}
 		});
 
+		closeAllItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				((VPX_TabbedPane) tabPane).fireCloseAllTabEvent(null, tabPane.getSelectedIndex());
+
+			}
+		});
+
+		closeOthersItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				((VPX_TabbedPane) tabPane).fireCloseOthersTabEvent(null, tabPane.getSelectedIndex());
+
+			}
+		});
+
 		setPopupMenu();
 	}
 
 	protected boolean isOneActionButtonEnabled() {
+
 		return isCloseButtonEnabled || isMaxButtonEnabled;
 	}
 
 	public boolean isCloseEnabled() {
+
 		return isCloseButtonEnabled;
+
 	}
 
 	public boolean isMaxEnabled() {
+
 		return isMaxButtonEnabled;
+
 	}
 
 	public void setCloseIcon(boolean b) {
+
 		isCloseButtonEnabled = b;
+
 		setPopupMenu();
 	}
 
 	public void setMaxIcon(boolean b) {
+
 		isMaxButtonEnabled = b;
+
 		setPopupMenu();
 	}
 
 	private void setPopupMenu() {
+
 		actionPopupMenu.removeAll();
-		if (isMaxButtonEnabled)
-			actionPopupMenu.add(maxItem);
-		if (isMaxButtonEnabled && isCloseButtonEnabled)
-			actionPopupMenu.addSeparator();
-		if (isCloseButtonEnabled)
-			actionPopupMenu.add(closeItem);
+
+		actionPopupMenu.add(closeItem);
+
+		actionPopupMenu.add(closeAllItem);
+
+		actionPopupMenu.add(closeOthersItem);
+
+		actionPopupMenu.addSeparator();
+
+		actionPopupMenu.add(maxItem);
 	}
 
 	protected int calculateTabWidth(int tabPlacement, int tabIndex, FontMetrics metrics) {
+
 		int delta = 2;
+
 		if (!isOneActionButtonEnabled())
+
 			delta += 6;
+
 		else {
+
 			if (isCloseButtonEnabled)
+
 				delta += BUTTONSIZE + WIDTHDELTA;
+
 			if (isMaxButtonEnabled)
+
 				delta += BUTTONSIZE + WIDTHDELTA;
 		}
 
@@ -228,10 +266,13 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 
 	protected void layoutLabel(int tabPlacement, FontMetrics metrics, int tabIndex, String title, Icon icon,
 			Rectangle tabRect, Rectangle iconRect, Rectangle textRect, boolean isSelected) {
+
 		textRect.x = textRect.y = iconRect.x = iconRect.y = 0;
 
 		View v = getTextViewForTab(tabIndex);
+
 		if (v != null) {
+
 			tabPane.putClientProperty("html", v);
 		}
 
@@ -242,6 +283,7 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 		tabPane.putClientProperty("html", null);
 
 		iconRect.x = tabRect.x + 8;
+
 		textRect.x = iconRect.x + iconRect.width + textIconGap;
 	}
 
@@ -1375,12 +1417,27 @@ public class VPX_BasicTabPaneUI extends BasicTabbedPaneUI {
 			}
 
 			if (isOneActionButtonEnabled() && e.isPopupTrigger()) {
+
 				super.mousePressed(e);
 
 				closeIndexStatus = INACTIVE; // Prevent undesired action when
+
 				maxIndexStatus = INACTIVE; // right-clicking on icons
 
 				actionPopupMenu.show(tabScroller.tabPanel, e.getX(), e.getY());
+
+				if (tabCount == 1) {
+
+					closeAllItem.setEnabled(false);
+
+					closeOthersItem.setEnabled(false);
+				} else {
+
+					closeAllItem.setEnabled(true);
+
+					closeOthersItem.setEnabled(true);
+				}
+
 				return;
 			}
 

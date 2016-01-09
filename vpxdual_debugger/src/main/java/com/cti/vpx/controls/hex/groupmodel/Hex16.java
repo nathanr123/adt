@@ -266,10 +266,9 @@ public class Hex16 extends AbstractTableModel {
 		setColumnHeaders(stride);
 		fireTableDataChanged();
 		editor.fireHexEditorEvent(0, doc.getSize(), 0);
-		
-		
+
 	}
-	
+
 	private void setColumnHeaders(int stride) {
 
 		TableColumnModel header = editor.getTable().getTableHeader().getColumnModel();
@@ -333,6 +332,19 @@ public class Hex16 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
+		String str = value.toString();
+
+		if (!str.startsWith("0x") && !str.startsWith("0x")) {
+
+			str = "0x" + value.toString();
+		}
+
+		int offset = editor.cellToOffset(row, col);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, Long.decode(str));
+
+		/*
+		
 		String val = String.format("%04x", Integer.parseInt(value.toString(), 16));
 
 		byte[] bArr = new byte[2];
@@ -352,6 +364,7 @@ public class Hex16 extends AbstractTableModel {
 		fireTableCellUpdated(row, col);
 
 		editor.fireHexEditorEvent(offset, 2, 2);
+		*/
 
 	}
 

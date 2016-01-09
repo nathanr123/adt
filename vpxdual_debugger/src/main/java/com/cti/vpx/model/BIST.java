@@ -28,7 +28,7 @@ public class BIST implements Serializable {
 
 	private String testDate = VPXUtilities.getCurrentTime(1);
 
-	private String testTime = VPXUtilities.getCurrentTime(2);
+	private String testTime = VPXUtilities.getCurrentTime(5);
 
 	// Result detail
 	private String resultTestNoofTests = NA;
@@ -37,9 +37,9 @@ public class BIST implements Serializable {
 
 	private String resultTestFailed = NA;
 
-	private String resultTestStartedAt = VPXUtilities.getCurrentTime(2);
+	private String resultTestStartedAt = VPXUtilities.getCurrentTime(5);
 
-	private String resultTestCompletedAt = VPXUtilities.getCurrentTime(2);
+	private String resultTestCompletedAt = VPXUtilities.getCurrentTime(5);
 
 	private String resultTestDuration = NA;
 
@@ -118,9 +118,9 @@ public class BIST implements Serializable {
 
 		testDate = VPXUtilities.getCurrentTime(1);
 
-		testTime = VPXUtilities.getCurrentTime(2);
+		testTime = VPXUtilities.getCurrentTime(5);
 
-		resultTestStartedAt = VPXUtilities.getCurrentTime(2);
+		resultTestStartedAt = VPXUtilities.getCurrentTime(5);
 
 	}
 
@@ -145,9 +145,9 @@ public class BIST implements Serializable {
 
 		testDate = VPXUtilities.getCurrentTime(1);
 
-		testTime = VPXUtilities.getCurrentTime(2);
+		testTime = VPXUtilities.getCurrentTime(5);
 
-		resultTestStartedAt = VPXUtilities.getCurrentTime(2);
+		resultTestStartedAt = VPXUtilities.getCurrentTime(5);
 
 	}
 

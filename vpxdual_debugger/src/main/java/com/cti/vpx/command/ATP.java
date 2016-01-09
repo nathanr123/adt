@@ -196,15 +196,22 @@ public interface ATP {
 
 	public static final long C7_L2SRAM_END_ADDRESS = 0x1787FFFFl;
 
-	/*
-	 * #define MSMC_START_ADDRESS 0x0C000000 #define MSMC_END_ADDRESS 0x0C3FFFFF
-	 * 
-	 * #define DDR3_START_ADDRESS 0x80000000 #define DDR3_END_ADDRESS 0xBFFFFFFF
-	 * 
-	 * 
-	 * #define C0_L2SRAM_START_ADDRESS 0x00800000 #define C0_L2SRAM_END_ADDRESS
-	 * 0x0087FFFF
-	 */
+	// For All Cores
+
+	// L2 SRAM
+	public static final long L2SRAM_START_ADDRESS = 0x00800000;
+	
+	public static final long L2SRAM_END_ADDRESS = 0x0087FFFF;
+
+	// DDR3
+	public static final long DDR3_START_ADDRESS = 0x80000000l;
+	
+	public static final long DDR3_END_ADDRESS = 0xBFFFFFFFl;
+
+	// MSMCSRAM
+	public static final long MSMCSRAM_START_ADDRESS = 0x0C000000;
+	
+	public static final long MSMCSRAM_END_ADDRESS = 0x0C3FFFFF;
 
 	// Endianess ByteOrder
 	public static final ByteOrder BYTEORDER_P2020 = ByteOrder.BIG_ENDIAN;

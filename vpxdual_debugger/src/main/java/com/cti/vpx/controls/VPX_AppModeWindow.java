@@ -51,7 +51,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private static String UARTNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UART Mode will be switched into minimal functionalities and windows.</left></body></html>";
 
-	private static String ETHNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ethernet Mode will be switched into full functional windows.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User must program LAN Configuration<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Peridicity limit Min: 3 Secs Max: 60 Secs</left></body></html>";
+	private static String ETHNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ethernet Mode will be switched into full functional windows.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User must program LAN Configuration<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Peridicity limit Min: 3 Secs Max: 60 Secs<p><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Please ensure LAN is enabled <u>jumbo support</u></b></font></p></left></body></html>";
 
 	private JPanel contentPane, basePane;
 
@@ -267,7 +267,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 					String flnmae = jb.getSelectedFile().getPath();
 
-					txtWorkspacePath.setText(flnmae);
+					txtWorkspacePath.setText(VPXUtilities.getPathAsLinuxStandard(flnmae));
 				}
 			}
 		});
@@ -752,21 +752,23 @@ public class VPX_AppModeWindow extends JFrame {
 
 	private void loadWorkspaceProperties() {
 
-		txtWorkspacePath.setText(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.WORKSPACE_PATH));
+		txtWorkspacePath.setText(VPXUtilities
+				.getPathAsLinuxStandard(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.WORKSPACE_PATH)));
 
 	}
 
 	private boolean validateWorkspaceSettings() {
 
-		boolean b = VPXUtilities.createWorkspaceDirs(txtWorkspacePath.getText().trim());
+		String workPath = VPXUtilities.getPathAsLinuxStandard(txtWorkspacePath.getText().trim());
+
+		boolean b = VPXUtilities.createWorkspaceDirs(workPath);
 		try {
 
 			if (b) {
 
-				VPXUtilities.updateProperties(VPXConstants.ResourceFields.WORKSPACE_PATH,
-						txtWorkspacePath.getText().trim());
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.WORKSPACE_PATH, workPath);
 
-				VPXSessionManager.setWorkspacePath(txtWorkspacePath.getText().trim());
+				VPXSessionManager.setWorkspacePath(workPath);
 
 				VPXUtilities.setEnableLog(true);
 			}
@@ -821,6 +823,12 @@ public class VPX_AppModeWindow extends JFrame {
 							.setCurrentPeriodicity(Integer.valueOf(spinPeriodicity.getValue().toString().trim()));
 
 					VPXSessionManager.setCurrentIP(txtIPAddress.getText());
+
+					VPXSessionManager.setCurrentLANName(cmbNWIface.getSelectedItem().toString());
+
+					VPXSessionManager.setCurrentSubnet(txtSubnet.getText());
+
+					VPXSessionManager.setCurrentGateway(txtGateway.getText());
 
 					try {
 						@SuppressWarnings("unused")
@@ -918,7 +926,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 		String curTime = VPXUtilities.getCurrentTime(3);
 
-		String flnmae = VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
+		String flnmae = VPXUtilities
+				.getPathAsLinuxStandard(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
 
 		if (!flnmae.endsWith(".log")) {
 
@@ -944,7 +953,7 @@ public class VPX_AppModeWindow extends JFrame {
 		if (currentMode == VPXConstants.UARTMODE) {
 
 			flnmae = "UART_" + flnmae;
-			
+
 			VPXSessionManager.setCurrentErrorLogFileName("UART_Error_" + curTime + ".log");
 		}
 		VPXSessionManager.setCurrentLogFileName(flnmae);

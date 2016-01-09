@@ -3,8 +3,8 @@ package com.cti.vpx.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_StatusBar;
+import com.cti.vpx.controls.VPX_LoggerPanel;
 
 public class VPXLogger {
 

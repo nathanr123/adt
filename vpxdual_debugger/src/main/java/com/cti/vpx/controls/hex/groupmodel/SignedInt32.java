@@ -331,6 +331,16 @@ public class SignedInt32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
+		
+		
+		String str = value.toString();
+
+
+		int offset = editor.cellToOffset(row, col);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.parseLong(str));
+		
+		/*
 		String val = String.format("%08x", Integer.parseInt(value.toString()));
 
 		byte[] bArr = new byte[4];
@@ -354,6 +364,8 @@ public class SignedInt32 extends AbstractTableModel {
 		fireTableCellUpdated(row, col);
 
 		editor.fireHexEditorEvent(offset, 4, 4);
+		
+		*/
 	}
 
 	/**

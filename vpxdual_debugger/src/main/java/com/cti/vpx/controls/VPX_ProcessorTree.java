@@ -61,7 +61,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	private JMenuItem vpx_Cxt_Detail;
 
-	private JMenuItem vpx_Cxt_Refresh;
+	// private JMenuItem vpx_Cxt_Refresh;
 
 	private JMenuItem vpx_Cxt_MemoryBrowser;
 
@@ -754,8 +754,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 					} else if (node.isSubSytemNode()) {
 						VPXSessionManager.setCurrentProcessor("", "", "");
 
+						parent.updateProcessorSettings();
+
 					} else if (node.isRootNode()) {
+
 						VPXSessionManager.setCurrentProcessor("", "", "");
+
+						parent.updateProcessorSettings();
 
 					}
 				}
@@ -886,19 +891,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			public void actionPerformed(ActionEvent e) {
 
 				parent.showDetail();
-
-			}
-		});
-
-		vpx_Cxt_Refresh = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Refresh"),
-				VPXConstants.Icons.ICON_REFRESH);
-
-		vpx_Cxt_Refresh.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				refreshStatus();
 
 			}
 		});
@@ -1037,7 +1029,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				parent.showVLAN(0);
+				parent.showVLAN(1);
 
 			}
 		});
@@ -1049,7 +1041,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				parent.showVLAN(1);
+				parent.showVLAN(0);
 
 			}
 		});
@@ -1322,7 +1314,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				}
 
-				vpx_contextMenu.add(vpx_Cxt_Refresh);
+				vpx_contextMenu.add(vpx_Cxt_Reload);
 
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 
@@ -1346,7 +1338,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
-				vpx_contextMenu.add(vpx_Cxt_Refresh);
+				vpx_contextMenu.add(vpx_Cxt_Reload);
 
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 
@@ -1368,7 +1360,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				vpx_contextMenu.add(VPXComponentFactory.createJSeparator());
 
-				vpx_contextMenu.add(vpx_Cxt_Refresh);
+				vpx_contextMenu.add(vpx_Cxt_Reload);
 
 				vpx_contextMenu.add(vpx_Cxt_Detail);
 			}

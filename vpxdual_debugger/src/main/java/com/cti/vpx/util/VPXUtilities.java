@@ -227,6 +227,17 @@ public class VPXUtilities {
 
 			ret = VPXConstants.DATEFORMAT_FILE.format(Calendar.getInstance().getTime());
 
+		else if (format == 4) {
+
+			VPXConstants.DATEFORMAT_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+			ret = VPXConstants.DATEFORMAT_TIME.format(Calendar.getInstance().getTime());
+
+		} else if (format == 5) {
+
+			ret = VPXConstants.DATEFORMAT_TIME12.format(Calendar.getInstance().getTime());
+
+		}
 		return ret;
 	}
 
@@ -263,8 +274,6 @@ public class VPXUtilities {
 			ret = VPXConstants.DATEFORMAT_TIME.format(millis);
 
 		} else if (format == 5) {
-
-			VPXConstants.DATEFORMAT_TIME12.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			ret = VPXConstants.DATEFORMAT_TIME12.format(millis);
 
@@ -436,7 +445,7 @@ public class VPXUtilities {
 
 				try {
 
-					Desktop.getDesktop().open(new File(file.substring(0, file.lastIndexOf("\\"))));
+					Desktop.getDesktop().open(new File(file.substring(0, file.lastIndexOf("/"))));
 
 				} catch (IOException ee) {
 
@@ -1585,12 +1594,12 @@ public class VPXUtilities {
 
 				run = run.replace("headerfile", headerFile);
 
-				//run = run.replace("pathtochange", "execute/");
+				// run = run.replace("pathtochange", "execute/");
 
 				writeFile("execute/run.sh", run);
 
 				setExecutePermission("execute/run.sh");
-				
+
 				setPermission("execute/");
 
 				// start run.bat
@@ -1611,7 +1620,7 @@ public class VPXUtilities {
 					VPXLogger.updateLog(s);
 
 				}
-				
+
 				BufferedReader stdErrInput = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
 				String sErr = null;
@@ -1621,8 +1630,6 @@ public class VPXUtilities {
 					VPXLogger.updateLog(sErr);
 
 				}
-				
-				
 
 				// System.out.println("Exit Code : "+p.exitValue());
 
@@ -1983,6 +1990,11 @@ public class VPXUtilities {
 
 		}
 
+	}
+
+	public static String getPathAsLinuxStandard(String path) {
+
+		return path.replaceAll("\\\\", "/");
 	}
 
 	public static void mkDir(String parent, String path) {

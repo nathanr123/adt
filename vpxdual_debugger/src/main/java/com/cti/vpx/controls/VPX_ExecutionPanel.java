@@ -667,30 +667,37 @@ public class VPX_ExecutionPanel extends JPanel {
 
 	private void doCoreDL(int core, String value) {
 
-		String msg = "";
+		int option = JOptionPane.showConfirmDialog(VPX_ExecutionPanel.this,
+				"The selected out file will be stripped.\nPlease make a copy of the file,if you need\nDo you want to continue?", "Confirmation",
+				JOptionPane.YES_NO_OPTION);
 
-		if (VPXUtilities.isFileValid(value)) {
+		if (option == JOptionPane.YES_OPTION) {
 
-			String[] fileArray = new String[8];
+			String msg = "";
 
-			for (int j = 0; j < fileArray.length; j++) {
+			if (VPXUtilities.isFileValid(value)) {
 
-				fileArray[j] = "";
+				String[] fileArray = new String[8];
+
+				for (int j = 0; j < fileArray.length; j++) {
+
+					fileArray[j] = "";
+
+				}
+
+				fileArray[core] = value;
+
+				processingWindow.setFiles(fileArray);
+
+				processingWindow.showProgress(currentIP);
+
+			} else {
+
+				msg = String.format("Core %d : %s is not valid file", core, value);
+
+				JOptionPane.showMessageDialog(VPX_ExecutionPanel.this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 
 			}
-
-			fileArray[core] = value;
-
-			processingWindow.setFiles(fileArray);
-
-			processingWindow.showProgress(currentIP);
-
-		} else {
-
-			msg = String.format("Core %d : %s is not valid file", core, value);
-
-			JOptionPane.showMessageDialog(VPX_ExecutionPanel.this, msg, "Error", JOptionPane.ERROR_MESSAGE);
-
 		}
 
 	}
@@ -924,164 +931,172 @@ public class VPX_ExecutionPanel extends JPanel {
 
 	private void doBatchDL() {
 
-		try {
+		int option = JOptionPane.showConfirmDialog(VPX_ExecutionPanel.this,
+				"The selected out files will be stripped.\nPlease make a copy of the files,if you need\nDo you want to continue?", "Confirmation",
+				JOptionPane.YES_NO_OPTION);
 
-			String msg = "Following selected files are not valid\n";
+		if (option == JOptionPane.YES_OPTION) {
 
-			boolean isCore1File = true, isCore2File = true, isCore3File = true, isCore4File = true, isCore5File = true,
-					isCore6File = true, isCore7File = true;
+			try {
 
-			String[] fileArray = new String[8];
+				String msg = "Following selected files are not valid\n";
 
-			for (int j = 0; j < fileArray.length; j++) {
+				boolean isCore1File = true, isCore2File = true, isCore3File = true, isCore4File = true,
+						isCore5File = true, isCore6File = true, isCore7File = true;
 
-				fileArray[j] = "";
+				String[] fileArray = new String[8];
 
-			}
+				for (int j = 0; j < fileArray.length; j++) {
 
-			if (chkCore1.isSelected()) {
+					fileArray[j] = "";
 
-				isCore1File = VPXUtilities.isFileValid(txtCore1.getText().trim());
-
-			}
-
-			if (chkCore2.isSelected()) {
-
-				isCore2File = VPXUtilities.isFileValid(txtCore2.getText().trim());
-
-			}
-
-			if (chkCore3.isSelected()) {
-
-				isCore3File = VPXUtilities.isFileValid(txtCore3.getText().trim());
-
-			}
-
-			if (chkCore4.isSelected()) {
-
-				isCore4File = VPXUtilities.isFileValid(txtCore4.getText().trim());
-
-			}
-
-			if (chkCore5.isSelected()) {
-
-				isCore5File = VPXUtilities.isFileValid(txtCore5.getText().trim());
-
-			}
-
-			if (chkCore6.isSelected()) {
-
-				isCore6File = VPXUtilities.isFileValid(txtCore6.getText().trim());
-
-			}
-
-			if (chkCore7.isSelected()) {
-
-				isCore7File = VPXUtilities.isFileValid(txtCore7.getText().trim());
-
-			}
-
-			if (isCore1File && isCore2File && isCore3File && isCore4File && isCore5File && isCore6File && isCore7File) {
+				}
 
 				if (chkCore1.isSelected()) {
 
-					fileArray[1] = txtCore1.getText().trim();
+					isCore1File = VPXUtilities.isFileValid(txtCore1.getText().trim());
 
 				}
 
 				if (chkCore2.isSelected()) {
 
-					fileArray[2] = txtCore2.getText().trim();
+					isCore2File = VPXUtilities.isFileValid(txtCore2.getText().trim());
 
 				}
 
 				if (chkCore3.isSelected()) {
 
-					fileArray[3] = txtCore3.getText().trim();
+					isCore3File = VPXUtilities.isFileValid(txtCore3.getText().trim());
 
 				}
 
 				if (chkCore4.isSelected()) {
 
-					fileArray[4] = txtCore4.getText().trim();
+					isCore4File = VPXUtilities.isFileValid(txtCore4.getText().trim());
 
 				}
 
 				if (chkCore5.isSelected()) {
 
-					fileArray[5] = txtCore5.getText().trim();
+					isCore5File = VPXUtilities.isFileValid(txtCore5.getText().trim());
 
 				}
 
 				if (chkCore6.isSelected()) {
 
-					fileArray[6] = txtCore6.getText().trim();
+					isCore6File = VPXUtilities.isFileValid(txtCore6.getText().trim());
 
 				}
 
 				if (chkCore7.isSelected()) {
 
-					fileArray[7] = txtCore7.getText().trim();
+					isCore7File = VPXUtilities.isFileValid(txtCore7.getText().trim());
 
 				}
 
-				processingWindow.setFiles(fileArray);
+				if (isCore1File && isCore2File && isCore3File && isCore4File && isCore5File && isCore6File
+						&& isCore7File) {
 
-				processingWindow.showProgress(currentIP);
+					if (chkCore1.isSelected()) {
 
-			} else {
+						fileArray[1] = txtCore1.getText().trim();
 
-				if (!isCore1File) {
+					}
 
-					msg = msg + "Core 1 : " + txtCore1.getText().trim() + "\n";
+					if (chkCore2.isSelected()) {
+
+						fileArray[2] = txtCore2.getText().trim();
+
+					}
+
+					if (chkCore3.isSelected()) {
+
+						fileArray[3] = txtCore3.getText().trim();
+
+					}
+
+					if (chkCore4.isSelected()) {
+
+						fileArray[4] = txtCore4.getText().trim();
+
+					}
+
+					if (chkCore5.isSelected()) {
+
+						fileArray[5] = txtCore5.getText().trim();
+
+					}
+
+					if (chkCore6.isSelected()) {
+
+						fileArray[6] = txtCore6.getText().trim();
+
+					}
+
+					if (chkCore7.isSelected()) {
+
+						fileArray[7] = txtCore7.getText().trim();
+
+					}
+
+					processingWindow.setFiles(fileArray);
+
+					processingWindow.showProgress(currentIP);
+
+				} else {
+
+					if (!isCore1File) {
+
+						msg = msg + "Core 1 : " + txtCore1.getText().trim() + "\n";
+
+					}
+
+					if (!isCore2File) {
+
+						msg = msg + "Core 2 : " + txtCore2.getText().trim() + "\n";
+
+					}
+
+					if (!isCore3File) {
+
+						msg = msg + "Core 3 : " + txtCore3.getText().trim() + "\n";
+
+					}
+
+					if (!isCore4File) {
+
+						msg = msg + "Core 4 : " + txtCore4.getText().trim() + "\n";
+
+					}
+
+					if (!isCore5File) {
+
+						msg = msg + "Core 5 : " + txtCore5.getText().trim() + "\n";
+
+					}
+
+					if (!isCore6File) {
+
+						msg = msg + "Core 6 : " + txtCore6.getText().trim() + "\n";
+
+					}
+
+					if (!isCore7File) {
+
+						msg = msg + "Core 7 : " + txtCore7.getText().trim() + "\n";
+
+					}
+
+					JOptionPane.showMessageDialog(VPX_ExecutionPanel.this, msg, "Error", JOptionPane.ERROR_MESSAGE);
+
+					txtCore1.requestFocus();
 
 				}
 
-				if (!isCore2File) {
+			} catch (Exception e2) {
 
-					msg = msg + "Core 2 : " + txtCore2.getText().trim() + "\n";
-
-				}
-
-				if (!isCore3File) {
-
-					msg = msg + "Core 3 : " + txtCore3.getText().trim() + "\n";
-
-				}
-
-				if (!isCore4File) {
-
-					msg = msg + "Core 4 : " + txtCore4.getText().trim() + "\n";
-
-				}
-
-				if (!isCore5File) {
-
-					msg = msg + "Core 5 : " + txtCore5.getText().trim() + "\n";
-
-				}
-
-				if (!isCore6File) {
-
-					msg = msg + "Core 6 : " + txtCore6.getText().trim() + "\n";
-
-				}
-
-				if (!isCore7File) {
-
-					msg = msg + "Core 7 : " + txtCore7.getText().trim() + "\n";
-
-				}
-
-				JOptionPane.showMessageDialog(VPX_ExecutionPanel.this, msg, "Error", JOptionPane.ERROR_MESSAGE);
-
-				txtCore1.requestFocus();
-
+				e2.printStackTrace();
 			}
-
-		} catch (Exception e2) {
-
-			e2.printStackTrace();
 		}
 	}
 
@@ -1126,7 +1141,7 @@ public class VPX_ExecutionPanel extends JPanel {
 
 				java.io.File file = fileDialog.getSelectedFile();
 
-				jtf.setText(file.getPath());
+				jtf.setText(VPXUtilities.getPathAsLinuxStandard(file.getPath()));
 			}
 		}
 	}

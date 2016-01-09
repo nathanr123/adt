@@ -37,6 +37,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.command.MSGCommand;
+import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_AppModeWindow;
@@ -55,11 +56,11 @@ import com.cti.vpx.controls.VPX_LogFileViewPanel;
 import com.cti.vpx.controls.VPX_LoggerPanel;
 import com.cti.vpx.controls.VPX_MADPanel;
 import com.cti.vpx.controls.VPX_MessagePanel;
+import com.cti.vpx.controls.VPX_NetworkMonitorPanel;
 import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorNode;
 import com.cti.vpx.controls.VPX_ProcessorTree;
-import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.controls.graph.VPX_SpectrumWindow;
@@ -79,6 +80,7 @@ import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
+import com.cti.vpx.util.VPXNetworkLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 
@@ -125,7 +127,7 @@ public class VPX_ETHWindow extends JFrame
 
 	private JMenuItem vpx_Menu_File_Detail;
 
-	private JMenuItem vpx_Menu_File_Refresh;
+	private JMenuItem vpx_Menu_File_Reload;
 
 	private JMenuItem vpx_Menu_File_Exit;
 
@@ -186,6 +188,8 @@ public class VPX_ETHWindow extends JFrame
 
 	private VPX_ConsolePanel console;
 
+	private VPX_NetworkMonitorPanel nwMonitor;
+
 	private VPX_ProcessorTree vpx_Processor_Tree;
 
 	private JTabbedPane vpx_Content_Tabbed_Pane_Message;
@@ -219,6 +223,8 @@ public class VPX_ETHWindow extends JFrame
 	private JButton btnMemoryBrowser;
 
 	private JButton btnMemoryPlot;
+	
+	private JButton btnMemorySpectrum;
 
 	private JButton btnMAD;
 
@@ -327,6 +333,9 @@ public class VPX_ETHWindow extends JFrame
 
 			memoryBrowserWindow[i].setParent(this);
 		}
+
+		btnMemoryBrowser.setToolTipText(
+				"remain " + (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " memory browsers");
 	}
 
 	public void openMemoryBrowser(MemoryViewFilter filter) {
@@ -357,13 +366,20 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
 
+			btnMemoryBrowser.setEnabled(false);
+
 		} else {
 
 			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
+
+			btnMemoryBrowser.setEnabled(true);
 		}
 
 		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
+
+		btnMemoryBrowser.setToolTipText(
+				"remain " + (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " memory browsers");
 
 		VPXLogger.updateLog("Memory Browser opened");
 	}
@@ -376,13 +392,20 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
 
+			btnMemoryBrowser.setEnabled(false);
+
 		} else {
 
 			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
+
+			btnMemoryBrowser.setEnabled(true);
 		}
 
 		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
 				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
+
+		btnMemoryBrowser.setToolTipText(
+				"remain " + (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " memory browsers");
 	}
 
 	// Plot Window
@@ -397,6 +420,9 @@ public class VPX_ETHWindow extends JFrame
 
 			memoryPlotWindow[i].setParent(this);
 		}
+
+		btnMemoryPlot
+				.setToolTipText("remain " + (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " memory plots");
 	}
 
 	public void openMemoryPlot() {
@@ -425,13 +451,20 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_MemoryPlot.setEnabled(false);
 
+			btnMemoryPlot.setEnabled(false);
+
 		} else {
 
 			vpx_Menu_Window_MemoryPlot.setEnabled(true);
+
+			btnMemoryPlot.setEnabled(true);
 		}
 
 		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+
+		btnMemoryPlot
+				.setToolTipText("remain " + (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " memory plots");
 
 		VPXLogger.updateLog("Memory Plot opened");
 	}
@@ -444,13 +477,20 @@ public class VPX_ETHWindow extends JFrame
 
 			vpx_Menu_Window_MemoryPlot.setEnabled(false);
 
+			btnMemoryPlot.setEnabled(false);
+
 		} else {
 
 			vpx_Menu_Window_MemoryPlot.setEnabled(true);
+
+			btnMemoryPlot.setEnabled(true);
 		}
 
 		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
 				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+
+		btnMemoryPlot
+				.setToolTipText("remain " + (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " memory plots");
 	}
 
 	// Spectrum Window
@@ -463,6 +503,8 @@ public class VPX_ETHWindow extends JFrame
 
 			spectrumWindow[i] = new VPX_SpectrumWindow(this, i);
 		}
+
+		btnMemorySpectrum.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 	}
 
 	public void openSpectrumWindow() {
@@ -490,14 +532,20 @@ public class VPX_ETHWindow extends JFrame
 		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
 
 			vpx_Menu_Window_Spectrum.setEnabled(false);
+			
+			btnMemorySpectrum.setEnabled(false);
 
 		} else {
 
 			vpx_Menu_Window_Spectrum.setEnabled(true);
+			
+			btnMemorySpectrum.setEnabled(true);
 		}
 
 		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
 				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
+
+		btnMemorySpectrum.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 
 		VPXLogger.updateLog("Data analyser opened");
 	}
@@ -509,14 +557,20 @@ public class VPX_ETHWindow extends JFrame
 		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
 
 			vpx_Menu_Window_Spectrum.setEnabled(false);
+			
+			btnMemorySpectrum.setEnabled(false);
 
 		} else {
 
 			vpx_Menu_Window_Spectrum.setEnabled(true);
+			
+			btnMemorySpectrum.setEnabled(true);
 		}
 
 		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
 				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
+
+		btnMemorySpectrum.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 	}
 
 	public void reloadVPXSystem() {
@@ -591,15 +645,15 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
-		vpx_Menu_File_Refresh = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Refresh"),
+		vpx_Menu_File_Reload = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.File.Reload"),
 				VPXConstants.Icons.ICON_REFRESH);
 
-		vpx_Menu_File_Refresh.addActionListener(new ActionListener() {
+		vpx_Menu_File_Reload.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				refreshProcessorTree(false);
+				refreshProcessorTree(true);
 
 			}
 		});
@@ -759,7 +813,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				showVLAN(0);
+				showVLAN(1);
 
 			}
 		});
@@ -772,7 +826,7 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				showVLAN(1);
+				showVLAN(0);
 
 			}
 		});
@@ -896,7 +950,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_File_Detail.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
 
-		vpx_Menu_File_Refresh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		vpx_Menu_File_Reload.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 
 		vpx_Menu_File_Exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
 
@@ -942,7 +996,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_File.add(VPXComponentFactory.createJSeparator());
 
-		vpx_Menu_File.add(vpx_Menu_File_Refresh);
+		vpx_Menu_File.add(vpx_Menu_File_Reload);
 
 		vpx_Menu_File.add(vpx_Menu_File_Detail);
 
@@ -1016,7 +1070,7 @@ public class VPX_ETHWindow extends JFrame
 
 		JButton btnAliasRefresh = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_REFRESH, null);
 
-		btnAliasRefresh.setToolTipText("Reload processors tree");
+		btnAliasRefresh.setToolTipText("Reload processors");
 
 		btnAliasRefresh.addActionListener(new ActionListener() {
 
@@ -1134,6 +1188,20 @@ public class VPX_ETHWindow extends JFrame
 
 			}
 		});
+		
+		btnMemorySpectrum = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_SPECTRUM, null);
+
+		btnMemorySpectrum.setToolTipText("Data Analyser");
+
+		btnMemorySpectrum.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				vpx_Menu_Window_Spectrum.doClick();
+
+			}
+		});
 
 		btnMAD = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_MAD, null);
 
@@ -1204,6 +1272,8 @@ public class VPX_ETHWindow extends JFrame
 		vpx_ToolBar.add(btnMemoryBrowser);
 
 		vpx_ToolBar.add(btnMemoryPlot);
+		
+		vpx_ToolBar.add(btnMemorySpectrum);
 
 		vpx_ToolBar.addSeparator();
 
@@ -1282,9 +1352,15 @@ public class VPX_ETHWindow extends JFrame
 
 		console = new VPX_ConsolePanel(this);
 
+		nwMonitor = new VPX_NetworkMonitorPanel();
+
+		VPXNetworkLogger.setNwMonitor(nwMonitor);
+
 		vpx_Content_Tabbed_Pane_Message.addTab("Log", logger);
 
 		vpx_Content_Tabbed_Pane_Message.addTab("Console", console);
+
+		vpx_Content_Tabbed_Pane_Message.addTab("Network", nwMonitor);
 
 		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
@@ -1400,7 +1476,10 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	public void updateProcessorSettings() {
+
 		messagePanel.updateProcessorSettings();
+
+		statusBar.updateProcessor();
 	}
 
 	public void unToggleFilter() {
@@ -1752,7 +1831,7 @@ public class VPX_ETHWindow extends JFrame
 
 				BIST bist = new BIST(isP2020, isDSP1, isDSP2);
 
-				bistWindow.showBISTWindow(VPX_ETHWindow.this,bist.getTotalProcessor());
+				bistWindow.showBISTWindow(VPX_ETHWindow.this, bist.getTotalProcessor());
 
 				udpMonitor.startBist(VPXSessionManager.getCurrentProcessor(), VPXSessionManager.getCurrentSubSystem(),
 						bist);
@@ -2026,7 +2105,9 @@ public class VPX_ETHWindow extends JFrame
 
 	public void showAppMode() {
 
-		this.dispose();
+		VPX_ETHWindow.this.dispose();
+
+		VPX_ETHWindow.this.udpMonitor.closeAllConnections();
 
 		VPX_AppModeWindow window = new VPX_AppModeWindow(VPXUtilities.getEthernetPorts(),
 				VPXUtilities.getSerialPorts());
@@ -2435,8 +2516,6 @@ public class VPX_ETHWindow extends JFrame
 
 			setTitle("Closing Application");
 
-			setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
 			setSize(500, 150);
 
 			setLocationRelativeTo(parent);
@@ -2537,8 +2616,10 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(false);
 
 			btnMemoryPlot.setEnabled(false);
+			
+			btnMemorySpectrum.setEnabled(false);
 
-			btnMAD.setEnabled(false);
+			// btnMAD.setEnabled(false);
 
 			btnBIST.setEnabled(false);
 
@@ -2571,8 +2652,10 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(true);
 
 			btnMemoryPlot.setEnabled(true);
+			
+			btnMemorySpectrum.setEnabled(true);
 
-			btnMAD.setEnabled(true);
+			// btnMAD.setEnabled(true);
 
 			btnBIST.setEnabled(false);
 
@@ -2604,8 +2687,10 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(false);
 
 			btnMemoryPlot.setEnabled(false);
+			
+			btnMemorySpectrum.setEnabled(false);
 
-			btnMAD.setEnabled(true);
+			// btnMAD.setEnabled(true);
 
 			btnBIST.setEnabled(true);
 
@@ -2638,8 +2723,10 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(false);
 
 			btnMemoryPlot.setEnabled(false);
+			
+			btnMemorySpectrum.setEnabled(false);
 
-			btnMAD.setEnabled(false);
+			// btnMAD.setEnabled(false);
 
 			btnBIST.setEnabled(false);
 

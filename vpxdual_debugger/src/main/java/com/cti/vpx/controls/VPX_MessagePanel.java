@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -19,6 +20,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -771,7 +773,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		try {
 
-			String path = VPXSessionManager.getMessagePath() + "\\Messages_"
+			String path = VPXSessionManager.getMessagePath() + "/Messages_"
 					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".log";
 
 			FileWriter fw = new FileWriter(new File(path), true);
@@ -814,7 +816,15 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void run() {
-				VPXLogger.updateLog("Help document opened");
+				try {
+
+					Desktop.getDesktop().open(new File(VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/vpxdebugger.chm"));
+
+				} catch (IOException e) {
+					VPXLogger.updateError(e);
+				}
+			}
+			/*	VPXLogger.updateLog("Help document opened");
 
 				final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
 
@@ -850,13 +860,14 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				if (browserCanvas.initialise()) {
 
-					browserCanvas.setUrl(System.getProperty("user.dir") + "\\help\\help.html");
+					browserCanvas.setUrl(
+							VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/help.html");
 				} else {
 				}
 
 				frame.setSize(651, 601);
 
-			}
+			}*/
 		});
 
 		th.start();

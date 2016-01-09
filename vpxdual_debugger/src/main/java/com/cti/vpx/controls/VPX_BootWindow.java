@@ -29,7 +29,7 @@ public class VPX_BootWindow extends JDialog {
 	private static final long serialVersionUID = -4001514154495393537L;
 
 	private static String BOARDNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots full board</left></body></html>";
-	
+
 	private static String P2020NOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots P2020 only</left></body></html>";
 
 	private static String DSP1NOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reboots DSP 1 Processor only</left></body></html>";
@@ -190,11 +190,19 @@ public class VPX_BootWindow extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				String msg = String.format(
-						"Please confirm the details\n\t\tProcessor : %s\n\t\tFlash Device : %s\n\t\tPage : %s\nDo you want to reboot?",
-						cmbProcessor.getSelectedItem().toString(), cmbFlashDevice.getSelectedItem().toString(),
-						cmbPage.getSelectedItem().toString());
+				String msg = "";
 
+				if (cmbProcessor.getSelectedIndex() == 0) {
+
+					msg = "Please confirm do you want to reboot board?";
+							
+				} else {
+					msg = String.format(
+							"Please confirm the details\n\t\tProcessor : %s\n\t\tFlash Device : %s\n\t\tPage : %s\nDo you want to reboot?",
+							cmbProcessor.getSelectedItem().toString(), cmbFlashDevice.getSelectedItem().toString(),
+							cmbPage.getSelectedItem().toString());
+
+				}
 				int option = JOptionPane.showConfirmDialog(VPX_BootWindow.this, msg, "Confirmation",
 						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 
@@ -245,8 +253,8 @@ public class VPX_BootWindow extends JDialog {
 
 		cmbProcessor.addItem("Board");
 
-		//cmbProcessor.addItem("P2020");
-		
+		// cmbProcessor.addItem("P2020");
+
 		cmbProcessor.addItem("DSP 1");
 
 		cmbProcessor.addItem("DSP 2");
@@ -277,7 +285,7 @@ public class VPX_BootWindow extends JDialog {
 
 			lblNote.setText(BOARDNOTE);
 
-		}  else if (index == 1) {
+		} else if (index == 1) {
 
 			cmbFlashDevice.setEnabled(true);
 

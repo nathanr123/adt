@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXUtilities;
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_AboutWindow extends JDialog {
 
@@ -43,12 +44,12 @@ public class VPX_AboutWindow extends JDialog {
 	}
 
 	private void init() {
-		
+
 		rBundle = VPXUtilities.getResourceBundle();
 
 		setResizable(false);
 
-		setBounds(100, 100, 383, 206);
+		setBounds(100, 100, 414, 206);
 
 		setIconImage(VPXConstants.Icons.ICON_ABOUT.getImage());
 
@@ -64,40 +65,49 @@ public class VPX_AboutWindow extends JDialog {
 	}
 
 	private void loadCompoenents() {
+
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(null);
+
+		contentPanel.setLayout(new MigLayout("", "[50px][10px][294px]", "[17px][11px][14px][3px][14px][59px]"));
 
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setBounds(10, 11, 50, 50);
+
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
 		lblNewLabel.setIcon(VPXConstants.Icons.ICON_CORNET_BIG);
-		contentPanel.add(lblNewLabel);
+
+		contentPanel.add(lblNewLabel, "cell 0 0 1 5,grow");
 
 		JLabel lblNewLabel_1 = new JLabel(rBundle.getString("App.title.name"));
-		lblNewLabel_1.setBounds(70, 11, 249, 17);
+
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.LEFT);
+
 		lblNewLabel_1.setVerticalAlignment(SwingConstants.TOP);
+
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 14));
-		contentPanel.add(lblNewLabel_1);
 
-		JLabel lblNewLabel_2 = new JLabel("Version : "+rBundle.getString("App.title.version"));
-		lblNewLabel_2.setBounds(70, 39, 249, 14);
-		contentPanel.add(lblNewLabel_2);
+		contentPanel.add(lblNewLabel_1, "cell 2 0,alignx left,aligny top");
 
-		JLabel lblBuildOn = new JLabel("Build on: 16-10-2015 14:21:34");
-		lblBuildOn.setBounds(70, 56, 249, 14);
-		contentPanel.add(lblBuildOn);
+		JLabel lblNewLabel_2 = new JLabel("Version : " + rBundle.getString("App.title.version"));
+
+		contentPanel.add(lblNewLabel_2, "cell 2 2,growx,aligny top");
+
+		JLabel lblBuildOn = new JLabel("Build on: 06-01-2016 11:12:46");
+
+		contentPanel.add(lblBuildOn, "cell 2 4,growx,aligny top");
 
 		JLabel lblNewLabel_3 = new JLabel("(c) Copyright Cornet Technology India Pvt Ltd");
-		lblNewLabel_3.setBounds(10, 72, 354, 31);
-		contentPanel.add(lblNewLabel_3);
+
+		contentPanel.add(lblNewLabel_3, "cell 0 5 3 1,growx,aligny top");
 
 		JLabel lblNewLabel_4 = new JLabel("Web site: www.cornetindia.com");
-		lblNewLabel_4.setBounds(10, 100, 354, 31);
-		contentPanel.add(lblNewLabel_4);
+
+		contentPanel.add(lblNewLabel_4, "cell 0 5 3 1,growx,aligny bottom");
 
 		JPanel buttonPane = new JPanel();
+
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
 		JButton cancelButton = new JButton("Close");
@@ -106,10 +116,12 @@ public class VPX_AboutWindow extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				VPX_AboutWindow.this.dispose();
 
 			}
 		});
+
 		buttonPane.add(cancelButton);
 
 	}

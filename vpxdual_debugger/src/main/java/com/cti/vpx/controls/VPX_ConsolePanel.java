@@ -577,7 +577,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 			// if (chooser.showSaveDialog(parent) ==
 			// JFileChooser.APPROVE_OPTION) {
 
-			String path = VPXSessionManager.getConsolePath() + "\\Console_"
+			String path = VPXSessionManager.getConsolePath() + "/Console_"
 					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".log";
 
 			fw = new FileWriter(new File(path), true);

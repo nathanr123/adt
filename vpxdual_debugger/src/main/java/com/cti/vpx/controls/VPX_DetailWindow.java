@@ -222,7 +222,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
-			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
 
 			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
@@ -233,7 +233,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
-			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
 			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
 
@@ -318,7 +318,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
-		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
 
 		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
@@ -327,7 +327,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
-		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
 		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
 

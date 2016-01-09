@@ -327,6 +327,18 @@ public class Hex32 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
+		
+		String str = value.toString();
+
+		if (!str.startsWith("0x") && !str.startsWith("0x")) {
+
+			str = "0x" + value.toString();
+		}
+
+		int offset = editor.cellToOffset(row, col);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.decode(str));
+		
 		/*
 		 * byte[] bArr1 = DatatypeConverter.parseHexBinary(value.toString());
 
@@ -339,7 +351,7 @@ public class Hex32 extends AbstractTableModel {
 		bArr[1] = bArr1[2];
 
 		bArr[0] = bArr1[3];
-		 * */
+		 * 
 		
 		
 		String val = String.format("%08x", Integer.parseInt(value.toString(), 16));
@@ -365,6 +377,7 @@ public class Hex32 extends AbstractTableModel {
 		fireTableCellUpdated(row, col);
 
 		editor.fireHexEditorEvent(offset, 4, 4);
+		*/
 	}
 
 	/**

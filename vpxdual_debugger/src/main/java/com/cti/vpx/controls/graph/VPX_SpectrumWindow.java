@@ -231,7 +231,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelFilter.add(cmbSubSystem, "cell 1 0,growx");
 
-		lblMinVal = new JLabel("66");
+		lblMinVal = new JLabel("");
 
 		lblMinVal.setPreferredSize(new Dimension(45, 25));
 
@@ -315,7 +315,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelFilter.add(lblMin, "cell 9 0");
 
-		lblMaxVal = new JLabel("4A");
+		lblMaxVal = new JLabel("");
 
 		lblMaxVal.setPreferredSize(new Dimension(45, 25));
 

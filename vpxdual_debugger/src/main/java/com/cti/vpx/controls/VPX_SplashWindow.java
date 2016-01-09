@@ -56,13 +56,9 @@ public class VPX_SplashWindow extends JWindow {
 
 			if (PROGBAR_MAX == count) {
 
-				VPX_SplashWindow.this.dispose();// dispose
-				// of
-				// splashscreen
+				VPX_SplashWindow.this.dispose();
 
-				progressBarTimer.stop();// stop
-				// the
-				// timer
+				progressBarTimer.stop();
 
 				createAndShowADTWindow();
 			}
@@ -83,7 +79,8 @@ public class VPX_SplashWindow extends JWindow {
 
 			String key = (String) e.nextElement();
 
-			lblCurrreading.setText("reading " + key + " = " + props.getProperty(key));
+			lblCurrreading
+					.setText("reading " + key + " = " + VPXUtilities.getPathAsLinuxStandard(props.getProperty(key)));
 
 			try {
 

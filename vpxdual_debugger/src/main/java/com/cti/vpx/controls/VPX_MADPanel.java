@@ -551,7 +551,7 @@ public class VPX_MADPanel extends JPanel {
 
 		compileFinalOutFilePanel.setLayout(new MigLayout("", "[][][grow][][][]", "[]"));
 
-		JLabel lblLblconfigfinaloutfile = new JLabel("Final Out File");
+		JLabel lblLblconfigfinaloutfile = new JLabel("File Name");
 
 		compileFinalOutFilePanel.add(lblLblconfigfinaloutfile, "cell 1 0,alignx left");
 
@@ -561,9 +561,10 @@ public class VPX_MADPanel extends JPanel {
 
 		txtCompilePathFinalOut.setColumns(10);
 
-		JButton btnCompileFinalOutFile = new JButton(new BrowseAction("Browse", txtCompilePathFinalOut));
+		// JButton btnCompileFinalOutFile = new JButton(new
+		// BrowseAction("Browse", txtCompilePathFinalOut));
 
-		compileFinalOutFilePanel.add(btnCompileFinalOutFile, "cell 4 0");
+		// compileFinalOutFilePanel.add(btnCompileFinalOutFile, "cell 4 0");
 
 		btnCompileLoad.addActionListener(new ActionListener() {
 
@@ -1013,13 +1014,15 @@ public class VPX_MADPanel extends JPanel {
 				isValid = false;
 			}
 
-			if (!VPXUtilities.isFileValid(txtCompilePathFinalOut.getText().trim(), true)) {
-
-				paths.append("Final Out file path is not valid.\n");
-
-				isValid = false;
-			}
-
+			/*
+			 * if
+			 * (!VPXUtilities.isFileValid(txtCompilePathFinalOut.getText().trim(
+			 * ), true)) {
+			 * 
+			 * paths.append("Final Out file path is not valid.\n");
+			 * 
+			 * isValid = false; }
+			 */
 		}
 
 		if (isValid)
@@ -1084,10 +1087,20 @@ public class VPX_MADPanel extends JPanel {
 		currentdployCfg = currentdployCfg.replace("nampath", nml);
 	}
 
-	public void createDeploymentFile(String outfilename, String out1Path, String out2Path, String out3Path,
+	public void createDeploymentFile(String outfileName, String out1Path, String out2Path, String out3Path,
 			String out4Path, String out5Path, String out6Path, String out7Path, String out8Path) {
 
 		String str = VPXUtilities.readFile("deploy/deployment.data", VPXConstants.DELIMITER_FILE);
+
+		String bin = outfileName;
+
+		if (!bin.endsWith(".bin")) {
+
+			bin = bin + ".bin";
+
+		}
+
+		String outfilename = VPXSessionManager.getDSPPath() + "/bin/" + bin;
 
 		str = str.replace("out1", out1Path.replaceAll("\\\\", "/"));
 
@@ -1123,7 +1136,7 @@ public class VPX_MADPanel extends JPanel {
 
 		p.setProperty(VPXConstants.ResourceFields.PATH_CORE7, out8Path);
 
-		p.setProperty(VPXConstants.ResourceFields.PATH_OUT, outfilename);
+		p.setProperty(VPXConstants.ResourceFields.PATH_OUT, outfileName);
 
 		VPXUtilities.updateProperties(p);
 
@@ -1169,13 +1182,13 @@ public class VPX_MADPanel extends JPanel {
 			}
 
 			System.out.println(cmd);
-			
+
 			VPXLogger.updateLog("Creating deployment files");
 
 			VPXLogger.updateLog("Creating deployment configuration files");
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			
+
 			BufferedReader stdErroInput = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 			String s = null;
@@ -1191,7 +1204,7 @@ public class VPX_MADPanel extends JPanel {
 				}
 
 			}
-			
+
 			String sError = null;
 
 			while ((sError = stdErroInput.readLine()) != null) {
@@ -1200,7 +1213,6 @@ public class VPX_MADPanel extends JPanel {
 
 				VPXLogger.updateLog(sError);
 
-			
 			}
 
 			if (ret) {
@@ -1273,7 +1285,7 @@ public class VPX_MADPanel extends JPanel {
 
 				java.io.File file = fileDialog.getSelectedFile();
 
-				jtf.setText(file.getPath());
+				jtf.setText(VPXUtilities.getPathAsLinuxStandard(file.getPath()));
 			}
 		}
 	}
@@ -1352,6 +1364,8 @@ public class VPX_MADPanel extends JPanel {
 			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 			setSize(800, 350);
+
+			setResizable(false);
 
 			getContentPane().setLayout(new BorderLayout());
 
@@ -1496,7 +1510,7 @@ public class VPX_MADPanel extends JPanel {
 
 			dialog = new VPX_FlashProgressWindow();
 
-			dialog.setRangePackets(1, 9);
+			dialog.setRangePackets(1, 8);
 
 			dialog.setVisible(true);
 
@@ -1533,12 +1547,13 @@ public class VPX_MADPanel extends JPanel {
 				checkAndCopy(corePath, core6, 6, false);
 				dialog.updatePackets(8, core7);
 				checkAndCopy(corePath, core7, 7, false);
-				dialog.updatePackets(9, bin);
-				checkAndCopy(
-						VPXSessionManager.getDSPPath() + "/"
-								+ VPXUtilities
-										.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN),
-						bin, 0, true);
+				// dialog.updatePackets(9, bin);
+				/*
+				 * checkAndCopy( VPXSessionManager.getDSPPath() + "/" +
+				 * VPXUtilities .getString(VPXConstants.ResourceFields.
+				 * FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN), bin, 0, true);
+				 * 
+				 */
 
 			} catch (Exception e) {
 				VPXLogger.updateError(e);
@@ -1626,7 +1641,7 @@ public class VPX_MADPanel extends JPanel {
 
 			try {
 
-				Desktop.getDesktop().open(new File(path.substring(0, path.lastIndexOf("/"))));
+				Desktop.getDesktop().open(new File(VPXSessionManager.getDSPPath() + "/bin"));
 
 				this.dispose();
 

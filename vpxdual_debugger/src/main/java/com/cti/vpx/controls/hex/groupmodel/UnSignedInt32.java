@@ -176,8 +176,10 @@ public class UnSignedInt32 extends AbstractTableModel {
 		}
 		// & with 0xff to convert to unsigned
 		byte[] b = doc.getByteByGroup(pos, 4, true);
+		
+		String str = String.format("0x%02x%02x%02x%02x", b[0]&0xff, b[1]&0xff, b[2]&0xff, b[3]&0xff).toUpperCase();
 
-		return new BigInteger(b).intValue();
+		return  Long.decode(str);
 
 	}
 
@@ -327,6 +329,13 @@ public class UnSignedInt32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
+		
+		String str = value.toString();
+
+		int offset = editor.cellToOffset(row, col);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.parseLong(str));
+		/*
 
 		String val = String.format("%08x", Integer.parseInt(value.toString()));
 
@@ -351,6 +360,7 @@ public class UnSignedInt32 extends AbstractTableModel {
 		fireTableCellUpdated(row, col);
 
 		editor.fireHexEditorEvent(offset, 4, 4);
+		*/
 	}
 
 	/**

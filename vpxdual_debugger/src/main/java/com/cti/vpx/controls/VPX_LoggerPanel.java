@@ -23,6 +23,7 @@ import javax.swing.border.EtchedBorder;
 
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
+import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
@@ -141,32 +142,19 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	private void saveLogtoFile() {
 
-		JFileChooser chooser;
-
 		try {
 
-			chooser = new JFileChooser();
+			String path = VPXSessionManager.getEventPath() + "/"
+					+ VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH) + "_"
+					+ VPXUtilities.getCurrentTime(3) + ".log";
 
-			chooser.setCurrentDirectory(new java.io.File("."));
+			fw = new FileWriter(new File(path), true);
 
-			chooser.setDialogTitle("Select folder to save");
+			txtA_Log.write(fw);
 
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			fw.close();
 
-			if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
-
-				String path = chooser.getSelectedFile().getPath() + "\\"
-						+ txtA_Log.getText().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
-						+ ".log";
-
-				fw = new FileWriter(new File(path), true);
-
-				txtA_Log.write(fw);
-
-				fw.close();
-
-				VPXUtilities.showPopup("File Saved at " + path, path);
-			}
+			VPXUtilities.showPopup("File Saved at " + path, path);
 
 		} catch (Exception e) {
 

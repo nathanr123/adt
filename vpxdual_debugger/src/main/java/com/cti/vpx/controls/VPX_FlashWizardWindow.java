@@ -131,9 +131,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 	private FilenameFilter outFilter = null;
 
 	private VPX_FlashProgressWindow dialog;
-	
+
 	private JButton btnLoadWorkspace;
-	
+
 	private JButton btnBackup;
 
 	/**
@@ -575,7 +575,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		compileFinalOutFilePanel.setLayout(new MigLayout("", "[][][grow][][][]", "[]"));
 
-		JLabel lblLblconfigfinaloutfile = new JLabel("Final Out File");
+		JLabel lblLblconfigfinaloutfile = new JLabel("File Name");
 
 		compileFinalOutFilePanel.add(lblLblconfigfinaloutfile, "cell 1 0,alignx left");
 
@@ -585,9 +585,10 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		txtCompilePathFinalOut.setColumns(10);
 
-		JButton btnCompileFinalOutFile = new JButton(new BrowseAction("Browse", txtCompilePathFinalOut));
+		// JButton btnCompileFinalOutFile = new JButton(new
+		// BrowseAction("Browse", txtCompilePathFinalOut));
 
-		compileFinalOutFilePanel.add(btnCompileFinalOutFile, "cell 4 0");
+		// compileFinalOutFilePanel.add(btnCompileFinalOutFile, "cell 4 0");
 
 	}
 
@@ -700,7 +701,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 		});
 
 		btnLoadWorkspace = new JButton("Load from workspace");
-		
+
 		btnLoadWorkspace.setEnabled(false);
 
 		btnLoadWorkspace.addActionListener(new ActionListener() {
@@ -716,7 +717,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 		navigationPanel.add(btnLoadWorkspace);
 
 		btnBackup = new JButton("Backup");
-		
+
 		btnBackup.setEnabled(false);
 
 		btnBackup.addActionListener(new ActionListener() {
@@ -843,7 +844,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		dialog = new VPX_FlashProgressWindow();
 
-		dialog.setRangePackets(1, 9);
+		dialog.setRangePackets(1, 8);
 
 		dialog.setVisible(true);
 
@@ -880,11 +881,15 @@ public class VPX_FlashWizardWindow extends JDialog {
 			checkAndCopy(corePath, core6, 6, false);
 			dialog.updatePackets(8, core7);
 			checkAndCopy(corePath, core7, 7, false);
-			dialog.updatePackets(9, bin);
-			checkAndCopy(
+			//dialog.updatePackets(9, bin);
+		
+		
+			
+/*			checkAndCopy(
 					VPXSessionManager.getDSPPath() + "/"
 							+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN),
 					bin, 0, true);
+					*/
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -979,6 +984,8 @@ public class VPX_FlashWizardWindow extends JDialog {
 	}
 
 	private void doNext() {
+		
+		btnLoadWorkspace.setEnabled(false);
 
 		if (madTab.getSelectedIndex() == 0 || madTab.getSelectedIndex() == 3) {
 
@@ -997,11 +1004,13 @@ public class VPX_FlashWizardWindow extends JDialog {
 		} else if (madTab.getSelectedIndex() == 1) {
 
 			applyConfiguration();
+			
+			btnLoadWorkspace.setEnabled(true);
 
 		} else if (madTab.getSelectedIndex() == 2) {
 
 			applyCompilation();
-
+			
 			btnNext.setEnabled(false);
 
 			btnBack.setEnabled(false);
@@ -1044,9 +1053,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 		btnClearFields.setEnabled(false);
 
 		btnOpenFolder.setEnabled(false);
-		
+
 		btnLoadWorkspace.setEnabled(false);
-		
+
 		btnBack.setEnabled(false);
 
 		btnBack.setEnabled(false);
@@ -1073,21 +1082,29 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 	private void loadPathsFromProperties() {
 
-		txtConfigPathPython.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PYTHON));
+		txtConfigPathPython
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_PYTHON)));
 
-		txtConfigPathMAP.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAP));
+		txtConfigPathMAP
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_MAP)));
 
-		txtConfigPathPrelinker.setText(p.getProperty(VPXConstants.ResourceFields.PATH_PRELINKER));
+		txtConfigPathPrelinker.setText(
+				VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_PRELINKER)));
 
-		txtConfigPathStriper.setText(p.getProperty(VPXConstants.ResourceFields.PATH_STRIPER));
+		txtConfigPathStriper
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_STRIPER)));
 
-		txtConfigPathOFD.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OFD));
+		txtConfigPathOFD
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_OFD)));
 
-		txtConfigPathMAL.setText(p.getProperty(VPXConstants.ResourceFields.PATH_MAL));
+		txtConfigPathMAL
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_MAL)));
 
-		txtConfigPathNML.setText(p.getProperty(VPXConstants.ResourceFields.PATH_NML));
+		txtConfigPathNML
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_NML)));
 
-		txtConfigPathDummyOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_DUMMY));
+		txtConfigPathDummyOut
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_DUMMY)));
 
 		boolean dummy = Boolean.valueOf(p.getProperty(VPXConstants.ResourceFields.DUMMY_CHK));
 
@@ -1095,23 +1112,32 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		txtConfigPathDummyOut.setEnabled(dummy);
 
-		txtCompilePathCore0.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE0));
+		txtCompilePathCore0
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE0)));
 
-		txtCompilePathCore1.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE1));
+		txtCompilePathCore1
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE1)));
 
-		txtCompilePathCore2.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE2));
+		txtCompilePathCore2
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE2)));
 
-		txtCompilePathCore3.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE3));
+		txtCompilePathCore3
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE3)));
 
-		txtCompilePathCore4.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE4));
+		txtCompilePathCore4
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE4)));
 
-		txtCompilePathCore5.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE5));
+		txtCompilePathCore5
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE5)));
 
-		txtCompilePathCore6.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE6));
+		txtCompilePathCore6
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE6)));
 
-		txtCompilePathCore7.setText(p.getProperty(VPXConstants.ResourceFields.PATH_CORE7));
+		txtCompilePathCore7
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_CORE7)));
 
-		txtCompilePathFinalOut.setText(p.getProperty(VPXConstants.ResourceFields.PATH_OUT));
+		txtCompilePathFinalOut
+				.setText(VPXUtilities.getPathAsLinuxStandard(p.getProperty(VPXConstants.ResourceFields.PATH_OUT)));
 
 	}
 
@@ -1173,9 +1199,9 @@ public class VPX_FlashWizardWindow extends JDialog {
 					txtCompilePathCore4.getText(), txtCompilePathCore5.getText(), txtCompilePathCore6.getText(),
 					txtCompilePathCore7.getText());
 
-			String path = txtCompilePathFinalOut.getText();
+			String path = VPXSessionManager.getDSPPath() + "/bin/";
 
-			madProcessPanel.setPath(path.substring(0, path.lastIndexOf("\\")));
+			madProcessPanel.setPath(path);
 
 			madProcessPanel.doCompile();
 
@@ -1445,13 +1471,15 @@ public class VPX_FlashWizardWindow extends JDialog {
 				isValid = false;
 			}
 
-			if (!VPXUtilities.isFileValid(txtCompilePathFinalOut.getText().trim(), true)) {
-
-				paths.append("Final Out file path is not valid.\n");
-
-				isValid = false;
-			}
-
+			/*
+			 * if
+			 * (!VPXUtilities.isFileValid(txtCompilePathFinalOut.getText().trim(
+			 * ), true)) {
+			 * 
+			 * paths.append("Final Out file path is not valid.\n");
+			 * 
+			 * isValid = false; }
+			 */
 		}
 
 		if (isValid)
@@ -1463,21 +1491,21 @@ public class VPX_FlashWizardWindow extends JDialog {
 	public void updateConfigFile(String pythonPath, String mapTool, String prelinker, String ofd, String strip,
 			String mal, String nml, boolean isUseDummy, String dummy) {
 
-		pythonPath = pythonPath.replaceAll("\\\\", "/");
+		pythonPath = VPXUtilities.getPathAsLinuxStandard(pythonPath);
 
-		mapTool = mapTool.replaceAll("\\\\", "/");
+		mapTool = VPXUtilities.getPathAsLinuxStandard(mapTool);
 
-		prelinker = prelinker.replaceAll("\\\\", "/");
+		prelinker = VPXUtilities.getPathAsLinuxStandard(prelinker);
 
-		ofd = ofd.replaceAll("\\\\", "/");
+		ofd = VPXUtilities.getPathAsLinuxStandard(ofd);
 
-		strip = strip.replaceAll("\\\\", "/");
+		strip = VPXUtilities.getPathAsLinuxStandard(strip);
 
-		mal = mal.replaceAll("\\\\", "/");
+		mal = VPXUtilities.getPathAsLinuxStandard(mal);
 
-		nml = nml.replaceAll("\\\\", "/");
+		nml = VPXUtilities.getPathAsLinuxStandard(nml);
 
-		dummy = dummy.replaceAll("\\\\", "/");
+		dummy = VPXUtilities.getPathAsLinuxStandard(dummy);
 
 		Properties p = VPXUtilities.readProperties();
 
@@ -1503,7 +1531,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		currMapPath = mapTool;
 
-		currentdployCfg = VPXUtilities.readFile("deploy/config.data",VPXConstants.DELIMITER_FILE);
+		currentdployCfg = VPXUtilities.readFile("deploy/config.data", VPXConstants.DELIMITER_FILE);
 
 		currentdployCfg = currentdployCfg.replace("prelinkpath", prelinker);
 
@@ -1516,26 +1544,36 @@ public class VPX_FlashWizardWindow extends JDialog {
 		currentdployCfg = currentdployCfg.replace("nampath", nml);
 	}
 
-	public void createDeploymentFile(String outfilename, String out1Path, String out2Path, String out3Path,
+	public void createDeploymentFile(String outfileName, String out1Path, String out2Path, String out3Path,
 			String out4Path, String out5Path, String out6Path, String out7Path, String out8Path) {
 
-		String str = VPXUtilities.readFile("deploy/deployment.data",VPXConstants.DELIMITER_FILE);
+		String str = VPXUtilities.readFile("deploy/deployment.data", VPXConstants.DELIMITER_FILE);
 
-		str = str.replace("out1", out1Path.replaceAll("\\\\", "/"));
+		String bin = outfileName;
+		
+		if (!bin.endsWith(".bin")) {
+			
+			bin = bin+".bin";
+			
+		}
+		
+		String outfilename = VPXSessionManager.getDSPPath() + "/bin/" + bin;
 
-		str = str.replace("out2", out2Path.replaceAll("\\\\", "/"));
+		str = str.replace("out1", VPXUtilities.getPathAsLinuxStandard(out1Path));
 
-		str = str.replace("out3", out3Path.replaceAll("\\\\", "/"));
+		str = str.replace("out2", VPXUtilities.getPathAsLinuxStandard(out2Path));
 
-		str = str.replace("out4", out4Path.replaceAll("\\\\", "/"));
+		str = str.replace("out3", VPXUtilities.getPathAsLinuxStandard(out3Path));
 
-		str = str.replace("out5", out5Path.replaceAll("\\\\", "/"));
+		str = str.replace("out4", VPXUtilities.getPathAsLinuxStandard(out4Path));
 
-		str = str.replace("out6", out6Path.replaceAll("\\\\", "/"));
+		str = str.replace("out5", VPXUtilities.getPathAsLinuxStandard(out5Path));
 
-		str = str.replace("out7", out7Path.replaceAll("\\\\", "/"));
+		str = str.replace("out6", VPXUtilities.getPathAsLinuxStandard(out6Path));
 
-		str = str.replace("out8", out8Path.replaceAll("\\\\", "/"));
+		str = str.replace("out7", VPXUtilities.getPathAsLinuxStandard(out7Path));
+
+		str = str.replace("out8", VPXUtilities.getPathAsLinuxStandard(out8Path));
 
 		Properties p = VPXUtilities.readProperties();
 
@@ -1555,7 +1593,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 		p.setProperty(VPXConstants.ResourceFields.PATH_CORE7, out8Path);
 
-		p.setProperty(VPXConstants.ResourceFields.PATH_OUT, outfilename);
+		p.setProperty(VPXConstants.ResourceFields.PATH_OUT, outfileName);
 
 		VPXUtilities.updateProperties(p);
 
@@ -1677,7 +1715,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 
 				java.io.File file = fileDialog.getSelectedFile();
 
-				jtf.setText(file.getPath());
+				jtf.setText(VPXUtilities.getPathAsLinuxStandard(file.getPath()));
 			}
 		}
 	}
@@ -1865,6 +1903,8 @@ public class VPX_FlashWizardWindow extends JDialog {
 			btnNext.setEnabled(true);
 
 			btnBack.setEnabled(true);
+			
+			btnBackup.setEnabled(true);
 			// btnCancel.setEnabled(true);
 
 			lblOpenFolder.setEnabled(true);
@@ -1879,6 +1919,8 @@ public class VPX_FlashWizardWindow extends JDialog {
 			btnNext.setEnabled(true);
 
 			btnBack.setEnabled(true);
+			
+			btnBackup.setEnabled(true);
 
 			// btnCancel.setEnabled(true);
 

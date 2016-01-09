@@ -2,6 +2,7 @@ package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -12,8 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,9 +28,9 @@ import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -37,6 +38,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -46,7 +48,6 @@ import javax.swing.border.TitledBorder;
 
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AppModeWindow;
-import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
@@ -60,7 +61,7 @@ import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import net.miginfocom.swing.MigLayout;
 
-public class VPX_UARTWindow extends JFrame {
+public class VPX_UARTWindow extends JFrame implements WindowListener {
 
 	/**
 	 * 
@@ -115,6 +116,18 @@ public class VPX_UARTWindow extends JFrame {
 
 	private JMenuItem vpx_UART_Menu_Help_Help;
 
+	private JRadioButton radDSP;
+
+	private JRadioButton radP2020;
+
+	private boolean isP2020 = true;
+
+	private final ButtonGroup processorGroup = new ButtonGroup();
+
+	private SerialPort serialPort;
+
+	private InputStream in;
+
 	/**
 	 * Launch the application.
 	 */
@@ -122,7 +135,7 @@ public class VPX_UARTWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VPX_UARTWindow frame = new VPX_UARTWindow("COM3");
+					VPX_UARTWindow frame = new VPX_UARTWindow("COM7");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -157,6 +170,7 @@ public class VPX_UARTWindow extends JFrame {
 		try {
 			connect(commport);
 		} catch (Exception e) {
+			e.printStackTrace();
 			VPXLogger.updateError(e);
 			JOptionPane.showMessageDialog(this, "Error in connecting..", "Error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -170,6 +184,8 @@ public class VPX_UARTWindow extends JFrame {
 		setIconImage(VPXUtilities.getAppIcon());
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		addWindowListener(this);
 
 		setSize(1000, 700);
 	}
@@ -336,6 +352,8 @@ public class VPX_UARTWindow extends JFrame {
 
 		cmbConsoleCoresFilter = new JComboBox<String>();
 
+		cmbConsoleCoresFilter.setEnabled(false);
+
 		cmbConsoleCoresFilter.setPreferredSize(new Dimension(130, 20));
 
 		btn_Msg_Clear = VPXComponentFactory.createJButton(new ClearAction("Clear"));
@@ -349,6 +367,40 @@ public class VPX_UARTWindow extends JFrame {
 		btn_Msg_Save.setPreferredSize(new Dimension(22, 22));
 
 		btn_Msg_Save.setBorderPainted(false);
+
+		radP2020 = new JRadioButton("p2020");
+
+		radP2020.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				enableProcessorComponents();
+
+			}
+		});
+
+		radP2020.setSelected(true);
+
+		processorGroup.add(radP2020);
+
+		consoleFilterPanel.add(radP2020);
+
+		radDSP = new JRadioButton("DSP");
+
+		radDSP.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				enableProcessorComponents();
+
+			}
+		});
+
+		processorGroup.add(radDSP);
+
+		consoleFilterPanel.add(radDSP);
 
 		consoleFilterPanel.add(cmbConsoleCoresFilter);
 
@@ -371,6 +423,7 @@ public class VPX_UARTWindow extends JFrame {
 		scrConsole.setViewportView(txtAConsole);
 
 		JPanel ControlsPanel = new JPanel();
+
 		consolePanel.add(ControlsPanel, BorderLayout.SOUTH);
 
 		ControlsPanel.setLayout(new BorderLayout(0, 0));
@@ -382,6 +435,9 @@ public class VPX_UARTWindow extends JFrame {
 		sendOptionPanel.setLayout(new MigLayout("", "[grow,fill]", "[]"));
 
 		cmbMessagesCoresFilter = new JComboBox<String>();
+
+		cmbMessagesCoresFilter.setEnabled(false);
+
 		sendOptionPanel.add(cmbMessagesCoresFilter, "flowx,cell 0 0,alignx center");
 
 		cmbMessagesCoresFilter.setPreferredSize(new Dimension(130, 20));
@@ -489,6 +545,16 @@ public class VPX_UARTWindow extends JFrame {
 
 	}
 
+	private void enableProcessorComponents() {
+
+		isP2020 = radP2020.isSelected();
+
+		cmbConsoleCoresFilter.setEnabled(!isP2020);
+
+		cmbMessagesCoresFilter.setEnabled(!isP2020);
+
+	}
+
 	public void connect(String portName) {
 
 		try {
@@ -507,12 +573,12 @@ public class VPX_UARTWindow extends JFrame {
 
 				if (commPort instanceof SerialPort) {
 
-					SerialPort serialPort = (SerialPort) commPort;
+					serialPort = (SerialPort) commPort;
 
 					serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
 							SerialPort.PARITY_NONE);
 
-					InputStream in = serialPort.getInputStream();
+					in = serialPort.getInputStream();
 
 					out = serialPort.getOutputStream();
 
@@ -530,10 +596,17 @@ public class VPX_UARTWindow extends JFrame {
 	}
 
 	public void sendData() {
-
+		String data = "";
 		try {
 
-			String data = cmbMessagesCoresFilter.getSelectedIndex()+ "::" + txtConsoleMsg.getText().trim();
+			if (isP2020) {
+
+				data = txtConsoleMsg.getText().trim();
+
+			} else {
+
+				data = cmbMessagesCoresFilter.getSelectedIndex() + "::" + txtConsoleMsg.getText().trim();
+			}
 
 			if (data.length() > 0) {
 
@@ -541,14 +614,23 @@ public class VPX_UARTWindow extends JFrame {
 
 				currentCommandIndex = cmdHistory.size();
 
-				out.write(data.getBytes());
+				byte[] byts = data.getBytes();
 
-				out.write("\n".getBytes());
+				for (int i = 0; i < byts.length; i++) {
+
+					out.write(byts[i]);
+
+					Thread.sleep(5);
+				}
+
+				// out.write(data.getBytes());
+
+				out.write("\r".getBytes());
 
 				txtConsoleMsg.setText("");
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
@@ -569,6 +651,8 @@ public class VPX_UARTWindow extends JFrame {
 
 			int data;
 
+			String msg = "";
+
 			try {
 
 				int len = 0;
@@ -584,54 +668,45 @@ public class VPX_UARTWindow extends JFrame {
 
 				String msg1 = new String(buffer, 0, len);
 
-				if (msg1.length() > 0) {
+				if (msg1.length() > 1) {
 
-					String msg = msg1.split("::")[1];
+					if (msg1.contains("::")) {
 
-					if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
+						msg = msg1.split("::")[1];
+					} else {
+						msg = msg1;
+					}
 
-						if (msg1.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
+					if (isP2020) {
 
-							txtAConsole.append(msg + "\n");
-						}
+						msg = msg.replaceAll("\\e\\[[\\d;]*[^\\d;]", "");
+						
+						txtAConsole.append(msg + "\n");
 
 					} else {
 
-						txtAConsole.append(msg + "\n");
+						if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
+
+							if (msg1.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
+
+								txtAConsole.append(msg + "\n");
+							}
+
+						} else {
+
+							txtAConsole.append(msg + "\n");
+
+						}
 					}
 
-					/*
-					 * if (msg1.trim().startsWith("~ #")) {
-					 * 
-					 * msg1 = "\n"; } if
-					 * (msg1.trim().equals(currentCommand.trim())) {
-					 * 
-					 * msg1 = String.format(" %s\\> %s",
-					 * VPX_UARTWindow.this.currCommport, msg1); }
-					 */
-					// txtAConsole.append(String.format(" %s\\> %s",
-					// this.currCommport, data) + "\n");
-
-					/*
-					 * String msg = msg1.split("::")[1];
-					 * 
-					 * if (cmbConsoleCoresFilter.getSelectedIndex() > 0) {
-					 * 
-					 * if (msg1.startsWith(String.valueOf(cmbConsoleCoresFilter.
-					 * getSelectedIndex() - 1))) {
-					 * 
-					 * txtAConsole.append(msg + "\n"); }
-					 * 
-					 * } else {
-					 * 
-					 * txtAConsole.append(msg + "\n"); }
-					 */
+					txtAConsole.setCaretPosition(txtAConsole.getText().length());
 				}
 
 			} catch (IOException e) {
-				VPXLogger.updateError(e);
-				txtAConsole.append("\n");
 
+				VPXLogger.updateError(e);
+
+				e.printStackTrace();
 			}
 		}
 
@@ -732,7 +807,7 @@ public class VPX_UARTWindow extends JFrame {
 
 			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 
-				String path = chooser.getSelectedFile().getPath() + "\\Messages."
+				String path = VPXUtilities.getPathAsLinuxStandard(chooser.getSelectedFile().getPath()) + "/Messages."
 						+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
 						+ ".txt";
 
@@ -791,6 +866,15 @@ public class VPX_UARTWindow extends JFrame {
 
 			@Override
 			public void run() {
+				try {
+
+					Desktop.getDesktop().open(new File(VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/vpxdebugger.chm"));
+
+				} catch (IOException e) {
+					VPXLogger.updateError(e);
+				}
+			}
+			/*	VPXLogger.updateLog("Help document opened");
 
 				final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
 
@@ -800,11 +884,11 @@ public class VPX_UARTWindow extends JFrame {
 
 				contentPane.add(browserCanvas, BorderLayout.CENTER);
 
-				JDialog frame = new JDialog(VPX_UARTWindow.this, "Help");
+				JDialog frame = new JDialog(parent, "List of commands");
 
 				frame.setBounds(100, 100, 650, 600);
 
-				frame.setLocationRelativeTo(VPX_UARTWindow.this);
+				frame.setLocationRelativeTo(parent);
 
 				frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -826,13 +910,14 @@ public class VPX_UARTWindow extends JFrame {
 
 				if (browserCanvas.initialise()) {
 
-					browserCanvas.setUrl(System.getProperty("user.dir") + "\\help\\help.html");
+					browserCanvas.setUrl(
+							VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/help.html");
 				} else {
 				}
 
 				frame.setSize(651, 601);
 
-			}
+			}*/
 		});
 
 		th.start();
@@ -913,7 +998,7 @@ public class VPX_UARTWindow extends JFrame {
 
 			if (VPXUtilities.isLogEnabled()) {
 
-				String filePath = VPXSessionManager.getCurrentLogFileName();// VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH);
+				String filePath = VPXSessionManager.getCurrentLogFileName();
 
 				VPXUtilities.updateToFile(filePath, log);
 
@@ -923,5 +1008,58 @@ public class VPX_UARTWindow extends JFrame {
 			VPXLogger.updateError(e);
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+
+		try {
+
+			in.close();
+
+			out.close();
+
+			serialPort.close();
+
+		} catch (Exception e2) {
+			// TODO: handle exception
+		}
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 }

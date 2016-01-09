@@ -330,10 +330,19 @@ public class Hex8 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
-		byte b = (byte) Integer.parseInt(value.toString(), 16);
+		String str =value.toString();
+		
+		if(!str.startsWith("0x")&&!str.startsWith("0x")){
+			
+			str = "0x"+value.toString();
+		}
+		
+		//byte b = (byte) Integer.parseInt(value.toString(), 16);
 
+		
+		
 		int offset = editor.cellToOffset(row, col);
-
+/*
 		if (offset > -1) { // i.e., not col 17...
 
 			byte old = doc.getByte(offset);
@@ -344,14 +353,15 @@ public class Hex8 extends AbstractTableModel {
 
 			doc.setByte(offset, b);
 
+
 			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
+*/
+			this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT8, 1,Long.decode(str));
 
-			this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT8, 1, b);
+	//		fireTableCellUpdated(row, col);
 
-			fireTableCellUpdated(row, col);
-
-			editor.fireHexEditorEvent(offset, 1, 1);
-		}
+		//	editor.fireHexEditorEvent(offset, 1, 1);
+	//	}
 	}
 
 	/**

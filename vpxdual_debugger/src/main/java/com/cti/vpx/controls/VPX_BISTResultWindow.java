@@ -887,6 +887,7 @@ public class VPX_BISTResultWindow extends JDialog implements WindowListener {
 		getRootPane().setDefaultButton(btnSave);
 
 		JLabel lblNote = new JLabel("Please wait until desired processors to complete test.");
+		lblNote.setVisible(false);
 
 		controlsPanel.add(lblNote, "cell 1 0");
 
@@ -1043,9 +1044,9 @@ public class VPX_BISTResultWindow extends JDialog implements WindowListener {
 
 		lblDSP2TestResultProcessorVal.setText(testResult.getResultDSP2Processor());
 
-		lblResultDetailTestCompletedAtVal.setText(testResult.getResultTestCompletedAt());
+		//lblResultDetailTestCompletedAtVal.setText(testResult.getResultTestCompletedAt());
 
-		lblResultDetailTestDurationVal.setText(testResult.getResultTestDuration());
+	//	lblResultDetailTestDurationVal.setText(testResult.getResultTestDuration());
 
 		if (testResult.isP2020Completed()) {
 
@@ -1104,7 +1105,7 @@ public class VPX_BISTResultWindow extends JDialog implements WindowListener {
 
 			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 
-				String fileName = String.format("%s\\%s_%s_%s.txt", chooser.getSelectedFile().getPath(),
+				String fileName = String.format("%s/%s_%s_%s.txt", VPXUtilities.getPathAsLinuxStandard(chooser.getSelectedFile().getPath()),
 						testResult.getTest().replaceAll(" ", "_"), testResult.getTestSubSystem(),
 						VPXUtilities.getCurrentTime(3));
 

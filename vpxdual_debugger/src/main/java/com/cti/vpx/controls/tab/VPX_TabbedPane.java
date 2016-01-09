@@ -81,6 +81,29 @@ public class VPX_TabbedPane extends JTabbedPane {
 		removeTabAt(index);
 	}
 
+	public void closeAllTab(int index) {
+
+		while (getTabCount() > 0) {
+
+			removeTabAt(0);
+		}
+	}
+
+	public void closeOthersTab(int index) {
+
+		int idx = getSelectedIndex();
+		
+		int count = getTabCount();
+
+		for (int j = count - 1; j >= 0; j--) {
+			
+			if (j != idx)
+				
+				remove(j);
+		}
+		repaint();
+	}
+
 	public void detachTab(int index) {
 
 		if (index < 0 || index >= getTabCount())
@@ -89,7 +112,7 @@ public class VPX_TabbedPane extends JTabbedPane {
 		final JFrame frame = new JFrame();
 
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		
+
 		frame.setIconImage(VPXUtilities.getAppIcon());
 
 		Window parentWindow = SwingUtilities.windowForComponent(this);
@@ -120,7 +143,7 @@ public class VPX_TabbedPane extends JTabbedPane {
 						JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[2]);
 
 				System.out.println(rc);
-				
+
 				if (rc == 0) {
 
 					frame.dispose();
@@ -169,8 +192,24 @@ public class VPX_TabbedPane extends JTabbedPane {
 	}
 
 	public void fireCloseTabEvent(MouseEvent e, int overTabIndex) {
+
 		this.overTabIndex = overTabIndex;
+
 		closeTab(overTabIndex);
+	}
+
+	public void fireCloseAllTabEvent(MouseEvent e, int overTabIndex) {
+
+		this.overTabIndex = overTabIndex;
+
+		closeAllTab(overTabIndex);
+	}
+
+	public void fireCloseOthersTabEvent(MouseEvent e, int overTabIndex) {
+
+		this.overTabIndex = overTabIndex;
+
+		closeOthersTab(overTabIndex);
 	}
 
 	public void fireMaxTabEvent(MouseEvent e, int overTabIndex) {

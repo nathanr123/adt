@@ -331,6 +331,20 @@ public class Hex64 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
+		String str = value.toString();
+
+		if (!str.startsWith("0x") && !str.startsWith("0x")) {
+
+			str = "0x" + value.toString();
+		}
+
+		int offset = editor.cellToOffset(row, col);
+
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT64, 1, Long.decode(str));
+		
+		/*
+		
+		
 		String val = String.format("%016x", Long.parseLong(value.toString(), 16));
 
 		byte[] bArr = new byte[8];
@@ -362,6 +376,7 @@ public class Hex64 extends AbstractTableModel {
 		fireTableCellUpdated(row, col);
 
 		editor.fireHexEditorEvent(offset, 8, 8);
+		*/
 	}
 
 	/**

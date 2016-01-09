@@ -22,6 +22,12 @@ public class VPXSessionManager {
 
 	private static String currentWorkspacePath;
 
+	private static String currentLANName;
+
+	private static String currentSubnet;
+
+	private static String currentGateway;
+
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
 	private static List<VPX.PROCESSOR_LIST> bistProcessors = new ArrayList<VPX.PROCESSOR_LIST>();
@@ -127,6 +133,30 @@ public class VPXSessionManager {
 		VPXSessionManager.currentSystemIP = currentSystemIP;
 	}
 
+	public static String getCurrentLANName() {
+		return currentLANName;
+	}
+
+	public static void setCurrentLANName(String currentLANName) {
+		VPXSessionManager.currentLANName = currentLANName;
+	}
+
+	public static String getCurrentSubnet() {
+		return currentSubnet;
+	}
+
+	public static void setCurrentSubnet(String currentSubnet) {
+		VPXSessionManager.currentSubnet = currentSubnet;
+	}
+
+	public static String getCurrentGateway() {
+		return currentGateway;
+	}
+
+	public static void setCurrentGateway(String currentGateway) {
+		VPXSessionManager.currentGateway = currentGateway;
+	}
+
 	public static String getCurrentLogFileName() {
 
 		return currentLogFileName;
@@ -164,7 +194,7 @@ public class VPXSessionManager {
 
 	public static void setWorkspacePath(String path) {
 
-		currentWorkspacePath = path;
+		currentWorkspacePath = VPXUtilities.getPathAsLinuxStandard(path);
 	}
 
 	public static String getWorkspacePath() {

@@ -58,7 +58,7 @@ public class VPXConstants {
 	public static final DateFormat DATEFORMAT_TIME = new SimpleDateFormat("HH:mm:ss");
 
 	public static final DateFormat DATEFORMAT_TIMEFULL = new SimpleDateFormat("HH:mm:ss.SSS");
-	
+
 	public static final DateFormat DATEFORMAT_TIME12 = new SimpleDateFormat("hh:mm:ss a");
 
 	public static final int UARTMODE = 0;
@@ -121,7 +121,7 @@ public class VPXConstants {
 
 	public static final int MAX_MEMORY_BROWSER = 4;
 
-	public static final int MAX_MEMORY_PLOT = 3;
+	public static final int MAX_MEMORY_PLOT = 4;
 
 	public static final int MAX_WATERFALL = 3;
 
@@ -308,6 +308,10 @@ public class VPXConstants {
 
 		public static final String ICON_SPECTRUM_NAME = "sepctrum.png";
 
+		public static final String ICON_UP_NAME = "up1.png";
+
+		public static final String ICON_DOWN_NAME = "down1.png";
+
 		// Icons
 
 		public static final Icon ICON_EMPTY = VPXUtilities.getEmptyIcon(14, 14);
@@ -387,6 +391,10 @@ public class VPXConstants {
 		public static final ImageIcon IMAGE_BG = VPXUtilities.getImageIcon(IMAGE_BG_NAME, 596, 596);
 
 		public static final ImageIcon ICON_SPECTRUM = VPXUtilities.getImageIcon(ICON_SPECTRUM_NAME, 14, 14);
+
+		public static final ImageIcon ICON_UP = VPXUtilities.getImageIcon(ICON_UP_NAME, 10, 10);
+
+		public static final ImageIcon ICON_DOWN = VPXUtilities.getImageIcon(ICON_DOWN_NAME, 10, 10);
 
 	}
 

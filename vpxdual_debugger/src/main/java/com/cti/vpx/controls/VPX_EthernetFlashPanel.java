@@ -235,7 +235,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 						t.start();
 
 					} else {
-						
+
 						dialog.setIndeterminate(false);
 
 						parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(),
@@ -560,9 +560,8 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			
 			fileDialog.resetChoosableFileFilters();
-			
+
 			if (currentType == PROCESSOR_LIST.PROCESSOR_P2020) {
 
 				if (cmbOffset.getSelectedIndex() == 0) {
@@ -572,17 +571,17 @@ public class VPX_EthernetFlashPanel extends JPanel {
 				} else if (cmbOffset.getSelectedIndex() == 1) {
 
 					fileDialog.addChoosableFileFilter(filterBoot);
-					
+
 					fileDialog.setAcceptAllFileFilterUsed(false);
 
 				} else if (cmbOffset.getSelectedIndex() == 2) {
 
 					fileDialog.addChoosableFileFilter(filterDTB);
-					
+
 					fileDialog.setAcceptAllFileFilterUsed(false);
 
 				} else if (cmbOffset.getSelectedIndex() == 3) {
-					
+
 					fileDialog.addChoosableFileFilter(filterBin);
 
 					fileDialog.setAcceptAllFileFilterUsed(false);
@@ -603,7 +602,7 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 				java.io.File file = fileDialog.getSelectedFile();
 
-				jtf.setText(file.getPath());
+				jtf.setText(VPXUtilities.getPathAsLinuxStandard(file.getPath()));
 			}
 		}
 	}

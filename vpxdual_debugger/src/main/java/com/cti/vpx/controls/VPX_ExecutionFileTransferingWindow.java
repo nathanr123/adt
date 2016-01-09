@@ -365,10 +365,12 @@ public class VPX_ExecutionFileTransferingWindow extends JDialog {
 
 	public void updateCurrentFile(String filename) {
 
-		lblTotalTransfer.setText(String.format("Downloading (%d / %d)    %s", (progressTotal.getValue()+1),
-				progressTotal.getMaximum(), filename));
+		String fname = VPXUtilities.getPathAsLinuxStandard(filename);
 
-		lblCurrentTransfer.setText("Transfering " + filename);
+		lblTotalTransfer.setText(String.format("Downloading (%d / %d)    %s", (progressTotal.getValue() + 1),
+				progressTotal.getMaximum(), fname));
+
+		lblCurrentTransfer.setText("Transfering " + fname);
 	}
 
 	public void resetCurrentProcess() {
