@@ -2,7 +2,6 @@ package com.cti.vpx.controls.graph;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -172,7 +171,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	private void init() {
 
-		setResizable(false);
+		//setResizable(false);
 
 		setIconImage(VPXConstants.Icons.ICON_SPECTRUM.getImage());
 

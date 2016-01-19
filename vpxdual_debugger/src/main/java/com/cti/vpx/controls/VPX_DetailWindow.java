@@ -215,6 +215,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
+			tbl_Property_Model.addRow(new String[] { "Up Time ",
+					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
+
 			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 					VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
 
@@ -226,6 +229,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
+			tbl_Property_Model.addRow(new String[] { "Up Time ",
+					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
+
 			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 					VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
 
@@ -236,6 +242,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
 			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+
+			tbl_Property_Model.addRow(new String[] { "Up Time ",
+					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp2uptime())) });
 
 			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 					VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });
@@ -273,6 +282,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 				tbl_Property_Model.addRow(new String[] { "IP Address", processor.getiP_Addresses() });
 
 				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(processor.getResponseTime()) });
+
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - processor.getUpTime())) });
 
 				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 						VPXUtilities.getCurrentTime(5, processor.getResponseTime()) });
@@ -313,6 +325,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
+		tbl_Property_Model.addRow(new String[] { "Up Time ",
+				VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
+
 		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 				VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
 
@@ -322,6 +337,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
+		tbl_Property_Model.addRow(new String[] { "Up Time ",
+				VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
+
 		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 				VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
 
@@ -330,6 +348,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
 		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+
+		tbl_Property_Model.addRow(new String[] { "Up Time ",
+				VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp2uptime())) });
 
 		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 				VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });
@@ -388,6 +409,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 				tbl_Property_Model
 						.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
+
 				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 						VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
 
@@ -399,6 +423,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
+
 				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 						VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
 
@@ -409,6 +436,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
 				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
 
 				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 						VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });

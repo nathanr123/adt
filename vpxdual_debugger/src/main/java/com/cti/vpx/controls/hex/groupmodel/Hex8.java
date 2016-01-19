@@ -33,7 +33,6 @@ import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;

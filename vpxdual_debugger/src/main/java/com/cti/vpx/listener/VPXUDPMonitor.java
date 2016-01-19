@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JLabel;
-import javax.swing.SwingWorker;
 
 import org.apache.commons.io.FileUtils;
 
@@ -52,9 +51,7 @@ public class VPXUDPMonitor {
 
 	private static VPXSubnetFilter subnet = null;
 
-	private VPXCommunicationMonitor communicationMonitor;
-
-	private VPXAdvertisementMonitor advertisementMonitor;
+	// private VPXCommunicationMonitor communicationMonitor;
 
 	private boolean isipinRange = true;
 
@@ -156,6 +153,14 @@ public class VPXUDPMonitor {
 
 	private VPXMessageConsoleMonitor messageMonitorRunnable;
 
+	private Thread advMonitor;
+
+	private VPXAdvMonitor advMonitorRunnable;
+
+	private Thread commMonitor;
+
+	private VPXCommMonitor commMonitorRunnable;
+
 	public VPXUDPMonitor() throws Exception {
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
@@ -177,13 +182,30 @@ public class VPXUDPMonitor {
 
 	private void createDefaultMonitors() throws Exception {
 
-		communicationMonitor = new VPXCommunicationMonitor();
+		// communicationMonitor = new VPXCommunicationMonitor();
 
-		advertisementMonitor = new VPXAdvertisementMonitor();
+		// advertisementMonitor = new VPXAdvertisementMonitor();
+
+		commMonitorRunnable = new VPXCommMonitor();
+
+		commMonitor = new Thread(commMonitorRunnable);
+
+		advMonitorRunnable = new VPXAdvMonitor();
+
+		advMonitor = new Thread(advMonitorRunnable);
 
 		messageMonitorRunnable = new VPXMessageConsoleMonitor();
 
 		messageMonitor = new Thread(messageMonitorRunnable);
+
+		advMonitor.setPriority(10);
+
+		advMonitor.setDaemon(true);
+
+		commMonitor.setPriority(5);
+
+		messageMonitor.setPriority(5);
+
 	}
 
 	public void startMonitor() throws Exception {
@@ -220,18 +242,26 @@ public class VPXUDPMonitor {
 
 	private void start() throws Exception {
 
-		advertisementMonitor.startMonitor();
+		// advertisementMonitor.startMonitor();
 
-		communicationMonitor.startMonitor();
+		advMonitor.start();
+
+		commMonitor.start();
+
+		// communicationMonitor.startMonitor();
 
 		messageMonitor.start();
 	}
 
 	private void stop() {
 
-		advertisementMonitor.stopMonitor();
+		// advertisementMonitor.stopMonitor();
 
-		communicationMonitor.stopMonitor();
+		messageMonitorRunnable.stop();
+
+		advMonitorRunnable.stop();
+
+		commMonitorRunnable.stop();
 
 	}
 
@@ -2374,7 +2404,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Parsing Communication Packets
-	private synchronized void parseCommunicationPacket(String ip, ATPCommand msgCommand) {
+	private void parseCommunicationPacket(String ip, ATPCommand msgCommand) {
 
 		int msgID = (int) msgCommand.msgID.get();
 
@@ -2507,7 +2537,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	private synchronized void parseCommunicationPacket(String ip, BISTCommand msgCommand) {
+	private void parseCommunicationPacket(String ip, BISTCommand msgCommand) {
 
 		int msgID = (int) msgCommand.msgID.get();
 
@@ -2524,7 +2554,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Parsing Advertisement Packets
-	private synchronized void parseAdvertisementPacket(String ip, String msg) {
+	private void parseAdvertisementPacket(String ip, String msg) {
 
 		if (msg.length() == 6) {
 
@@ -2543,7 +2573,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Parsing Advertisement Packets
-	private synchronized void parseMessagePacket(String ip, MSGCommand msgCommand) {
+	private void parseMessagePacket(String ip, MSGCommand msgCommand) {
 
 		if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_CONSOLE) {
 
@@ -2660,32 +2690,34 @@ public class VPXUDPMonitor {
 		@Override
 		public void run() {
 
-			while (messageReceiverSocket != null) {
+			while (isRunning) {
 
-				if (!messageReceiverSocket.isClosed()) {
-					try {
+				// if (!messageReceiverSocket.isClosed()) {
+				try {
 
-						messageReceiverSocket.receive(messagePacket);
+					messageReceiverSocket.receive(messagePacket);
 
-						String ip = messagePacket.getAddress().getHostAddress();
+					String ip = messagePacket.getAddress().getHostAddress();
 
-						VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
-								VPXSessionManager.getCurrentIP(), "UDP", messageReceiverSocket.getLocalPort(),
-								messagePacket.getLength(), new JLabel("Recieved Message Packet"), messageData));
+					 VPXNetworkLogger.updatePacket(new VPXNWPacket(0,
+					 VPXUtilities.getCurrentTime(0), ip,
+					 VPXSessionManager.getCurrentIP(), "UDP",
+					 messageReceiverSocket.getLocalPort(),
+					 messagePacket.getLength(), new JLabel("Recieved Message Packet"), messageData));
 
-						parseMessagePacket(ip, createMSGCommand(ip, messageData));
+					parseMessagePacket(ip, createMSGCommand(ip, messageData));
 
-						Thread.sleep(500);
+					Thread.sleep(10);
 
-					} catch (Exception e) {
+				} catch (Exception e) {
 
-						VPXLogger.updateError(e);
+					VPXLogger.updateError(e);
 
-						// e.printStackTrace();
-					}
-				} else {
-					break;
+					// e.printStackTrace();
 				}
+				// } else {
+				// break;
+				// }
 			}
 
 		}
@@ -2700,7 +2732,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Communication Monitor
-	class VPXCommunicationMonitor extends SwingWorker<Void, Void> {
+	class VPXCommMonitor implements Runnable {
 
 		DatagramSocket communicationSocket = null;
 
@@ -2710,65 +2742,61 @@ public class VPXUDPMonitor {
 
 		DatagramPacket messagePacket = new DatagramPacket(commandData, commandData.length);
 
-		public VPXCommunicationMonitor() throws Exception {
+		public VPXCommMonitor() throws Exception {
 
 			communicationSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO);
+
 		}
 
 		@Override
-		protected Void doInBackground() {
+		public void run() {
 
-			while (communicationSocket != null) {
+			while (isRunning) {
 
-				if (!communicationSocket.isClosed()) {
-					try {
+				// if (!communicationSocket.isClosed()) {
+				try {
 
-						communicationSocket.receive(messagePacket);
+					communicationSocket.receive(messagePacket);
 
-						String ip = messagePacket.getAddress().getHostAddress();
+					String ip = messagePacket.getAddress().getHostAddress();
 
-						VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
-								VPXSessionManager.getCurrentIP(), "UDP", communicationSocket.getLocalPort(),
-								messagePacket.getLength(), new JLabel("Recieved  Communication Packet"), commandData));
+					 VPXNetworkLogger.updatePacket(new VPXNWPacket(0,
+					 VPXUtilities.getCurrentTime(0), ip,
+					 VPXSessionManager.getCurrentIP(), "UDP",
+					 communicationSocket.getLocalPort(),
+					 messagePacket.getLength(), new JLabel("Recieved Communication Packet"), commandData));
 
-						if (messagePacket.getLength() > 64)
+					if (messagePacket.getLength() > 64)
 
-							parseCommunicationPacket(ip, createATPCommand(ip, commandData));
-						else
-							parseCommunicationPacket(ip, createBISTCommand(ip, commandData));
+						parseCommunicationPacket(ip, createATPCommand(ip, commandData));
+					else
+						parseCommunicationPacket(ip, createBISTCommand(ip, commandData));
 
-						Thread.sleep(10);
+					Thread.sleep(10);
 
-					} catch (Exception e) {
-						VPXLogger.updateError(e);
-						// e.printStackTrace();
-					}
-				} else {
-					break;
+				} catch (Exception e) {
+					VPXLogger.updateError(e);
+					// e.printStackTrace();
 				}
+				// } else {
+				// break;
+				// }
 
 			}
-			return null;
+
 		}
 
-		public void startMonitor() {
-
-			execute();
-		}
-
-		public void stopMonitor() {
+		public void stop() {
 
 			isRunning = false;
 
 			communicationSocket.close();
-
-			cancel(true);
 		}
 
 	}
 
 	// Advertisement Monitor
-	class VPXAdvertisementMonitor extends SwingWorker<Void, Void> {
+	class VPXAdvMonitor implements Runnable {
 
 		DatagramSocket advertisementSocket;
 
@@ -2778,59 +2806,59 @@ public class VPXUDPMonitor {
 
 		DatagramPacket advertisementPacket = new DatagramPacket(advertisementData, advertisementData.length);
 
-		public VPXAdvertisementMonitor() throws Exception {
+		public VPXAdvMonitor() {
 
-			advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO);
+			try {
+				advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		}
 
 		@Override
-		protected Void doInBackground() {
+		public void run() {
 
-			while (advertisementSocket != null) {
+			while (isRunning) {
 
-				if (!advertisementSocket.isClosed()) {
+				// if (!advertisementSocket.isClosed()) {
 
-					try {
-						isipinRange = true;
+				try {
+					isipinRange = true;
 
-						advertisementSocket.receive(advertisementPacket);
+					advertisementSocket.receive(advertisementPacket);
 
-						ip = advertisementPacket.getAddress().getHostAddress();
+					ip = advertisementPacket.getAddress().getHostAddress();
 
-						VPXNetworkLogger.updatePacket(
-								new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip, VPXSessionManager.getCurrentIP(),
-										"UDP", advertisementSocket.getLocalPort(), advertisementPacket.getLength(),
-										new JLabel("Recieved Advertisement Packet"), advertisementData));
+					VPXNetworkLogger.updatePacket(
+							new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip, VPXSessionManager.getCurrentIP(),
+									"UDP", advertisementSocket.getLocalPort(), advertisementPacket.getLength(),
+									new JLabel("Recieved Advertisement Packet"), advertisementData));
 
-						parseAdvertisementPacket(ip,
-								new String(advertisementPacket.getData(), 0, advertisementPacket.getLength()));
+					parseAdvertisementPacket(ip,
+							new String(advertisementPacket.getData(), 0, advertisementPacket.getLength()));
 
-						Thread.sleep(500);
+					Thread.sleep(10);
 
-					} catch (Exception e) {
-						VPXLogger.updateError(e);
-						// e.printStackTrace();
-					}
-
-				} else {
-					break;
+				} catch (Exception e) {
+					VPXLogger.updateError(e);
+					e.printStackTrace();
 				}
+
+				// } else {
+				// break;
+				// }
 			}
-			return null;
+
 		}
 
-		public void startMonitor() {
-			execute();
-		}
-
-		public void stopMonitor() {
+		public void stop() {
 
 			isRunning = false;
 
 			advertisementSocket.close();
-
-			cancel(true);
 		}
+
 	}
 
 	private void printBytes(byte byteVal, int i) {
@@ -2862,15 +2890,27 @@ public class VPXUDPMonitor {
 
 		isRunning = false;
 
-		communicationMonitor.stopMonitor();
+		// communicationMonitor.stopMonitor();
 
-		advertisementMonitor.stopMonitor();
+		// advertisementMonitor.stopMonitor();
+
+		advMonitorRunnable.stop();
 
 		messageMonitorRunnable.stop();
 
-		communicationMonitor = null;
+		commMonitorRunnable.stop();
 
-		advertisementMonitor = null;
+		// communicationMonitor = null;
+
+		// advertisementMonitor = null;
+
+		commMonitorRunnable = null;
+
+		commMonitor = null;
+
+		advMonitorRunnable = null;
+
+		advMonitor = null;
 
 		messageMonitorRunnable = null;
 

@@ -6,6 +6,7 @@ package com.cti.vpx.controls;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
+import com.cti.vpx.util.VPXUtilities;
 
 /**
  * @author nathanr_kamal
@@ -54,6 +55,8 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 	private boolean isAmplitude = false;
 
 	private long respondedTime = 0;
+
+	private long upTime = 0;
 
 	private static final long serialVersionUID = -2910762841638542391L;
 
@@ -274,6 +277,11 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	public void setRespondedTime(long respondedTime) {
 		this.respondedTime = respondedTime;
+
+		if (this.upTime == 0) {
+
+			this.upTime = respondedTime;
+		}
 	}
 
 	private void updateNodeStatus() {
@@ -281,7 +289,45 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 		createUserObject();
 
 		setUserObject(nodeUserObject);
+
+		// setToolTip();
 	}
+
+	/*
+	 * private void setToolTip() {
+	 * 
+	 * String str = "";
+	 * 
+	 * if (isProcessorNode) {
+	 * 
+	 * str = String.format( "<html>Node : Processor Node<br>" +
+	 * "Processor : %s<br>" + "IP Address : %s<br>" + "Sub System : %s<br>" +
+	 * "Status  : %s<br>" + "Up Time : %s<br>" + "Last Responded : %s</html>",
+	 * nodeTypeString, nodeIP, subSystemName, getProcStatus(),
+	 * VPXUtilities.getCurrentTime(5, (System.currentTimeMillis() - upTime)),
+	 * VPXUtilities.getCurrentTime(5, respondedTime)); } }
+	 * 
+	 * 
+	 * private String getProcStatus() {
+	 * 
+	 * String sub = "";
+	 * 
+	 * if (isAlive) {
+	 * 
+	 * sub = sub + "<font face='Tahoma' size='2.5' color='green'> Alive </font>"
+	 * + "&nbsp;&nbsp;";
+	 * 
+	 * } else {
+	 * 
+	 * sub = sub + "<font face='Tahom' size='2.5' color='red'> Not Alive</font>"
+	 * + "&nbsp;&nbsp;";
+	 * 
+	 * }
+	 * 
+	 * return sub;
+	 * 
+	 * }
+	 */
 
 	private void createUserObject() {
 

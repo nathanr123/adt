@@ -25,6 +25,12 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 
 	private long dsp2ResponseTime;
 
+	private long p2020uptime;
+
+	private long dsp1uptime;
+
+	private long dsp2uptime;
+
 	public VPXSubSystem() {
 		// TODO Auto-generated constructor stub
 	}
@@ -156,6 +162,12 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	@XmlTransient
 	public void setP2020ResponseTime(long p2020ResponseTime) {
 		this.p2020ResponseTime = p2020ResponseTime;
+
+		if (this.p2020uptime == 0) {
+
+			this.p2020uptime = p2020ResponseTime;
+
+		}
 	}
 
 	/**
@@ -172,6 +184,12 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	@XmlTransient
 	public void setDsp1ResponseTime(long dsp1ResponseTime) {
 		this.dsp1ResponseTime = dsp1ResponseTime;
+
+		if (dsp1uptime == 0) {
+
+			this.dsp1uptime = dsp1ResponseTime;
+
+		}
 	}
 
 	/**
@@ -188,6 +206,12 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	@XmlTransient
 	public void setDsp2ResponseTime(long dsp2ResponseTime) {
 		this.dsp2ResponseTime = dsp2ResponseTime;
+		
+		if (this.dsp2uptime == 0) {
+
+			this.dsp2uptime = dsp2ResponseTime;
+
+		}
 	}
 
 	@Override
@@ -208,6 +232,30 @@ public class VPXSubSystem implements VPX, Comparable<VPXSubSystem> {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	public long getP2020uptime() {
+		return p2020uptime;
+	}
+
+	public void setP2020uptime(long p2020uptime) {
+		this.p2020uptime = p2020uptime;
+	}
+
+	public long getDsp1uptime() {
+		return dsp1uptime;
+	}
+
+	public void setDsp1uptime(long dsp1uptime) {
+		this.dsp1uptime = dsp1uptime;
+	}
+
+	public long getDsp2uptime() {
+		return dsp2uptime;
+	}
+
+	public void setDsp2uptime(long dsp2uptime) {
+		this.dsp2uptime = dsp2uptime;
 	}
 
 }

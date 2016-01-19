@@ -256,4 +256,10 @@ public class VPXSystem implements VPX {
 		return sub;
 
 	}
+
+	public int getTotalSize() {
+
+		return (subsystem.size() + unListed.size());
+
+	}
 }

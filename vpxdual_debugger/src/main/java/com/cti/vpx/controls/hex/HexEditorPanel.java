@@ -533,8 +533,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			for (int i = 0; i < values.length; i++) {
 
-				str = str + String.format("%02x", values[i])
-						+ ((((i + 1) % 16) == 0) ? System.getProperty("line.separator") : " ");
+				str = str + String.format("%02x%s", values[i], System.getProperty("line.separator"));
 			}
 
 			formattedString = str.toUpperCase().getBytes();
@@ -545,23 +544,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 				if ((i + 1) < values.length) {
 
-					str = str + String.format("%02x%02x", values[i + 1], values[i]);
-
-					if (i > 0) {
-
-						if (((i + 2) % 32) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
-
+					str = str + String.format("%02x%02x%s", values[i + 1], values[i],
+							System.getProperty("line.separator"));
 				}
 
 			}
@@ -574,23 +558,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 				if ((i + 3) < values.length) {
 
-					str = str
-							+ String.format("%02x%02x%02x%02x", values[i + 3], values[i + 2], values[i + 1], values[i]);
-
-					if (i > 0) {
-
-						if (((i + 4) % 64) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str + String.format("%02x%02x%02x%02x%s", values[i + 3], values[i + 2], values[i + 1],
+							values[i], System.getProperty("line.separator"));
 
 				}
 
@@ -604,23 +573,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 				if ((i + 7) < values.length) {
 
-					str = str + String.format("%02x%02x%02x%02x%02x%02x%02x%02x", values[i + 7], values[i + 6],
-							values[i + 5], values[i + 4], values[i + 3], values[i + 2], values[i + 1], values[i]);
-
-					if (i > 0) {
-
-						if (((i + 4) % 128) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str + String.format("%02x%02x%02x%02x%02x%02x%02x%02x%s", values[i + 7], values[i + 6],
+							values[i + 5], values[i + 4], values[i + 3], values[i + 2], values[i + 1], values[i],
+							System.getProperty("line.separator"));
 
 				}
 
@@ -640,22 +595,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 					b[1] = values[i];
 
-					str = str + String.format("%d", new BigInteger(b).intValue());
-
-					if (i > 0) {
-
-						if (((i + 2) % 32) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str
+							+ String.format("%d%s", new BigInteger(b).intValue(), System.getProperty("line.separator"));
 
 				}
 
@@ -676,22 +617,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 					b[2] = values[i + 1];
 					b[3] = values[i];
 
-					str = str + String.format("%d", new BigInteger(b).intValue());
-
-					if (i > 0) {
-
-						if (((i + 4) % 64) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str
+							+ String.format("%d%s", new BigInteger(b).intValue(), System.getProperty("line.separator"));
 
 				}
 
@@ -711,22 +638,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 					b[1] = values[i];
 
-					str = str + String.format("%d", new BigInteger(b).intValue());
-
-					if (i > 0) {
-
-						if (((i + 2) % 32) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str + String.format("%d%s",
+							Integer.decode(String.format("0x%02x%02x", b[0] & 0xff, b[1] & 0xff)),
+							System.getProperty("line.separator"));
 
 				}
 
@@ -747,22 +661,9 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 					b[2] = values[i + 1];
 					b[3] = values[i];
 
-					str = str + String.format("%d", new BigInteger(b).intValue());
-
-					if (i > 0) {
-
-						if (((i + 4) % 64) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str + String.format("%d%s", Long.decode(
+							String.format("0x%02x%02x%02x%02x", b[0] & 0xff, b[1] & 0xff, b[2] & 0xff, b[3] & 0xff)),
+							System.getProperty("line.separator"));
 
 				}
 
@@ -783,22 +684,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 					b[2] = values[i + 1];
 					b[3] = values[i];
 
-					str = str + String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat());
-
-					if (i > 0) {
-
-						if (((i + 4) % 64) == 0) {
-
-							str = str + System.getProperty("line.separator");
-
-						} else {
-
-							str = str + " ";
-						}
-					} else {
-
-						str = str + " ";
-					}
+					str = str + (String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat())
+							+ System.getProperty("line.separator"));
 
 				}
 

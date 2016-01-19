@@ -10,7 +10,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
 
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
@@ -134,9 +133,13 @@ public class VPX_StatusBar extends JPanel {
 			addRightComponent(progressBar);
 		}
 
-		MemoryMonitor memMonitor = new MemoryMonitor();
+		//MemoryMonitor memMonitor = new MemoryMonitor();
 
-		memMonitor.execute();
+		//memMonitor.execute();
+		
+		Thread th = new Thread(new MemMonitor());
+		
+		th.start();
 	}
 
 	public void setLeftComponent(JComponent component) {
@@ -301,22 +304,31 @@ public class VPX_StatusBar extends JPanel {
 
 	}
 
-	class MemoryMonitor extends SwingWorker<Void, Void> {
+	
+	class MemMonitor implements Runnable {
 
 		@Override
-		protected Void doInBackground() throws Exception {
-
+		public void run() {
 			while (isAppRunning) {
 
+				
+				try {
+				
 				updateMemory();
 
 				clearStatus();
 
 				Thread.sleep(5000);
+				
+				
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
-			return null;
+			
 		}
-
+		
 	}
+	
 
 }

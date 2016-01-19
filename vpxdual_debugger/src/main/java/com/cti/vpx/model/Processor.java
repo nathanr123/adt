@@ -18,6 +18,8 @@ public class Processor implements VPX {
 
 	private long responseTime;
 
+	private long upTime = 0;
+
 	public Processor() {
 
 	}
@@ -44,6 +46,11 @@ public class Processor implements VPX {
 
 		}
 
+		if (this.upTime == 0) {
+
+			upTime = responsedTime;
+		}
+
 		this.msg = msg;
 	}
 
@@ -60,8 +67,13 @@ public class Processor implements VPX {
 	}
 
 	public void setResponseTime(long responseTime) {
-			
+
 		this.responseTime = responseTime;
+
+		if (this.upTime == 0) {
+
+			upTime = responseTime;
+		}
 	}
 
 	public String getName() {
@@ -79,5 +91,15 @@ public class Processor implements VPX {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
+
+	public long getUpTime() {
+		return upTime;
+	}
+
+	public void setUpTime(long upTime) {
+		this.upTime = upTime;
+	}
+	
+	
 
 }

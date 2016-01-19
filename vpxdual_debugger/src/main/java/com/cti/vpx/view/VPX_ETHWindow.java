@@ -223,7 +223,7 @@ public class VPX_ETHWindow extends JFrame
 	private JButton btnMemoryBrowser;
 
 	private JButton btnMemoryPlot;
-	
+
 	private JButton btnMemorySpectrum;
 
 	private JButton btnMAD;
@@ -255,11 +255,7 @@ public class VPX_ETHWindow extends JFrame
 
 		subnetFilter = new VPX_SubnetFilterWindow(VPX_ETHWindow.this);
 
-		udpMonitor = new VPXUDPMonitor();
-
-		udpMonitor.addUDPListener(this);
-
-		udpMonitor.startMonitor();
+		
 
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -277,6 +273,30 @@ public class VPX_ETHWindow extends JFrame
 				}
 			}
 		});
+		
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				try {
+
+					udpMonitor = new VPXUDPMonitor();
+
+					udpMonitor.addUDPListener(VPX_ETHWindow.this);
+
+					udpMonitor.startMonitor();
+
+				} catch (Exception e) {
+					// TODO: handle exception
+					
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		th.start();
 
 	}
 
@@ -504,7 +524,8 @@ public class VPX_ETHWindow extends JFrame
 			spectrumWindow[i] = new VPX_SpectrumWindow(this, i);
 		}
 
-		btnMemorySpectrum.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
+		btnMemorySpectrum
+				.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 	}
 
 	public void openSpectrumWindow() {
@@ -532,20 +553,21 @@ public class VPX_ETHWindow extends JFrame
 		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
 
 			vpx_Menu_Window_Spectrum.setEnabled(false);
-			
+
 			btnMemorySpectrum.setEnabled(false);
 
 		} else {
 
 			vpx_Menu_Window_Spectrum.setEnabled(true);
-			
+
 			btnMemorySpectrum.setEnabled(true);
 		}
 
 		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
 				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
 
-		btnMemorySpectrum.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
+		btnMemorySpectrum
+				.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 
 		VPXLogger.updateLog("Data analyser opened");
 	}
@@ -557,20 +579,21 @@ public class VPX_ETHWindow extends JFrame
 		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
 
 			vpx_Menu_Window_Spectrum.setEnabled(false);
-			
+
 			btnMemorySpectrum.setEnabled(false);
 
 		} else {
 
 			vpx_Menu_Window_Spectrum.setEnabled(true);
-			
+
 			btnMemorySpectrum.setEnabled(true);
 		}
 
 		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
 				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
 
-		btnMemorySpectrum.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
+		btnMemorySpectrum
+				.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 	}
 
 	public void reloadVPXSystem() {
@@ -1188,7 +1211,7 @@ public class VPX_ETHWindow extends JFrame
 
 			}
 		});
-		
+
 		btnMemorySpectrum = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_SPECTRUM, null);
 
 		btnMemorySpectrum.setToolTipText("Data Analyser");
@@ -1272,7 +1295,7 @@ public class VPX_ETHWindow extends JFrame
 		vpx_ToolBar.add(btnMemoryBrowser);
 
 		vpx_ToolBar.add(btnMemoryPlot);
-		
+
 		vpx_ToolBar.add(btnMemorySpectrum);
 
 		vpx_ToolBar.addSeparator();
@@ -1970,7 +1993,7 @@ public class VPX_ETHWindow extends JFrame
 
 		paswordWindow.setVisible(true);
 
-		VPXLogger.updateLog("Asking Super user password for VLAN Configuration");
+	
 
 		if (paswordWindow.isAccepted()) {
 			if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
@@ -2012,12 +2035,20 @@ public class VPX_ETHWindow extends JFrame
 				if (browserCanvas.initialise()) {
 
 					if (tab == 1) {
+						
+						VPXLogger.updateLog("Asking Super user password for VLAN Configuration");
 
 						browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
+						
+						frame.setTitle("VLAN Configuration");
 
 					} else {
+						
+						VPXLogger.updateLog("Asking Super user password for IP Configuration");
 
 						browserCanvas.setUrl("http://192.168.10.1/cgi-bin/ipsetting.cgi");
+						
+						frame.setTitle("IP Configuration");
 					}
 
 				}
@@ -2616,7 +2647,7 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(false);
 
 			btnMemoryPlot.setEnabled(false);
-			
+
 			btnMemorySpectrum.setEnabled(false);
 
 			// btnMAD.setEnabled(false);
@@ -2652,7 +2683,7 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(true);
 
 			btnMemoryPlot.setEnabled(true);
-			
+
 			btnMemorySpectrum.setEnabled(true);
 
 			// btnMAD.setEnabled(true);
@@ -2687,7 +2718,7 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(false);
 
 			btnMemoryPlot.setEnabled(false);
-			
+
 			btnMemorySpectrum.setEnabled(false);
 
 			// btnMAD.setEnabled(true);
@@ -2723,7 +2754,7 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryBrowser.setEnabled(false);
 
 			btnMemoryPlot.setEnabled(false);
-			
+
 			btnMemorySpectrum.setEnabled(false);
 
 			// btnMAD.setEnabled(false);

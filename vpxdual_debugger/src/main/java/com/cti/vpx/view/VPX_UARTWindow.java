@@ -31,7 +31,6 @@ import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -622,6 +621,8 @@ public class VPX_UARTWindow extends JFrame implements WindowListener {
 
 					Thread.sleep(5);
 				}
+				
+				updateLog(data);
 
 				// out.write(data.getBytes());
 
@@ -680,8 +681,10 @@ public class VPX_UARTWindow extends JFrame implements WindowListener {
 					if (isP2020) {
 
 						msg = msg.replaceAll("\\e\\[[\\d;]*[^\\d;]", "");
-						
+
 						txtAConsole.append(msg + "\n");
+						
+						updateLog(msg);
 
 					} else {
 
@@ -690,11 +693,15 @@ public class VPX_UARTWindow extends JFrame implements WindowListener {
 							if (msg1.startsWith(String.valueOf(cmbConsoleCoresFilter.getSelectedIndex() - 1))) {
 
 								txtAConsole.append(msg + "\n");
+								
+								updateLog(msg);
 							}
 
 						} else {
 
 							txtAConsole.append(msg + "\n");
+							
+							updateLog(msg);
 
 						}
 					}
@@ -793,32 +800,17 @@ public class VPX_UARTWindow extends JFrame implements WindowListener {
 
 	private void saveLogtoFile() {
 
-		JFileChooser chooser;
-
 		try {
+			String path = VPXSessionManager.getEventPath() + "/UART_log_"
+					+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_') + ".txt";
 
-			chooser = new JFileChooser();
+			FileWriter fw = new FileWriter(new File(path), true);
 
-			chooser.setCurrentDirectory(new java.io.File("."));
+			fw.write(txtAConsole.getText());
 
-			chooser.setDialogTitle("Select folder to save");
+			fw.close();
 
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-
-				String path = VPXUtilities.getPathAsLinuxStandard(chooser.getSelectedFile().getPath()) + "/Messages."
-						+ getCurrentTime().split("  ")[0].replace(':', '_').replace(' ', '_').replace('-', '_')
-						+ ".txt";
-
-				FileWriter fw = new FileWriter(new File(path), true);
-
-				fw.write(txtAConsole.getText());
-
-				fw.close();
-
-				VPXUtilities.showPopup("File Saved at " + path, path);
-			}
+			VPXUtilities.showPopup("File Saved at " + path, path);
 
 		} catch (Exception e) {
 
@@ -868,56 +860,55 @@ public class VPX_UARTWindow extends JFrame implements WindowListener {
 			public void run() {
 				try {
 
-					Desktop.getDesktop().open(new File(VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/vpxdebugger.chm"));
+					Desktop.getDesktop()
+							.open(new File(VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir"))
+									+ "/help/vpxdebugger.chm"));
 
 				} catch (IOException e) {
 					VPXLogger.updateError(e);
 				}
 			}
-			/*	VPXLogger.updateLog("Help document opened");
-
-				final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
-
-				JPanel contentPane = new JPanel();
-
-				contentPane.setLayout(new BorderLayout());
-
-				contentPane.add(browserCanvas, BorderLayout.CENTER);
-
-				JDialog frame = new JDialog(parent, "List of commands");
-
-				frame.setBounds(100, 100, 650, 600);
-
-				frame.setLocationRelativeTo(parent);
-
-				frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-				frame.setContentPane(contentPane);
-
-				frame.setResizable(true);
-
-				frame.addWindowListener(new WindowAdapter() {
-
-					@Override
-					public void windowClosing(WindowEvent e) { // Dispose of the
-						// native
-						// component cleanly
-						browserCanvas.dispose();
-					}
-				});
-
-				frame.setVisible(true);
-
-				if (browserCanvas.initialise()) {
-
-					browserCanvas.setUrl(
-							VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/help.html");
-				} else {
-				}
-
-				frame.setSize(651, 601);
-
-			}*/
+			/*
+			 * VPXLogger.updateLog("Help document opened");
+			 * 
+			 * final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+			 * 
+			 * JPanel contentPane = new JPanel();
+			 * 
+			 * contentPane.setLayout(new BorderLayout());
+			 * 
+			 * contentPane.add(browserCanvas, BorderLayout.CENTER);
+			 * 
+			 * JDialog frame = new JDialog(parent, "List of commands");
+			 * 
+			 * frame.setBounds(100, 100, 650, 600);
+			 * 
+			 * frame.setLocationRelativeTo(parent);
+			 * 
+			 * frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			 * 
+			 * frame.setContentPane(contentPane);
+			 * 
+			 * frame.setResizable(true);
+			 * 
+			 * frame.addWindowListener(new WindowAdapter() {
+			 * 
+			 * @Override public void windowClosing(WindowEvent e) { // Dispose
+			 * of the // native // component cleanly browserCanvas.dispose(); }
+			 * });
+			 * 
+			 * frame.setVisible(true);
+			 * 
+			 * if (browserCanvas.initialise()) {
+			 * 
+			 * browserCanvas.setUrl(
+			 * VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir"
+			 * )) + "/help/help.html"); } else { }
+			 * 
+			 * frame.setSize(651, 601);
+			 * 
+			 * }
+			 */
 		});
 
 		th.start();

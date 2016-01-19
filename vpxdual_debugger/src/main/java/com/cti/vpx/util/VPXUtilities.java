@@ -428,8 +428,19 @@ public class VPXUtilities {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try {
+					if (parent != null) {
 
-				parent.openFile(file);
+						parent.openFile(file);
+					} else {
+
+						Desktop.getDesktop().open(new File(file));
+
+					}
+
+				} catch (IOException ee) {
+
+				}
 
 				dialog.dispose();
 

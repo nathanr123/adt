@@ -304,8 +304,15 @@ public class VPX_AppModeWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				btnOpen.setEnabled(false);
+				new Thread(new Runnable() {
 
-				openDebugWindow();
+					@Override
+					public void run() {
+						openDebugWindow();
+
+					}
+				}).start();
 			}
 		});
 
