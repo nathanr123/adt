@@ -978,6 +978,50 @@ public class VPXUDPMonitor {
 		}
 	}
 
+	public void sendMemoryFile(VPX_MemoryLoadProgressWindow parentDialog, String filename, long address, String ip,
+			boolean isBinary, int format, int delimiter) {
+
+		try {
+
+			File f = new File(filename);
+
+			//size = FileUtils.sizeOf(f);
+
+			if (isBinary)
+
+				filestoSend = VPXUtilities.readFileToByteArray(filename);
+
+			else
+				filestoSend = VPXUtilities.readFileToByteArray(filename, format, delimiter);
+			
+			size = filestoSend.length;
+
+			Map<Long, byte[]> t = VPXUtilities.divideArrayAsMap(filestoSend, ATP.DEFAULTBUFFERSIZE);
+
+			fb = new FileBytesToSend(size, t);
+
+			byte b[] = new byte[ATP.DEFAULTBUFFERSIZE];
+
+			long len = (filestoSend.length > b.length) ? b.length : filestoSend.length;
+
+			for (int i = 0; i < len; i++) {
+				b[i] = filestoSend[i];
+			}
+
+			this.memLoadDialog = parentDialog;
+
+			isLoingMemoryStatred = true;
+
+			sendMemoryFileToProcessor(ip, address, FileUtils.sizeOf(f), fb.getBytePacket(0));
+
+			VPXLogger.updateLog(String.format("Sending file ( %s ) to %s start address 0x%08x", filename, ip, address));
+
+		} catch (Exception e) {
+			VPXLogger.updateError(e);
+			e.printStackTrace();
+		}
+	}
+
 	public void sendMemoryFileToProcessor(String ip, long address, long size, byte[] sendBuffer) {
 		try {
 
@@ -1011,6 +1055,8 @@ public class VPXUDPMonitor {
 			for (int i = 0; i < sendBuffer.length; i++) {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
+				
+				printBytes(sendBuffer[i], i);
 
 			}
 
@@ -1071,6 +1117,8 @@ public class VPXUDPMonitor {
 					for (int i = 0; i < bb.length; i++) {
 
 						msg.params.memoryinfo.buffer[i].set(bb[i]);
+						
+						printBytes(bb[i], i);
 
 					}
 
@@ -2699,11 +2747,9 @@ public class VPXUDPMonitor {
 
 					String ip = messagePacket.getAddress().getHostAddress();
 
-					 VPXNetworkLogger.updatePacket(new VPXNWPacket(0,
-					 VPXUtilities.getCurrentTime(0), ip,
-					 VPXSessionManager.getCurrentIP(), "UDP",
-					 messageReceiverSocket.getLocalPort(),
-					 messagePacket.getLength(), new JLabel("Recieved Message Packet"), messageData));
+					VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
+							VPXSessionManager.getCurrentIP(), "UDP", messageReceiverSocket.getLocalPort(),
+							messagePacket.getLength(), new JLabel("Recieved Message Packet"), messageData));
 
 					parseMessagePacket(ip, createMSGCommand(ip, messageData));
 
@@ -2760,11 +2806,9 @@ public class VPXUDPMonitor {
 
 					String ip = messagePacket.getAddress().getHostAddress();
 
-					 VPXNetworkLogger.updatePacket(new VPXNWPacket(0,
-					 VPXUtilities.getCurrentTime(0), ip,
-					 VPXSessionManager.getCurrentIP(), "UDP",
-					 communicationSocket.getLocalPort(),
-					 messagePacket.getLength(), new JLabel("Recieved Communication Packet"), commandData));
+					VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
+							VPXSessionManager.getCurrentIP(), "UDP", communicationSocket.getLocalPort(),
+							messagePacket.getLength(), new JLabel("Recieved Communication Packet"), commandData));
 
 					if (messagePacket.getLength() > 64)
 

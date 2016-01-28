@@ -24,9 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -65,6 +70,7 @@ import com.cti.vpx.command.ATP.PROCESSOR_TYPE;
 import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
+import com.cti.vpx.controls.hex.HexEditor;
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
@@ -1333,7 +1339,7 @@ public class VPXUtilities {
 
 				String cmd = VPXConstants.RUNASADMIN + "netsh interface ip set address \"" + lan
 
-				+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
+						+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
 
 				Process pp = Runtime.getRuntime().exec(cmd);
 
@@ -1705,6 +1711,272 @@ public class VPXUtilities {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static String readFile(String filename) {
+
+		try {
+
+			String content = new String(Files.readAllBytes(Paths.get(URI.create("file:///" +getPathAsLinuxStandard(filename)))));
+
+			return content;
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			return null;
+		}
+	}
+
+	public static byte[] readFileToByteArray(String filename) throws IOException {
+
+		return FileUtils.readFileToByteArray(new File(filename));
+	}
+
+	public static byte[] readFileToByteArray(String filename, int format, int delimiter) {
+
+		String content = readFile(filename);
+
+		String seperator = (delimiter == 0) ? System.lineSeparator() : ",";
+
+		String[] arr = content.split(seperator);
+
+		return getByteArray(arr, format);
+	}
+
+	private static byte[] getByteArray(String[] arr, int format) {
+
+		ByteBuffer bb = null;
+		byte[] b = null;
+		// 0 - 8 Bit Hex
+		// 1 - 16 Bit Hex
+		// 2 - 32 Bit Hex
+		// 3 - 64 Bit Hex
+		// 4 - 16 Bit Signed
+		// 5 - 32 Bit Signed
+		// 6 - 16 Bit Unsigned
+		// 7 - 32 Bit Unsigned
+		// 8 - 32 Bit Floating
+
+		switch (format) {
+		case HexEditor.HEX8:
+
+			b = new byte[arr.length];
+
+			break;
+		case HexEditor.HEX16:
+		case HexEditor.SINGNEDINT16:
+		case HexEditor.UNSINGNEDINT16:
+
+			b = new byte[arr.length * 2];
+
+			break;
+		case HexEditor.HEX32:
+		case HexEditor.SINGNEDINT32:
+		case HexEditor.UNSINGNEDINT32:
+		case HexEditor.UNSINGNEDFLOAT32:
+
+			b = new byte[arr.length * 4];
+
+			break;
+		case HexEditor.HEX64:
+
+			b = new byte[arr.length * 8];
+
+			break;
+
+		}
+
+		switch (format) {
+
+		case HexEditor.HEX8:
+
+			for (int i = 0; i < arr.length; i++) {
+
+				b[i] = (byte) Integer.parseInt(arr[i], 16);
+			}
+
+			break;
+
+		case HexEditor.HEX16:
+
+			bb = ByteBuffer.allocate(arr.length * 2);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArr = new byte[2];
+
+				String val = arr[i];
+
+				bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+				bArr[0] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		case HexEditor.SINGNEDINT16:
+
+			bb = ByteBuffer.allocate(arr.length * 2);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i])).toByteArray();
+
+				byte[] bArr = new byte[bArra.length];
+
+				bArr[1] = bArra[0];
+
+				bArr[0] = bArra[1];
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		case HexEditor.UNSINGNEDINT16:
+
+			bb = ByteBuffer.allocate(arr.length * 2);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArr = new byte[2];
+
+				String val = arr[i];
+
+				bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+				bArr[0] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		case HexEditor.HEX32:
+
+			bb = ByteBuffer.allocate(arr.length * 4);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArr = new byte[4];
+
+				String val = arr[i];
+
+				bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+				bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+				bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+				bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		case HexEditor.SINGNEDINT32:
+
+			bb = ByteBuffer.allocate(arr.length * 4);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i])).toByteArray();
+
+				byte[] bArr = new byte[bArra.length];
+
+				bArr[3] = bArra[0];
+
+				bArr[2] = bArra[1];
+
+				bArr[1] = bArra[2];
+
+				bArr[0] = bArra[3];
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		case HexEditor.UNSINGNEDINT32:
+
+			bb = ByteBuffer.allocate(arr.length * 4);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i])).toByteArray();
+
+				byte[] bArr = new byte[bArra.length];
+
+				bArr[3] = bArra[0];
+
+				bArr[2] = bArra[1];
+
+				bArr[1] = bArra[2];
+
+				bArr[0] = bArra[3];
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		case HexEditor.UNSINGNEDFLOAT32:
+
+			break;
+
+		case HexEditor.HEX64:
+
+			bb = ByteBuffer.allocate(arr.length * 8);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				byte[] bArr = new byte[8];
+
+				String val = arr[i];
+
+				bArr[7] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+				bArr[6] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+				bArr[5] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+				bArr[4] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+				bArr[3] = (byte) Integer.parseInt(val.substring(8, 10), 16);
+
+				bArr[2] = (byte) Integer.parseInt(val.substring(10, 12), 16);
+
+				bArr[1] = (byte) Integer.parseInt(val.substring(12, 14), 16);
+
+				bArr[0] = (byte) Integer.parseInt(val.substring(14, 16), 16);
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
+			break;
+
+		}
+
+		return b;
 	}
 
 	public static void writeFile(String filename, String content) {

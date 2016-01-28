@@ -720,9 +720,17 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			startAddress = (memoryLoadWindow.isStartAddress() ? memoryLoadWindow.getStartAddress() : "0x0000000");
 
 			VPXUtilities.getParent().sendMemoryFile(memoryWindow.getSelectedProcessor(), memoryLoadWindow.getFileName(),
-					(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress), dialog);
+					(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress),
+					memoryLoadWindow.isReadAsBinary(), memoryLoadWindow.getFormat(), memoryLoadWindow.getDelimiter(),
+					dialog);
 
-			handleOpenFile(file.getAbsolutePath(), startAddress);
+			if (memoryLoadWindow.isReadAsBinary()) {
+
+				handleOpenFile(file.getAbsolutePath(), startAddress);
+			} else {
+				handleOpenFile(VPXUtilities.readFileToByteArray(memoryLoadWindow.getFileName(),
+						memoryLoadWindow.getFormat(), memoryLoadWindow.getDelimiter()), startAddress);
+			}
 		}
 
 	}
@@ -800,6 +808,30 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 				}
 			}
 		} catch (IOException ioe) {
+			VPXLogger.updateError(ioe);
+			ioe.printStackTrace();
+			String message = msg.getString("Error.Title");
+			String title = msg.getString("Error.Desc");
+			title = MessageFormat.format(title, new Object[] { ioe.toString() });
+			JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	/**
+	 * Opens a file. Displays an error dialog if the file cannot be opened.
+	 *
+	 * @param fileName
+	 *            The file to open.
+	 */
+	private void handleOpenFile(byte[] buffer, String startAddress) {
+
+		try {
+			editor.open(buffer, 0);
+
+			editor.setShowRowHeader(
+					(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress), 0, true);
+
+		} catch (Exception ioe) {
 			VPXLogger.updateError(ioe);
 			ioe.printStackTrace();
 			String message = msg.getString("Error.Title");

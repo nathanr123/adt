@@ -118,6 +118,7 @@ public class Hex8 extends AbstractTableModel {
 
 	/**
 	 * Returns the number of bytes in the document.
+	 * 
 	 *
 	 * @return The size of the document, in bytes.
 	 */

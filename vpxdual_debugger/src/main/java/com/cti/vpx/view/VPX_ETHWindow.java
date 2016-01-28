@@ -255,8 +255,6 @@ public class VPX_ETHWindow extends JFrame
 
 		subnetFilter = new VPX_SubnetFilterWindow(VPX_ETHWindow.this);
 
-		
-
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_NONE);
@@ -273,7 +271,7 @@ public class VPX_ETHWindow extends JFrame
 				}
 			}
 		});
-		
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
@@ -289,7 +287,7 @@ public class VPX_ETHWindow extends JFrame
 
 				} catch (Exception e) {
 					// TODO: handle exception
-					
+
 					e.printStackTrace();
 				}
 
@@ -710,10 +708,10 @@ public class VPX_ETHWindow extends JFrame
 		// Window Menus
 		vpx_Menu_Window_MemoryBrowser = VPXComponentFactory
 
-		.createJMenuItem(
-				rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
-						+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ",
-				VPXConstants.Icons.ICON_MEMORY);
+				.createJMenuItem(
+						rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+								+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ",
+						VPXConstants.Icons.ICON_MEMORY);
 
 		vpx_Menu_Window_MemoryBrowser.addActionListener(new ActionListener() {
 
@@ -1993,8 +1991,6 @@ public class VPX_ETHWindow extends JFrame
 
 		paswordWindow.setVisible(true);
 
-	
-
 		if (paswordWindow.isAccepted()) {
 			if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
 
@@ -2035,19 +2031,19 @@ public class VPX_ETHWindow extends JFrame
 				if (browserCanvas.initialise()) {
 
 					if (tab == 1) {
-						
+
 						VPXLogger.updateLog("Asking Super user password for VLAN Configuration");
 
 						browserCanvas.setUrl("http://192.168.10.1/cgi-bin/portsetting.cgi");
-						
+
 						frame.setTitle("VLAN Configuration");
 
 					} else {
-						
+
 						VPXLogger.updateLog("Asking Super user password for IP Configuration");
 
 						browserCanvas.setUrl("http://192.168.10.1/cgi-bin/ipsetting.cgi");
-						
+
 						frame.setTitle("IP Configuration");
 					}
 
@@ -2482,10 +2478,10 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void sendMemoryFile(String ip, String filename, long startAddress,
-			VPX_MemoryLoadProgressWindow flashingWindow) {
+	public void sendMemoryFile(String ip, String filename, long startAddress, boolean isBinary, int format,
+			int delimiter, VPX_MemoryLoadProgressWindow flashingWindow) {
 
-		udpMonitor.sendMemoryFile(flashingWindow, filename, startAddress, ip);
+		udpMonitor.sendMemoryFile(flashingWindow, filename, startAddress, ip, isBinary, format, delimiter);
 
 	}
 
