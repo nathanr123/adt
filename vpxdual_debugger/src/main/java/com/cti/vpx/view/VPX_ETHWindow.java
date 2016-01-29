@@ -2175,9 +2175,15 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
-	public void sendExecuteCommand(String ip, int core, int command) {
+	public void sendExecuteCommand(String ip, int command, int core) {
 
-		udpMonitor.sendExecutionCommand(ip, core, command);
+		udpMonitor.sendExecutionCommand(ip, command, core);
+	}
+
+	public void sendExecuteCommand(String ip, int command, int core1, int core2, int core3, int core4, int core5,
+			int core6, int core7) {
+
+		udpMonitor.sendExecutionCommand(ip, command, core1, core2, core3, core4, core5, core6, core7);
 	}
 
 	@Override
@@ -2256,16 +2262,16 @@ public class VPX_ETHWindow extends JFrame
 	@Override
 	public void readMemory(MemoryViewFilter filter) {
 
-		Thread th = new Thread(new Runnable() {
+	//	Thread th = new Thread(new Runnable() {
 
-			@Override
-			public void run() {
+		//	@Override
+		//	public void run() {
 				udpMonitor.readMemory(filter);
 
-			}
-		});
+		//	}
+	//	});
 
-		th.start();
+	//	th.start();
 
 	}
 

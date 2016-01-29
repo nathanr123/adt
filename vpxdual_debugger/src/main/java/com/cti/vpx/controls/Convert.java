@@ -13,7 +13,7 @@ public class Convert {
 
 	public static void convertIntoLong() {
 
-		String str = "-4.619284E-27";
+		String str = "3.4585365E19";
 
 		String val = String.format("%04X", Float.floatToIntBits(Float.parseFloat(str)));
 
@@ -40,6 +40,19 @@ public class Convert {
 		System.out.format("%04x\n", s);
 
 	}
+	
+	public static void convertIntoByte() {
+
+		String str = "F4";
+		
+		byte b = (byte) 244;
+		
+		byte t = (byte) Integer.parseInt(str, 16);
+		
+		
+
+		System.out.println((t == b));
+	}
 
 	public static long bytesToLong(byte[] b) {
 		
@@ -63,9 +76,9 @@ public class Convert {
 		// printBytes(b[i], i);
 		// }
 
-		// convertIntoLong();
+		convertIntoByte();
 
-		readFile("D:/array/array.txt");
+	//	readFile("D:/array/array.txt");
 	}
 
 	public static String readFile(String filename) {

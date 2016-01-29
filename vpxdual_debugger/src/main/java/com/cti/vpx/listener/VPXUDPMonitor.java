@@ -695,7 +695,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	public void sendExecutionCommand(String ip, int core, int command) {
+	public void sendExecutionCommand(String ip, int command, int core) {
 
 		try {
 
@@ -713,7 +713,57 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(command);
 
+			// 0 - Single Core
+			// 1 - Multi Core
+			msg.params.memoryinfo.byteZero.set(0);
+
 			msg.params.memoryinfo.core.set(core);
+
+			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+
+		} catch (Exception e) {
+			VPXLogger.updateError(e);
+			e.printStackTrace();
+		}
+
+	}
+
+	public void sendExecutionCommand(String ip, int command, int core1, int core2, int core3, int core4, int core5,
+			int core6, int core7) {
+
+		try {
+
+			ATPCommand msg = new DSPATPCommand();
+
+			byte[] buffer = new byte[msg.size()];
+
+			ByteBuffer bf = ByteBuffer.wrap(buffer);
+
+			bf.order(msg.byteOrder());
+
+			msg.setByteBuffer(bf, 0);
+
+			msg.msgID.set(ATP.MSG_ID_SET);
+
+			msg.msgType.set(command);
+
+			// 0 - Single Core
+			// 1 - Multi Core
+			msg.params.memoryinfo.byteZero.set(1);
+
+			msg.params.memoryinfo.buffer[0].set((short) core1);
+
+			msg.params.memoryinfo.buffer[1].set((short) core2);
+
+			msg.params.memoryinfo.buffer[2].set((short) core3);
+
+			msg.params.memoryinfo.buffer[3].set((short) core4);
+
+			msg.params.memoryinfo.buffer[4].set((short) core5);
+
+			msg.params.memoryinfo.buffer[5].set((short) core6);
+
+			msg.params.memoryinfo.buffer[6].set((short) core7);
 
 			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
 
@@ -985,7 +1035,7 @@ public class VPXUDPMonitor {
 
 			File f = new File(filename);
 
-			//size = FileUtils.sizeOf(f);
+			// size = FileUtils.sizeOf(f);
 
 			if (isBinary)
 
@@ -993,7 +1043,7 @@ public class VPXUDPMonitor {
 
 			else
 				filestoSend = VPXUtilities.readFileToByteArray(filename, format, delimiter);
-			
+
 			size = filestoSend.length;
 
 			Map<Long, byte[]> t = VPXUtilities.divideArrayAsMap(filestoSend, ATP.DEFAULTBUFFERSIZE);
@@ -1055,7 +1105,7 @@ public class VPXUDPMonitor {
 			for (int i = 0; i < sendBuffer.length; i++) {
 
 				msg.params.memoryinfo.buffer[i].set(sendBuffer[i]);
-				
+
 				printBytes(sendBuffer[i], i);
 
 			}
@@ -1117,7 +1167,7 @@ public class VPXUDPMonitor {
 					for (int i = 0; i < bb.length; i++) {
 
 						msg.params.memoryinfo.buffer[i].set(bb[i]);
-						
+
 						printBytes(bb[i], i);
 
 					}
@@ -1341,6 +1391,8 @@ public class VPXUDPMonitor {
 
 				break;
 			}
+
+			Thread.sleep(15);
 
 			readMemory(filter);
 
@@ -2452,7 +2504,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Parsing Communication Packets
-	private void parseCommunicationPacket(String ip, ATPCommand msgCommand) {
+	private synchronized void parseCommunicationPacket(String ip, ATPCommand msgCommand) {
 
 		int msgID = (int) msgCommand.msgID.get();
 
@@ -2585,7 +2637,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	private void parseCommunicationPacket(String ip, BISTCommand msgCommand) {
+	private synchronized void parseCommunicationPacket(String ip, BISTCommand msgCommand) {
 
 		int msgID = (int) msgCommand.msgID.get();
 
@@ -2602,7 +2654,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Parsing Advertisement Packets
-	private void parseAdvertisementPacket(String ip, String msg) {
+	private synchronized void parseAdvertisementPacket(String ip, String msg) {
 
 		if (msg.length() == 6) {
 
@@ -2621,7 +2673,7 @@ public class VPXUDPMonitor {
 	}
 
 	// Parsing Advertisement Packets
-	private void parseMessagePacket(String ip, MSGCommand msgCommand) {
+	private synchronized void parseMessagePacket(String ip, MSGCommand msgCommand) {
 
 		if (msgCommand.mode.get() == ATP.MESSAGE_MODE.MSG_MODE_CONSOLE) {
 
