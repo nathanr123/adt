@@ -43,7 +43,7 @@ public class Convert {
 	
 	public static void convertIntoByte() {
 
-		String str = "F4";
+	/*	String str = "F4";
 		
 		byte b = (byte) 244;
 		
@@ -51,7 +51,11 @@ public class Convert {
 		
 		
 
-		System.out.println((t == b));
+		System.out.println((t == b));*/
+		
+		String str = "3.4585365E19";
+
+		System.out.println(Float. parseFloat(str));
 	}
 
 	public static long bytesToLong(byte[] b) {

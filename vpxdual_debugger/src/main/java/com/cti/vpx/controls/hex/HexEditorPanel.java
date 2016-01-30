@@ -724,6 +724,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 					memoryLoadWindow.isReadAsBinary(), memoryLoadWindow.getFormat(), memoryLoadWindow.getDelimiter(),
 					dialog);
 
+			//editor.updateBuffer();
+			
 			if (memoryLoadWindow.isReadAsBinary()) {
 
 				handleOpenFile(file.getAbsolutePath(), startAddress);
@@ -732,6 +734,20 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 						memoryLoadWindow.getFormat(), memoryLoadWindow.getDelimiter()), startAddress);
 			}
 		}
+
+	}
+
+	public void clearContent() {
+
+		infoField.setText("");
+
+		selField.setText("");
+
+		sizeField.setText("");
+
+		cmbFormatBytes.setSelectedIndex(0);
+
+		getHexEditor().clearContent();
 
 	}
 
@@ -1513,7 +1529,10 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			try {
 
+				//editor.updateBuffer();
+
 				setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
+
 			} catch (Exception e) {
 				VPXLogger.updateError(e);
 				e.printStackTrace();
@@ -1561,6 +1580,8 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 					memoryWindow.setMemory(start1, editor.getCurrentModel(), (int) length,
 							new BigInteger(memStFillWindow.getData().getBytes()).longValue());
+
+					//editor.updateBuffer();
 
 					setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
 
