@@ -32,6 +32,7 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -51,7 +52,6 @@ import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 import net.miginfocom.swing.MigLayout;
-import javax.swing.SwingConstants;
 
 public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
@@ -59,6 +59,24 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -2851744765165677816L;
+
+	public static final int HEX8 = 0;
+
+	public static final int HEX16 = 1;
+
+	public static final int HEX32 = 2;
+
+	public static final int HEX64 = 3;
+
+	public static final int SINGNEDINT16 = 4;
+
+	public static final int SINGNEDINT32 = 5;
+
+	public static final int UNSINGNEDINT16 = 6;
+
+	public static final int UNSINGNEDINT32 = 7;
+
+	public static final int UNSINGNEDFLOAT32 = 8;
 
 	private int MINUTE = 60 * 1000;
 
@@ -722,9 +740,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		loadFilters();
 
-		byte[] b = { 0 };
+		//byte[] b = { 0 };
 
-		setBytes(0, 0, b);
+		// setBytes(0, 0, b);
 
 		applyFilters();
 
@@ -1034,21 +1052,21 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			hexPanel.getHexEditor().setCurrentStride(Integer.parseInt(memoryFilter.getMemoryStride()));
 
+			hexPanel.getHexEditor().updateBuffer();
+
 			parent.readMemory(memoryFilter);
 
 			/*
-			Thread th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-
-					showLoadProcessingWindow("Memory loading...");
-
-				}
-			});
-
-			th.start();
-	*/
+			 * Thread th = new Thread(new Runnable() {
+			 * 
+			 * @Override public void run() {
+			 * 
+			 * showLoadProcessingWindow("Memory loading...");
+			 * 
+			 * } });
+			 * 
+			 * th.start();
+			 */
 		} else {
 			if (!isSelectedProcessorValid) {
 
@@ -1126,6 +1144,13 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		spinMemoryStride.setValue(0);
 
+		clearTableContent();
+
+	}
+
+	private void clearTableContent() {
+
+		hexPanel.clearContent();
 	}
 
 	private String getAddressErrorMessage(int option) {
@@ -1142,8 +1167,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		} else if (option == -3) {
 
 			ret = String.format("Length exceeding the limit.\nPlease ensure the length");
-		} else if(option == -4){
-			
+		} else if (option == -4) {
+
 			ret = "Address is not valid";
 		}
 		/*
@@ -1252,6 +1277,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 						try {
 
+							hexPanel.getHexEditor().updateBuffer();
+
+							Thread.sleep(10);
+
 							parent.readMemory(memoryFilter);
 
 							Thread.sleep(currentThreadSleepTime);
@@ -1284,11 +1313,11 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	private int isAddressValid() {
 
-		if(txtMemoryAddres.getText().trim().length() == 0){
-			
+		if (txtMemoryAddres.getText().trim().length() == 0) {
+
 			return -4;
 		}
-		
+
 		int retValue = 0;
 
 		long address = VPXUtilities.getValue(txtMemoryAddres.getText().trim());
@@ -1423,7 +1452,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		parent.reindexMemoryBrowserIndex();
+		parent.reIndexMemoryBrowserIndex();
 
 	}
 
@@ -1451,8 +1480,192 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		long addr = hexPanel.getHexEditor().getHexEditorRowHeader().getRowHeaderModel().getStartAddress() + fromAddress;
 
+		hexPanel.getHexEditor().updateBuffer();
+
 		parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID, typeSize,
 				length, newValue);
+	}
+
+	public void setMemory(long fromAddress, int typeSize, int length, byte[] newValue) {
+
+		long addr = hexPanel.getHexEditor().getHexEditorRowHeader().getRowHeaderModel().getStartAddress() + fromAddress;
+
+		hexPanel.getHexEditor().updateBuffer();
+
+		parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID, typeSize,
+				length, newValue);
+	}
+
+	public void setMemory(long fromAddress, int typeSize, int length, String value) {
+
+		long newValue = 0;
+
+		long fAddress = 0;
+
+		int type = ATP.DATA_TYPE_SIZE_BIT8;
+
+		switch (typeSize) {
+		case HEX8:
+			
+			if(!value.startsWith("0x")&&!value.startsWith("0x")){
+				
+				value = "0x"+value.toString();
+			}
+
+			newValue = Long.decode(value);
+
+			fAddress = fromAddress;
+
+			type = ATP.DATA_TYPE_SIZE_BIT8;
+
+			break;
+		case HEX16:
+
+			newValue = Long.decode(value);
+
+			fAddress = fromAddress * 2;
+
+			type = ATP.DATA_TYPE_SIZE_BIT16;
+
+			break;
+		case HEX32:
+
+			newValue = Long.decode(value);
+
+			fAddress = fromAddress * 4;
+
+			type = ATP.DATA_TYPE_SIZE_BIT32;
+
+			break;
+		case HEX64:
+
+			fAddress = fromAddress * 8;
+
+			type = ATP.DATA_TYPE_SIZE_BIT64;
+
+			break;
+		case SINGNEDINT16:
+
+			newValue = Long.parseLong(value);
+
+			fAddress = fromAddress * 2;
+
+			type = ATP.DATA_TYPE_SIZE_BIT16;
+
+			break;
+		case SINGNEDINT32:
+
+			fAddress = fromAddress * 4;
+
+			newValue = Long.parseLong(value);
+
+			type = ATP.DATA_TYPE_SIZE_BIT32;
+
+			break;
+		case UNSINGNEDINT16:
+
+			fAddress = fromAddress * 2;
+
+			newValue = Long.parseLong(value);
+
+			type = ATP.DATA_TYPE_SIZE_BIT16;
+
+			break;
+		case UNSINGNEDINT32:
+
+			fAddress = fromAddress * 4;
+
+			newValue = Long.parseLong(value);
+
+			type = ATP.DATA_TYPE_SIZE_BIT32;
+
+			break;
+		case UNSINGNEDFLOAT32:
+
+			fAddress = fromAddress * 4;
+
+			newValue = convertIntoLong(value);
+
+			type = ATP.DATA_TYPE_SIZE_BIT32;
+
+			break;
+
+		}
+
+		if (typeSize == HEX64) {
+
+			String val = value.toString();
+			
+			byte[] bArr = new byte[8];
+
+			bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+			bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+			bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+			bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+			bArr[4] = (byte) Integer.parseInt(val.substring(8, 10), 16);
+
+			bArr[5] = (byte) Integer.parseInt(val.substring(10, 12), 16);
+
+			bArr[6] = (byte) Integer.parseInt(val.substring(12, 14), 16);
+
+			bArr[7] = (byte) Integer.parseInt(val.substring(14, 16), 16);
+
+			long addr = hexPanel.getHexEditor().getHexEditorRowHeader().getRowHeaderModel().getStartAddress()
+					+ fAddress;
+
+			hexPanel.getHexEditor().updateBuffer();
+
+			parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID, type,
+					length, bArr);
+
+		} else {
+
+			long addr = hexPanel.getHexEditor().getHexEditorRowHeader().getRowHeaderModel().getStartAddress()
+					+ fAddress;
+
+			hexPanel.getHexEditor().updateBuffer();
+
+			parent.setMemoryValue(getSelectedProcessor(), cmbCores.getSelectedIndex() - 1, addr, memoryBrowserID, type,
+					length, newValue);
+		}
+	}
+
+	private long convertIntoLong(String str) {
+
+		String val = String.format("%04X", Float.floatToIntBits(Float.parseFloat(str)));
+
+		byte[] bArr = new byte[4];
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		long s = bytesToLong(bArr);
+
+		return s;
+
+	}
+
+	private long bytesToLong(byte[] b) {
+
+		long result = 0;
+
+		for (int i = 0; i < 4; i++) {
+
+			result <<= 8;
+
+			result |= (b[i] & 0xFF);
+		}
+
+		return result;
 	}
 
 	public void setBytes(long startAddress, int stride, byte[] buf) {

@@ -7,6 +7,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -21,7 +23,7 @@ import com.cti.vpx.util.VPXUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
-public class VPX_PasswordWindow extends JDialog implements WindowListener{
+public class VPX_PasswordWindow extends JDialog implements WindowListener {
 
 	/**
 	 * 
@@ -60,11 +62,12 @@ public class VPX_PasswordWindow extends JDialog implements WindowListener{
 		setModal(true);
 
 		getContentPane().setLayout(new BorderLayout());
-		
+
 		addWindowListener(this);
 	}
 
 	public void resetPassword() {
+
 		pwdAdminPassword.setText("");
 	}
 
@@ -81,6 +84,34 @@ public class VPX_PasswordWindow extends JDialog implements WindowListener{
 		contentPanel.add(lblAdminPassword, "cell 0 1,alignx trailing");
 
 		pwdAdminPassword = new JPasswordField();
+
+		pwdAdminPassword.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+					doAccept();
+				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+
+					doCancel();
+				}
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 		contentPanel.add(pwdAdminPassword, "cell 2 1,growx");
 
@@ -99,9 +130,7 @@ public class VPX_PasswordWindow extends JDialog implements WindowListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				isAccepted = true;
-
-				VPX_PasswordWindow.this.dispose();
+				doAccept();
 
 			}
 		});
@@ -119,11 +148,7 @@ public class VPX_PasswordWindow extends JDialog implements WindowListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				pwdAdminPassword.setText("");
-
-				isAccepted = false;
-
-				VPX_PasswordWindow.this.dispose();
+				doCancel();
 
 			}
 		});
@@ -157,42 +182,59 @@ public class VPX_PasswordWindow extends JDialog implements WindowListener{
 	@Override
 	public void windowActivated(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
 		isAccepted = false;
-		
+
 	}
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowIconified(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	private void doAccept() {
+
+		isAccepted = true;
+
+		VPX_PasswordWindow.this.dispose();
+
+	}
+
+	private void doCancel() {
+
+		pwdAdminPassword.setText("");
+
+		isAccepted = false;
+
+		VPX_PasswordWindow.this.dispose();
 	}
 }

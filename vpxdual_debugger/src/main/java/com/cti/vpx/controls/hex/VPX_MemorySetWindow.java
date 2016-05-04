@@ -202,7 +202,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 
 				boolean validLen = isValidLength(length);
 
-				boolean validData = isValidData(data);
+				boolean validData = true;//isValidData(data);
 
 				if (validLen && validStAddr && validData) {
 

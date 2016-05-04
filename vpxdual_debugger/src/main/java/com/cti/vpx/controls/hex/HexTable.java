@@ -44,6 +44,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.nio.ByteOrder;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultCellEditor;
@@ -140,6 +142,8 @@ public class HexTable extends JTable {
 	private JMenuItem vpx_Hex_Cxt_FillMemory;
 
 	private JMenuItem vpx_Hex_Cxt_SetMemory;
+
+	private ByteBuffer oldBuff;
 
 	/**
 	 * Creates a new table to display hex data.
@@ -299,14 +303,14 @@ public class HexTable extends JTable {
 		}
 		if (row == getRowCount() - 1) {
 
-			int lastRowCount = model.getByteCount() % 16;
+			int lastRowCount = getCount() % 16;// getCount() % 16;
 
 			if (lastRowCount == 0) {
 				lastRowCount = 16;
 			}
 
 			if (lastRowCount < 17) { // Last row's not entirely full
-				return col;// Math.min(col, (model.getByteCount() % 16) - 1);
+				return col;// Math.min(col, (getCount() % 16) - 1);
 			}
 		}
 
@@ -425,6 +429,50 @@ public class HexTable extends JTable {
 		}
 
 		return cols;
+	}
+
+	public void storeByteBuffer() {
+
+		TableModel modl = getModel();
+
+		if (modl instanceof Hex8) {
+
+			oldBuff = ((Hex8) modl).getBytes();
+
+		} else if (modl instanceof Hex16) {
+
+			oldBuff = ((Hex16) modl).getBytes();
+
+		} else if (modl instanceof Hex32) {
+
+			oldBuff = ((Hex32) modl).getBytes();
+
+		} else if (modl instanceof Hex64) {
+
+			oldBuff = ((Hex64) modl).getBytes();
+
+		} else if (modl instanceof SignedInt16) {
+
+			oldBuff = ((SignedInt16) modl).getBytes();
+
+		} else if (modl instanceof SignedInt32) {
+
+			oldBuff = ((SignedInt32) modl).getBytes();
+
+		} else if (modl instanceof UnSignedInt16) {
+
+			oldBuff = ((UnSignedInt16) modl).getBytes();
+
+		} else if (modl instanceof UnSignedInt32) {
+
+			oldBuff = ((UnSignedInt32) modl).getBytes();
+
+		} else if (modl instanceof Floating32) {
+
+			oldBuff = ((Floating32) modl).getBytes();
+
+		}
+
 	}
 
 	private void createPopupMenu() {
@@ -839,6 +887,7 @@ public class HexTable extends JTable {
 	public int cellToOffset(int row, int col) {
 		// Check row and column individually to prevent them being invalid
 		// values but still pointing to a valid offset in the buffer.
+
 		if (row < 0 || row >= getRowCount() || col < 0 || col > getCurrentColCount(row, col)) { // Don't
 			// include
 			// last
@@ -850,7 +899,102 @@ public class HexTable extends JTable {
 		}
 
 		int offs = row * 16 + col;
-		return (offs >= 0 && offs < model.getByteCount()) ? offs : -1;
+
+		return (offs >= 0 && offs < getCount()) ? offs : -1;
+	}
+
+	private int getCount() {
+
+		TableModel m = getModel();
+
+		int count = 0;
+
+		if (m instanceof Hex8) {
+
+			count = ((Hex8) m).getByteCount();
+
+		} else if (m instanceof Hex16) {
+
+			count = ((Hex16) m).getByteCount();
+
+		} else if (m instanceof Hex32) {
+
+			count = ((Hex32) m).getByteCount();
+
+		} else if (m instanceof Hex64) {
+
+			count = ((Hex64) m).getByteCount();
+
+		} else if (m instanceof SignedInt16) {
+
+			count = ((SignedInt16) m).getByteCount();
+
+		} else if (m instanceof SignedInt32) {
+
+			count = ((SignedInt32) m).getByteCount();
+
+		} else if (m instanceof UnSignedInt16) {
+
+			count = ((UnSignedInt16) m).getByteCount();
+
+		} else if (m instanceof UnSignedInt32) {
+
+			count = ((UnSignedInt32) m).getByteCount();
+
+		} else if (m instanceof Floating32) {
+
+			count = ((Floating32) m).getByteCount();
+
+		}
+
+		return count;
+
+	}
+
+	private byte getByteAt(int offset) {
+
+		TableModel m = getModel();
+
+		if (m instanceof Hex8) {
+
+			return ((Hex8) m).getByte(offset);
+
+		} else if (m instanceof Hex16) {
+
+			return ((Hex16) m).getByte(offset);
+
+		} else if (m instanceof Hex32) {
+
+			return ((Hex32) m).getByte(offset);
+
+		} else if (m instanceof Hex64) {
+
+			return ((Hex64) m).getByte(offset);
+
+		} else if (m instanceof SignedInt16) {
+
+			return ((SignedInt16) m).getByte(offset);
+
+		} else if (m instanceof SignedInt32) {
+
+			return ((SignedInt32) m).getByte(offset);
+
+		} else if (m instanceof UnSignedInt16) {
+
+			return ((UnSignedInt16) m).getByte(offset);
+
+		} else if (m instanceof UnSignedInt32) {
+
+			return ((UnSignedInt32) m).getByte(offset);
+
+		} else if (m instanceof Floating32) {
+
+			return ((Floating32) m).getByte(offset);
+
+		}
+
+		return 0;
+
 	}
 
 	/**
@@ -911,7 +1055,7 @@ public class HexTable extends JTable {
 	 */
 	public void changeSelectionByOffset(int offset, boolean extend) {
 		offset = Math.max(0, offset);
-		offset = Math.min(offset, model.getByteCount() - 1);
+		offset = Math.min(offset, getCount() - 1);
 		int row = offset / 16;
 		int col = offset % 16;
 		changeSelection(row, col, false, extend);
@@ -981,7 +1125,7 @@ public class HexTable extends JTable {
 	 * @return The byte.
 	 */
 	public byte getByte(int offset) {
-		return model.getByte(offset);
+		return getByteAt(offset);// model.getByte(offset);
 	}
 
 	/**
@@ -990,7 +1134,7 @@ public class HexTable extends JTable {
 	 * @return The number of bytes.
 	 */
 	public int getByteCount() {
-		return model.getByteCount();
+		return getCount();// getCount();
 	}
 
 	/**
@@ -1045,7 +1189,7 @@ public class HexTable extends JTable {
 	 * @see #cellToOffset(int, int)
 	 */
 	public Point offsetToCell(int offset) {
-		if (offset < 0 || offset >= model.getByteCount()) {
+		if (offset < 0 || offset >= getCount()) {// getCount()) {
 			return new Point(-1, -1);
 		}
 		int row = offset / 16;
@@ -1113,6 +1257,7 @@ public class HexTable extends JTable {
 			((Hex8) model).setBytes(bytes, stride);
 
 		} else if (model instanceof Hex16) {
+
 			((Hex16) model).setBytes(bytes, stride);
 
 		} else if (model instanceof Hex32) {
@@ -1131,6 +1276,7 @@ public class HexTable extends JTable {
 			((SignedInt32) model).setBytes(bytes, stride);
 
 		} else if (model instanceof UnSignedInt16) {
+
 			((UnSignedInt16) model).setBytes(bytes, stride);
 
 		} else if (model instanceof UnSignedInt32) {
@@ -1158,6 +1304,312 @@ public class HexTable extends JTable {
 		model.setBytes(in);
 	}
 
+	private boolean isValueChanged(int row, int column, Object value) {
+
+		boolean retVal = false;
+
+		if (oldBuff == null) {
+
+			return true;
+
+		}
+
+		TableModel model = getModel();
+
+		int idx = cellToOffset(row, column);
+
+		if (idx > (oldBuff.getSize() - 1) || idx < 0) {
+
+			retVal = true;
+
+			return retVal;
+		}
+
+		if (model instanceof Hex8) {
+
+			if (oldBuff.getSize() > 0) {
+
+				byte bb = oldBuff.getByte(idx);
+
+				byte b = (byte) Integer.parseInt(value.toString(), 16);
+
+				retVal = (b != bb);
+
+			} else {
+
+				retVal = true;
+			}
+
+		} else if (model instanceof Hex16) {
+
+			boolean change = false;
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 2, true);
+
+				if (bb != null) {
+
+					byte[] b = new byte[2];
+
+					String val = value.toString();
+
+					if (val.length() > 0) {
+
+						b[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+						b[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+						for (int i = 0; i < b.length; i++) {
+
+							if (bb != null) {
+
+								if (bb[i] != b[i]) {
+
+									change = true;
+								}
+							} else {
+								change = true;
+							}
+						}
+
+						retVal = change;
+
+					} else {
+
+						retVal = true;
+					}
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof Hex32) {
+
+			boolean change = false;
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 4, true);
+
+				if (bb != null) {
+					byte[] b = new byte[4];
+
+					String val = value.toString();
+
+					if (val.length() > 0) {
+
+						b[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+						b[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+						b[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+						b[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+						for (int i = 0; i < b.length; i++) {
+
+							if (bb[i] != b[i]) {
+
+								change = true;
+							}
+						}
+
+						retVal = change;
+
+					} else {
+
+						retVal = true;
+					}
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof Hex64) {
+
+			boolean change = false;
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 8, true);
+
+				if (bb != null) {
+
+					byte[] b = new byte[8];
+
+					String val = value.toString();
+
+					if (val.length() > 0) {
+
+						b[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+						b[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+						b[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+						b[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+						b[4] = (byte) Integer.parseInt(val.substring(8, 10), 16);
+
+						b[5] = (byte) Integer.parseInt(val.substring(10, 12), 16);
+
+						b[6] = (byte) Integer.parseInt(val.substring(12, 14), 16);
+
+						b[7] = (byte) Integer.parseInt(val.substring(14, 16), 16);
+
+						for (int i = 0; i < b.length; i++) {
+
+							if (bb[i] != b[i]) {
+
+								change = true;
+							}
+						}
+
+						retVal = change;
+
+					} else {
+
+						retVal = true;
+					}
+
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof SignedInt16) {
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 2, false);
+
+				if (bb != null) {
+					String str = value.toString();
+
+					if (str.length() > 0) {
+
+						long l = Long.parseLong(str);
+
+						long ll = new BigInteger(bb).intValue();
+
+						retVal = (l != ll);
+					}
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof SignedInt32) {
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 4, false);
+
+				if (bb != null) {
+					String str = value.toString();
+
+					if (str.length() > 0) {
+
+						long l = Long.parseLong(str);
+
+						long ll = new BigInteger(bb).intValue();
+
+						retVal = (l != ll);
+					}
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof UnSignedInt16) {
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 2, true);
+
+				if (bb != null) {
+
+					String str = value.toString();
+
+					if (str.length() > 0) {
+
+						long l = Long.parseLong(str);
+
+						String str1 = String.format("0x%02x%02x", bb[0] & 0xff, bb[1] & 0xff).toUpperCase();
+
+						long ll = Long.decode(str1);
+
+						retVal = (l != ll);
+					}
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof UnSignedInt32) {
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 4, true);
+
+				if (bb != null) {
+
+					String str = value.toString();
+
+					if (str.length() > 0) {
+
+						long l = Long.parseLong(str);
+
+						String str1 = String
+								.format("0x%02x%02x%02x%02x", bb[0] & 0xff, bb[1] & 0xff, bb[2] & 0xff, bb[3] & 0xff)
+								.toUpperCase();
+
+						long ll = Long.decode(str1);
+
+						retVal = (l != ll);
+					}
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		} else if (model instanceof Floating32) {
+
+			if (oldBuff.getSize() > 0) {
+
+				byte[] bb = oldBuff.getByteByGroup(idx, 4, true);
+
+				if (bb != null) {
+					String str = value.toString();
+
+					if (str.length() > 0 && (!str.toUpperCase().equals("NAN"))) {
+
+						float f = Float.parseFloat(str);
+
+						float ff = java.nio.ByteBuffer.wrap(bb).order(ByteOrder.BIG_ENDIAN).getFloat();
+
+						retVal = (f != ff);
+					}
+
+				} else {
+					retVal = true;
+				}
+
+			}
+
+		}
+
+		return retVal;
+	}
+
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 
 		Object value = getValueAt(row, column);
@@ -1168,7 +1620,11 @@ public class HexTable extends JTable {
 
 		Component component = renderer.getTableCellRendererComponent(this, value, isSelected, hasFocus, row, column);
 
-		// component.setForeground(Color.RED);
+		if (isValueChanged(row, column, value))
+
+			component.setForeground(Color.RED);
+		else
+			component.setForeground(Color.BLACK);
 
 		int rendererWidth = component.getPreferredSize().width;
 
@@ -1207,12 +1663,14 @@ public class HexTable extends JTable {
 			if (c != null) {
 				((JComponent) component).setToolTipText(String.format("<html>Address : %s<br>External : %s</html>",
 
-				("0x" + String
-						.format("%08x",
-								(Long.decode(c.getElementAt(row).toString()) + getColsWithStride(cols, c.getStride())))
-						.toUpperCase()), value.toString().toUpperCase())); // For
-																			// all
-																			// format
+						("0x" + String
+								.format("%08x",
+										(Long.decode(c.getElementAt(row).toString())
+												+ getColsWithStride(cols, c.getStride())))
+								.toUpperCase()),
+						value.toString().toUpperCase())); // For
+															// all
+															// format
 			}
 		}
 
@@ -1243,7 +1701,7 @@ public class HexTable extends JTable {
 					break;
 				case KeyEvent.VK_RIGHT:
 					extend = e.isShiftDown();
-					offs = Math.min(leadSelectionIndex + 1, model.getByteCount() - 1);
+					offs = Math.min(leadSelectionIndex + 1, getCount() - 1);
 					changeSelectionByOffset(offs, extend);
 					e.consume();
 					break;
@@ -1255,14 +1713,14 @@ public class HexTable extends JTable {
 					break;
 				case KeyEvent.VK_DOWN:
 					extend = e.isShiftDown();
-					offs = Math.min(leadSelectionIndex + 16, model.getByteCount() - 1);
+					offs = Math.min(leadSelectionIndex + 16, getCount() - 1);
 					changeSelectionByOffset(offs, extend);
 					e.consume();
 					break;
 				case KeyEvent.VK_PAGE_DOWN:
 					extend = e.isShiftDown();
 					int visibleRowCount = getVisibleRect().height / getRowHeight();
-					offs = Math.min(leadSelectionIndex + visibleRowCount * 16, model.getByteCount() - 1);
+					offs = Math.min(leadSelectionIndex + visibleRowCount * 16, getCount() - 1);
 					changeSelectionByOffset(offs, extend);
 					e.consume();
 					break;
@@ -1282,7 +1740,7 @@ public class HexTable extends JTable {
 				case KeyEvent.VK_END:
 					extend = e.isShiftDown();
 					offs = (leadSelectionIndex / 16) * 16 + 15;
-					offs = Math.min(offs, model.getByteCount() - 1);
+					offs = Math.min(offs, getCount() - 1);
 					changeSelectionByOffset(offs, extend);
 					e.consume();
 					break;
@@ -1426,7 +1884,7 @@ public class HexTable extends JTable {
 	public void setSelectionByOffsets(int startOffs, int endOffs) {
 
 		startOffs = Math.max(0, startOffs);
-		startOffs = Math.min(startOffs, model.getByteCount() - 1);
+		startOffs = Math.min(startOffs, getCount() - 1);// getCount() - 1);
 
 		// Clear the old selection (may not be necessary).
 		repaintSelection();

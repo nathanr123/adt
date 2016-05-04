@@ -1,5 +1,6 @@
 package com.cti.vpx.controls.graph;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,6 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
@@ -30,14 +33,21 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.panel.CrosshairOverlay;
+import org.jfree.chart.plot.Crosshair;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleEdge;
 
 import com.cti.vpx.controls.graph.example.WaterfallGraphPanel;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.DrawSurface;
@@ -63,6 +73,8 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 	private String currentSubSystem = "";
 
 	private String currentProcIP = "";
+
+	private int currentCore = -1;
 
 	private final JPanel contentPanel = new JPanel();
 
@@ -103,6 +115,14 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 	private JLabel lblMaxVal;
 
 	private JCheckBox chkWaterfall;
+
+	private Crosshair xCrosshair;
+
+	private Crosshair yCrosshair;
+
+	private JButton btnStart;
+
+	private JButton btnClear;
 
 	/**
 	 * Launch the application.
@@ -171,7 +191,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	private void init() {
 
-		//setResizable(false);
+		// setResizable(false);
 
 		setIconImage(VPXConstants.Icons.ICON_SPECTRUM.getImage());
 
@@ -259,12 +279,14 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelFilter.add(cmbProcessor, "cell 1 1,growx");
 
 		JLabel lblAutoRefresh = new JLabel("Auto Refresh");
+		lblAutoRefresh.setVisible(false);
 
 		lblAutoRefresh.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		panelFilter.add(lblAutoRefresh, "cell 2 1,alignx left,growy");
 
 		slideAutoRefresh = new JSlider();
+		slideAutoRefresh.setVisible(false);
 
 		slideAutoRefresh.setMinimum(30);
 
@@ -275,6 +297,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelFilter.add(slideAutoRefresh, "cell 4 1,growx,aligny bottom");
 
 		lblAutoRefreshValue = new JLabel("30");
+		lblAutoRefreshValue.setVisible(false);
 
 		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -283,12 +306,13 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelFilter.add(lblAutoRefreshValue, "cell 5 1,alignx center,aligny center");
 
 		lblMins = new JLabel("Secs");
+		lblMins.setVisible(false);
 
 		lblMins.setPreferredSize(new Dimension(45, 25));
 
 		panelFilter.add(lblMins, "cell 6 1,alignx left,aligny center");
 
-		JButton btnStart = new JButton("Start");
+		btnStart = new JButton("Apply");
 
 		btnStart.addActionListener(new ActionListener() {
 
@@ -305,6 +329,21 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		chkWaterfall = new JCheckBox("Waterfall");
 
 		panelFilter.add(chkWaterfall, "cell 5 0 2 1,alignx left,aligny center");
+
+		btnClear = new JButton("Clear");
+		btnClear.setEnabled(false);
+
+		btnClear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				clearData();
+
+			}
+		});
+
+		panelFilter.add(btnClear, "cell 8 1");
 
 		JLabel lblMax = new JLabel("Max Value");
 
@@ -336,11 +375,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelWaterfall.setBackground(Color.BLACK);
 
-		// panelWaterfall.setBorder(new
-		// TitledBorder(UIManager.getBorder("TitledBorder.border"), "Waterfall",
-		// TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255,
-		// 255)));
-
 		panelWaterfall.setPreferredSize(new Dimension(10, 350));
 
 		panelWaterfall.setLayout(new BorderLayout(0, 0));
@@ -355,11 +389,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelAmplitude.setBackground(Color.BLACK);
 
-		// panelAmplitude.setBorder(new
-		// TitledBorder(UIManager.getBorder("TitledBorder.border"), "Amplitude",
-		// TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255,
-		// 255)));
-
 		series = new XYSeries("Amplitude", true, true);
 
 		dataset = new XYSeriesCollection(series);
@@ -367,6 +396,70 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		final JFreeChart chart = createChart(dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
+		/*
+		chartPanel.addChartMouseListener(new ChartMouseListener() {
+
+			@Override
+			public void chartMouseClicked(ChartMouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void chartMouseMoved(ChartMouseEvent event) {
+
+				try {
+
+					Rectangle2D dataArea = chartPanel.getScreenDataArea();
+
+					JFreeChart chart = event.getChart();
+
+					XYPlot plot = (XYPlot) chart.getPlot();
+
+					ValueAxis xAxis = plot.getDomainAxis();
+
+					double x = xAxis.java2DToValue(event.getTrigger().getX(), dataArea, RectangleEdge.BOTTOM);
+
+					// make the crosshairs disappear if the mouse is out of
+					// range
+
+					if (!xAxis.getRange().contains(x)) {
+						x = Double.NaN;
+					}
+
+					double y = DatasetUtilities.findYValue(plot.getDataset(), 0, x);
+
+					VPX_SpectrumWindow.this.xCrosshair.setValue(x);
+
+					VPX_SpectrumWindow.this.yCrosshair.setValue(y);
+
+				} catch (Exception e) {
+
+				}
+
+			}
+
+		});*/
+
+		CrosshairOverlay crosshairOverlay = new CrosshairOverlay();
+
+		this.xCrosshair = new Crosshair(Double.NaN, Color.GRAY, new BasicStroke(0f));
+
+		this.xCrosshair.setLabelBackgroundPaint(Color.WHITE);
+
+		this.xCrosshair.setLabelVisible(true);
+
+		this.yCrosshair = new Crosshair(Double.NaN, Color.GRAY, new BasicStroke(0f));
+
+		this.yCrosshair.setLabelBackgroundPaint(Color.WHITE);
+
+		this.yCrosshair.setLabelVisible(true);
+
+		crosshairOverlay.addDomainCrosshair(xCrosshair);
+
+		crosshairOverlay.addRangeCrosshair(yCrosshair);
+
+		chartPanel.addOverlay(crosshairOverlay);
 
 		chartPanel.setCursor(DrawSurface.getDefaultCrossHairCursor());
 
@@ -436,7 +529,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		XYItemRenderer renderer = xyplot.getRenderer();
 
-		renderer.setSeriesPaint(0, Color.RED);
+		renderer.setSeriesPaint(0, Color.YELLOW);
 
 		renderer.setSeriesItemLabelsVisible(0, false);
 
@@ -454,7 +547,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		xyplot.setRangeCrosshairVisible(true);
 
-		xyplot.setBackgroundPaint(Color.DARK_GRAY);
+		xyplot.setBackgroundPaint(Color.BLACK);
 
 		return jfreechart;
 	}
@@ -489,17 +582,56 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		setLocation(dx, dy);
 	}
 
+	private void enableComponents(boolean option) {
+
+		cmbSubSystem.setEnabled(option);
+
+		cmbProcessor.setEnabled(option);
+
+		cmbGraphObject.setEnabled(option);
+
+		btnClear.setEnabled(!option);
+
+		btnStart.setEnabled(option);
+
+	}
+
 	private void startPopulateData() {
 
 		// send command to to populate data
 
-		doReadData();
+		if (cmbProcessor.getSelectedIndex() > 0) {
 
-		isStarted = true;
+			if (!parent.isAlreadyAvailable(cmbProcessor.getSelectedItem().toString(),
+					cmbGraphObject.getSelectedIndex())) {
 
-		loadCurrentThreadSleepTime(slideAutoRefresh.getValue());
+				setTitle("Data Graph " + (spectrumID + 1) + " for " + currentProcIP + " Core " + currentCore);
 
-		startAutoRefreshThread();
+				currentProcIP = cmbProcessor.getSelectedItem().toString();
+
+				currentCore = cmbGraphObject.getSelectedIndex();
+
+				doReadData();
+
+				isStarted = true;
+
+				enableComponents(false);
+
+				// loadCurrentThreadSleepTime(slideAutoRefresh.getValue());
+
+				// startAutoRefreshThread();
+			} else {
+
+				JOptionPane.showMessageDialog(this,
+						"Selected Processor or core is already opened.\nPlease select different values.", "Validation",
+						JOptionPane.ERROR_MESSAGE);
+			}
+
+		} else {
+
+			JOptionPane.showMessageDialog(this, "Please Select processor", "Validation", JOptionPane.ERROR_MESSAGE);
+
+		}
 	}
 
 	private void loadCurrentThreadSleepTime(int value) {
@@ -610,8 +742,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 					curProcFilter = vpxSubSystem;
 
-					// cmbProcessor.addItem(vpxSubSystem.getIpP2020());
-
 					cmbProcessor.addItem(vpxSubSystem.getIpDSP1());
 
 					cmbProcessor.addItem(vpxSubSystem.getIpDSP2());
@@ -643,11 +773,30 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	private void doReadData() {
 
-		parent.readAnalyticalData(cmbProcessor.getSelectedItem().toString(), cmbGraphObject.getSelectedIndex(),
-				spectrumID);
+		parent.readSpectrum(cmbProcessor.getSelectedItem().toString(), cmbGraphObject.getSelectedIndex(), spectrumID);
+	}
+
+	private void clearData() {
+
+		currentCore = -1;
+
+		currentProcIP = "";
+
+		this.series.clear();
+
+		this.dataset.removeSeries(series);
+
+		newWaterfallGraph.clearAlldata();
+
+		enableComponents(true);
+
+		setTitle("Data Graph " + (spectrumID + 1));
+
 	}
 
 	public void loadData(int core, float yAxis[]) {
+
+		currentCore = core;
 
 		float[] f = new float[1024];
 
@@ -733,15 +882,35 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		parent.sendAnalyticalDataInterrupt(currentProcIP);
+		// parent.sendAnalyticalDataInterrupt(currentProcIP);
 
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
 
-		parent.reindexSpectrumWindowIndex();
+		parent.reIndexSpectrumWindowIndex(currentProcIP, currentCore);
 
+		currentProcIP = "";
+
+		currentCore = -1;
+
+	}
+
+	public String getCurrentProcIP() {
+		return currentProcIP;
+	}
+
+	public void setCurrentProcIP(String currentProcIP) {
+		this.currentProcIP = currentProcIP;
+	}
+
+	public int getCurrentCore() {
+		return currentCore;
+	}
+
+	public void setCurrentCore(int currentCore) {
+		this.currentCore = currentCore;
 	}
 
 	@Override

@@ -117,6 +117,14 @@ public class VPX_ExecutionPanel extends JPanel {
 	private JButton btnBrowseCore5;
 	private JButton btnBrowseCore6;
 	private JButton btnBrowseCore7;
+	private JButton btnStopCore1;
+	private JButton btnStopCore2;
+	private JButton btnStopCore3;
+	private JButton btnStopCore4;
+	private JButton btnStopCore5;
+	private JButton btnStopCore6;
+	private JButton btnStopCore7;
+	private JButton btnBatchStop;
 
 	public static void main(String[] args) {
 
@@ -188,7 +196,7 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		flowLayout.setAlignment(FlowLayout.LEFT);
 
-		btnBatchDL = new JButton("Batch Download");
+		btnBatchDL = new JButton("Batch Download", VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnBatchDL.setEnabled(false);
 
@@ -204,7 +212,7 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		batchControlPanel.add(btnBatchDL);
 
-		btnBatchRun = new JButton("Batch Run");
+		btnBatchRun = new JButton("Batch Run", VPXConstants.Icons.ICON_RUN);
 
 		btnBatchRun.setEnabled(false);
 
@@ -220,7 +228,23 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		batchControlPanel.add(btnBatchRun);
 
-		basePanel.setLayout(new MigLayout("", "[490px][87px][33px][33px]",
+		btnBatchStop = new JButton("Batch Stop", VPXConstants.Icons.ICON_STOP);
+
+		btnBatchStop.setEnabled(false);
+
+		btnBatchStop.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				stopAllCores();
+
+			}
+		});
+
+		batchControlPanel.add(btnBatchStop);
+
+		basePanel.setLayout(new MigLayout("", "[490px][87px][33px][][33px]",
 				"[pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center][pref!,center]"));
 
 		txtCore2 = new JTextField();
@@ -266,7 +290,22 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore2, "cell 3 3,alignx left,growy");
+		btnStopCore2 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore2.setEnabled(false);
+
+		btnStopCore2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(2);
+			}
+		});
+
+		basePanel.add(btnStopCore2, "cell 3 3,alignx left,growy");
+
+		basePanel.add(btnDLCore2, "cell 4 3,alignx left,growy");
 
 		txtCore1 = new JTextField();
 
@@ -297,6 +336,21 @@ public class VPX_ExecutionPanel extends JPanel {
 
 		basePanel.add(btnRunCore1, "cell 2 1,alignx left,growy");
 
+		btnStopCore1 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore1.setEnabled(false);
+
+		btnStopCore1.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(1);
+			}
+		});
+
+		basePanel.add(btnStopCore1, "cell 3 1,alignx left,growy");
+
 		btnDLCore1 = new JButton(VPXConstants.Icons.ICON_DOWNLOAD);
 
 		btnDLCore1.setEnabled(false);
@@ -311,7 +365,7 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore1, "cell 3 1,alignx left,growy");
+		basePanel.add(btnDLCore1, "cell 4 1,alignx left,growy");
 
 		txtCore3 = new JTextField();
 
@@ -356,7 +410,22 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore3, "cell 3 5,alignx left,growy");
+		btnStopCore3 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore3.setEnabled(false);
+
+		btnStopCore3.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(3);
+			}
+		});
+
+		basePanel.add(btnStopCore3, "cell 3 5,alignx left,growy");
+
+		basePanel.add(btnDLCore3, "cell 4 5,alignx left,growy");
 
 		txtCore4 = new JTextField();
 
@@ -401,7 +470,22 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore4, "cell 3 7,alignx left,growy");
+		btnStopCore4 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore4.setEnabled(false);
+
+		btnStopCore4.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(4);
+			}
+		});
+
+		basePanel.add(btnStopCore4, "cell 3 7,alignx left,growy");
+
+		basePanel.add(btnDLCore4, "cell 4 7,alignx left,growy");
 
 		txtCore5 = new JTextField();
 
@@ -446,7 +530,22 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore5, "cell 3 9,alignx left,growy");
+		btnStopCore5 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore5.setEnabled(false);
+
+		btnStopCore5.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(5);
+			}
+		});
+
+		basePanel.add(btnStopCore5, "cell 3 9,alignx left,growy");
+
+		basePanel.add(btnDLCore5, "cell 4 9,alignx left,growy");
 
 		txtCore6 = new JTextField();
 
@@ -491,7 +590,22 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore6, "cell 3 11,alignx left,growy");
+		btnStopCore6 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore6.setEnabled(false);
+
+		btnStopCore6.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(6);
+			}
+		});
+
+		basePanel.add(btnStopCore6, "cell 3 11,alignx left,growy");
+
+		basePanel.add(btnDLCore6, "cell 4 11,alignx left,growy");
 
 		txtCore7 = new JTextField();
 
@@ -536,7 +650,22 @@ public class VPX_ExecutionPanel extends JPanel {
 			}
 		});
 
-		basePanel.add(btnDLCore7, "cell 3 13,alignx left,growy");
+		btnStopCore7 = new JButton(VPXConstants.Icons.ICON_STOP);
+
+		btnStopCore7.setEnabled(false);
+
+		btnStopCore7.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				setStop(7);
+			}
+		});
+
+		basePanel.add(btnStopCore7, "cell 3 13,alignx left,growy");
+
+		basePanel.add(btnDLCore7, "cell 4 13,alignx left,growy");
 
 		chkCore1 = new JCheckBox("Core 1");
 
@@ -668,8 +797,8 @@ public class VPX_ExecutionPanel extends JPanel {
 	private void doCoreDL(int core, String value) {
 
 		int option = JOptionPane.showConfirmDialog(VPX_ExecutionPanel.this,
-				"The selected out file will be stripped.\nPlease make a copy of the file,if you need\nDo you want to continue?", "Confirmation",
-				JOptionPane.YES_NO_OPTION);
+				"The selected out file will be stripped.\nPlease make a copy of the file,if you need\nDo you want to continue?",
+				"Confirmation", JOptionPane.YES_NO_OPTION);
 
 		if (option == JOptionPane.YES_OPTION) {
 
@@ -702,33 +831,71 @@ public class VPX_ExecutionPanel extends JPanel {
 
 	}
 
-	private void setStart(int option) {
+	private void setStart(int core) {
 
-		doStart(option);
+		doStart(core);
 
 		JOptionPane.showMessageDialog(VPX_ExecutionPanel.this,
-				String.format("%s core %d started successfully", currentIP, option), "Error",
+				String.format("%s core %d started successfully", currentIP, core), "Error",
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	private void doStart(int option) {
+	private void setStop(int core) {
 
-		parent.sendExecuteCommand(currentIP, option, ATP.MSG_TYPE_EXECUTE_START);
+		int opt = JOptionPane.showConfirmDialog(VPX_ExecutionPanel.this, "Do you want stop core " + core + " ?",
+				"Confirmation", JOptionPane.YES_NO_OPTION);
 
-		VPXLogger.updateLog(String.format("%s core %d started successfully", currentIP, option));
+		if (opt == JOptionPane.YES_OPTION) {
+
+			doStop(core);
+
+			JOptionPane.showMessageDialog(VPX_ExecutionPanel.this,
+					String.format("%s core %d stopped successfully", currentIP, core), "Error",
+					JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
-	private void startAllCores() {
+	private void doStop(int core) {
+
+		parent.sendExecuteCommand(currentIP, ATP.MSG_TYPE_EXECUTE_STOP, core);
+
+		VPXLogger.updateLog(String.format("%s core %d stopped successfully", currentIP, core));
+	}
+
+	private void doStart(int core) {
+
+		parent.sendExecuteCommand(currentIP, ATP.MSG_TYPE_EXECUTE_START, core);
+
+		VPXLogger.updateLog(String.format("%s core %d started successfully", currentIP, core));
+	}
+
+	private void stopAllCores() {
 
 		String cores = "";
+
+		int core1 = 0;
+
+		int core2 = 0;
+
+		int core3 = 0;
+
+		int core4 = 0;
+
+		int core5 = 0;
+
+		int core6 = 0;
+
+		int core7 = 0;
 
 		try {
 
 			if (chkCore1.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_1);
+				// doStop(ATP.EXECUTE_CORE_1);
+
+				core1 = 1;
 
 				cores = "1,";
 
@@ -736,9 +903,11 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			if (chkCore2.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_2);
+				// doStop(ATP.EXECUTE_CORE_2);
+
+				core2 = 1;
 
 				cores = cores + "2,";
 
@@ -746,9 +915,11 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			if (chkCore3.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_3);
+				// doStop(ATP.EXECUTE_CORE_3);
+
+				core3 = 1;
 
 				cores = cores + "3,";
 
@@ -756,9 +927,11 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			if (chkCore4.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_4);
+				// doStop(ATP.EXECUTE_CORE_4);
+
+				core4 = 1;
 
 				cores = cores + "4,";
 
@@ -766,9 +939,11 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			if (chkCore5.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_5);
+				// doStop(ATP.EXECUTE_CORE_5);
+
+				core5 = 1;
 
 				cores = cores + "5,";
 
@@ -776,9 +951,11 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			if (chkCore6.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_6);
+				// doStop(ATP.EXECUTE_CORE_6);
+
+				core6 = 1;
 
 				cores = cores + "6,";
 
@@ -786,9 +963,11 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			if (chkCore7.isSelected()) {
 
-				Thread.sleep(10);
+				// Thread.sleep(10);
 
-				doStart(ATP.EXECUTE_CORE_7);
+				// doStop(ATP.EXECUTE_CORE_7);
+
+				core7 = 1;
 
 				cores = cores + "7,";
 
@@ -798,6 +977,137 @@ public class VPX_ExecutionPanel extends JPanel {
 
 				cores = cores.substring(0, cores.length() - 1);
 			}
+
+			parent.sendExecuteCommand(currentIP, ATP.MSG_TYPE_EXECUTE_STOP, core1, core2, core3, core4, core5, core6,
+					core7);
+
+			String msg = String.format("%s batch stop for selected cores %s stopped successfully", currentIP, cores);
+
+			JOptionPane.showMessageDialog(VPX_ExecutionPanel.this, msg, "Success", JOptionPane.INFORMATION_MESSAGE);
+
+			VPXLogger.updateLog(msg);
+
+		} catch (Exception e) {
+
+			VPXLogger.updateError(e);
+
+			e.printStackTrace();
+
+		}
+
+	}
+
+	private void startAllCores() {
+
+		String cores = "";
+
+		int core1 = 0;
+
+		int core2 = 0;
+
+		int core3 = 0;
+
+		int core4 = 0;
+
+		int core5 = 0;
+
+		int core6 = 0;
+
+		int core7 = 0;
+
+		try {
+
+			if (chkCore1.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_1);
+
+				core1 = 1;
+
+				cores = "1,";
+
+			}
+
+			if (chkCore2.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_2);
+
+				core2 = 1;
+
+				cores = cores + "2,";
+
+			}
+
+			if (chkCore3.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_3);
+
+				core3 = 1;
+
+				cores = cores + "3,";
+
+			}
+
+			if (chkCore4.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_4);
+
+				core4 = 1;
+
+				cores = cores + "4,";
+
+			}
+
+			if (chkCore5.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_5);
+
+				core5 = 1;
+
+				cores = cores + "5,";
+
+			}
+
+			if (chkCore6.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_6);
+
+				core6 = 1;
+
+				cores = cores + "6,";
+
+			}
+
+			if (chkCore7.isSelected()) {
+
+				// Thread.sleep(10);
+
+				// doStart(ATP.EXECUTE_CORE_7);
+
+				core7 = 1;
+
+				cores = cores + "7,";
+
+			}
+
+			if (cores.endsWith(",")) {
+
+				cores = cores.substring(0, cores.length() - 1);
+			}
+
+			parent.sendExecuteCommand(currentIP, ATP.MSG_TYPE_EXECUTE_START, core1, core2, core3, core4, core5, core6,
+					core7);
 
 			String msg = String.format("%s batch run for selected cores %s started successfully", currentIP, cores);
 
@@ -831,6 +1141,8 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			btnBrowseCore1.setEnabled(option);
 
+			btnStopCore1.setEnabled(option);
+
 			btnDLCore1.setEnabled(option);
 
 			btnRunCore1.setEnabled(option);
@@ -842,6 +1154,8 @@ public class VPX_ExecutionPanel extends JPanel {
 		case ATP.EXECUTE_CORE_2:
 
 			btnBrowseCore2.setEnabled(option);
+
+			btnStopCore2.setEnabled(option);
 
 			btnDLCore2.setEnabled(option);
 
@@ -855,6 +1169,8 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			btnBrowseCore3.setEnabled(option);
 
+			btnStopCore3.setEnabled(option);
+
 			btnDLCore3.setEnabled(option);
 
 			btnRunCore3.setEnabled(option);
@@ -866,6 +1182,8 @@ public class VPX_ExecutionPanel extends JPanel {
 		case ATP.EXECUTE_CORE_4:
 
 			btnBrowseCore4.setEnabled(option);
+
+			btnStopCore4.setEnabled(option);
 
 			btnDLCore4.setEnabled(option);
 
@@ -879,6 +1197,8 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			btnBrowseCore5.setEnabled(option);
 
+			btnStopCore5.setEnabled(option);
+
 			btnDLCore5.setEnabled(option);
 
 			btnRunCore5.setEnabled(option);
@@ -891,6 +1211,8 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			btnBrowseCore6.setEnabled(option);
 
+			btnStopCore6.setEnabled(option);
+
 			btnDLCore6.setEnabled(option);
 
 			btnRunCore6.setEnabled(option);
@@ -902,6 +1224,8 @@ public class VPX_ExecutionPanel extends JPanel {
 		case ATP.EXECUTE_CORE_7:
 
 			btnBrowseCore7.setEnabled(option);
+
+			btnStopCore7.setEnabled(option);
 
 			btnDLCore7.setEnabled(option);
 
@@ -920,11 +1244,15 @@ public class VPX_ExecutionPanel extends JPanel {
 
 			btnBatchRun.setEnabled(true);
 
+			btnBatchStop.setEnabled(true);
+
 		} else {
 
 			btnBatchDL.setEnabled(false);
 
 			btnBatchRun.setEnabled(false);
+
+			btnBatchStop.setEnabled(false);
 		}
 
 	}
@@ -932,8 +1260,8 @@ public class VPX_ExecutionPanel extends JPanel {
 	private void doBatchDL() {
 
 		int option = JOptionPane.showConfirmDialog(VPX_ExecutionPanel.this,
-				"The selected out files will be stripped.\nPlease make a copy of the files,if you need\nDo you want to continue?", "Confirmation",
-				JOptionPane.YES_NO_OPTION);
+				"The selected out files will be stripped.\nPlease make a copy of the files,if you need\nDo you want to continue?",
+				"Confirmation", JOptionPane.YES_NO_OPTION);
 
 		if (option == JOptionPane.YES_OPTION) {
 

@@ -300,7 +300,7 @@ public class VPXConstants {
 
 		public static final String ICON_FILTER_NAME = "filter.png";
 
-		public static final String IMAGE_BG_NAME = "BG.jpg";
+		public static final String IMAGE_BG_NAME = "Bg3.jpg";
 
 		public static final String ICON_HELP_NAME = "help.png";
 
@@ -311,6 +311,8 @@ public class VPXConstants {
 		public static final String ICON_UP_NAME = "up1.png";
 
 		public static final String ICON_DOWN_NAME = "down1.png";
+
+		public static final String ICON_STOP_NAME = "Stop.gif";
 
 		// Icons
 
@@ -358,6 +360,8 @@ public class VPXConstants {
 
 		public static final ImageIcon ICON_PAUSE = VPXUtilities.getImageIcon(ICON_PAUSE_NAME, 14, 14);
 
+		public static final ImageIcon ICON_STOP = VPXUtilities.getImageIcon(ICON_STOP_NAME, 14, 14);
+
 		public static final ImageIcon ICON_CONFIG = VPXUtilities.getImageIcon(ICON_CONFIG_NAME, 14, 14);
 
 		public static final ImageIcon ICON_DETAIL = VPXUtilities.getImageIcon(ICON_DETAIL_NAME, 14, 14);
@@ -388,7 +392,7 @@ public class VPXConstants {
 
 		public static final ImageIcon ICON_DETACH = VPXUtilities.getImageIcon(ICON_DETACH_NAME, 14, 14);
 
-		public static final ImageIcon IMAGE_BG = VPXUtilities.getImageIcon(IMAGE_BG_NAME, 596, 596);
+		public static final ImageIcon IMAGE_BG = VPXUtilities.getImageIcon(IMAGE_BG_NAME, 500, 300);
 
 		public static final ImageIcon ICON_SPECTRUM = VPXUtilities.getImageIcon(ICON_SPECTRUM_NAME, 14, 14);
 

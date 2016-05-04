@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -71,8 +70,6 @@ public class UnSignedInt16 extends AbstractTableModel {
 	 * for fast rendering.
 	 */
 	private String[] byteStrVals;
-
-	private BigInteger bi;
 
 	/**
 	 * Creates the model.
@@ -177,13 +174,17 @@ public class UnSignedInt16 extends AbstractTableModel {
 		// & with 0xff to convert to unsigned
 
 		byte[] b = doc.getByteByGroup(pos, 2, true);
-	
-		String str = String.format("0x%02x%02x", b[0]&0xff, b[1]&0xff).toUpperCase();
-		
-		return  Integer.decode(str);
+
+		if (b != null) {
+
+			String str = String.format("0x%02x%02x", b[0] & 0xff, b[1] & 0xff).toUpperCase();
+
+			return Integer.decode(str);
+		} else
+			return "";
 
 	}
-	
+
 	/**
 	 * Redoes the last undoable edit undone.
 	 *
@@ -331,35 +332,13 @@ public class UnSignedInt16 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		
-		String str = value.toString();
 
+		String str = value.toString();
 
 		int offset = editor.cellToOffset(row, col);
 
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, Long.parseLong(str));
+		this.editor.getMemoryWindow().setMemory(offset * 2, ATP.DATA_TYPE_SIZE_BIT16, 1, Long.parseLong(str));
 
-		/*
-		String val = String.format("%04x", Integer.parseInt(value.toString()));
-
-		byte[] bArr = new byte[2];
-
-		bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
-
-		bArr[0] = (byte) Integer.parseInt(val.substring(2, 4), 16);
-
-		int offset = editor.cellToOffset(row, col) * 2;
-
-		replaceBytes(offset, 2, bArr);
-
-		bi = new BigInteger(bArr);
-
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, bi.longValue());
-
-		fireTableCellUpdated(row, col);
-
-		editor.fireHexEditorEvent(offset, 2, 2);
-*/
 	}
 
 	/**

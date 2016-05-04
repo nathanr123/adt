@@ -605,7 +605,7 @@ public class VPX_MADPanel extends JPanel {
 							txtCompilePathCore4.getText(), txtCompilePathCore5.getText(), txtCompilePathCore6.getText(),
 							txtCompilePathCore7.getText());
 
-					madProcessWindow = new MADProcessWindow(txtCompilePathFinalOut.getText().trim());
+					madProcessWindow = new MADProcessWindow();
 
 					madProcessWindow.doCompile();
 
@@ -1181,7 +1181,7 @@ public class VPX_MADPanel extends JPanel {
 				proc = Runtime.getRuntime().exec(new String[] { "sh", "-c", cmd });
 			}
 
-			System.out.println(cmd);
+			// System.out.println(cmd);
 
 			VPXLogger.updateLog("Creating deployment files");
 
@@ -1275,10 +1275,6 @@ public class VPX_MADPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			// fileDialog.addChoosableFileFilter(filterOut);
-
-			// fileDialog.setAcceptAllFileFilterUsed(false);
-
 			int returnVal = fileDialog.showOpenDialog(null);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -1305,8 +1301,6 @@ public class VPX_MADPanel extends JPanel {
 
 		private JButton btnCancel;
 
-		private String path = null;
-
 		private JLabel lblOpenFolder;
 
 		private JTextArea txtAResult;
@@ -1320,9 +1314,7 @@ public class VPX_MADPanel extends JPanel {
 		/**
 		 * Create the dialog.
 		 */
-		public MADProcessWindow(String pathToOPen) {
-
-			this.path = pathToOPen;
+		public MADProcessWindow() {
 
 			init();
 
@@ -1529,7 +1521,6 @@ public class VPX_MADPanel extends JPanel {
 				String core5 = txtCompilePathCore5.getText().trim().replaceAll("\\\\", "/");
 				String core6 = txtCompilePathCore6.getText().trim().replaceAll("\\\\", "/");
 				String core7 = txtCompilePathCore7.getText().trim().replaceAll("\\\\", "/");
-				String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
 
 				dialog.updatePackets(1, core0);
 				checkAndCopy(corePath, core0, 0, false);
@@ -1547,13 +1538,6 @@ public class VPX_MADPanel extends JPanel {
 				checkAndCopy(corePath, core6, 6, false);
 				dialog.updatePackets(8, core7);
 				checkAndCopy(corePath, core7, 7, false);
-				// dialog.updatePackets(9, bin);
-				/*
-				 * checkAndCopy( VPXSessionManager.getDSPPath() + "/" +
-				 * VPXUtilities .getString(VPXConstants.ResourceFields.
-				 * FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN), bin, 0, true);
-				 * 
-				 */
 
 			} catch (Exception e) {
 				VPXLogger.updateError(e);

@@ -127,7 +127,7 @@ public class NetworkMonitorModel extends AbstractTableModel {
 			return true;
 
 		} catch (Exception e) {
-		
+
 			return false;
 		}
 	}

@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.SystemColor;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -80,7 +79,7 @@ public class VPX_SplashWindow extends JWindow {
 			String key = (String) e.nextElement();
 
 			lblCurrreading
-					.setText("reading " + key + " = " + VPXUtilities.getPathAsLinuxStandard(props.getProperty(key)));
+					.setText(" reading " + key + " = " + VPXUtilities.getPathAsLinuxStandard(props.getProperty(key)));
 
 			try {
 
@@ -118,7 +117,7 @@ public class VPX_SplashWindow extends JWindow {
 
 		lblCurrreading = new JLabel("");
 
-		lblCurrreading.setForeground(SystemColor.activeCaptionBorder);
+		lblCurrreading.setForeground(Color.BLACK);
 
 		lblCurrreading.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 12));
 
@@ -130,15 +129,16 @@ public class VPX_SplashWindow extends JWindow {
 
 		lblV.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		lblV.setForeground(SystemColor.activeCaptionBorder);
+		lblV.setForeground(Color.BLACK);
 
-		lblV.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 14));
+		lblV.setFont(new Font("Segoe UI", Font.ITALIC, 14));
 
-		lblV.setBounds(369, 148, 44, 20);
+		lblV.setBounds(400, 165, 44, 20);
 
 		panel.add(lblV);
 
 		JLabel lblCaption = new JLabel("A VPX Dual Application Debugger Tool");
+		lblCaption.setVisible(false);
 
 		lblCaption.setForeground(UIManager.getColor("CheckBox.background"));
 
@@ -149,6 +149,7 @@ public class VPX_SplashWindow extends JWindow {
 		panel.add(lblCaption);
 
 		JLabel lblIcon = new JLabel();
+		lblIcon.setVisible(false);
 
 		lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -159,6 +160,7 @@ public class VPX_SplashWindow extends JWindow {
 		panel.add(lblIcon);
 
 		JLabel lblBanner = new JLabel("Application Debugger Tool");
+		lblBanner.setVisible(false);
 
 		lblBanner.setForeground(Color.WHITE);
 

@@ -16,9 +16,15 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void updateBIST(BIST bist);
 
+	// Memory Window
+
 	public void readMemory(MemoryViewFilter filter);
 
 	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer);
+
+	public void reIndexMemoryBrowserIndex();
+
+	// Plot Window
 
 	public void readPlot(MemoryViewFilter filter);
 
@@ -26,10 +32,16 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void populatePlot(int plotID, int lineID, long startAddress, byte[] buffer);
 
-	public void readAnalyticalData(String ip, int core, int id);
+	public void reIndexMemoryPlotIndex();
 
-	public void populateAnalyticalData(String ip, int core, int id, float[] yAxis);
+	// Spectrum Window
 
-	public void sendAnalyticalDataInterrupt(String ip);
+	public void readSpectrum(String ip, int core, int id);
+
+	public void populateSpectrum(String ip, int core, int id, float[] yAxis);
+
+	public void sendSpectrumInterrupt(String ip, int core);
+
+	public void reIndexSpectrumWindowIndex(String ip, int core);
 
 }

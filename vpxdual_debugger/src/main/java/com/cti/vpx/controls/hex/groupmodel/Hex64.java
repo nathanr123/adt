@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -60,19 +59,7 @@ public class Hex64 extends AbstractTableModel {
 	private UndoManager undoManager;
 	private String[] columnNames;
 
-	/**
-	 * Cache of string values of "<code>0</code>"-"<code>ff</code>" for fast
-	 * rendering.
-	 */
-	private String[] paddedLowerByteStrVals;
-
-	/**
-	 * Cache of "padded" string values of "<code>00</code>"-"<code>0f</code>"
-	 * for fast rendering.
-	 */
-	private String[] byteStrVals;
-
-	private BigInteger bi;
+	
 
 	/**
 	 * Creates the model.
@@ -95,15 +82,6 @@ public class Hex64 extends AbstractTableModel {
 			columnNames[i] = Integer.toHexString(i).toUpperCase();
 		}
 
-		/*
-		 * byteStrVals = new String[256]; for (int i = 0; i <
-		 * byteStrVals.length; i++) { byteStrVals[i] =
-		 * Integer.toHexString(i).toUpperCase(); }
-		 * 
-		 * paddedLowerByteStrVals = new String[16]; for (int i = 0; i <
-		 * paddedLowerByteStrVals.length; i++) { paddedLowerByteStrVals[i] = "0"
-		 * + Integer.toHexString(i).toUpperCase(); }
-		 */
 	}
 
 	/**
@@ -175,11 +153,12 @@ public class Hex64 extends AbstractTableModel {
 		}
 		byte[] b = doc.getByteByGroup(pos, 8, true);
 
-		return String.format("%02x%02x%02x%02x%02x%02x%02x%02x", b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7])
-				.toUpperCase();// (b
-		// <
-		// 0x10
-		// &&
+		if (b != null) {
+
+			return String.format("%02x%02x%02x%02x%02x%02x%02x%02x", b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7])
+					.toUpperCase();// (b
+		} else
+			return "";
 
 	}
 
@@ -331,52 +310,32 @@ public class Hex64 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
-		String str = value.toString();
-
-		if (!str.startsWith("0x") && !str.startsWith("0x")) {
-
-			str = "0x" + value.toString();
-		}
-
+		
 		int offset = editor.cellToOffset(row, col);
 
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT64, 1, Long.decode(str));
-		
-		/*
-		
-		
-		String val = String.format("%016x", Long.parseLong(value.toString(), 16));
+		String val = value.toString();//String.format("%016x", Long.parseLong(value.toString(), 16));
 
 		byte[] bArr = new byte[8];
 
-		bArr[7] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
-		bArr[6] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
 
-		bArr[5] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
 
-		bArr[4] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
 
-		bArr[3] = (byte) Integer.parseInt(val.substring(8, 10), 16);
+		bArr[4] = (byte) Integer.parseInt(val.substring(8, 10), 16);
 
-		bArr[2] = (byte) Integer.parseInt(val.substring(10, 12), 16);
+		bArr[5] = (byte) Integer.parseInt(val.substring(10, 12), 16);
 
-		bArr[1] = (byte) Integer.parseInt(val.substring(12, 14), 16);
+		bArr[6] = (byte) Integer.parseInt(val.substring(12, 14), 16);
 
-		bArr[0] = (byte) Integer.parseInt(val.substring(14, 16), 16);
+		bArr[7] = (byte) Integer.parseInt(val.substring(14, 16), 16);
 
-		int offset = editor.cellToOffset(row, col) * 8;
+		this.editor.getMemoryWindow().setMemory(offset * 8, ATP.DATA_TYPE_SIZE_BIT64, 1, bArr);
 
-		replaceBytes(offset, 8, bArr);
-
-		bi = new BigInteger(bArr);
-
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT64, 1, bi.longValue());
-
-		fireTableCellUpdated(row, col);
-
-		editor.fireHexEditorEvent(offset, 8, 8);
-		*/
+	
 	}
 
 	/**

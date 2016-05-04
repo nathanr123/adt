@@ -8,8 +8,8 @@ import javolution.io.Struct;
 public class MSGCommand extends Struct implements ATP, Serializable {
 
 	/**
-     * 
-     */
+	 * 
+	 */
 
 	private static final long serialVersionUID = -3422816712139640712L;
 

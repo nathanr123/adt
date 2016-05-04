@@ -178,7 +178,10 @@ public class Floating32 extends AbstractTableModel {
 		// & with 0xff to convert to unsigned
 		byte[] b = doc.getByteByGroup(pos, 4, true);
 
-		return String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat());
+		if (b != null) {
+			return String.valueOf(java.nio.ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat());
+		} else
+			return "";
 
 	}
 
@@ -329,38 +332,45 @@ public class Floating32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		/*
-		String str = value.toString();
-
-		int offset = editor.cellToOffset(row, col);
-
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1,Long.parseLong(str));
-		*/
-		
-		String val = String.format("%08X", Float.floatToIntBits(Float.parseFloat(value.toString())));
-
-		byte[] bArr = new byte[4];
-
-		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
-
-		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
-
-		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
-
-		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
 
 		int offset = editor.cellToOffset(row, col) * 4;
 
-		//replaceBytes(offset, 4, bArr);
+		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, convertIntoLong(value.toString()));
 
-		bi = new BigInteger(bArr);
+	}
 
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, bi.longValue());
+	private long convertIntoLong(String str) {
 
-	//	fireTableCellUpdated(row, col);
+		String val = String.format("%08X", Float.floatToIntBits(Float.parseFloat(str)));
 
-	//	editor.fireHexEditorEvent(offset, 4, 4);
-		
+		byte[] bArr = new byte[4];
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		long s = bytesToLong(bArr);
+
+		return s;
+
+	}
+
+	private long bytesToLong(byte[] b) {
+
+		long result = 0;
+
+		for (int i = 0; i < 4; i++) {
+
+			result <<= 8;
+
+			result |= (b[i] & 0xFF);
+		}
+
+		return result;
 	}
 
 	/**

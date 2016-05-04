@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -71,9 +70,7 @@ public class UnSignedInt32 extends AbstractTableModel {
 	 * for fast rendering.
 	 */
 	private String[] byteStrVals;
-
-	private BigInteger bi;
-
+	
 	/**
 	 * Creates the model.
 	 *
@@ -176,10 +173,15 @@ public class UnSignedInt32 extends AbstractTableModel {
 		}
 		// & with 0xff to convert to unsigned
 		byte[] b = doc.getByteByGroup(pos, 4, true);
-		
-		String str = String.format("0x%02x%02x%02x%02x", b[0]&0xff, b[1]&0xff, b[2]&0xff, b[3]&0xff).toUpperCase();
 
-		return  Long.decode(str);
+		if (b != null) {
+
+			String str = String.format("0x%02x%02x%02x%02x", b[0] & 0xff, b[1] & 0xff, b[2] & 0xff, b[3] & 0xff)
+					.toUpperCase();
+
+			return Long.decode(str);
+		} else
+			return "";
 
 	}
 
@@ -260,7 +262,7 @@ public class UnSignedInt32 extends AbstractTableModel {
 		this.doc = buff;
 	}
 
-	public void setBytes(byte[] bytes,int stride) throws IOException {
+	public void setBytes(byte[] bytes, int stride) throws IOException {
 		doc = new ByteBuffer(bytes);
 		undoManager.discardAllEdits();
 		setColumnHeaders(stride);
@@ -284,6 +286,7 @@ public class UnSignedInt32 extends AbstractTableModel {
 
 		editor.setShowColumnHeader(true);
 	}
+
 	/**
 	 * Sets the bytes displayed to those in the given file.
 	 *
@@ -329,38 +332,13 @@ public class UnSignedInt32 extends AbstractTableModel {
 	 *            The column of the cell to change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		
+
 		String str = value.toString();
 
 		int offset = editor.cellToOffset(row, col);
 
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.parseLong(str));
-		/*
+		this.editor.getMemoryWindow().setMemory(offset * 4, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.parseLong(str));
 
-		String val = String.format("%08x", Integer.parseInt(value.toString()));
-
-		byte[] bArr = new byte[4];
-
-		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
-
-		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
-
-		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
-
-		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
-
-		int offset = editor.cellToOffset(row, col) * 4;
-
-		replaceBytes(offset, 4, bArr);
-
-		bi = new BigInteger(bArr);
-
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, bi.longValue());
-
-		fireTableCellUpdated(row, col);
-
-		editor.fireHexEditorEvent(offset, 4, 4);
-		*/
 	}
 
 	/**

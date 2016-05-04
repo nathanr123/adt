@@ -77,7 +77,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		
 		setResizable(false);
 
-		setSize(500, 104);
+		setSize(500, 87);
 
 		setAlwaysOnTop(true);
 
@@ -97,7 +97,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 		getContentPane().add(progressPanel, BorderLayout.CENTER);
 
-		progressPanel.setLayout(new MigLayout("", "[440px,left][][44px]", "[14px,grow,fill][17px,grow,fill]"));
+		progressPanel.setLayout(new MigLayout("", "[440px,left][][44px]", "[14px,grow,fill][][17px,grow,fill]"));
 
 		lblFlashing = new JLabel("Flashing File");
 
@@ -109,7 +109,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 		
 		progressFileSent.setStringPainted(true);
 
-		progressPanel.add(progressFileSent, "cell 0 1 3 1,growx,aligny top");
+		progressPanel.add(progressFileSent, "cell 0 2 3 1,growx,aligny top");
 
 		lblElapsedTimeVal = new JLabel("");
 

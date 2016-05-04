@@ -1717,7 +1717,8 @@ public class VPXUtilities {
 
 		try {
 
-			String content = new String(Files.readAllBytes(Paths.get(URI.create("file:///" +getPathAsLinuxStandard(filename)))));
+			String content = new String(
+					Files.readAllBytes(Paths.get(URI.create("file:///" + getPathAsLinuxStandard(filename)))));
 
 			return content;
 
@@ -1794,7 +1795,7 @@ public class VPXUtilities {
 
 			for (int i = 0; i < arr.length; i++) {
 
-				b[i] = (byte) Integer.parseInt(arr[i], 16);
+				b[i] = (byte) Integer.parseInt(arr[i].trim(), 16);
 			}
 
 			break;
@@ -1807,7 +1808,7 @@ public class VPXUtilities {
 
 				byte[] bArr = new byte[2];
 
-				String val = arr[i];
+				String val = arr[i].trim();
 
 				bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
@@ -1826,7 +1827,7 @@ public class VPXUtilities {
 
 			for (int i = 0; i < arr.length; i++) {
 
-				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i])).toByteArray();
+				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i].trim())).toByteArray();
 
 				byte[] bArr = new byte[bArra.length];
 
@@ -1849,7 +1850,7 @@ public class VPXUtilities {
 
 				byte[] bArr = new byte[2];
 
-				String val = arr[i];
+				String val = arr[i].trim();
 
 				bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
@@ -1870,7 +1871,7 @@ public class VPXUtilities {
 
 				byte[] bArr = new byte[4];
 
-				String val = arr[i];
+				String val = arr[i].trim();
 
 				bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
@@ -1893,7 +1894,7 @@ public class VPXUtilities {
 
 			for (int i = 0; i < arr.length; i++) {
 
-				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i])).toByteArray();
+				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i].trim())).toByteArray();
 
 				byte[] bArr = new byte[bArra.length];
 
@@ -1918,7 +1919,7 @@ public class VPXUtilities {
 
 			for (int i = 0; i < arr.length; i++) {
 
-				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i])).toByteArray();
+				byte[] bArra = BigInteger.valueOf(Long.parseLong(arr[i].trim())).toByteArray();
 
 				byte[] bArr = new byte[bArra.length];
 
@@ -1939,6 +1940,42 @@ public class VPXUtilities {
 
 		case HexEditor.UNSINGNEDFLOAT32:
 
+			bb = ByteBuffer.allocate(arr.length * 4);
+
+			for (int i = 0; i < arr.length; i++) {
+
+				//long l = convertIntoLong(arr[i].trim());
+
+				//byte[] bArra = BigInteger.valueOf(l).toByteArray();
+
+				byte[] bArra = convertIntoByte(arr[i].trim());// BigInteger.valueOf(l).toByteArray();
+
+				byte[] bArr = new byte[4];
+
+				if (bArra.length == 1) {
+					bArr[3] = bArra[0];
+
+					bArr[2] = bArra[0];
+
+					bArr[1] = bArra[0];
+
+					bArr[0] = bArra[0];
+				} else {
+
+					bArr[3] = bArra[0];
+
+					bArr[2] = bArra[1];
+
+					bArr[1] = bArra[2];
+
+					bArr[0] = bArra[3];
+				}
+
+				bb.put(bArr);
+			}
+
+			b = bb.array();
+
 			break;
 
 		case HexEditor.HEX64:
@@ -1949,7 +1986,7 @@ public class VPXUtilities {
 
 				byte[] bArr = new byte[8];
 
-				String val = arr[i];
+				String val = arr[i].trim();
 
 				bArr[7] = (byte) Integer.parseInt(val.substring(0, 2), 16);
 
@@ -1977,6 +2014,58 @@ public class VPXUtilities {
 		}
 
 		return b;
+	}
+
+	private static byte[] convertIntoByte(String str) {
+
+		String val = String.format("%08X", Float.floatToIntBits(Float.parseFloat(str)));
+
+		byte[] bArr = new byte[4];
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		return bArr;
+
+	}
+
+	private static long convertIntoLong(String str) {
+
+		String val = String.format("%08X", Float.floatToIntBits(Float.parseFloat(str)));
+
+		byte[] bArr = new byte[4];
+
+		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+
+		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+
+		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+
+		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+
+		long s = bytesToLong(bArr);
+
+		return s;
+
+	}
+
+	private static long bytesToLong(byte[] b) {
+
+		long result = 0;
+
+		for (int i = 0; i < 4; i++) {
+
+			result <<= 8;
+
+			result |= (b[i] & 0xFF);
+		}
+
+		return result;
 	}
 
 	public static void writeFile(String filename, String content) {
@@ -2052,7 +2141,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
+				VPXLogger.updateLog(s);
 			}
 
 		} catch (Exception e) {
@@ -2075,7 +2164,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
+				VPXLogger.updateLog(s);
 			}
 
 		} catch (Exception e) {
@@ -2121,7 +2210,7 @@ public class VPXUtilities {
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
+				VPXLogger.updateLog(s);
 			}
 
 		} catch (Exception e) {
@@ -2226,7 +2315,8 @@ public class VPXUtilities {
 				createSubsystemFolder(rootPath);
 
 			} else {
-				System.out.println("root directory is wrong");
+							
+				VPXLogger.updateLog("root directory is wrong");
 
 				return false;
 			}

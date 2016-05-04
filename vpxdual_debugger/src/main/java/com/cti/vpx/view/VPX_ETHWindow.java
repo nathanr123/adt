@@ -37,7 +37,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cti.vpx.command.MSGCommand;
-import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_AboutWindow;
 import com.cti.vpx.controls.VPX_AliasConfigWindow;
 import com.cti.vpx.controls.VPX_AppModeWindow;
@@ -61,6 +60,7 @@ import com.cti.vpx.controls.VPX_PasswordWindow;
 import com.cti.vpx.controls.VPX_PreferenceWindow;
 import com.cti.vpx.controls.VPX_ProcessorNode;
 import com.cti.vpx.controls.VPX_ProcessorTree;
+import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_SubnetFilterWindow;
 import com.cti.vpx.controls.VPX_VLANConfig;
 import com.cti.vpx.controls.graph.VPX_SpectrumWindow;
@@ -402,30 +402,6 @@ public class VPX_ETHWindow extends JFrame
 		VPXLogger.updateLog("Memory Browser opened");
 	}
 
-	public void reindexMemoryBrowserIndex() {
-
-		currentNoofMemoryView--;
-
-		if (currentNoofMemoryView == VPXConstants.MAX_MEMORY_BROWSER) {
-
-			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
-
-			btnMemoryBrowser.setEnabled(false);
-
-		} else {
-
-			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
-
-			btnMemoryBrowser.setEnabled(true);
-		}
-
-		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
-				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
-
-		btnMemoryBrowser.setToolTipText(
-				"remain " + (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " memory browsers");
-	}
-
 	// Plot Window
 
 	public void createMemoryPlots() {
@@ -487,30 +463,6 @@ public class VPX_ETHWindow extends JFrame
 		VPXLogger.updateLog("Memory Plot opened");
 	}
 
-	public void reindexMemoryPlotIndex() {
-
-		currentNoofMemoryPlot--;
-
-		if (currentNoofMemoryPlot == VPXConstants.MAX_MEMORY_PLOT) {
-
-			vpx_Menu_Window_MemoryPlot.setEnabled(false);
-
-			btnMemoryPlot.setEnabled(false);
-
-		} else {
-
-			vpx_Menu_Window_MemoryPlot.setEnabled(true);
-
-			btnMemoryPlot.setEnabled(true);
-		}
-
-		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
-				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
-
-		btnMemoryPlot
-				.setToolTipText("remain " + (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " memory plots");
-	}
-
 	// Spectrum Window
 
 	public void createSpectrumWindow() {
@@ -570,28 +522,31 @@ public class VPX_ETHWindow extends JFrame
 		VPXLogger.updateLog("Data analyser opened");
 	}
 
-	public void reindexSpectrumWindowIndex() {
+	public boolean isAlreadyAvailable(String ip, int core) {
 
-		currentNoofSpectrum--;
+		boolean ret = false;
 
-		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
+		for (int j = 0; j < spectrumWindow.length; j++) {
 
-			vpx_Menu_Window_Spectrum.setEnabled(false);
+			if (spectrumWindow[j].getCurrentProcIP().equals(ip) &&
 
-			btnMemorySpectrum.setEnabled(false);
+					spectrumWindow[j].getCurrentCore() == core) {
 
-		} else {
+				ret = true;
 
-			vpx_Menu_Window_Spectrum.setEnabled(true);
+				break;
 
-			btnMemorySpectrum.setEnabled(true);
+			}
+
 		}
 
-		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
-				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
+		return ret;
 
-		btnMemorySpectrum
-				.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
+	}
+
+	public void updateConsoleFilters() {
+
+		console.reloadSubsystems();
 	}
 
 	public void reloadVPXSystem() {
@@ -1449,7 +1404,7 @@ public class VPX_ETHWindow extends JFrame
 
 		treeLegendPanel.add(lblNewLabel_1);
 
-		JLabel lblNewLabel_2 = new JLabel("W");
+		JLabel lblNewLabel_2 = new JLabel(" ");
 
 		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -1469,13 +1424,13 @@ public class VPX_ETHWindow extends JFrame
 
 		treeLegendPanel.add(lblNewLabel_3);
 
-		JLabel lblNewLabel_4 = new JLabel("Waterfall Graph");
+		JLabel lblNewLabel_4 = new JLabel(" ");
 
 		lblNewLabel_4.setBounds(93, 12, 148, 14);
 
 		treeLegendPanel.add(lblNewLabel_4);
 
-		JLabel lblAmplitudeGraph = new JLabel("Amplitude Graph");
+		JLabel lblAmplitudeGraph = new JLabel("Amplitude / Waterfall Graph");
 
 		lblAmplitudeGraph.setBounds(93, 38, 148, 14);
 
@@ -1510,6 +1465,8 @@ public class VPX_ETHWindow extends JFrame
 
 	public void updateProcessorTree() {
 		vpx_Processor_Tree.updateVPXSystemTree();
+
+		console.reloadFilters();
 	}
 
 	public void addTab(String tabName, JScrollPane comp) {
@@ -1562,18 +1519,25 @@ public class VPX_ETHWindow extends JFrame
 	public void openLogFile() {
 
 		fileDialog.addChoosableFileFilter(filterOut);
+		
+		fileDialog.setMultiSelectionEnabled(true);
 
-		int returnVal = fileDialog.showOpenDialog(null);
+		int returnVal = fileDialog.showOpenDialog(this);
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 
-			File file = fileDialog.getSelectedFile();
+			File[] file = fileDialog.getSelectedFiles();
 
-			vpx_Content_Tabbed_Pane_Right.addTab(file.getName(), new VPX_LogFileViewPanel(file));
+			for (int i = 0; i < file.length; i++) {
 
-			vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+				vpx_Content_Tabbed_Pane_Right.addTab(file[i].getName(), new VPX_LogFileViewPanel(file[i]));
 
+				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
+
+			}
 		}
+		
+		fileDialog.setMultiSelectionEnabled(false);
 
 	}
 
@@ -1992,6 +1956,7 @@ public class VPX_ETHWindow extends JFrame
 		paswordWindow.setVisible(true);
 
 		if (paswordWindow.isAccepted()) {
+			
 			if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
 
 				paswordWindow.dispose();
@@ -2262,21 +2227,37 @@ public class VPX_ETHWindow extends JFrame
 	@Override
 	public void readMemory(MemoryViewFilter filter) {
 
-	//	Thread th = new Thread(new Runnable() {
+		// Thread th = new Thread(new Runnable() {
 
-		//	@Override
-		//	public void run() {
-				udpMonitor.readMemory(filter);
+		// @Override
+		// public void run() {
+		udpMonitor.readMemory(filter);
 
-		//	}
-	//	});
+		// }
+		// });
 
-	//	th.start();
+		// th.start();
 
 	}
 
 	public void setMemoryValue(String ip, int core, long fromAddress, int memindex, int typeSize, int length,
 			long newValue) {
+
+		Thread th = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				udpMonitor.setMemory(ip, core, fromAddress, memindex, typeSize, length, newValue);
+
+			}
+		});
+
+		th.start();
+	}
+
+	public void setMemoryValue(String ip, int core, long fromAddress, int memindex, int typeSize, int length,
+			byte[] newValue) {
 
 		Thread th = new Thread(new Runnable() {
 
@@ -2344,6 +2325,31 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
+	public void reIndexMemoryPlotIndex() {
+
+		currentNoofMemoryPlot--;
+
+		if (currentNoofMemoryPlot == VPXConstants.MAX_MEMORY_PLOT) {
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(false);
+
+			btnMemoryPlot.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_MemoryPlot.setEnabled(true);
+
+			btnMemoryPlot.setEnabled(true);
+		}
+
+		vpx_Menu_Window_MemoryPlot.setText(rBundle.getString("Menu.Window.MemoryPlot") + " ( "
+				+ (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " ) ");
+
+		btnMemoryPlot
+				.setToolTipText("remain " + (VPXConstants.MAX_MEMORY_PLOT - currentNoofMemoryPlot) + " memory plots");
+	}
+
+	@Override
 	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer) {
 		Thread th = new Thread(new Runnable() {
 
@@ -2371,23 +2377,57 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
-	public void readAnalyticalData(String ip, int core, int id) {
+	public void reIndexMemoryBrowserIndex() {
+
+		currentNoofMemoryView--;
+
+		if (currentNoofMemoryView == VPXConstants.MAX_MEMORY_BROWSER) {
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(false);
+
+			btnMemoryBrowser.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_MemoryBrowser.setEnabled(true);
+
+			btnMemoryBrowser.setEnabled(true);
+		}
+
+		vpx_Menu_Window_MemoryBrowser.setText(rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+				+ (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " ) ");
+
+		btnMemoryBrowser.setToolTipText(
+				"remain " + (VPXConstants.MAX_MEMORY_BROWSER - currentNoofMemoryView) + " memory browsers");
+	}
+
+	@Override
+	public void readSpectrum(String ip, int core, int id) {
 
 		udpMonitor.readSpectrum(ip, core, id);
 	}
 
 	@Override
-	public void populateAnalyticalData(String ip, int core, int id, float[] yAxis) {
+	public void populateSpectrum(String ip, int core, int id, float[] yAxis) {
 
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
+
 				try {
 
-					if (spectrumWindow[id].isVisible()) {
+					for (int i = 0; i < spectrumWindow.length; i++) {
 
-						spectrumWindow[id].loadData(core, yAxis);
+						if (spectrumWindow[i].isVisible()) {
+
+							if ((spectrumWindow[i].getCurrentCore() == core)
+									&& (spectrumWindow[i].getCurrentProcIP().equals(ip))) {
+
+								spectrumWindow[i].loadData(core, yAxis);
+
+							}
+						}
 					}
 
 				} catch (Exception e) {
@@ -2403,9 +2443,36 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
-	public void sendAnalyticalDataInterrupt(String ip) {
+	public void reIndexSpectrumWindowIndex(String ip, int core) {
 
-		udpMonitor.setSpectrumInterrupted(ip);
+		currentNoofSpectrum--;
+
+		if (currentNoofSpectrum == VPXConstants.MAX_SPECTRUM) {
+
+			vpx_Menu_Window_Spectrum.setEnabled(false);
+
+			btnMemorySpectrum.setEnabled(false);
+
+		} else {
+
+			vpx_Menu_Window_Spectrum.setEnabled(true);
+
+			btnMemorySpectrum.setEnabled(true);
+		}
+
+		vpx_Menu_Window_Spectrum.setText(rBundle.getString("Menu.Window.Spectrum") + " ( "
+				+ (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " ) ");
+
+		btnMemorySpectrum
+				.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
+
+		sendSpectrumInterrupt(ip, core);
+	}
+
+	@Override
+	public void sendSpectrumInterrupt(String ip, int core) {
+
+		udpMonitor.setSpectrumInterrupted(ip, core);
 
 	}
 

@@ -94,16 +94,6 @@ public class Hex16 extends AbstractTableModel {
 		for (int i = 0; i < 16; i++) {
 			columnNames[i] = Integer.toHexString(i).toUpperCase();
 		}
-
-		/*
-		 * byteStrVals = new String[256]; for (int i = 0; i <
-		 * byteStrVals.length; i++) { byteStrVals[i] =
-		 * Integer.toHexString(i).toUpperCase(); }
-		 * 
-		 * paddedLowerByteStrVals = new String[16]; for (int i = 0; i <
-		 * paddedLowerByteStrVals.length; i++) { paddedLowerByteStrVals[i] = "0"
-		 * + Integer.toHexString(i).toUpperCase(); }
-		 */
 	}
 
 	/**
@@ -177,9 +167,12 @@ public class Hex16 extends AbstractTableModel {
 
 		byte[] b = doc.getByteByGroup(pos, 2, true);
 
-		String str = String.format("%02x%02x", b[0], b[1]).toUpperCase();
+		if (b != null) {
+			String str = String.format("%02x%02x", b[0], b[1]).toUpperCase();
 
-		return str;
+			return str;
+		} else
+			return "";
 
 	}
 
@@ -341,30 +334,7 @@ public class Hex16 extends AbstractTableModel {
 
 		int offset = editor.cellToOffset(row, col);
 
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, Long.decode(str));
-
-		/*
-		
-		String val = String.format("%04x", Integer.parseInt(value.toString(), 16));
-
-		byte[] bArr = new byte[2];
-
-		bArr[1] = (byte) Integer.parseInt(val.substring(0, 2), 16);
-
-		bArr[0] = (byte) Integer.parseInt(val.substring(2, 4), 16);
-
-		int offset = editor.cellToOffset(row, col) * 2;
-
-		replaceBytes(offset, 2, bArr);
-
-		bi = new BigInteger(bArr);
-
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT16, 1, bi.longValue());
-
-		fireTableCellUpdated(row, col);
-
-		editor.fireHexEditorEvent(offset, 2, 2);
-		*/
+		this.editor.getMemoryWindow().setMemory(offset * 2, ATP.DATA_TYPE_SIZE_BIT16, 1, Long.decode(str));
 
 	}
 

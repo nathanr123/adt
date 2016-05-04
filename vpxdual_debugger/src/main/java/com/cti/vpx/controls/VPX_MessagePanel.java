@@ -12,10 +12,14 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -144,9 +148,9 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		loadMessageStyles();
 	}
 
-	private void navigateCommand(KeyEvent keyEvent) {
+	private void navigateCommand(int keyEvent) {
 
-		if (keyEvent.getKeyCode() == KeyEvent.VK_UP) {
+		if (keyEvent == KeyEvent.VK_UP) {
 
 			if (currentCommandIndex > 0) {
 
@@ -155,7 +159,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 				txt_Msg_Send.setText(cmdHistory.get(currentCommandIndex));
 			}
 
-		} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN) {
+		} else if (keyEvent == KeyEvent.VK_DOWN) {
 
 			if (currentCommandIndex < cmdHistory.size()) {
 
@@ -360,6 +364,22 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		txt_Msg_Send.setFont(VPXConstants.BISTRESULTFONT);
 
+		txt_Msg_Send.addMouseWheelListener(new MouseWheelListener() {
+
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+
+				int rotaionDirection = e.getWheelRotation();
+
+				if (rotaionDirection < 0) {
+					navigateCommand(KeyEvent.VK_UP);
+				} else {
+					navigateCommand(KeyEvent.VK_DOWN);
+				}
+
+			}
+		});
+
 		txt_Msg_Send.addMouseListener(new MouseListener() {
 
 			@Override
@@ -404,14 +424,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 					btn_Msg_Send.doClick();
 
-				}
-				if (arg0.getKeyCode() == KeyEvent.VK_UP) {
+				} else {
 
-					navigateCommand(arg0);
+					navigateCommand(arg0.getKeyCode());
 
-				} else if (arg0.getKeyCode() == KeyEvent.VK_DOWN) {
-
-					navigateCommand(arg0);
 				}
 
 			}
@@ -487,6 +503,21 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		fl_controlsPanel.setAlignment(FlowLayout.RIGHT);
 
 		cmbCores = new JComboBox<String>();
+
+		cmbCores.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				if (arg0.getSource().equals(cmbCores)) {
+
+					if (arg0.getStateChange() == ItemEvent.SELECTED) {
+
+						txt_Msg_Send.requestFocus();
+					}
+				}
+			}
+		});
 
 		cmbCores.setPreferredSize(new Dimension(140, 22));
 
@@ -603,7 +634,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			if (cmbCores.getSelectedIndex() == 0) {
 
-				updateProcessorMessage(VPXSessionManager.getCurrentSubSystem() + " "
+				updateProcessorMessage(VPXSessionManager.getCurrentSubSystem() + " :: "
 						+ VPXSessionManager.getCurrentProcType() + " : \n", proc_From_Style);
 
 				updateProcessorMessage("  " + msg.substring(2, msg.length()) + "\n\n", proc_Msg_Style);
@@ -667,9 +698,17 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private void updateUserMessage(String msg) {
 
-		updateUserMessage(
-				VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType() + " : \n",
-				proc_From_Style);
+		if (VPXSessionManager.getCurrentProcType().contains("P2020")) {
+
+			updateUserMessage(
+					VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType() + " : \n",
+					proc_From_Style);
+
+		} else {
+
+			updateUserMessage(VPXSessionManager.getCurrentSubSystem() + " " + VPXSessionManager.getCurrentProcType()
+					+ " Core " + (cmbCores.getSelectedIndex() - 1) + " : \n", proc_From_Style);
+		}
 
 		updateUserMessage("  " + msg + "\n\n", proc_Msg_Style);
 	}
@@ -816,56 +855,55 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			public void run() {
 				try {
 
-					Desktop.getDesktop().open(new File(VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/vpxdebugger.chm"));
+					Desktop.getDesktop()
+							.open(new File(VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir"))
+									+ "/help/vpxdebugger.chm"));
 
 				} catch (IOException e) {
 					VPXLogger.updateError(e);
 				}
 			}
-			/*	VPXLogger.updateLog("Help document opened");
-
-				final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
-
-				JPanel contentPane = new JPanel();
-
-				contentPane.setLayout(new BorderLayout());
-
-				contentPane.add(browserCanvas, BorderLayout.CENTER);
-
-				JDialog frame = new JDialog(parent, "List of commands");
-
-				frame.setBounds(100, 100, 650, 600);
-
-				frame.setLocationRelativeTo(parent);
-
-				frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-				frame.setContentPane(contentPane);
-
-				frame.setResizable(true);
-
-				frame.addWindowListener(new WindowAdapter() {
-
-					@Override
-					public void windowClosing(WindowEvent e) { // Dispose of the
-						// native
-						// component cleanly
-						browserCanvas.dispose();
-					}
-				});
-
-				frame.setVisible(true);
-
-				if (browserCanvas.initialise()) {
-
-					browserCanvas.setUrl(
-							VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir")) + "/help/help.html");
-				} else {
-				}
-
-				frame.setSize(651, 601);
-
-			}*/
+			/*
+			 * VPXLogger.updateLog("Help document opened");
+			 * 
+			 * final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
+			 * 
+			 * JPanel contentPane = new JPanel();
+			 * 
+			 * contentPane.setLayout(new BorderLayout());
+			 * 
+			 * contentPane.add(browserCanvas, BorderLayout.CENTER);
+			 * 
+			 * JDialog frame = new JDialog(parent, "List of commands");
+			 * 
+			 * frame.setBounds(100, 100, 650, 600);
+			 * 
+			 * frame.setLocationRelativeTo(parent);
+			 * 
+			 * frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			 * 
+			 * frame.setContentPane(contentPane);
+			 * 
+			 * frame.setResizable(true);
+			 * 
+			 * frame.addWindowListener(new WindowAdapter() {
+			 * 
+			 * @Override public void windowClosing(WindowEvent e) { // Dispose
+			 * of the // native // component cleanly browserCanvas.dispose(); }
+			 * });
+			 * 
+			 * frame.setVisible(true);
+			 * 
+			 * if (browserCanvas.initialise()) {
+			 * 
+			 * browserCanvas.setUrl(
+			 * VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir"
+			 * )) + "/help/help.html"); } else { }
+			 * 
+			 * frame.setSize(651, 601);
+			 * 
+			 * }
+			 */
 		});
 
 		th.start();
@@ -1206,4 +1244,5 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		}
 
 	}
+
 }

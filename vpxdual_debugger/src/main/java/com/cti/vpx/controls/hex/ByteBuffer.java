@@ -39,13 +39,13 @@ public class ByteBuffer {
 	 * The byte buffer that contains the document content.
 	 */
 	private byte[] buffer;
-	
+
 	private int length;
 
 	public ByteBuffer(int size) {
-		
+
 		this.length = size;
-		
+
 		buffer = new byte[size];
 	}
 
@@ -59,9 +59,9 @@ public class ByteBuffer {
 		if (size < 0) { // Probably never happens.
 			throw new IOException("Negative file length: " + size);
 		}
-		
+
 		this.length = size;
-		
+
 		buffer = new byte[size];
 
 		if (size > 0) {
@@ -95,7 +95,7 @@ public class ByteBuffer {
 			baos.write(buffer, 0, count);
 		}
 		buffer = baos.toByteArray();
-		
+
 		this.length = buffer.length;
 	}
 
@@ -112,7 +112,7 @@ public class ByteBuffer {
 		buffer = new byte[bytes.length]; // Use as a temporary buffer.
 
 		System.arraycopy(bytes, 0, buffer, 0, bytes.length);
-		
+
 		this.length = bytes.length;
 	}
 
@@ -124,13 +124,19 @@ public class ByteBuffer {
 
 		int j = offset * group;
 
-		byte[] b = new byte[group];
+		byte[] b = null;
+
+		if (offset < 0)
+			return b;
 
 		if (j < buffer.length) {
+
+			b = new byte[group];
 
 			for (int i = b.length - 1; i >= 0; i--) {
 
 				if (j < buffer.length) {
+
 					if (isunSigned)
 						b[i] = (byte) (buffer[j] & 0xff);
 					else
@@ -154,11 +160,11 @@ public class ByteBuffer {
 		buf2[offset] = b;
 		System.arraycopy(buffer, offset, buf2, offset + 1, buffer.length - offset);
 		buffer = buf2;
-		this.length= buffer.length;
+		this.length = buffer.length;
 	}
 
 	public void insertBytes(int offs, byte[] b) {
-		
+
 		int replaceLength = this.length - buffer.length;
 
 		if (b == null || b.length == 0) {
@@ -167,7 +173,7 @@ public class ByteBuffer {
 
 		byte[] buf2 = new byte[this.length];
 		System.arraycopy(buffer, 0, buf2, 0, offs);
-		System.arraycopy(b, 0, buf2, offs,replaceLength);
+		System.arraycopy(b, 0, buf2, offs, replaceLength);
 		System.arraycopy(buffer, offs, buf2, offs + replaceLength, buffer.length - offs);
 		buffer = buf2;
 		this.length = buffer.length;

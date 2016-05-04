@@ -337,31 +337,11 @@ public class Hex8 extends AbstractTableModel {
 			str = "0x"+value.toString();
 		}
 		
-		//byte b = (byte) Integer.parseInt(value.toString(), 16);
-
-		
-		
+	
 		int offset = editor.cellToOffset(row, col);
-/*
-		if (offset > -1) { // i.e., not col 17...
 
-			byte old = doc.getByte(offset);
-
-			if (old == b) {
-				return;
-			}
-
-			doc.setByte(offset, b);
-
-
-			undoManager.addEdit(new ByteChangedUndoableEdit(offset, old, b));
-*/
 			this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT8, 1,Long.decode(str));
 
-	//		fireTableCellUpdated(row, col);
-
-		//	editor.fireHexEditorEvent(offset, 1, 1);
-	//	}
 	}
 
 	/**

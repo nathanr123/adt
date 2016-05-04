@@ -719,13 +719,13 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			startAddress = (memoryLoadWindow.isStartAddress() ? memoryLoadWindow.getStartAddress() : "0x0000000");
 
+			editor.updateBuffer();
+
 			VPXUtilities.getParent().sendMemoryFile(memoryWindow.getSelectedProcessor(), memoryLoadWindow.getFileName(),
 					(VPXUtilities.getValue(startAddress) == -1) ? 0 : VPXUtilities.getValue(startAddress),
 					memoryLoadWindow.isReadAsBinary(), memoryLoadWindow.getFormat(), memoryLoadWindow.getDelimiter(),
 					dialog);
 
-			//editor.updateBuffer();
-			
 			if (memoryLoadWindow.isReadAsBinary()) {
 
 				handleOpenFile(file.getAbsolutePath(), startAddress);
@@ -1529,7 +1529,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			try {
 
-				//editor.updateBuffer();
+				editor.updateBuffer();
 
 				setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
 
@@ -1561,7 +1561,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 		if (rc == 1) {
 
-			Point p = null;
+		//	Point p = null;
 
 			long start = editor.getHexEditorRowHeader().getRowHeaderModel().getStartAddress();
 
@@ -1574,18 +1574,7 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 			try {
 
-				for (int i = offset; i < (offset + length); i++) {
-
-					p = editor.offsetToCell(i);
-
-					memoryWindow.setMemory(start1, editor.getCurrentModel(), (int) length,
-							new BigInteger(memStFillWindow.getData().getBytes()).longValue());
-
-					//editor.updateBuffer();
-
-					setValue(memStFillWindow.getData(), (int) p.getX(), (int) p.getY());
-
-				}
+				memoryWindow.setMemory(offset, editor.getCurrentModel(), (int) length, memStFillWindow.getData());
 
 			} catch (Exception e) {
 				VPXLogger.updateError(e);

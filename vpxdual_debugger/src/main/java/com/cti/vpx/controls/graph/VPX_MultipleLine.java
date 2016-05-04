@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,10 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 
 	private final javax.swing.Timer dataTimer;
 	private final javax.swing.Timer dataTimer1;
+	private byte[] plot1Bytes;
+	private byte[] plot2Bytes;
+	private boolean isPlot1 = false;
+	private boolean isPlot2 = false;
 
 	/** Creates new form GraphWithMultipleLines */
 	public VPX_MultipleLine() {
@@ -62,45 +67,43 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		line1Data = new GeneratedLineData(0, 0, 0, new float[0]);
 
 		line2Data = new GeneratedLineData(0, 0, 0, new float[0]);
-		
-		lineGraph.setGridYMinMax(0, 255);
-		
+
+		//lineGraph.setGridYMinMax(0, 255);
+
 		dataTimer = new javax.swing.Timer(500, new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 
 				float[] floats = getFile("D:\\test.bin");
-			
+
 				line1Data.setXValues(0, floats.length, floats.length);
-				
+
 				lineGraph.setGridXMinMax(0, floats.length);
-				
+
 				final float[] yValues1 = new float[floats.length];
-				
+
 				System.arraycopy(floats, 0, yValues1, 0, floats.length);
-				
+
 				line1Data.setYValues(yValues1);
 
 				lineGraph.setGraphData(LINE_1, line1Data);
 
-
 			}
 		});
 
-	//dataTimer.start();
-		
+		// dataTimer.start();
+
 		dataTimer1 = new javax.swing.Timer(550, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				
 				float[] floats = getFile("D:\\rews.bin");
-				
-				line2Data.setXValues(0, floats.length, floats.length);				
-				
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
 				final float[] yValues2 = new float[floats.length];
-				
+
 				System.arraycopy(floats, 0, yValues2, 0, floats.length);
-				
+
 				line2Data.setYValues(yValues2);
 
 				lineGraph.setGraphData(LINE_2, line2Data);
@@ -108,7 +111,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 			}
 		});
 
-	//	dataTimer1.start();
+		// dataTimer1.start();
 	}
 
 	public float[] getFile(String fileName) {
@@ -128,16 +131,16 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		return f;
 
 	}
-	
-	public void clearAll(){
-		
+
+	public void clearAll() {
+
 		lineGraph.clear();
-		
+
 		line1Data = new GeneratedLineData(0, 0, 0, new float[0]);
 
 		line2Data = new GeneratedLineData(0, 0, 0, new float[0]);
-		
-		lineGraph.setGridYMinMax(0, 255);
+
+		//lineGraph.setGridYMinMax(0, 255);
 	}
 
 	public void setBytes(byte[] bytes1, byte[] bytes2) {
@@ -174,33 +177,389 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 
 	public void setBytes(int lineID, byte[] bytes) {
 
-		float[] floats = toFloatArray(bytes);
-
 		if (lineID == LINEID_1) {
-			
-			line1Data.setXValues(0, floats.length, floats.length);
-			
-			lineGraph.setGridXMinMax(0, floats.length);
-			
-			final float[] yValues1 = new float[floats.length];
-			
-			System.arraycopy(floats, 0, yValues1, 0, floats.length);
-			
-			line1Data.setYValues(yValues1);
 
-			lineGraph.setGraphData(LINE_1, line1Data);
+			plot1Bytes = bytes;
+
+			isPlot1 = true;
 
 		} else if (lineID == LINEID_2) {
-			
-			line2Data.setXValues(0, floats.length, floats.length);				
-			
-			final float[] yValues2 = new float[floats.length];
-			
-			System.arraycopy(floats, 0, yValues2, 0, floats.length);
-			
-			line2Data.setYValues(yValues2);
 
-			lineGraph.setGraphData(LINE_2, line2Data);
+			plot2Bytes = bytes;
+
+			isPlot2 = true;
+		}
+
+		reDraw(1);
+
+		/*
+		 * float[] floats = toFloatArray(bytes);
+		 * 
+		 * if (lineID == LINEID_1) {
+		 * 
+		 * plot1Bytes = bytes;
+		 * 
+		 * isPlot1 = true;
+		 * 
+		 * line1Data.setXValues(0, floats.length, floats.length);
+		 * 
+		 * lineGraph.setGridXMinMax(0, floats.length);
+		 * 
+		 * final float[] yValues1 = new float[floats.length];
+		 * 
+		 * System.arraycopy(floats, 0, yValues1, 0, floats.length);
+		 * 
+		 * line1Data.setYValues(yValues1);
+		 * 
+		 * lineGraph.setGraphData(LINE_1, line1Data);
+		 * 
+		 * } else if (lineID == LINEID_2) {
+		 * 
+		 * plot2Bytes = bytes;
+		 * 
+		 * isPlot2 = true;
+		 * 
+		 * line2Data.setXValues(0, floats.length, floats.length);
+		 * 
+		 * final float[] yValues2 = new float[floats.length];
+		 * 
+		 * System.arraycopy(floats, 0, yValues2, 0, floats.length);
+		 * 
+		 * line2Data.setYValues(yValues2);
+		 * 
+		 * lineGraph.setGraphData(LINE_2, line2Data); }
+		 */
+	}
+
+	public void reDraw(int format) {
+
+		lineGraph.clear();
+
+		switch (format) {
+		case 0:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0,255);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 1:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes, format);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(floats.length,floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes, format);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 2:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 3:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 4:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 5:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 6:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 7:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(0, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
+		case 8:
+
+			if (isPlot1) {
+
+				float[] floats = toFloatArray(plot1Bytes);
+
+				line1Data.setXValues(0, floats.length, floats.length);
+
+				lineGraph.setGridXMinMax(-floats.length, floats.length);
+
+				final float[] yValues1 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues1, 0, floats.length);
+
+				line1Data.setYValues(yValues1);
+
+				lineGraph.setGraphData(LINE_1, line1Data);
+
+			}
+			if (isPlot2) {
+
+				float[] floats = toFloatArray(plot2Bytes);
+
+				line2Data.setXValues(0, floats.length, floats.length);
+
+				final float[] yValues2 = new float[floats.length];
+
+				System.arraycopy(floats, 0, yValues2, 0, floats.length);
+
+				line2Data.setYValues(yValues2);
+
+				lineGraph.setGraphData(LINE_2, line2Data);
+			}
+
+			break;
+
 		}
 
 	}
@@ -215,6 +574,177 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		}
 
 		return floatArray;
+	}
+
+	private float[] toFloatArray(byte[] bytes, int format) {
+
+		float[] floatArr = null;
+
+		// 0-8 Bit Hex
+		// 1-16 Bit Hex
+		// 2-32 Bit Hex
+		// 3-64 Bit Hex
+		// 4-16 Bit Signed
+		// 5-32 Bit Signed
+		// 6-16 Bit Unsigned
+		// 7-32 Bit Unsigned
+		// 8-32 Bit Floating
+
+		int len = 0;
+
+		if (format == 0) {// 8 Bit Hex
+
+			len = bytes.length;
+
+			float[] floatArray = new float[len];
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				floatArray[i] = (float) (bytes[i] & 0x0ff);
+			}
+
+			floatArr = floatArray;
+
+		} else if (format == 1) {// 16 Bit Hex
+
+			len = bytes.length / 2;
+
+			float[] floatArray = new float[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 2);
+
+				floatArray[i] = (float) new BigInteger(1, bb).intValue();
+			}
+
+			floatArr = floatArray;
+
+		} else if (format == 2) {// 32 Bit Hex
+
+			len = bytes.length / 4;
+
+			float[] floatArray = new float[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				floatArray[i] = (float) new BigInteger(1, bb).intValue();
+			}
+
+			floatArr = floatArray;
+
+		} else if (format == 3) {// 64 Bit Hex
+
+			len = bytes.length / 8;
+
+			float[] floatArray = new float[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 8);
+
+				floatArray[i] = (float) new BigInteger(1, bb).intValue();
+			}
+
+			floatArr = floatArray;
+
+		} else if (format == 4) {// 16 Bit Signed
+
+			len = bytes.length / 2;
+
+		} else if (format == 5) {// 32 Bit Signed
+
+			len = bytes.length / 4;
+
+			float[] floatArray = new float[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				floatArray[i] = (float) new BigInteger(1, bb).intValue();
+			}
+
+			floatArr = floatArray;
+
+		} else if (format == 6) {// 16 Bit Unsigned
+
+			len = bytes.length / 2;
+
+		} else if (format == 7) {// 32 Bit Unsigned
+
+			len = bytes.length / 4;
+
+			float[] floatArray = new float[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				floatArray[i] = (float) new BigInteger(1, bb).intValue();
+			}
+
+			floatArr = floatArray;
+
+		} else if (format == 8) {// 32 Bit Floating
+
+			len = bytes.length / 4;
+
+			float[] floatArray = new float[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < floatArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				floatArray[i] = (float) new BigInteger(1, bb).intValue();
+			}
+
+			floatArr = floatArray;
+
+		}
+
+		return floatArr;
+	}
+
+	public byte[] getByteByGroup(byte[] buffer, int offset, int group) {
+
+		int j = offset * group;
+
+		byte[] b = null;
+
+		if (offset < 0)
+			return b;
+
+		if (j < buffer.length) {
+
+			b = new byte[group];
+
+			for (int i = b.length - 1; i >= 0; i--) {
+
+				if (j < buffer.length) {
+
+					b[i] = (byte) (buffer[j]);
+				}
+
+				j++;
+			}
+
+		}
+		return b;
 	}
 
 	/**

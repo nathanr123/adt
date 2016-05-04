@@ -92,7 +92,7 @@ public class VPX_AboutWindow extends JDialog {
 
 		contentPanel.add(lblNewLabel_2, "cell 2 2,growx,aligny top");
 
-		JLabel lblBuildOn = new JLabel("Build on: 06-01-2016 11:12:46");
+		JLabel lblBuildOn = new JLabel("Build on: 01-02-2016 01:48:22");
 
 		contentPanel.add(lblBuildOn, "cell 2 4,growx,aligny top");
 

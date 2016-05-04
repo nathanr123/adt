@@ -50,8 +50,6 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	private boolean isAlive = false;
 
-	private boolean isWaterfall = false;
-
 	private boolean isAmplitude = false;
 
 	private long respondedTime = 0;
@@ -70,8 +68,7 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	}
 
-	public VPX_ProcessorNode(String ip, String subSystem, PROCESSOR_LIST pType, boolean isAlive, boolean isWaterfall,
-			boolean isAmplitude) {
+	public VPX_ProcessorNode(String ip, String subSystem, PROCESSOR_LIST pType, boolean isAlive, boolean isAmplitude) {
 
 		setNodeLevel(PROCESSOR_NODE);
 
@@ -81,8 +78,6 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 		setNodeType(pType);
 
-		setWaterfall(isWaterfall);
-
 		setAmplitude(isAmplitude);
 
 		setStatus(isAlive);
@@ -91,7 +86,7 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	public VPX_ProcessorNode(String ip, String subSystem, PROCESSOR_LIST pType, boolean isAlive) {
 
-		this(ip, subSystem, pType, isAlive, false, false);
+		this(ip, subSystem, pType, isAlive, false);
 
 	}
 
@@ -220,11 +215,9 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	}
 
-	public void setStatus(boolean isAlive, boolean waterfall, boolean amplitude) {
+	public void setStatus(boolean isAlive, boolean amplitude) {
 
 		this.isAlive = isAlive;
-
-		this.isWaterfall = waterfall;
 
 		this.isAmplitude = amplitude;
 
@@ -239,17 +232,6 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	public void setNodeTypeString(String nodeTypeString) {
 		this.nodeTypeString = nodeTypeString;
-	}
-
-	public boolean isWaterfall() {
-		return isWaterfall;
-	}
-
-	public void setWaterfall(boolean isWaterfall) {
-
-		this.isWaterfall = isWaterfall;
-
-		updateNodeStatus();
 	}
 
 	public boolean isAmplitude() {
@@ -293,41 +275,41 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 		// setToolTip();
 	}
 
-	/*
-	 * private void setToolTip() {
-	 * 
-	 * String str = "";
-	 * 
-	 * if (isProcessorNode) {
-	 * 
-	 * str = String.format( "<html>Node : Processor Node<br>" +
-	 * "Processor : %s<br>" + "IP Address : %s<br>" + "Sub System : %s<br>" +
-	 * "Status  : %s<br>" + "Up Time : %s<br>" + "Last Responded : %s</html>",
-	 * nodeTypeString, nodeIP, subSystemName, getProcStatus(),
-	 * VPXUtilities.getCurrentTime(5, (System.currentTimeMillis() - upTime)),
-	 * VPXUtilities.getCurrentTime(5, respondedTime)); } }
-	 * 
-	 * 
-	 * private String getProcStatus() {
-	 * 
-	 * String sub = "";
-	 * 
-	 * if (isAlive) {
-	 * 
-	 * sub = sub + "<font face='Tahoma' size='2.5' color='green'> Alive </font>"
-	 * + "&nbsp;&nbsp;";
-	 * 
-	 * } else {
-	 * 
-	 * sub = sub + "<font face='Tahom' size='2.5' color='red'> Not Alive</font>"
-	 * + "&nbsp;&nbsp;";
-	 * 
-	 * }
-	 * 
-	 * return sub;
-	 * 
-	 * }
-	 */
+	public String getToolTip() {
+
+		String str = "";
+
+		if (isProcessorNode) {
+
+			str = String.format(
+					"<html>Node : Processor Node<br>" + "Processor : %s<br>" + "IP Address : %s<br>"
+							+ "Sub System : %s<br>" + "Status  : %s<br>" + "Up Time : %s<br>"
+							+ "Last Responded : %s</html>",
+					nodeTypeString, nodeIP, subSystemName, getProcStatus(),
+					VPXUtilities.getCurrentTime(5, (System.currentTimeMillis() - upTime)),
+					VPXUtilities.getCurrentTime(5, respondedTime));
+		}
+
+		return str;
+	}
+
+	private String getProcStatus() {
+
+		String sub = "";
+
+		if (isAlive) {
+
+			sub = sub + "<font face='Tahoma' size='2.5' color='green'> Alive </font>" + "&nbsp;&nbsp;";
+
+		} else {
+
+			sub = sub + "<font face='Tahom' size='2.5' color='red'> Not Alive</font>" + "&nbsp;&nbsp;";
+
+		}
+
+		return sub;
+
+	}
 
 	private void createUserObject() {
 
@@ -349,15 +331,6 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 			sub = sub + "<font face='Tahoma' size='2.5' color='green'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
 
-			if (isWaterfall) {
-
-				sub = sub + "<font face='Tahoma' size='2' color='green'>W</font>" + "&nbsp;&nbsp;";
-
-			} else {
-
-				sub = sub + "<font face='Tahoma' size='2' color='red'>W</font>" + "&nbsp;&nbsp;";
-			}
-
 			if (isAmplitude) {
 
 				sub = sub + "<font face='Tahoma' size='2' color='green'>A</font>" + "&nbsp;&nbsp;";
@@ -370,8 +343,6 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 		} else {
 
 			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
-
-			sub = sub + "<font face='Tahoma' size='2' color='red'>W</font>" + "&nbsp;&nbsp;";
 
 			sub = sub + "<font face='Tahoma' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
 		}

@@ -53,7 +53,7 @@ public class VPXTFTPMonitor implements Runnable {
 		GET_ONLY, PUT_ONLY, GET_AND_PUT;
 	}
 
-	private HashSet<TFTPTransfer> transfers_ = new HashSet();
+	private HashSet<TFTPTransfer> transfers_ = new HashSet<TFTPTransfer>();
 
 	private volatile boolean shutdownServer = false;
 

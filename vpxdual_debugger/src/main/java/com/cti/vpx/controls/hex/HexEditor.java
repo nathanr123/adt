@@ -41,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import com.cti.vpx.controls.hex.groupmodel.Floating32;
@@ -196,7 +197,7 @@ public class HexEditor extends JScrollPane {
 	public void setHexModel(int mod) {
 
 		ByteBuffer bb = getByteBuffer(table.getModel());
-
+		
 		switch (mod) {
 
 		case HEX8:
@@ -206,7 +207,7 @@ public class HexEditor extends JScrollPane {
 			hex8model.setBytes(bb);
 
 			table.setModel(hex8model);
-
+			
 			currentMode = HEX8;
 
 			break;
@@ -313,10 +314,91 @@ public class HexEditor extends JScrollPane {
 		setShowRowHeader(getHexEditorRowHeader().getRowHeaderModel().getStartAddress(), currentStride, true);
 	}
 
-	public void setCurrentStride(int stride){
+	public void setCurrentStride(int stride) {
 		this.currentStride = stride;
 	}
-	
+
+	public void clearContent() {
+
+		TableModel model = table.getModel();
+
+		if (model instanceof Hex8) {
+
+			Hex8 mod = ((Hex8) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof Hex16) {
+
+			Hex16 mod = ((Hex16) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof Hex32) {
+
+			Hex32 mod = ((Hex32) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof Hex64) {
+
+			Hex64 mod = ((Hex64) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof SignedInt16) {
+
+			SignedInt16 mod = ((SignedInt16) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof SignedInt32) {
+
+			SignedInt32 mod = ((SignedInt32) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof UnSignedInt16) {
+
+			UnSignedInt16 mod = ((UnSignedInt16) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof UnSignedInt32) {
+
+			UnSignedInt32 mod = ((UnSignedInt32) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		} else if (model instanceof Floating32) {
+
+			Floating32 mod = ((Floating32) model);
+
+			mod.setBytes(new ByteBuffer(0));
+
+			mod.fireTableDataChanged();
+
+		}
+
+		setShowRowHeader(0, 0, true);
+	}
+
 	private ByteBuffer getByteBuffer(TableModel model) {
 
 		ByteBuffer bb = null;
@@ -361,6 +443,11 @@ public class HexEditor extends JScrollPane {
 
 		return bb;
 
+	}
+
+	public void updateBuffer() {
+
+		table.storeByteBuffer();
 	}
 
 	public int getCurrentModel() {

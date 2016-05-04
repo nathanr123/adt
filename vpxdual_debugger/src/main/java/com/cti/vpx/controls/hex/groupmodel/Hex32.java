@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -60,19 +59,6 @@ public class Hex32 extends AbstractTableModel {
 	private UndoManager undoManager;
 	private String[] columnNames;
 
-	/**
-	 * Cache of string values of "<code>0</code>"-"<code>ff</code>" for fast
-	 * rendering.
-	 */
-	private String[] paddedLowerByteStrVals;
-
-	/**
-	 * Cache of "padded" string values of "<code>00</code>"-"<code>0f</code>"
-	 * for fast rendering.
-	 */
-	private String[] byteStrVals;
-
-	private BigInteger bi;
 
 	/**
 	 * Creates the model.
@@ -95,14 +81,6 @@ public class Hex32 extends AbstractTableModel {
 			columnNames[i] = Integer.toHexString(i).toUpperCase();
 		}
 
-		/*
-		 * byteStrVals = new String[256]; for (int i = 0; i <
-		 * byteStrVals.length; i++) { byteStrVals[i] = Integer.toHexString(i); }
-		 * 
-		 * paddedLowerByteStrVals = new String[16]; for (int i = 0; i <
-		 * paddedLowerByteStrVals.length; i++) { paddedLowerByteStrVals[i] = "0"
-		 * + Integer.toHexString(i); }
-		 */
 	}
 
 	/**
@@ -175,7 +153,11 @@ public class Hex32 extends AbstractTableModel {
 		// & with 0xff to convert to unsigned
 		byte[] b = doc.getByteByGroup(pos, 4, true);
 
-		return String.format("%02x%02x%02x%02x", b[0], b[1], b[2], b[3]).toUpperCase();// (b
+		if (b != null) {
+
+			return String.format("%02x%02x%02x%02x", b[0], b[1], b[2], b[3]).toUpperCase();
+		} else
+			return "";
 
 	}
 
@@ -256,14 +238,14 @@ public class Hex32 extends AbstractTableModel {
 		this.doc = buff;
 	}
 
-	public void setBytes(byte[] bytes,int stride) throws IOException {
+	public void setBytes(byte[] bytes, int stride) throws IOException {
 		doc = new ByteBuffer(bytes);
 		undoManager.discardAllEdits();
 		setColumnHeaders(stride);
 		fireTableDataChanged();
 		editor.fireHexEditorEvent(0, doc.getSize(), 0);
 	}
-	
+
 	private void setColumnHeaders(int stride) {
 
 		TableColumnModel header = editor.getTable().getTableHeader().getColumnModel();
@@ -327,7 +309,6 @@ public class Hex32 extends AbstractTableModel {
 	 */
 	public void setValueAt(Object value, int row, int col) {
 
-		
 		String str = value.toString();
 
 		if (!str.startsWith("0x") && !str.startsWith("0x")) {
@@ -337,47 +318,8 @@ public class Hex32 extends AbstractTableModel {
 
 		int offset = editor.cellToOffset(row, col);
 
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.decode(str));
-		
-		/*
-		 * byte[] bArr1 = DatatypeConverter.parseHexBinary(value.toString());
+		this.editor.getMemoryWindow().setMemory(offset * 4, ATP.DATA_TYPE_SIZE_BIT32, 1, Long.decode(str));
 
-		byte[] bArr = new byte[4];
-
-		bArr[3] = bArr1[0];
-
-		bArr[2] = bArr1[1];
-
-		bArr[1] = bArr1[2];
-
-		bArr[0] = bArr1[3];
-		 * 
-		
-		
-		String val = String.format("%08x", Integer.parseInt(value.toString(), 16));
-
-		byte[] bArr = new byte[4];
-
-		bArr[3] = (byte) Integer.parseInt(val.substring(0, 2), 16);
-
-		bArr[2] = (byte) Integer.parseInt(val.substring(2, 4), 16);
-
-		bArr[1] = (byte) Integer.parseInt(val.substring(4, 6), 16);
-
-		bArr[0] = (byte) Integer.parseInt(val.substring(6, 8), 16);
-
-		int offset = editor.cellToOffset(row, col) * 4;
-
-		replaceBytes(offset, 4, bArr);
-		
-		bi = new BigInteger(bArr);
-
-		this.editor.getMemoryWindow().setMemory(offset, ATP.DATA_TYPE_SIZE_BIT32, 1, bi.longValue());
-
-		fireTableCellUpdated(row, col);
-
-		editor.fireHexEditorEvent(offset, 4, 4);
-		*/
 	}
 
 	/**

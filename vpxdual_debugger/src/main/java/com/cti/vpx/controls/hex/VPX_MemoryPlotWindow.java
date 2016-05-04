@@ -1,12 +1,16 @@
 package com.cti.vpx.controls.hex;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -14,11 +18,14 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.math.BigInteger;
+import java.nio.ByteOrder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -34,6 +41,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -41,8 +49,23 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.entity.EntityCollection;
+import org.jfree.chart.labels.XYToolTipGenerator;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleInsets;
+
 import com.cti.vpx.command.ATP;
-import com.cti.vpx.controls.graph.VPX_MultipleLine;
+import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.DrawSurface;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -60,6 +83,18 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 8729031397351962182L;
+
+	private static final int LINEID_1 = 1;
+
+	private static final int LINEID_2 = 2;
+
+	private byte[] plot1Bytes;
+
+	private byte[] plot2Bytes;
+
+	private boolean isPlot1 = false;
+
+	private boolean isPlot2 = false;
 
 	private int MINUTE = 60 * 1000;
 
@@ -191,8 +226,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	private Thread autoRefreshThread = null;
 
-	private VPX_MultipleLine multiLine = new VPX_MultipleLine();
-
 	private JSlider slideAutoRefresh;
 
 	private JLabel lblAutoRefreshValue;
@@ -206,6 +239,16 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	private JLabel lblPlot2Size;
 
 	private JComboBox<String> cmbPlot2MemSize;
+
+	private JComboBox<String> cmbFormatBytes;
+
+	private XYSeries plotSeries1, plotSeries2;
+
+	private XYPlot plot;
+
+	private XYSeriesCollection data;
+
+	private JFreeChart chart;
 
 	/**
 	 * 
@@ -245,6 +288,9 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		init();
 
 		loadComponents();
+
+		// testPlot();
+
 	}
 
 	private void init() {
@@ -326,6 +372,8 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				doPlotMemory();
+				
+			//	 testPlot();
 
 			}
 		});
@@ -334,14 +382,111 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		btnClear = new JButton("Clear");
 
+		btnClear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				clearAllContents();
+
+			}
+		});
+
 		controlsPanel.add(btnClear);
 
-		contentPane.add(multiLine, BorderLayout.CENTER);
+		cmbFormatBytes = new JComboBox<String>(
+				new DefaultComboBoxModel<String>(new String[] { "8 Bit Hex", "16 Bit Hex", "32 Bit Hex", "64 Bit Hex",
+						"16 Bit Signed", "32 Bit Signed", "16 Bit Unsigned", "32 Bit Unsigned", "32 Bit Floating" }));
+
+		cmbFormatBytes.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getSource().equals(cmbFormatBytes)) {
+
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+
+						plotInDifferentFormat();
+
+					}
+				}
+			}
+		});
+
+		controlsPanel.add(cmbFormatBytes);
+
+		chkAutoRefresh = new JCheckBox("Auto Refresh in every");
+		controlsPanel.add(chkAutoRefresh);
+
+		slideAutoRefresh = new JSlider();
+		controlsPanel.add(slideAutoRefresh);
+		slideAutoRefresh.setMinimum(30);
+
+		slideAutoRefresh.setMaximum(960);
+		slideAutoRefresh.setValue(30);
+
+		slideAutoRefresh.setEnabled(false);
+
+		lblAutoRefreshValue = new JLabel("30");
+		controlsPanel.add(lblAutoRefreshValue);
+		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAutoRefreshValue.setEnabled(false);
+		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
+
+		lblMins = new JLabel("Secs");
+		controlsPanel.add(lblMins);
+		lblMins.setEnabled(false);
+		lblMins.setPreferredSize(new Dimension(35, 25));
+
+		slideAutoRefresh.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+
+				JSlider source = (JSlider) e.getSource();
+
+				int fps = (int) source.getValue();
+
+				if (fps <= 59) {
+
+					lblAutoRefreshValue.setText("" + fps);
+
+					lblMins.setText("Secs");
+
+				} else {
+
+					lblAutoRefreshValue.setText("" + (fps / 60));
+
+					lblMins.setText("Mins");
+				}
+
+			}
+		});
+
+		chkAutoRefresh.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+
+				lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
+
+				lblMins.setEnabled(chkAutoRefresh.isSelected());
+			}
+		});
+
+		createPlot();
 
 		createPlot1FilterPanel();
 
 		createPlot2FilterPanel();
 
+	}
+
+	private void plotInDifferentFormat() {
+
+		reDrawPlot(cmbFormatBytes.getSelectedIndex());
 	}
 
 	private void createPlot1FilterPanel() {
@@ -529,67 +674,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		cmbPlot1Cores.setPreferredSize(new Dimension(120, 20));
 
 		plot1SubSystemPanel.add(cmbPlot1Cores, "cell 5 0,alignx left,aligny center");
-
-		chkAutoRefresh = new JCheckBox("Auto Refresh in every");
-
-		chkAutoRefresh.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-
-				slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
-
-				lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
-
-				lblMins.setEnabled(chkAutoRefresh.isSelected());
-			}
-		});
-
-		plot1SubSystemPanel.add(chkAutoRefresh, "cell 6 0,alignx center,aligny top");
-
-		slideAutoRefresh = new JSlider();
-		slideAutoRefresh.setMinimum(30);
-
-		slideAutoRefresh.setMaximum(960);
-		slideAutoRefresh.setValue(30);
-
-		slideAutoRefresh.setEnabled(false);
-		plot1SubSystemPanel.add(slideAutoRefresh, "cell 7 0");
-
-		slideAutoRefresh.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-
-				JSlider source = (JSlider) e.getSource();
-
-				int fps = (int) source.getValue();
-
-				if (fps <= 59) {
-
-					lblAutoRefreshValue.setText("" + fps);
-
-					lblMins.setText("Secs");
-
-				} else {
-
-					lblAutoRefreshValue.setText("" + (fps / 60));
-
-					lblMins.setText("Mins");
-				}
-
-			}
-		});
-
-		lblAutoRefreshValue = new JLabel("30");
-		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
-		lblAutoRefreshValue.setEnabled(false);
-		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
-		plot1SubSystemPanel.add(lblAutoRefreshValue, "cell 8 0");
-
-		lblMins = new JLabel("Secs");
-		lblMins.setEnabled(false);
-		lblMins.setPreferredSize(new Dimension(35, 25));
-		plot1SubSystemPanel.add(lblMins, "cell 9 0");
 
 		JPanel plot1MapPanel = new JPanel();
 
@@ -784,8 +868,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot1MemoryFilter.setAutoRefresh(chkAutoRefresh.isSelected());
 
-		plot1MemoryFilter.setAutoRefresh(chkAutoRefresh.isSelected());
-
 		plot1MemoryFilter.setTimeinterval(slideAutoRefresh.getValue());
 
 		plot1MemoryFilter.setUseMapFile(radPlot1UseMap.isSelected());
@@ -965,8 +1047,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		txtPlot1MemoryAddres.setText(plot1MemoryFilter.getMemoryAddress());
 
 		txtPlot1MemoryLength.setText(plot1MemoryFilter.getMemoryLength());
-
-		// spinPlot1MemoryStride.setValue(plot1MemoryFilter.getMemoryStride());
 
 		enablePlot1MemoryFields();
 
@@ -1414,6 +1494,10 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot2MemoryFilter.setMemoryStride(spinPlot2MemoryStride.getValue().toString());
 
+		plot2MemoryFilter.setAutoRefresh(chkAutoRefresh.isSelected());
+
+		plot2MemoryFilter.setTimeinterval(slideAutoRefresh.getValue());
+
 	}
 
 	private String getLengthAsString(String value, int size) {
@@ -1502,6 +1586,14 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 			}
 		}
 
+		chkAutoRefresh.setSelected(plot2MemoryFilter.isAutoRefresh());
+
+		slideAutoRefresh.setEnabled(chkAutoRefresh.isSelected());
+
+		lblAutoRefreshValue.setEnabled(chkAutoRefresh.isSelected());
+
+		lblMins.setEnabled(chkAutoRefresh.isSelected());
+
 		radPlot2UseMap.setSelected(plot2MemoryFilter.isUseMapFile());
 
 		radPlot2UserAddress.setSelected(plot2MemoryFilter.isDirectMemory());
@@ -1513,8 +1605,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		txtPlot2MemoryAddres.setText(plot2MemoryFilter.getMemoryAddress());
 
 		txtPlot2MemoryLength.setText(plot2MemoryFilter.getMemoryLength());
-
-		// spinPlot2MemoryStride.setValue(plot2MemoryFilter.getMemoryStride());
 
 		enablePlot2MemoryFields();
 
@@ -1735,19 +1825,21 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			btnClear.setEnabled(true);
 
+			cmbFormatBytes.setEnabled(true);
+
 		} else {
 
 			btnPlot.setEnabled(false);
 
 			btnClear.setEnabled(false);
+
+			cmbFormatBytes.setEnabled(false);
 		}
 	}
 
 	private void loadPlot1MemoryVariables(String fileName) {
 
 		cmbPlot1MemoryVariables.removeAllItems();
-
-		// cmbPlot1MemoryVariables.addItem("");
 
 		txtPlot1MapFilePath.setText(fileName);
 
@@ -1779,8 +1871,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		cmbPlot2MemoryVariables.removeAllItems();
 
-		// cmbPlot2MemoryVariables.addItem("");
-
 		txtPlot2MapFilePath.setText(fileName);
 
 		plot2MemVariables = VPXUtilities.getMemoryAddressVariables(fileName);
@@ -1788,6 +1878,42 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		cmbPlot2MemoryVariables.addMemoryVariables(plot2MemVariables);
 
 		cmbPlot2MemoryVariables.setSelectedIndex(0);
+
+	}
+
+	private void clearAllContents() {
+
+		plotSeries1.clear();
+
+		plotSeries2.clear();
+
+		plot1Bytes = null;
+
+		plot2Bytes = null;
+
+		isPlot1 = false;
+
+		isPlot2 = false;
+
+		cmbFormatBytes.setSelectedIndex(0);
+
+		loadPlot1Filters();
+
+		loadPlot2Filters();
+
+		createDefaultFilters();
+
+		enablePlot1Components();
+
+		enablePlot2Components();
+
+		chkPlot1.setSelected(false);
+
+		chkPlot2.setSelected(false);
+
+		enablePlot1Components();
+
+		enablePlot2Components();
 
 	}
 
@@ -1848,11 +1974,407 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			btnClear.setEnabled(true);
 
+			cmbFormatBytes.setEnabled(true);
+
 		} else {
 
 			btnPlot.setEnabled(false);
 
 			btnClear.setEnabled(false);
+
+			cmbFormatBytes.setEnabled(false);
+		}
+	}
+
+	public void createPlot() {
+
+		data = new XYSeriesCollection();
+
+		plotSeries1 = new XYSeries("Plot - 1");
+
+		plotSeries2 = new XYSeries("Plot - 2");
+
+		data.addSeries(plotSeries1);
+
+		data.addSeries(plotSeries2);
+
+		chart = ChartFactory.createXYLineChart("", "", "", data, PlotOrientation.VERTICAL, true, true, false);
+
+		chart.setAntiAlias(true);
+
+		chart.setBackgroundPaint((new JPanel()).getBackground());
+
+		chart.setBorderVisible(false);
+
+		chart.setTextAntiAlias(true);
+
+		plot = chart.getXYPlot();
+
+		plot.setDomainPannable(true);
+		
+		plot.setBackgroundPaint(Color.BLACK);
+		
+		plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
+
+		plot.setDomainCrosshairVisible(true);
+
+		plot.setRangeCrosshairVisible(true);
+
+		//refreshRenderer();
+
+		ValueAxis domain = new NumberAxis(), range = new NumberAxis();
+
+		plot.setDomainAxis(domain);
+
+		plot.setRangeAxis(range);
+
+		ChartPanel phnPlotPanel = new ChartPanel(chart);
+
+		phnPlotPanel.setCursor(DrawSurface.getDefaultCrossHairCursor());
+
+		phnPlotPanel.setPopupMenu(null);
+
+		contentPane.add(phnPlotPanel, BorderLayout.CENTER);
+
+	}
+
+	public void plot() {
+		try {
+
+			for (int i = 0; i < 1024; i++)
+				plotSeries1.add(i, Math.sin(i / 70.0), false);
+
+			plotSeries1.fireSeriesChanged();
+
+			Thread.sleep(250);
+
+			for (int i = 0; i < 1024; i++)
+				plotSeries2.add(i, Math.sin(i / 30.0), false);
+
+			plotSeries2.fireSeriesChanged();
+
+			//refreshRenderer();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void setBytes(int lineID, byte[] bytes) {
+
+		if (lineID == LINEID_1) {
+
+			plot1Bytes = bytes;
+
+			isPlot1 = true;
+
+		} else if (lineID == LINEID_2) {
+
+			plot2Bytes = bytes;
+
+			isPlot2 = true;
+		}
+
+		reDrawPlot(cmbFormatBytes.getSelectedIndex());
+	}
+
+	public void reDrawPlot(int format) {
+
+		plotSeries1.clear();
+
+		plotSeries2.clear();
+
+		if (isPlot1) {
+
+			double[] doubles = getDoubleArray(plot1Bytes, format);
+
+			if (doubles != null) {
+
+				for (int i = 0; i < doubles.length; i++)
+					plotSeries1.add(i, doubles[i], true);
+
+				plotSeries1.fireSeriesChanged();
+			}
+
+		}
+		if (isPlot2) {
+
+			double[] doubles = getDoubleArray(plot2Bytes, format);
+
+			if (doubles != null) {
+
+				for (int i = 0; i < doubles.length; i++)
+					plotSeries2.add(i, doubles[i], true);
+
+				plotSeries2.fireSeriesChanged();
+			}
+		}
+
+	}
+
+	private double[] getDoubleArray(byte[] bytes, int format) {
+
+		double[] doubleArr = null;
+
+		if (bytes == null) {
+
+			return doubleArr;
+		}
+
+		// 0-8 Bit Hex
+		// 1-16 Bit Hex
+		// 2-32 Bit Hex
+		// 3-64 Bit Hex
+		// 4-16 Bit Signed
+		// 5-32 Bit Signed
+		// 6-16 Bit Unsigned
+		// 7-32 Bit Unsigned
+		// 8-32 Bit Floating
+
+		int len = 0;
+
+		if (format == 0) {// 8 Bit Hex
+
+			len = bytes.length;
+
+			double[] doubleArray = new double[len];
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				doubleArray[i] = (double) (bytes[i] & 0x0ff);
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 1) {// 16 Bit Hex
+
+			len = bytes.length / 2;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 2);
+
+				doubleArray[i] = (double) new BigInteger(1, bb).intValue();
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 2) {// 32 Bit Hex
+
+			len = bytes.length / 4;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				doubleArray[i] = (double) new BigInteger(1, bb).longValue();
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 3) {// 64 Bit Hex
+
+			len = bytes.length / 8;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 8);
+
+				doubleArray[i] = (double) new BigInteger(1, bb).longValue();
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 4) {// 16 Bit Signed
+
+			len = bytes.length / 2;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 2);
+
+				doubleArray[i] = (double) new BigInteger(1, bb).intValue();
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 5) {// 32 Bit Signed
+
+			len = bytes.length / 4;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				doubleArray[i] = (double) new BigInteger(1, bb).intValue();
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 6) {// 16 Bit Unsigned
+
+			len = bytes.length / 2;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 2);
+
+				doubleArray[i] = (double) Integer.decode(String.format("0x%02x%02x", bb[0] & 0xff, bb[1] & 0xff));
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 7) {// 32 Bit Unsigned
+
+			len = bytes.length / 4;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				doubleArray[i] = (double) Long.decode(
+						String.format("0x%02x%02x%02x%02x", bb[0] & 0xff, bb[1] & 0xff, bb[2] & 0xff, bb[3] & 0xff));
+			}
+
+			doubleArr = doubleArray;
+
+		} else if (format == 8) {// 32 Bit floating
+
+			len = bytes.length / 4;
+
+			double[] doubleArray = new double[len];
+
+			byte[] bb = null;
+
+			for (int i = 0; i < doubleArray.length; i++) {
+
+				bb = getByteByGroup(bytes, i, 4);
+
+				doubleArray[i] = (double) java.nio.ByteBuffer.wrap(bb).order(ByteOrder.BIG_ENDIAN).getFloat();
+			}
+
+			doubleArr = doubleArray;
+
+		}
+
+		return doubleArr;
+	}
+
+	public byte[] getByteByGroup(byte[] buffer, int offset, int group) {
+
+		int j = offset * group;
+
+		byte[] b = null;
+
+		if (offset < 0)
+			return b;
+
+		if (j < buffer.length) {
+
+			b = new byte[group];
+
+			for (int i = b.length - 1; i >= 0; i--) {
+
+				if (j < buffer.length) {
+
+					b[i] = (byte) (buffer[j]);
+				}
+
+				j++;
+			}
+
+		}
+		return b;
+	}
+
+	public void refreshRenderer() {
+
+		APXYLineAndShapeRenderer r = new APXYLineAndShapeRenderer();
+
+		r.setSeriesStroke(0, new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+
+		r.setSeriesShape(0, new Rectangle(0, 0));
+
+		r.setSeriesPaint(0, Color.red);
+
+		r.setSeriesStroke(1, new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+
+		r.setSeriesShape(1, new Rectangle(0, 0));
+
+		r.setSeriesPaint(1, Color.blue);
+
+		XYToolTipGenerator tt1 = new XYToolTipGenerator() {
+			public String generateToolTip(XYDataset dataset, int series, int item) {
+				StringBuffer sb = new StringBuffer();
+				Number x = dataset.getX(series, item);
+				Number y = dataset.getY(series, item);
+
+				String htmlStr = "<html><p style='color:#ff0000;'>Plot - 1:</p>" + x.doubleValue() + "<br />"
+						+ y.doubleValue() + "</html>";
+				sb.append(htmlStr);
+				return sb.toString();
+			}
+		};
+		XYToolTipGenerator tt2 = new XYToolTipGenerator() {
+			public String generateToolTip(XYDataset dataset, int series, int item) {
+				StringBuffer sb = new StringBuffer();
+				Number x = dataset.getX(series, item);
+				Number y = dataset.getY(series, item);
+				String htmlStr = "<html><p style='color:blue;'>Plot - 2:</p>" + x.doubleValue() + "<br />"
+						+ y.doubleValue() + "</html>";
+				sb.append(htmlStr);
+				return sb.toString();
+			}
+		};
+		r.setSeriesToolTipGenerator(0, tt1);
+		r.setSeriesToolTipGenerator(1, tt2);
+		plot.setRenderer(r);
+
+		UIManager.put("ToolTip.background", new Color(0.9f, 0.9f, 0.9f));
+		UIManager.put("ToolTip.font", null);
+	}
+
+	public class APXYLineAndShapeRenderer extends XYLineAndShapeRenderer {
+		private static final long serialVersionUID = 1L; // <- eclipse insists
+															// on this and I
+															// hate warnings ^^
+
+		@Override
+		protected void addEntity(EntityCollection entities, Shape area, XYDataset dataset, int series, int item,
+				double entityX, double entityY) {
+			if (area.getBounds().width < 2 || area.getBounds().height < 2)
+				super.addEntity(entities, null, dataset, series, item, entityX, entityY);
+			else
+				super.addEntity(entities, area, dataset, series, item, entityX, entityY);
 		}
 	}
 
@@ -1870,7 +2392,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		parent.reindexMemoryPlotIndex();
+		parent.reIndexMemoryPlotIndex();
 
 	}
 
@@ -1899,7 +2421,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 	}
 
 	public void populateValues(int lineID, byte[] bytes) {
-		multiLine.setBytes(lineID, bytes);
+		setBytes(lineID, bytes);
 	}
 
 	private void readMemory() {
@@ -1922,7 +2444,29 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		}
 	}
 
+	private void testPlot() {
+
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				plot();
+
+			}
+		});
+
+		t.start();
+	}
+
 	private void doPlotMemory() {
+
+		plotSeries1.clear();
+
+		plotSeries2.clear();
+
+		plot1Bytes = null;
+
+		plot2Bytes = null;
 
 		if (isPlot1Valid() && isPlot2Valid()) {
 
@@ -1956,7 +2500,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 				}
 			}
-			multiLine.clearAll();
 
 			readMemory();
 
@@ -2158,100 +2701,11 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		} else if (option == -3) {
 
 			ret = String.format("Length exceeding the limit.\nPlease ensure the length");
-		}else if(option == -4){
-			
+		} else if (option == -4) {
+
 			ret = "Address is not valid";
 		}
 
-		/*
-		 * String ret = "";
-		 * 
-		 * if (index > 0) {
-		 * 
-		 * switch (index - 1) {
-		 * 
-		 * case 0:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE0_DDR3_START_ADDRESS,
-		 * ATP.CORE0_DDR3_END_ADDRESS, ATP.C0_L2SRAM_START_ADDRESS,
-		 * ATP.C0_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * case 1:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE1_DDR3_START_ADDRESS,
-		 * ATP.CORE1_DDR3_END_ADDRESS, ATP.C1_L2SRAM_START_ADDRESS,
-		 * ATP.C1_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * case 2:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE2_DDR3_START_ADDRESS,
-		 * ATP.CORE2_DDR3_END_ADDRESS, ATP.C2_L2SRAM_START_ADDRESS,
-		 * ATP.C2_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * case 3:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE3_DDR3_START_ADDRESS,
-		 * ATP.CORE3_DDR3_END_ADDRESS, ATP.C3_L2SRAM_START_ADDRESS,
-		 * ATP.C3_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * case 4:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE4_DDR3_START_ADDRESS,
-		 * ATP.CORE4_DDR3_END_ADDRESS, ATP.C4_L2SRAM_START_ADDRESS,
-		 * ATP.C4_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * case 5:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE5_DDR3_START_ADDRESS,
-		 * ATP.CORE5_DDR3_END_ADDRESS, ATP.C5_L2SRAM_START_ADDRESS,
-		 * ATP.C5_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * case 6:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE6_DDR3_START_ADDRESS,
-		 * ATP.CORE6_DDR3_END_ADDRESS, ATP.C6_L2SRAM_START_ADDRESS,
-		 * ATP.C6_L2SRAM_END_ADDRESS); break;
-		 * 
-		 * case 7:
-		 * 
-		 * ret = String.format(
-		 * "Addres is invalid for Core - %d.\nAddress Range between ( 0x%08X and 0x%08X ) or (  0x%08X and 0x%08X  )"
-		 * , (index - 1), ATP.CORE7_DDR3_START_ADDRESS,
-		 * ATP.CORE7_DDR3_END_ADDRESS, ATP.C7_L2SRAM_START_ADDRESS,
-		 * ATP.C7_L2SRAM_END_ADDRESS);
-		 * 
-		 * break;
-		 * 
-		 * }
-		 * 
-		 * }
-		 */
 		return ret;
 	}
 
@@ -2311,82 +2765,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 			retValue = -3;
 		}
-
-		/*
-		 * boolean retValue = true;
-		 * 
-		 * long address = VPXUtilities.getValue(addr.trim());
-		 * 
-		 * if (address == -1 || coreIDX == 0) return false;
-		 * 
-		 * int core = coreIDX - 1;
-		 * 
-		 * if (core == 0) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE0_DDR3_START_ADDRESS,
-		 * ATP.CORE0_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C0_L2SRAM_START_ADDRESS, ATP.C0_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 1) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE1_DDR3_START_ADDRESS,
-		 * ATP.CORE1_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C1_L2SRAM_START_ADDRESS, ATP.C1_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 2) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE2_DDR3_START_ADDRESS,
-		 * ATP.CORE2_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C2_L2SRAM_START_ADDRESS, ATP.C2_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 3) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE3_DDR3_START_ADDRESS,
-		 * ATP.CORE3_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C3_L2SRAM_START_ADDRESS, ATP.C3_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 4) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE4_DDR3_START_ADDRESS,
-		 * ATP.CORE4_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C4_L2SRAM_START_ADDRESS, ATP.C4_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 5) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE5_DDR3_START_ADDRESS,
-		 * ATP.CORE5_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C5_L2SRAM_START_ADDRESS, ATP.C5_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 6) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE6_DDR3_START_ADDRESS,
-		 * ATP.CORE6_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C6_L2SRAM_START_ADDRESS, ATP.C6_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * } else if (core == 7) {
-		 * 
-		 * if (!VPXUtilities.isBetween(address, ATP.CORE7_DDR3_START_ADDRESS,
-		 * ATP.CORE7_DDR3_END_ADDRESS) && !VPXUtilities.isBetween(address,
-		 * ATP.C7_L2SRAM_START_ADDRESS, ATP.C7_L2SRAM_END_ADDRESS)) {
-		 * 
-		 * retValue = false; }
-		 * 
-		 * }
-		 */
 
 		return retValue;
 	}

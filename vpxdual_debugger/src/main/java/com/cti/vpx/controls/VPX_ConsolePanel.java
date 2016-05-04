@@ -63,6 +63,12 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	private boolean isFilterApply = false;
 
+	private String sub = "";
+
+	private String proc = "";
+
+	private String core = "";
+
 	List<String> ips = new ArrayList<String>();
 
 	@SuppressWarnings("unused")
@@ -181,6 +187,15 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 				ips.clear();
 
+				sub = cmbSubSystem.getSelectedItem().toString();
+
+				proc = cmbProcessor.getSelectedItem().toString();
+
+				if (cmbCores.getItemCount() > 0) {
+
+					core = cmbCores.getSelectedItem().toString();
+				}
+
 				isFilterApply = true;
 
 			}
@@ -201,11 +216,13 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 				ips.clear();
 
-				cmbSubSystem.setSelectedIndex(0);
+				loadFilters();
 
-				cmbProcessor.setSelectedIndex(0);
+				// cmbSubSystem.setSelectedIndex(0);
 
-				cmbCores.setSelectedIndex(0);
+				// cmbProcessor.setSelectedIndex(0);
+
+				// cmbCores.setSelectedIndex(0);
 
 			}
 		});
@@ -255,6 +272,28 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 		scrl_Console.setViewportView(txtA_Console);
 
 		txtA_Console.setEditable(false);
+
+	}
+
+	public void reloadFilters() {
+
+		sub = cmbSubSystem.getSelectedItem().toString();
+
+		proc = cmbProcessor.getSelectedItem().toString();
+
+		if (cmbCores.getItemCount() > 0) {
+			core = cmbCores.getSelectedItem().toString();
+		}
+
+		loadFilters();
+
+		cmbSubSystem.setSelectedItem(sub);
+
+		cmbProcessor.setSelectedItem(proc);
+
+		if (cmbCores.getItemCount() > 0) {
+			cmbCores.setSelectedItem(core);
+		}
 
 	}
 
@@ -523,27 +562,30 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner {
 
 	public void reloadSubsystems() {
 
-		int sub = cmbSubSystem.getSelectedIndex();
+		reloadFilters();
 
-		int proc = cmbProcessor.getSelectedIndex();
+		/*
+		 * int sub = cmbSubSystem.getSelectedIndex();
+		 * 
+		 * int proc = cmbProcessor.getSelectedIndex();
+		 * 
+		 * int core = 0;
+		 * 
+		 * if (cmbCores.getItemCount() > 0) {
+		 * 
+		 * core = cmbCores.getSelectedIndex(); }
+		 * 
+		 * loadFilters();
+		 * 
+		 * cmbSubSystem.setSelectedIndex(sub);
+		 * 
+		 * cmbProcessor.setSelectedIndex(proc);
+		 * 
+		 * if (cmbCores.getItemCount() > 0) {
+		 * 
+		 * cmbCores.setSelectedIndex(core); }
+		 */
 
-		int core = 0;
-
-		if (cmbCores.getItemCount() > 0) {
-
-			core = cmbCores.getSelectedIndex();
-		}
-
-		loadFilters();
-
-		cmbSubSystem.setSelectedIndex(sub);
-
-		cmbProcessor.setSelectedIndex(proc);
-
-		if (cmbCores.getItemCount() > 0) {
-
-			cmbCores.setSelectedIndex(core);
-		}
 	}
 
 	private void clearContents() {

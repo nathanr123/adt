@@ -14,9 +14,10 @@ public class DSPATPCommand extends ATPCommand {
 	public DSPATPCommand() {
 		super();
 	}
+
 	@Override
 	public ByteOrder byteOrder() {
-		return  ATP.BYTEORDER_DSP;
+		return ATP.BYTEORDER_DSP;
 	}
 
 }

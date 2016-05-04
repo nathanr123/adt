@@ -25,6 +25,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -254,6 +255,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
+		ToolTipManager.sharedInstance().registerComponent(this);
+
 	}
 
 	private void startMonitor() {
@@ -346,6 +349,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 			addToUnlistedNode(p);
 
+			parent.updateConsoleFilters();
+
 		}
 
 		setRespondTimetoVPXSystem(ip, time);
@@ -422,13 +427,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		} else if (msg.startsWith("D1")) {
 
-			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP1, true, w.equals("1"),
-					a.equals("1"));
+			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP1, true,
+					(w.equals("1") || a.equals("1")));
 
 		} else if (msg.startsWith("D2")) {
 
-			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP2, true, w.equals("1"),
-					a.equals("1"));
+			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP2, true,
+					(w.equals("1") || a.equals("1")));
 
 		}
 
@@ -449,13 +454,13 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		} else if (msg.startsWith("D1")) {
 
-			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP1, true, w.equals("1"),
-					a.equals("1"));
+			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP1, true,
+					(w.equals("1") || a.equals("1")));
 
 		} else if (msg.startsWith("D2")) {
 
-			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP2, true, w.equals("1"),
-					a.equals("1"));
+			node = new VPX_ProcessorNode(ip, subsystem, PROCESSOR_LIST.PROCESSOR_DSP2, true,
+					(w.equals("1") || a.equals("1")));
 
 		}
 
@@ -485,7 +490,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				String a = msg.substring(3, 4).trim();
 
-				node.setStatus(true, w.equals("1"), a.equals("1"));
+				node.setStatus(true, (w.equals("1") || a.equals("1")));
 
 			}
 
@@ -575,11 +580,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				if (!subSystem.getIpDSP1().isEmpty())
 					dsp1Node = new VPX_ProcessorNode(subSystem.getIpDSP1(), subSystemNode.getNodeName(),
-							PROCESSOR_LIST.PROCESSOR_DSP1, false, false, false);
+							PROCESSOR_LIST.PROCESSOR_DSP1, false, false);
 
 				if (!subSystem.getIpDSP2().isEmpty())
 					dsp2Node = new VPX_ProcessorNode(subSystem.getIpDSP2(), subSystemNode.getNodeName(),
-							PROCESSOR_LIST.PROCESSOR_DSP2, false, false, false);
+							PROCESSOR_LIST.PROCESSOR_DSP2, false, false);
 
 				subSystemNode.add(p2020Node);
 
@@ -647,11 +652,11 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 				if (!subSystem.getIpDSP1().isEmpty())
 					dsp1Node = new VPX_ProcessorNode(subSystem.getIpDSP1(), subSystemNode.getNodeName(),
-							PROCESSOR_LIST.PROCESSOR_DSP1, false, false, false);
+							PROCESSOR_LIST.PROCESSOR_DSP1, false, false);
 
 				if (!subSystem.getIpDSP2().isEmpty())
 					dsp2Node = new VPX_ProcessorNode(subSystem.getIpDSP2(), subSystemNode.getNodeName(),
-							PROCESSOR_LIST.PROCESSOR_DSP2, false, false, false);
+							PROCESSOR_LIST.PROCESSOR_DSP2, false, false);
 
 				subSystemNode.add(p2020Node);
 
@@ -694,15 +699,14 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 				difference = (System.currentTimeMillis() - response) / 1000;
 
 				if (difference > (VPXSessionManager.getCurrentPeriodicity() + VPXConstants.MAXRESPONSETIMEOUT)) {
-   
-				
+
 					if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_P2020) {
 
 						node.setStatus(false);
 
 					} else {
 
-						node.setStatus(false, false, false);
+						node.setStatus(false, false);
 					}
 				}
 
@@ -730,6 +734,8 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 			String nodo = "";
 
 			VPX_ProcessorNode dNode = ((VPX_ProcessorNode) value);
+
+			setToolTipText(dNode.getToolTip());
 
 			if (sel) {
 				setTextSelectionColor(Color.white);
@@ -939,10 +945,10 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 		// Window Menus
 		vpx_Cxt_MemoryBrowser = VPXComponentFactory
 
-		.createJMenuItem(
-				rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
-						+ (VPXConstants.MAX_MEMORY_BROWSER - VPX_ETHWindow.currentNoofMemoryView) + " ) ",
-				VPXConstants.Icons.ICON_MEMORY);
+				.createJMenuItem(
+						rBundle.getString("Menu.Window.MemoryBrowser") + " ( "
+								+ (VPXConstants.MAX_MEMORY_BROWSER - VPX_ETHWindow.currentNoofMemoryView) + " ) ",
+						VPXConstants.Icons.ICON_MEMORY);
 
 		vpx_Cxt_MemoryBrowser.addActionListener(new ActionListener() {
 
@@ -1432,7 +1438,6 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 		vpx_Cxt_Spectrum.setEnabled(hasSubystem);
 
-		
 		// Testing pending
 		/*
 		 * if (hasSubystem) {
@@ -1550,7 +1555,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 								} else {
 
-									node.setStatus(false, false, false);
+									node.setStatus(false, false);
 								}
 
 							} else {
@@ -1561,7 +1566,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 								} else {
 
-									node.setStatus(true, node.isWaterfall(), node.isAmplitude());
+									node.setStatus(true, node.isAmplitude());
 								}
 							}
 
@@ -1627,7 +1632,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 							} else {
 
-								node.setStatus(false, false, false);
+								node.setStatus(false, false);
 							}
 
 						} else {
@@ -1638,7 +1643,7 @@ public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 							} else {
 
-								node.setStatus(true, node.isWaterfall(), node.isAmplitude());
+								node.setStatus(true, node.isAmplitude());
 							}
 						}
 
