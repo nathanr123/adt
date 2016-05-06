@@ -12,7 +12,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,21 +32,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.panel.CrosshairOverlay;
 import org.jfree.chart.plot.Crosshair;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.RectangleEdge;
 
 import com.cti.vpx.controls.graph.example.WaterfallGraphPanel;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.DrawSurface;
@@ -61,6 +55,7 @@ import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 import net.miginfocom.swing.MigLayout;
+import java.awt.GridLayout;
 
 public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
@@ -366,8 +361,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelGraph.setBackground(Color.BLACK);
 
 		contentPanel.add(panelGraph, BorderLayout.CENTER);
-
-		panelGraph.setLayout(new BorderLayout(0, 0));
+		panelGraph.setLayout(new GridLayout(0, 1, 0, 0));
 
 		JPanel panelWaterfall = new JPanel();
 
@@ -381,7 +375,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelWaterfall.add(newWaterfallGraph, BorderLayout.CENTER);
 
-		panelGraph.add(panelWaterfall, BorderLayout.NORTH);
+		panelGraph.add(panelWaterfall);
 
 		JPanel panelAmplitude = new JPanel(new BorderLayout());
 

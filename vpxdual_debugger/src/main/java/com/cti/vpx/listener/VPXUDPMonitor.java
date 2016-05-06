@@ -162,7 +162,9 @@ public class VPXUDPMonitor {
 
 	private VPXCommMonitor commMonitorRunnable;
 
-	private InetSocketAddress inetAddress = null;
+	private InetSocketAddress inetSocketAddressSend = null;
+
+	private InetAddress inetAddressRecv = null;
 
 	public VPXUDPMonitor() throws Exception {
 
@@ -185,6 +187,8 @@ public class VPXUDPMonitor {
 
 	private void createDefaultMonitors() throws Exception {
 
+		setInetAddress();
+
 		commMonitorRunnable = new VPXCommMonitor();
 
 		commMonitor = new Thread(commMonitorRunnable);
@@ -204,7 +208,6 @@ public class VPXUDPMonitor {
 		commMonitor.setPriority(5);
 
 		messageMonitor.setPriority(5);
-
 	}
 
 	public void startMonitor() throws Exception {
@@ -226,7 +229,7 @@ public class VPXUDPMonitor {
 
 	public void applyFilterbySubnet(String subnetmask) {
 
-		subnet = VPXSubnetFilter.createInstance(VPXSessionManager.getCurrentIP() + "/" + subnetmask);
+		subnet = VPXSubnetFilter.createInstance(VPXSessionManager.getCurrentSystemIP() + "/" + subnetmask);
 
 		VPXLogger.updateLog(String.format("Subnet Filter %s enabled", subnet));
 	}
@@ -1194,8 +1197,11 @@ public class VPXUDPMonitor {
 	private void setInetAddress() {
 
 		try {
-
-			if (inetAddress == null) {
+			inetAddressRecv = InetAddress.getByName(VPXSessionManager.getCurrentSystemIP());
+			
+			inetSocketAddressSend = new InetSocketAddress(inetAddressRecv, 0);
+/*
+			if (inetSocketAddressSend == null) {
 
 				NetworkInterface nif = NetworkInterface
 						.getByInetAddress(InetAddress.getByName(VPXSessionManager.getCurrentSystemIP()));
@@ -1204,15 +1210,15 @@ public class VPXUDPMonitor {
 
 					System.err.println("Error getting the Network Interface");
 
-					inetAddress = null;
+					inetSocketAddressSend = null;
 
 					return;
 				}
 
 				Enumeration<InetAddress> nifAddresses = nif.getInetAddresses();
 
-				inetAddress = new InetSocketAddress(nifAddresses.nextElement(), 0);
-			}
+				inetSocketAddressSend = new InetSocketAddress(inetAddressRecv, 0);
+			}*/
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1258,10 +1264,10 @@ public class VPXUDPMonitor {
 
 		try {
 
-			setInetAddress();
+			// setInetAddress();
 
-			if (inetAddress != null)
-				datagramSocket = new DatagramSocket(inetAddress);
+			if (inetSocketAddressSend != null)
+				datagramSocket = new DatagramSocket(inetSocketAddressSend);
 			else
 				datagramSocket = new DatagramSocket();
 
@@ -2955,7 +2961,10 @@ public class VPXUDPMonitor {
 
 		public VPXMessageConsoleMonitor() throws Exception {
 
-			messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO);
+			if (inetAddressRecv != null)
+				messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO, inetAddressRecv);
+			else
+				messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO);
 
 		}
 
@@ -3011,8 +3020,10 @@ public class VPXUDPMonitor {
 
 		public VPXCommMonitor() throws Exception {
 
-			communicationSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO);
-
+			if (inetAddressRecv != null)
+				communicationSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO, inetAddressRecv);
+			else
+				communicationSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO);
 		}
 
 		@Override
@@ -3072,7 +3083,12 @@ public class VPXUDPMonitor {
 		public VPXAdvMonitor() {
 
 			try {
-				advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO);
+
+				if (inetAddressRecv != null)
+					advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO, inetAddressRecv);
+				else
+					advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO);
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

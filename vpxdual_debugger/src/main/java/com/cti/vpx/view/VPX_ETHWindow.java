@@ -1216,7 +1216,9 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				vpx_Menu_Window_EthFlash.doClick();
+				// vpx_Menu_Window_EthFlash.doClick();
+
+				showEthFlash();
 
 			}
 		});
@@ -1519,7 +1521,7 @@ public class VPX_ETHWindow extends JFrame
 	public void openLogFile() {
 
 		fileDialog.addChoosableFileFilter(filterOut);
-		
+
 		fileDialog.setMultiSelectionEnabled(true);
 
 		int returnVal = fileDialog.showOpenDialog(this);
@@ -1536,7 +1538,7 @@ public class VPX_ETHWindow extends JFrame
 
 			}
 		}
-		
+
 		fileDialog.setMultiSelectionEnabled(false);
 
 	}
@@ -1710,7 +1712,8 @@ public class VPX_ETHWindow extends JFrame
 
 				vpx_Content_Tabbed_Pane_Right.setSelectedIndex(vpx_Content_Tabbed_Pane_Right.getTabCount() - 1);
 
-				VPXLogger.updateLog("Ethernet Flash opened");
+				VPXLogger.updateLog("Ethernet Flash opened for " + VPXSessionManager.getCurrentProcessor() + "("
+						+ VPXSessionManager.getCurrentProcType() + ")");
 
 			}
 		});
@@ -1722,7 +1725,7 @@ public class VPX_ETHWindow extends JFrame
 	public void showDataAnalyzer(String ip) {
 
 		Thread th = new Thread(new Runnable() {
-
+      
 			@Override
 			public void run() {
 
@@ -1956,7 +1959,7 @@ public class VPX_ETHWindow extends JFrame
 		paswordWindow.setVisible(true);
 
 		if (paswordWindow.isAccepted()) {
-			
+
 			if (VPXUtilities.getCurrentPassword().equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
 
 				paswordWindow.dispose();
