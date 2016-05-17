@@ -105,6 +105,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JMenuItem vpxSendMsgContextMenu_Cut;
 
+	private JMenuItem vpxSendMsgContextMenu_Clear;
+
 	private JMenuItem vpxSendMsgContextMenu_Copy;
 
 	private JMenuItem vpxSendMsgContextMenu_Paste;
@@ -173,6 +175,17 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void createContextMenus() {
+
+		vpxSendMsgContextMenu_Clear = VPXComponentFactory.createJMenuItem("Clear");
+
+		vpxSendMsgContextMenu_Clear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				clearContents();
+			}
+		});
 
 		vpxSendMsgContextMenu_Cut = VPXComponentFactory.createJMenuItem("Cut");
 
@@ -253,6 +266,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			}
 		});
 
+		vpxSendMsgContextMenu.add(vpxSendMsgContextMenu_Clear);
+
+		vpxSendMsgContextMenu.add(VPXComponentFactory.createJSeparator());
+		
 		vpxSendMsgContextMenu.add(vpxSendMsgContextMenu_Cut);
 
 		vpxSendMsgContextMenu.add(vpxSendMsgContextMenu_Copy);
@@ -278,6 +295,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		if (isList) {
 
+			vpxSendMsgContextMenu_Clear.setEnabled(true);
+			
 			if (cmdHistory.size() > 0) {
 
 				vpxSendMsgContextMenu_Cut.setEnabled(false);
@@ -784,6 +803,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		txtP_Proc_Msg_Display.setText("");
 
 		txtP_User_Msg_Display.setText("");
+
+		txt_Msg_Send.setText("");
 	}
 
 	private void loadCoresFilter() {

@@ -314,6 +314,8 @@ public class VPXConstants {
 
 		public static final String ICON_STOP_NAME = "Stop.gif";
 
+		public static final String ICON_SEARCH_NAME = "scan.png";
+
 		// Icons
 
 		public static final Icon ICON_EMPTY = VPXUtilities.getEmptyIcon(14, 14);
@@ -353,6 +355,8 @@ public class VPXConstants {
 		public static final ImageIcon ICON_UPLOAD = VPXUtilities.getImageIcon(ICON_UPLOAD_NAME, 14, 14);
 
 		public static final ImageIcon ICON_CLEAR = VPXUtilities.getImageIcon(ICON_CLEAR_NAME, 14, 14);
+
+		public static final ImageIcon ICON_SEARCH = VPXUtilities.getImageIcon(ICON_SEARCH_NAME, 14, 14);
 
 		public static final ImageIcon ICON_DOWNLOADOUT = VPXUtilities.getImageIcon(ICON_DOWNLOADOUT_NAME, 14, 14);
 

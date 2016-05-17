@@ -1944,9 +1944,9 @@ public class VPXUtilities {
 
 			for (int i = 0; i < arr.length; i++) {
 
-				//long l = convertIntoLong(arr[i].trim());
+				// long l = convertIntoLong(arr[i].trim());
 
-				//byte[] bArra = BigInteger.valueOf(l).toByteArray();
+				// byte[] bArra = BigInteger.valueOf(l).toByteArray();
 
 				byte[] bArra = convertIntoByte(arr[i].trim());// BigInteger.valueOf(l).toByteArray();
 
@@ -2111,6 +2111,21 @@ public class VPXUtilities {
 			File f = new File(fileName);
 
 			return f.exists();
+
+		} catch (Exception e) {
+			return false;
+		}
+
+	}
+
+	public static boolean isFileNameValid(String fileName) {
+
+		try {
+
+			if (fileName.length() < 3)
+				return false;
+			else
+				return true;
 
 		} catch (Exception e) {
 			return false;
@@ -2315,7 +2330,7 @@ public class VPXUtilities {
 				createSubsystemFolder(rootPath);
 
 			} else {
-							
+
 				VPXLogger.updateLog("root directory is wrong");
 
 				return false;
@@ -2351,15 +2366,15 @@ public class VPXUtilities {
 					.forceMkdir(
 							new File(
 									rootPath + "/"
-											+ VPXUtilities.getString(
-													VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM)
+											+ VPXUtilities
+													.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM)
 											+ "/"
 											+ VPXUtilities.getString(
 													VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP)
 											+ "/"
 											+ (VPXUtilities.getString(
 													VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_CORE)
-											+ " " + i)));
+													+ " " + i)));
 
 		}
 

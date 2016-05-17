@@ -862,9 +862,7 @@ public class VPX_AppModeWindow extends JFrame {
 						JOptionPane.showMessageDialog(null,
 								"Another instance is running or the ports are bind by another application.",
 								"Opening Application", JOptionPane.ERROR_MESSAGE);
-
-						e.printStackTrace();
-
+						
 						VPXLogger.updateError(e);
 
 						System.exit(0);

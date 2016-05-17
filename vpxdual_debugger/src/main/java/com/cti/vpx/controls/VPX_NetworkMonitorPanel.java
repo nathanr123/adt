@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -21,7 +22,9 @@ import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -53,6 +56,16 @@ public class VPX_NetworkMonitorPanel extends JPanel {
 
 	private DefaultTableCellRenderer centerRenderer;
 	private DefaultTableCellRenderer infoRenderer;
+
+	private final JPopupMenu vpxLogContextMenu = new JPopupMenu();
+
+	private JMenuItem vpxSendMsgContextMenu_Clear;
+
+	private JMenuItem vpxLogContextMenu_Show;
+
+	private JMenuItem vpxLogContextMenu_Save;
+
+	private int rowNum = -1;
 
 	/**
 	 * Create the panel.
@@ -115,6 +128,28 @@ public class VPX_NetworkMonitorPanel extends JPanel {
 		tableNetworkMonitor = new JTable();
 
 		tableNetworkMonitor.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseReleased(MouseEvent me) {
+
+				JTable table = (JTable) me.getSource();
+
+				Point p = me.getPoint();
+
+				rowNum = table.rowAtPoint(p);
+
+				if (me.getButton() == 3) {
+					
+					table.setRowSelectionInterval(rowNum, rowNum);
+
+					if (rowNum == -1)
+						vpxLogContextMenu_Show.setEnabled(false);
+					else
+						vpxLogContextMenu_Show.setEnabled(true);
+
+					showPopupMenu(me.getX(), me.getY());
+				}
+			}
 
 			public void mousePressed(MouseEvent me) {
 
@@ -216,6 +251,65 @@ public class VPX_NetworkMonitorPanel extends JPanel {
 		scrlNtetwork.setViewportView(tableNetworkMonitor);
 
 		scrlNtetwork.getViewport().setBackground(Color.WHITE);
+
+		createContextMenus();
+	}
+
+	private void createContextMenus() {
+
+		vpxSendMsgContextMenu_Clear = VPXComponentFactory.createJMenuItem("Clear All");
+
+		vpxSendMsgContextMenu_Clear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				clear();
+			}
+		});
+
+		vpxLogContextMenu_Show = VPXComponentFactory.createJMenuItem("Show Detail");
+
+		vpxLogContextMenu_Show.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				showDetail();
+			}
+		});
+
+		vpxLogContextMenu_Save = VPXComponentFactory.createJMenuItem("Save");
+
+		vpxLogContextMenu_Save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				save();
+			}
+		});
+
+		vpxLogContextMenu.add(vpxSendMsgContextMenu_Clear);
+
+		vpxLogContextMenu.add(vpxLogContextMenu_Save);
+
+		vpxLogContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpxLogContextMenu.add(vpxLogContextMenu_Show);
+
+	}
+
+	private void showPopupMenu(int x, int y) {
+
+		vpxLogContextMenu.show(this, x, y);
+
+	}
+
+	private void showDetail() {
+
+		new VPX_NWDataDetailWindow(nwMonitorModel.getPacket((Integer) nwMonitorModel.getValueAt(rowNum, 0)));
+
 	}
 
 	public void addPacket(VPXNWPacket packet) {

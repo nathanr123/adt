@@ -9,13 +9,18 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
@@ -26,7 +31,7 @@ import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
+public class VPX_LoggerPanel extends JPanel implements ClipboardOwner, FindController {
 
 	/**
 	 * 
@@ -38,6 +43,20 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 	private FileWriter fw;
 
 	private VPX_ETHWindow parent;
+
+	private final JPopupMenu vpxLogContextMenu = new JPopupMenu();
+
+	private JMenuItem vpxLogContextMenu_Clear;
+
+	private JMenuItem vpxLogContextMenu_Find;
+
+	private JMenuItem vpxLogContextMenu_Copy;
+
+	private JMenuItem vpxLogContextMenu_Save;
+
+	private int idx = 0;
+
+	private VPX_FindLog find = new VPX_FindLog(this, parent);
 
 	/**
 	 * Create the panel.
@@ -68,6 +87,16 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 
 		add(log_Panel, BorderLayout.NORTH);
+
+		JButton btn_Log_Find = VPXComponentFactory.createJButton(new FindAction("Find"));
+
+		btn_Log_Find.setPreferredSize(new Dimension(22, 22));
+
+		btn_Log_Find.setFocusPainted(false);
+
+		btn_Log_Find.setBorderPainted(false);
+
+		log_Panel.add(btn_Log_Find);
 
 		JButton btn_Log_Clear = VPXComponentFactory.createJButton(new ClearAction("Clear"));
 
@@ -105,9 +134,87 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 		txtA_Log = VPXComponentFactory.createJTextArea();
 
+		txtA_Log.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+
+				if (e.getButton() == 3) {
+
+					showPopupMenu(e.getX(), e.getY());
+				}
+
+			}
+		});
+
 		scrl_Log.setViewportView(txtA_Log);
 
 		txtA_Log.setEditable(false);
+
+		createContextMenus();
+	}
+
+	private void createContextMenus() {
+
+		vpxLogContextMenu_Clear = VPXComponentFactory.createJMenuItem("Clear All");
+
+		vpxLogContextMenu_Clear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				clearContents();
+			}
+		});
+
+		vpxLogContextMenu_Find = VPXComponentFactory.createJMenuItem("Find");
+
+		vpxLogContextMenu_Find.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				showFind();
+			}
+		});
+		vpxLogContextMenu_Copy = VPXComponentFactory.createJMenuItem("Copy");
+
+		vpxLogContextMenu_Copy.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				copyContents();
+			}
+		});
+
+		vpxLogContextMenu_Save = VPXComponentFactory.createJMenuItem("Save");
+
+		vpxLogContextMenu_Save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				saveLogtoFile();
+			}
+		});
+
+		vpxLogContextMenu.add(vpxLogContextMenu_Find);
+
+		vpxLogContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpxLogContextMenu.add(vpxLogContextMenu_Clear);
+
+		vpxLogContextMenu.add(VPXComponentFactory.createJSeparator());
+
+		vpxLogContextMenu.add(vpxLogContextMenu_Copy);
+
+		vpxLogContextMenu.add(vpxLogContextMenu_Save);
+
+	}
+
+	private void showPopupMenu(int x, int y) {
+
+		vpxLogContextMenu.show(this, x, y);
 
 	}
 
@@ -125,9 +232,18 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		}
 	}
 
+	private void copyContents() {
+
+		setClipboardContents(txtA_Log.getText());
+
+		VPXUtilities.showPopup("Contents copied to clipboard");
+
+	}
+
 	private void clearContents() {
 
 		txtA_Log.setText("");
+
 	}
 
 	private void setClipboardContents(String aString) {
@@ -162,6 +278,12 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 
 	}
 
+	private void showFind() {
+
+		find.showFindWindow();
+
+	}
+
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
 
 	}
@@ -185,6 +307,28 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		public void actionPerformed(ActionEvent e) {
 
 			saveLogtoFile();
+		}
+	}
+
+	class FindAction extends AbstractAction {
+
+		/**
+		 * 
+		 */
+
+		public FindAction(String name) {
+
+			putValue(Action.SHORT_DESCRIPTION, name);
+
+			putValue(Action.SMALL_ICON, VPXConstants.Icons.ICON_SEARCH);
+		}
+
+		private static final long serialVersionUID = -780929428772240491L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			showFind();
 		}
 	}
 
@@ -227,10 +371,30 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			setClipboardContents(txtA_Log.getText());
-
-			VPXUtilities.showPopup("Contents copied to clipboard");
+			copyContents();
 		}
+	}
+
+	@Override
+	public void find(String value) {
+
+		String str = txtA_Log.getText();
+
+		idx = str.indexOf(value, idx);
+
+		txtA_Log.setSelectionStart(idx);
+
+		idx = idx + value.length();
+
+		txtA_Log.setSelectionEnd(idx);
+
+	}
+
+	@Override
+	public void clearFind() {
+		idx = 0;
+
+		txtA_Log.select(0, 0);
 	}
 
 }

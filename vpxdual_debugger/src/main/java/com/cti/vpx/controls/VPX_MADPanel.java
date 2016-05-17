@@ -1014,15 +1014,13 @@ public class VPX_MADPanel extends JPanel {
 				isValid = false;
 			}
 
-			/*
-			 * if
-			 * (!VPXUtilities.isFileValid(txtCompilePathFinalOut.getText().trim(
-			 * ), true)) {
-			 * 
-			 * paths.append("Final Out file path is not valid.\n");
-			 * 
-			 * isValid = false; }
-			 */
+			if (!VPXUtilities.isFileNameValid(txtCompilePathFinalOut.getText().trim())) {
+
+				paths.append("Final Bin file name is not valid.\n");
+
+				isValid = false;
+			}
+
 		}
 
 		if (isValid)

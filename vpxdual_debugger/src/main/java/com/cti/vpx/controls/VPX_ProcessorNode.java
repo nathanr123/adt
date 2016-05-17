@@ -299,11 +299,11 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 		if (isAlive) {
 
-			sub = sub + "<font face='Tahoma' size='2.5' color='green'> Alive </font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahomaa' size='2.5' color='green'> Alive </font>" + "&nbsp;&nbsp;";
 
 		} else {
 
-			sub = sub + "<font face='Tahom' size='2.5' color='red'> Not Alive</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahoma' size='2.5' color='red'> Not Alive</font>" + "&nbsp;&nbsp;";
 
 		}
 
@@ -329,22 +329,22 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 		if (isAlive) {
 
-			sub = sub + "<font face='Tahoma' size='2.5' color='green'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahomaa' size='2.5' color='green'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
 
 			if (isAmplitude) {
 
-				sub = sub + "<font face='Tahoma' size='2' color='green'>A</font>" + "&nbsp;&nbsp;";
+				sub = sub + "<font face='Tahomaa' size='2' color='green'>A</font>" + "&nbsp;&nbsp;";
 
 			} else {
 
-				sub = sub + "<font face='Tahoma' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
+				sub = sub + "<font face='Tahomaa' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
 			}
 
 		} else {
 
-			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahoma' size='2.5' color='red'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
 
-			sub = sub + "<font face='Tahoma' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahomaa' size='2' color='red'>A</font>" + "&nbsp;&nbsp;";
 		}
 
 		sub = sub + "</html>";
@@ -358,11 +358,11 @@ public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 		if (isAlive) {
 
-			sub = sub + "<font face='Tahom' size='2.5' color='green'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahoma' size='2.5' color='green'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
 
 		} else {
 
-			sub = sub + "<font face='Tahom' size='2.5' color='red'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
+			sub = sub + "<font face='Tahoma' size='2.5' color='red'>" + nodeName + "</font>" + "&nbsp;&nbsp;";
 		}
 
 		sub = sub + "</html>";

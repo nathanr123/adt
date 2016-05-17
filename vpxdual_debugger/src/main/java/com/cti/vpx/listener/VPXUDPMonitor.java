@@ -6,10 +6,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1198,27 +1196,28 @@ public class VPXUDPMonitor {
 
 		try {
 			inetAddressRecv = InetAddress.getByName(VPXSessionManager.getCurrentSystemIP());
-			
+
 			inetSocketAddressSend = new InetSocketAddress(inetAddressRecv, 0);
-/*
-			if (inetSocketAddressSend == null) {
-
-				NetworkInterface nif = NetworkInterface
-						.getByInetAddress(InetAddress.getByName(VPXSessionManager.getCurrentSystemIP()));
-
-				if (nif == null) {
-
-					System.err.println("Error getting the Network Interface");
-
-					inetSocketAddressSend = null;
-
-					return;
-				}
-
-				Enumeration<InetAddress> nifAddresses = nif.getInetAddresses();
-
-				inetSocketAddressSend = new InetSocketAddress(inetAddressRecv, 0);
-			}*/
+			/*
+			 * if (inetSocketAddressSend == null) {
+			 * 
+			 * NetworkInterface nif = NetworkInterface
+			 * .getByInetAddress(InetAddress.getByName(VPXSessionManager.
+			 * getCurrentSystemIP()));
+			 * 
+			 * if (nif == null) {
+			 * 
+			 * System.err.println("Error getting the Network Interface");
+			 * 
+			 * inetSocketAddressSend = null;
+			 * 
+			 * return; }
+			 * 
+			 * Enumeration<InetAddress> nifAddresses = nif.getInetAddresses();
+			 * 
+			 * inetSocketAddressSend = new InetSocketAddress(inetAddressRecv,
+			 * 0); }
+			 */
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1290,7 +1289,9 @@ public class VPXUDPMonitor {
 
 			VPXLogger.updateError(e);
 
-			e.printStackTrace();
+			parent.updateNetworkError(ip.getHostAddress()
+					+ " should be in same subnet\nPlease check network configuration and restart the application");
+
 		}
 	}
 

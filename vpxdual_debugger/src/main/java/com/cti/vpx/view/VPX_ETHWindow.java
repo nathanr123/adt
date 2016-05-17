@@ -2,6 +2,7 @@ package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -259,6 +261,12 @@ public class VPX_ETHWindow extends JFrame
 
 		enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_NONE);
 
+		udpMonitor = new VPXUDPMonitor();
+
+		udpMonitor.addUDPListener(VPX_ETHWindow.this);
+
+		udpMonitor.startMonitor();
+
 		setVisible(true);
 
 		EventQueue.invokeLater(new Runnable() {
@@ -271,30 +279,6 @@ public class VPX_ETHWindow extends JFrame
 				}
 			}
 		});
-
-		Thread th = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				try {
-
-					udpMonitor = new VPXUDPMonitor();
-
-					udpMonitor.addUDPListener(VPX_ETHWindow.this);
-
-					udpMonitor.startMonitor();
-
-				} catch (Exception e) {
-					// TODO: handle exception
-
-					e.printStackTrace();
-				}
-
-			}
-		});
-
-		th.start();
 
 	}
 
@@ -1725,7 +1709,7 @@ public class VPX_ETHWindow extends JFrame
 	public void showDataAnalyzer(String ip) {
 
 		Thread th = new Thread(new Runnable() {
-      
+
 			@Override
 			public void run() {
 
@@ -2675,6 +2659,38 @@ public class VPX_ETHWindow extends JFrame
 				progressFileSent.setValue(value);
 			}
 		}
+
+	}
+
+	public void updateNetworkError(String msg) {
+
+		
+		
+		String[] buttons = { "Ok", "<html><b>Help<b></html>" };
+
+		int rc = JOptionPane.showOptionDialog(null, msg, "Network Error",
+				JOptionPane.ERROR_MESSAGE, 0, null, buttons, buttons[0]);
+
+		System.out.println(rc);
+
+		if (rc == 0) {
+
+			
+
+		} else if (rc == 1) {
+
+			try {
+
+				Desktop.getDesktop()
+						.open(new File("E:\\netip.pdf"));
+
+			} catch (IOException e) {
+				VPXLogger.updateError(e);
+			}
+
+		}
+
+		System.exit(0);
 
 	}
 
