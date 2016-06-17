@@ -7,8 +7,6 @@ import javax.swing.UIManager;
 /**
  * Need Range Cursor demo Cursor demo constellation graph cConstellationGraph
  * cBarGraph measure cursors
- * 
- * @author Noel Grandin
  */
 public class GraphsDemo {
 

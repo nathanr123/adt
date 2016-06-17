@@ -14,11 +14,10 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.PixelUnitConvert
 /**
  * FIXME this should probably be a subclass of GridDrawSurface. We should probably move the logarithmic feature into
  * there.
- * 
- * @author Andre
  */
 class DrawSurface extends JPanel
 {
+	private static final long serialVersionUID = -2313670080617876488L;
 
 	/**
 	 * Default minimum and maximum values of the Axis.

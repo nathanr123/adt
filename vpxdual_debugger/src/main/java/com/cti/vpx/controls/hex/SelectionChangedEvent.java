@@ -30,10 +30,6 @@ import java.util.EventObject;
 
 /**
  * Occurs when the cell selection within the hex editor becomes changed.
- * 
- * @author PAX
- * 
- * @version 1.0
  */
 public class SelectionChangedEvent extends EventObject {
 

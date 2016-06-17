@@ -23,8 +23,6 @@ import javax.swing.SwingUtilities;
 
 /**
  * Utility methods for swing.
- * 
- * @author Noel Grandin
  */
 public final class SwingLib
 {

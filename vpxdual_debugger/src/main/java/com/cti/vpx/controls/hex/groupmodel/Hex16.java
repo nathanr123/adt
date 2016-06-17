@@ -46,9 +46,6 @@ import com.cti.vpx.controls.hex.HexEditor;
 
 /**
  * The table model used by the <code>JTable</code> in the hex editor.
- *
- * @author Robert Futrell
- * @version 1.0
  */
 public class Hex16 extends AbstractTableModel {
 
@@ -358,9 +355,6 @@ public class Hex16 extends AbstractTableModel {
 
 	/**
 	 * An "undoable event" representing a single byte changing value.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class ByteChangedUndoableEdit extends AbstractUndoableEdit {
 
@@ -406,9 +400,6 @@ public class Hex16 extends AbstractTableModel {
 	/**
 	 * An "undoable event" representing a range of bytes being replaced (or just
 	 * removed or inserted)
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class BytesReplacedUndoableEdit extends AbstractUndoableEdit {
 

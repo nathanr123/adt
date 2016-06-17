@@ -12,12 +12,10 @@ import javax.swing.event.ChangeListener;
 
 /**
  * A lightly modified spinner class that only fires an update if the user has stopped making changes for 300ms.
- * 
- * @author Noel Grandin
  */
 public class DelayedSpinner extends JSpinner
 {
-	
+	private static final long serialVersionUID = 2507283572021200037L;
 	private boolean bDontFire = false;
 	
 	public DelayedSpinner()

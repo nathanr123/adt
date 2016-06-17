@@ -881,15 +881,13 @@ public class VPX_FlashWizardWindow extends JDialog {
 			checkAndCopy(corePath, core6, 6, false);
 			dialog.updatePackets(8, core7);
 			checkAndCopy(corePath, core7, 7, false);
-			//dialog.updatePackets(9, bin);
-		
-		
-			
-/*			checkAndCopy(
-					VPXSessionManager.getDSPPath() + "/"
-							+ VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN),
-					bin, 0, true);
-					*/
+			// dialog.updatePackets(9, bin);
+
+			/*
+			 * checkAndCopy( VPXSessionManager.getDSPPath() + "/" +
+			 * VPXUtilities.getString(VPXConstants.ResourceFields.
+			 * FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN), bin, 0, true);
+			 */
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -984,7 +982,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 	}
 
 	private void doNext() {
-		
+
 		btnLoadWorkspace.setEnabled(false);
 
 		if (madTab.getSelectedIndex() == 0 || madTab.getSelectedIndex() == 3) {
@@ -1004,16 +1002,14 @@ public class VPX_FlashWizardWindow extends JDialog {
 		} else if (madTab.getSelectedIndex() == 1) {
 
 			applyConfiguration();
-			
+
 			btnLoadWorkspace.setEnabled(true);
 
 		} else if (madTab.getSelectedIndex() == 2) {
 
 			applyCompilation();
-			
-			btnNext.setEnabled(false);
 
-			btnBack.setEnabled(false);
+		
 
 		}
 
@@ -1214,6 +1210,10 @@ public class VPX_FlashWizardWindow extends JDialog {
 			madTab.setSelectedIndex(idx);
 
 			disableAll(idx);
+			
+			btnNext.setEnabled(false);
+
+			btnBack.setEnabled(false);
 		} else {
 
 			JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
@@ -1471,15 +1471,13 @@ public class VPX_FlashWizardWindow extends JDialog {
 				isValid = false;
 			}
 
-			/*
-			 * if
-			 * (!VPXUtilities.isFileValid(txtCompilePathFinalOut.getText().trim(
-			 * ), true)) {
-			 * 
-			 * paths.append("Final Out file path is not valid.\n");
-			 * 
-			 * isValid = false; }
-			 */
+			if (!VPXUtilities.isFileNameValid(txtCompilePathFinalOut.getText().trim())) {
+
+				paths.append("Final Out file path is not valid.\n");
+
+				isValid = false;
+			}
+
 		}
 
 		if (isValid)
@@ -1550,13 +1548,13 @@ public class VPX_FlashWizardWindow extends JDialog {
 		String str = VPXUtilities.readFile("deploy/deployment.data", VPXConstants.DELIMITER_FILE);
 
 		String bin = outfileName;
-		
+
 		if (!bin.endsWith(".bin")) {
-			
-			bin = bin+".bin";
-			
+
+			bin = bin + ".bin";
+
 		}
-		
+
 		String outfilename = VPXSessionManager.getDSPPath() + "/bin/" + bin;
 
 		str = str.replace("out1", VPXUtilities.getPathAsLinuxStandard(out1Path));
@@ -1903,7 +1901,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 			btnNext.setEnabled(true);
 
 			btnBack.setEnabled(true);
-			
+
 			btnBackup.setEnabled(true);
 			// btnCancel.setEnabled(true);
 
@@ -1919,7 +1917,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 			btnNext.setEnabled(true);
 
 			btnBack.setEnabled(true);
-			
+
 			btnBackup.setEnabled(true);
 
 			// btnCancel.setEnabled(true);

@@ -11,7 +11,6 @@ import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.cti.vpx.view.VPX_ETHWindow;
@@ -28,17 +27,7 @@ public class VPX_FindLog extends JDialog implements WindowListener {
 
 	private FindController logger = null;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			VPX_FindLog dialog = new VPX_FindLog(null, null);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private JLabel lblSearchStatus;
 
 	/**
 	 * Create the dialog.
@@ -55,9 +44,9 @@ public class VPX_FindLog extends JDialog implements WindowListener {
 
 		setResizable(false);
 
-		setBounds(100, 100, 387, 89);
+		setBounds(100, 100, 387, 120);
 
-		getContentPane().setLayout(new MigLayout("", "[46px][89px][2px][305px]", "[20px,fill][23px,fill]"));
+		getContentPane().setLayout(new MigLayout("", "[46px][89px][2px][305px]", "[20px,fill][23px,fill][grow]"));
 
 		JLabel lblFind = new JLabel("Find:");
 
@@ -95,6 +84,10 @@ public class VPX_FindLog extends JDialog implements WindowListener {
 
 		getContentPane().add(btnClose, "cell 3 1,alignx left,aligny top");
 
+		lblSearchStatus = new JLabel("");
+
+		getContentPane().add(lblSearchStatus, "cell 1 2 3 1,growx");
+
 		addWindowListener(this);
 
 		centerFrame();
@@ -103,6 +96,14 @@ public class VPX_FindLog extends JDialog implements WindowListener {
 	private void clear() {
 
 		txtFind.setText("");
+
+		lblSearchStatus.setText("");
+
+	}
+
+	public void updateStatus(String msg) {
+
+		lblSearchStatus.setText(msg);
 
 	}
 

@@ -95,9 +95,6 @@ import com.cti.vpx.util.VPXUtilities;
 /**
  * Content pane for the demo applet/standalone app, that demonstrates the
  * functionality of the Swing {@link HexEditor} component.
- *
- * @author Robert Futrell
- * @version 1.0
  */
 public class HexEditorPanel extends JPanel implements ActionListener, HexEditorListener, SelectionChangedListener {
 
@@ -924,9 +921,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Base class for all actions in the demo.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private abstract class ActionBase extends AbstractAction {
 
@@ -948,9 +942,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Renderer for JComboBox content lists containing colors.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private static class ColorCellRenderer extends DefaultListCellRenderer implements Icon {
 
@@ -1144,9 +1135,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Saves the currently selected bytes to the file.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class DumpAction extends ActionBase {
 
@@ -1221,9 +1209,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Copies the currently selected bytes to the clipboard.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class CopyAction extends ActionBase {
 
@@ -1246,9 +1231,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	/**
 	 * Moves the currently selected bytes to the clipboard, similar to a "cut"
 	 * action in a text editor.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class CutAction extends ActionBase {
 
@@ -1270,9 +1252,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Deletes the currently selected bytes.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class DeleteAction extends ActionBase {
 
@@ -1294,9 +1273,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Action that prompts a user to open a file.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class SettingsAction extends ActionBase {
 
@@ -1318,9 +1294,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Action that prompts a user to open a file.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class OpenAction extends ActionBase {
 
@@ -1343,9 +1316,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 	/**
 	 * Pastes the current clipboard contents into the hex editor at the
 	 * currently selected byte location.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class PasteAction extends ActionBase {
 
@@ -1367,9 +1337,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Undoes the last "undo" operation.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class RedoAction extends ActionBase {
 
@@ -1391,9 +1358,6 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 
 	/**
 	 * Takes back the last operation done.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class UndoAction extends ActionBase {
 

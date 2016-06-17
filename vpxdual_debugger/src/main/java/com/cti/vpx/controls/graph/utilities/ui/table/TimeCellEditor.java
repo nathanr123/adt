@@ -23,8 +23,6 @@ import javax.swing.tree.TreeCellEditor;
  * A CellEditor for java.util.Date that displays only the time portion of the value.
  * 
  * It also has the useful side-effect that it preserves the year/month/days value in the input.
- * 
- * @author Noel Grandin
  */
 public class TimeCellEditor implements TableCellEditor, TreeCellEditor
 {
@@ -43,6 +41,8 @@ public class TimeCellEditor implements TableCellEditor, TreeCellEditor
 	 */
 	private static class MyFormattedTextField extends JFormattedTextField
 	{
+		private static final long serialVersionUID = 6867063480822009774L;
+
 		@Override
 		public void setValue(Object value)
 		{
@@ -70,6 +70,8 @@ public class TimeCellEditor implements TableCellEditor, TreeCellEditor
 		ftf.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "check");
 		ftf.getActionMap().put("check", new AbstractAction()
 		{
+			private static final long serialVersionUID = 5302064445484985886L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				// if the text is invalid

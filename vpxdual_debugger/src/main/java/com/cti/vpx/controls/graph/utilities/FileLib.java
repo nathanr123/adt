@@ -8,10 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
-/**
- * @author Noel Grandin
- */
 public final class FileLib
 {
 	/** not meant to be instantiated */

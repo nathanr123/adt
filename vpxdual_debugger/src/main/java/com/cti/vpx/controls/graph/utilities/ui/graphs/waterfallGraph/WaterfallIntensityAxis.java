@@ -14,11 +14,10 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.IntensityAxis;
 
 /**
  * A specialised intensity axis for cIntensityWaterfallGraph
- * 
- * @author Noel Grandin
  */
 public class WaterfallIntensityAxis extends JComponent
 {
+	private static final long serialVersionUID = 287485758283895804L;
 	private final IntensityAxis axis;
 	private final JToggleButton autoModeButton;
 	private final IntensityWaterfallGraph graph;

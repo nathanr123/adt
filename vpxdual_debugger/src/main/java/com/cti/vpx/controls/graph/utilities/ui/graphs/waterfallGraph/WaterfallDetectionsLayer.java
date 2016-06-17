@@ -15,8 +15,6 @@ import com.cti.vpx.controls.graph.utilities.ui.ScrollableBufferedImage;
  * 
  * So I wrap a ScrollableBufferedImage and do some work here to make sure that
  * every detection is drawn to a pixel regardless of the resizing.
- * 
- * @author Noel Grandin
  */
 class WaterfallDetectionsLayer
 {

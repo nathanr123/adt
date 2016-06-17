@@ -11,10 +11,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-/**
- *
- * @author Andre Esterhuizen
- */
 public abstract class EventsSurface extends DrawSurface implements MouseListener, 
                                                       MouseMotionListener, 
                                                       MouseWheelListener,
@@ -23,6 +19,11 @@ public abstract class EventsSurface extends DrawSurface implements MouseListener
 {
   
   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1082605200659354103L;
+
+/**
    * This stores the X position of where the mouse was pressed.
    */
   public int iMousePressedX = 0;

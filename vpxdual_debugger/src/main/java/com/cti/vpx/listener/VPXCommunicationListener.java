@@ -4,10 +4,6 @@ import com.cti.vpx.controls.hex.MemoryViewFilter;
 import com.cti.vpx.model.BIST;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 
-/**
- * @author RajuDhachu
- *
- */
 public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void updateExit(int val);

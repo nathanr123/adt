@@ -6,10 +6,6 @@ import java.awt.Color;
 import com.cti.vpx.controls.graph.sharedlibs.dsphostl.TimeStamp;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.waterfallGraph.IntensityWaterfallGraph;
 
-/**
- *
- * @author Noel Grandin
- */
 public class WaterfallGraphPanel extends javax.swing.JPanel {
 
 	/**

@@ -9,15 +9,13 @@ import java.io.StringReader;
 
 /**
  * A <code>Transferable</code> that transfers an array of bytes.
- *
- * @author Robert Futrell
- * @version 1.0
  */
 class ByteArrayTransferable implements Transferable {
 
 	private int offset;
 	private byte[] bytes;
 
+	@SuppressWarnings("deprecation")
 	private static final DataFlavor[] FLAVORS = { DataFlavor.stringFlavor, DataFlavor.plainTextFlavor, };
 
 	/**

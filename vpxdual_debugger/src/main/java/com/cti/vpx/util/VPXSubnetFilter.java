@@ -4,9 +4,6 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-/**
- * @author c3oe.de, based on snippets from Scott Plante, John Kugelmann
- */
 public class VPXSubnetFilter {
 	final private int bytesSubnetCount;
 	final private BigInteger bigMask;

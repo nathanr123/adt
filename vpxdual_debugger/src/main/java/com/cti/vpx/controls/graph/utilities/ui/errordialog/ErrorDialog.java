@@ -14,8 +14,6 @@ import com.cti.vpx.controls.graph.utilities.ui.SwingLib;
 
 /**
  * Display error dialog for application exceptions.
- * 
- * @author Noel Grandin
  */
 public final class ErrorDialog
 {

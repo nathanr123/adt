@@ -18,9 +18,7 @@ import com.cti.vpx.controls.graph.utilities.ui.errordialog.ErrorDialog;
  * look at cPeralexLibsBundle to see how it is done.
  * 
  * Each program/library should have it's own cXXXResourceBundle class because each cXXXResourceBundle class is tied to a
- * specific set of resource properties files.
- * 
- * @author Noel Grandin
+ * specific set of resource properties files. 
  */
 public class GenericBundle
 {

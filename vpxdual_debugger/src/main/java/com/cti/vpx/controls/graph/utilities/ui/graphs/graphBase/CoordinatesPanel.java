@@ -13,11 +13,14 @@ import javax.swing.Timer;
  * It has a timer to limit the rate of GUI update events.
  * 
  * FIXME rename the co-ordinates panel to something like MouseCoordinatesPanel to distinguish it from line-cursors.
- * 
- * @author Noel Grandin
  */
 public class CoordinatesPanel extends javax.swing.JPanel
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 806503652506693668L;
+
 	/**
    * Timer to delay setting of Coordinate Labels.
    */

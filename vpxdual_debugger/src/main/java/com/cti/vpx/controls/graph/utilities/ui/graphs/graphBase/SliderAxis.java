@@ -42,11 +42,13 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.axisscale.NumberAxisScale;
  * margin at either end of the slider, and instead the slider runs right up to the edge of its display area.
  * 
  * This component supports multiple sliders on the same axis, although they have to share the same min/max values.
- * 
- * @author Noel Grandin
  */
 public class SliderAxis extends JComponent
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5787511223898752549L;
 	/**
 	 * used for slider components and labels.
 	 */
@@ -436,8 +438,9 @@ public class SliderAxis extends JComponent
 	//////////////////////////////////////////////////////////////////////////////
 
 	private final class MyAxis extends NumberAxisScale
-	{
-		
+	{		
+		private static final long serialVersionUID = -2664957149915288626L;
+
 		/**
 		 * paint the sliders
 		 */

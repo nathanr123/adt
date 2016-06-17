@@ -4,11 +4,11 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.waterfallGraph;
 /**
  * A waterfall graph that displays amplitudes and detections, but uses an intensity axis
  * to calculate the necessary colors.
- * 
- * @author Noel Grandin
  */
 public class IntensityWaterfallGraph extends AmplitudeDetectionWaterfallGraph
 { 
+	private static final long serialVersionUID = 9140173625756390138L;
+
 	private final WaterfallIntensityAxis oIntensityAxis;
   
 	/**

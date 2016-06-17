@@ -9,11 +9,9 @@ import java.text.DecimalFormat;
  * size.
  * 
  * Mostly used in graph co-ordinate panel displays.
- * 
- * @author Noel Grandin
  */
 public class FixedSizeNumberLabel extends FixedSizeLabel {
-
+	private static final long serialVersionUID = 6696011230310052681L;
 	private DecimalFormat oFormat;
 	private String pattern;
 	private String oSuffix = "";

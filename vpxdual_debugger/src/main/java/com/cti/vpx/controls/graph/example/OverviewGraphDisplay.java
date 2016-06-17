@@ -11,6 +11,7 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.MultiLineGraph;
 
 public class OverviewGraphDisplay extends BaseGraphDisplay
 {
+	private static final long serialVersionUID = -4430194330856002321L;
 	////////////////////////////////////////////////////////////
 	// Graphs and other visual objects
 	////////////////////////////////////////////////////////////

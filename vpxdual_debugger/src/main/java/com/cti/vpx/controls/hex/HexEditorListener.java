@@ -5,9 +5,6 @@ import java.util.EventListener;
 
 /**
  * An object listening for events from a {@link HexEditor}.
- *
- * @author Robert Futrell
- * @version 1.0
  */
 public interface HexEditorListener extends EventListener {
 

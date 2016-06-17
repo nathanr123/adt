@@ -3,8 +3,6 @@ package com.cti.vpx.controls.graph.utilities;
 
 /**
  * Some array utility routines.
- * 
- * @author Noel Grandin
  */
 public final class ArrayLib
 {

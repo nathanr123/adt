@@ -45,10 +45,6 @@ import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-/**
- * @author Abi_Achu
- *
- */
 public class VPX_ProcessorTree extends JTree implements MouseListener {
 
 	/**

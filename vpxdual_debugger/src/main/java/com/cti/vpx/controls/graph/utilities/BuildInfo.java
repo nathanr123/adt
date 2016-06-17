@@ -4,8 +4,6 @@ package com.cti.vpx.controls.graph.utilities;
  * DO NOT CHANGE THE NAME OF THIS CLASS OR THE FORMATS OF THE STRINGS.
  * 
  * The build process updates the strings with real values.
- * 
- * @author Noel Grandin
  */
 public final class BuildInfo
 {

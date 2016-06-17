@@ -5,10 +5,6 @@ package com.cti.vpx.model;
 
 import java.io.Serializable;
 
-/**
- * @author Abi_Achu
- *
- */
 public interface VPX extends Serializable {
 
 	public int ADV_PORTNO = 12345;

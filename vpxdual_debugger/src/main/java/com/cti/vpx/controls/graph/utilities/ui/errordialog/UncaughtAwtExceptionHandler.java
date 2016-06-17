@@ -5,8 +5,6 @@ package com.cti.vpx.controls.graph.utilities.ui.errordialog;
  * 
  * @see <a href="http://lhankins.blogspot.com/#390328764"> </a>
  * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5076724"> </a>
- * 
- * @author Noel Grandin
  */
 public class UncaughtAwtExceptionHandler
 {

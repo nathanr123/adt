@@ -10,8 +10,6 @@ import javax.swing.JToolTip;
 
 /**
  * A factory class for creating buttons that display popup help messages.
- * 
- * @author Noel Grandin
  */
 final class HelpPopup
 {

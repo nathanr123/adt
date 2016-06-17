@@ -12,8 +12,6 @@ import com.cti.vpx.controls.graph.sharedlibs.dsphostl.TimeStamp;
 
 /**
  * A waterfall graph to draw amplitude data only on.
- * 
- * @author Andre
  */
 public class AmplitudeWaterfallGraph extends AmplitudeDetectionWaterfallGraph
 {
@@ -21,6 +19,7 @@ public class AmplitudeWaterfallGraph extends AmplitudeDetectionWaterfallGraph
 	//  Variables used in the drawing of the Waterfall.
 	//////////////////////////////////////////////////////////////////////////////
 	
+	private static final long serialVersionUID = 4647025840793213711L;
 	//////////////////////////////////////////////////////////////////////////////
 	//  Variables used in the drawing of the time cursors and timestamps.
 	//////////////////////////////////////////////////////////////////////////////

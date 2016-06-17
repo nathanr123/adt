@@ -11,11 +11,14 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.GridDrawSurface;
  * not have a default font.
  * It would be better if I could make this an interface, but too many things depend on it
  * being a subclass of JComponent.
- * 
- * @author Noel Grandin
  */
 public abstract class AbstractAxisScale extends JPanel
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -711945651256998109L;
 
 	/**
 	 * Clear the current collection of labels.

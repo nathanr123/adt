@@ -1,8 +1,5 @@
 package com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph;
 
-/**
- * @author Noel Grandin
- */
 public abstract class AbstractLineData {
 
   /** 

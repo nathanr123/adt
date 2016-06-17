@@ -9,12 +9,14 @@ import javax.swing.border.AbstractBorder;
 
 /**
  * A line border that only paints some of it's borders.
- * 
- * @author Noel Grandin
- * @author Pieter De Vos
  */
 public final class PartialLineBorder extends AbstractBorder
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1458629262734646169L;
 
 	private final Color lineColor;
 

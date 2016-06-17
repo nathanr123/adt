@@ -6,8 +6,6 @@ import java.awt.Window;
 
 /**
  * Utility routines for Swing windows and frames.
- * 
- * @author Noel Grandin
  */
 public final class WindowLib
 {

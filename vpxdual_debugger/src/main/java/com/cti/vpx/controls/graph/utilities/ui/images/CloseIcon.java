@@ -8,10 +8,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
-/**
- * 
- * @author Noel Grandin
- */
 public final class CloseIcon implements IIconFactory
 {
 	public static final CloseIcon INSTANCE = new CloseIcon();

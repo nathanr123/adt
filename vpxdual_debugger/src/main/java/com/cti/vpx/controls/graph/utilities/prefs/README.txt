@@ -1,6 +1,3 @@
-Notes from Noel.
-
-
 This is my package for managing application preferences. 
 
 It is mostly a wrapper around the java Preferences API. But it makes it much easier to handle :

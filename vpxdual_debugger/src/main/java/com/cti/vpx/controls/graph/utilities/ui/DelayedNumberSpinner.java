@@ -17,11 +17,13 @@ import com.cti.vpx.controls.graph.sharedlibs.dsphostl.ParameterRangeShort;
 
 /**
  * A TimedSpinner that provides the kind of basic editing we need for numbers. It performs validation on the text entry.
- * 
- * @author Noel Grandin
  */
 public class DelayedNumberSpinner extends DelayedSpinner
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6622961274094709615L;
 	private Color defaultBackground;
 
 	public DelayedNumberSpinner()
@@ -107,6 +109,7 @@ public class DelayedNumberSpinner extends DelayedSpinner
 	private void validateNumber(final JFormattedTextField textField,
 			final SpinnerNumberModel model)
 	{
+		@SuppressWarnings("rawtypes")
 		final Comparable textValue;
 
 		try

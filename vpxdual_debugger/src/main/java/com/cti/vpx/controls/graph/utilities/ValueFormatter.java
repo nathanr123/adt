@@ -14,8 +14,6 @@ import java.util.TimeZone;
  *
  * Note (Noel) : the methods in this class are synchronized because the standard
  *   Java Format classes are NOT thread-safe.
- * 
- * @author Jaco Jooste
  */
 public final class ValueFormatter
 {

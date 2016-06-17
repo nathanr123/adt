@@ -41,10 +41,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 /**
- * Header of the hex table; displays address of the first byte on the row.
- *
- * @author Robert Futrell
- * @version 1.0
+ * Header of the hex table; displays address of the first byte on the row.0
  */
 class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 
@@ -175,9 +172,6 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 
 	/**
 	 * Renders the cells of the row header.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class CellRenderer extends DefaultListCellRenderer {
 
@@ -200,9 +194,6 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 
 	/**
 	 * List model used by the header for the hex table.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	public class RowHeaderListModel extends AbstractListModel<Object> {
 
@@ -265,9 +256,6 @@ class HexEditorRowHeader extends JList<Object>implements TableModelListener {
 	 * Border for the entire row header. This draws a line to separate the
 	 * header from the table contents, and gives a small amount of whitespace to
 	 * separate the two.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class RowHeaderBorder extends EmptyBorder {
 

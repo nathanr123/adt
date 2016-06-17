@@ -65,9 +65,6 @@ import com.cti.vpx.util.VPXUtilities;
  * <li>Undo/redo
  * <li>Selecting a contiguous block of bytes
  * </ul>
- *
- * @author Robert Futrell
- * @version 1.0
  */
 public class HexEditor extends JScrollPane {
 

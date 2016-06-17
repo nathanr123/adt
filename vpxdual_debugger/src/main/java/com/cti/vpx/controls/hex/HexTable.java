@@ -90,10 +90,6 @@ import com.cti.vpx.util.VPXUtilities;
 /**
  * The table displaying the hex content of a file. This is the meat of the hex
  * viewer.
- *
- *
- * @author Robert Futrell
- * @version 1.0
  */
 public class HexTable extends JTable {
 
@@ -1925,9 +1921,6 @@ public class HexTable extends JTable {
 	/**
 	 * Table cell editor that restricts input to byte values (
 	 * <code>0 - 255</code>).
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private static class CellEditor extends DefaultCellEditor implements FocusListener {
 
@@ -1967,9 +1960,6 @@ public class HexTable extends JTable {
 	 * so this class helps to alleviate some of that pain. 1.4 and 1.5 JRE's
 	 * don't have as much of a performance problem, but you still can see some
 	 * lag at times.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private class CellRenderer extends DefaultTableCellRenderer {
 
@@ -2071,9 +2061,6 @@ public class HexTable extends JTable {
 	/**
 	 * Filter that ensures the user only enters valid characters in a byte's
 	 * cell while editing.
-	 *
-	 * @author Robert Futrell
-	 * @version 1.0
 	 */
 	private static class EditorDocumentFilter extends DocumentFilter {
 

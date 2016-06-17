@@ -28,9 +28,13 @@ import org.jfree.ui.RectangleEdge;
  */
 public class CrosshairOverlayDemo1 extends JFrame {
 
-    static class MyDemoPanel extends JPanel implements ChartMouseListener {
+	private static final long serialVersionUID = -3195037454993758060L;
 
-        private ChartPanel chartPanel;
+	static class MyDemoPanel extends JPanel implements ChartMouseListener {
+
+		private static final long serialVersionUID = 1235747855970649909L;
+
+		private ChartPanel chartPanel;
 
         private Crosshair xCrosshair;
 

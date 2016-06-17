@@ -17,12 +17,10 @@ import javax.swing.TransferHandler;
 import com.cti.vpx.controls.graph.utilities.ui.GBFormBuilder;
 import com.cti.vpx.controls.graph.utilities.ui.SwingLib;
 
-/**
- * 
- * @author Noel Grandin
- */
 final class DialogPanel extends JPanel
 {
+
+	private static final long serialVersionUID = 2907727356765964653L;
 
 	public static enum ButtonStyle
 	{

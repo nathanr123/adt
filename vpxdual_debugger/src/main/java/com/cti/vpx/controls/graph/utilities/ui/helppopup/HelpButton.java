@@ -11,12 +11,10 @@ import com.cti.vpx.controls.graph.utilities.ui.images.IconManager;
 
 /**
  * A help button that displays some text in a popup.
- * 
- * @author Noel Grandin
  */
 public class HelpButton extends JButton
 {
-
+	private static final long serialVersionUID = 4569335964847623928L;
 	private String sHelpText;
 	private JPopupMenu oHelpPopup;
 

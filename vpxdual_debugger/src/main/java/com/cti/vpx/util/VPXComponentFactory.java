@@ -36,10 +36,6 @@ import javax.swing.tree.TreeNode;
 import com.cti.vpx.controls.VPX_ProcessorTree;
 import com.cti.vpx.view.VPX_ETHWindow;
 
-/**
- * @author nathanr_kamal
- *
- */
 public class VPXComponentFactory {
 
 	public static JPanel createJPanel() {

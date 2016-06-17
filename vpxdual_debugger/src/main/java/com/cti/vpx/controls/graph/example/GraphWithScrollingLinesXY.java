@@ -7,12 +7,10 @@ import java.awt.event.ActionListener;
 
 import com.cti.vpx.controls.graph.utilities.ui.graphs.scrollingline.XYScrollingLineGraph;
 
-/**
- *
- * @author Noel Grandin
- */
 public class GraphWithScrollingLinesXY extends javax.swing.JPanel {
   
+	private static final long serialVersionUID = 8171528018180652594L;
+
 	private static final double GRAPH_WINDOW = 1000;
 	
 	private static final String LINE_1 = "Line1";
@@ -154,19 +152,19 @@ public class GraphWithScrollingLinesXY extends javax.swing.JPanel {
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
 
-  private void gridVisibleCheckBoxActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gridVisibleCheckBoxActionPerformed
+  private void gridVisibleCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gridVisibleCheckBoxActionPerformed
 		lineGraph.setGridVisible(gridVisibleCheckBox.isSelected());
   }//GEN-LAST:event_gridVisibleCheckBoxActionPerformed
 
-  private void zoomEnabledCheckBoxActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomEnabledCheckBoxActionPerformed
+  private void zoomEnabledCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomEnabledCheckBoxActionPerformed
 		lineGraph.setZoomEnabled(zoomEnabledCheckBox.isSelected());
   }//GEN-LAST:event_zoomEnabledCheckBoxActionPerformed
 
-  private void line1ColorComboBoxActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt) {//GEN-FIRST:event_line1ColorComboBoxActionPerformed
+  private void line1ColorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_line1ColorComboBoxActionPerformed
 		lineGraph.setLineColor(LINE_1, toColor((String)line1ColorComboBox.getSelectedItem()));
   }//GEN-LAST:event_line1ColorComboBoxActionPerformed
 
-  private void line2ColorComboBoxActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt) {//GEN-FIRST:event_line2ColorComboBoxActionPerformed
+  private void line2ColorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_line2ColorComboBoxActionPerformed
 		lineGraph.setLineColor(LINE_2, toColor((String)line2ColorComboBox.getSelectedItem()));
   }//GEN-LAST:event_line2ColorComboBoxActionPerformed
   

@@ -6,12 +6,10 @@ import java.awt.Graphics2D;
 
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.PixelUnitConverter;
 
-/**
- * 
- * @author Andre Esterhuizen
- */
 class HistogramSingleChannelDrawSurface extends DrawSurface
 {
+
+	private static final long serialVersionUID = 3551780911982762230L;
 
 	/**
 	 * This stores the histogram data will be drawn in this graph.

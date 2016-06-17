@@ -15,14 +15,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JMenuItem;
 
-/**
- *
- * @author  Andre
- */
 public abstract class ZoomDrawSurface extends CursorDrawSurface
 {
 	  
-  private static final AlphaComposite ZOOM_COMPOSITE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f);
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 159300847903727259L;
+
+private static final AlphaComposite ZOOM_COMPOSITE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f);
   
   /**
    * Stores all the Zoom Listeners.

@@ -6,8 +6,6 @@ import javax.swing.JTabbedPane;
 
 /**
  * A collection of few useful functions for JTabbedPane
- * 
- * @author Noel Grandin
  */
 public class TabbedPaneLib
 {

@@ -7,14 +7,15 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPanel;
 
-/**
- *
- * @author  Andre
- */
 public class ProbabilityFactorColorPanel extends JPanel
 {
   
-  /** 
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5651952103265300583L;
+
+/** 
    * Creates new form oProbabilityFactorColorPanel 
    */
   public ProbabilityFactorColorPanel()

@@ -5,14 +5,12 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPopupMenu;
 
-/**
- *
- * @author  Andre
- */
 public abstract class PopupMenuDrawSurface extends EventsSurface
 {
 
-  /**
+	private static final long serialVersionUID = -458019018555922504L;
+
+/**
    * This is the PopupMenu that appears when the user right-clicks.
    */
   protected final JPopupMenu oPopupMenu = new JPopupMenu();

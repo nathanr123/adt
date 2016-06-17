@@ -13,12 +13,13 @@ import javax.swing.table.TableCellRenderer;
 /**
  * Useful renderer for displaying long sequences of text that need to wrap. 
  * Will make the JTable have rows of different heights.
- * 
- * @author Heinz Kabutz
- * @author Noel Grandin
  */
 public class LongTextCellRenderer extends JTextArea implements TableCellRenderer
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1733139586461770763L;
 	private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
 
 	public LongTextCellRenderer(final JTable table)

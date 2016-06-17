@@ -31,40 +31,40 @@ import javax.swing.event.MouseInputAdapter;
 import com.cti.vpx.controls.graph.utilities.ui.ListenerSupport;
 
 /**
- * Displays a "rainbow" compass with direction data and blocking regions overlaid.
- * 
- * @author Noel Grandin
+ * Displays a "rainbow" compass with direction data and blocking regions
+ * overlaid.
  */
-public class PolarDirectionGraph extends JComponent
-{
-	private final class BlockingManipulator extends MouseInputAdapter implements KeyListener
-	{
+public class PolarDirectionGraph extends JComponent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9095645058318787751L;
+
+	private final class BlockingManipulator extends MouseInputAdapter implements KeyListener {
 		private BlockRegion block;
 
 		private float start_degrees;
 
 		private float end_degrees;
-		
+
 		/**
-		 * I need to know if the user is dragging clockwise or counter-clockwise.
+		 * I need to know if the user is dragging clockwise or
+		 * counter-clockwise.
 		 */
 		private Boolean clockwise = null;
 
 		@Override
-		public void mousePressed(MouseEvent e)
-		{
+		public void mousePressed(MouseEvent e) {
 			if (!blockingManipulationEnabled)
 				return;
-			
+
 			// request focus so that the key listening works
 			requestFocusInWindow();
 
-			if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1)
-			{
+			if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
 				final Point position = e.getPoint();
 				double radius = CompassLib.compassR(position.x - translateX, position.y - translateY);
-				if (radius < directionRadius)
-				{
+				if (radius < directionRadius) {
 					start_degrees = (float) CompassLib.compassA_deg(position.x - translateX, position.y - translateY);
 					end_degrees = start_degrees + 10;
 					block = new BlockRegion(start_degrees, end_degrees);
@@ -76,16 +76,14 @@ public class PolarDirectionGraph extends JComponent
 		}
 
 		@Override
-		public void mouseDragged(MouseEvent e)
-		{
-			if (!blockingManipulationEnabled || block==null)
+		public void mouseDragged(MouseEvent e) {
+			if (!blockingManipulationEnabled || block == null)
 				return;
 
-			if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK)
-			{
+			if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK) {
 				final Point position = e.getPoint();
 				end_degrees = (float) CompassLib.compassA_deg(position.x - translateX, position.y - translateY);
-				if (clockwise==null) {
+				if (clockwise == null) {
 					clockwise = end_degrees > start_degrees;
 				}
 				if (clockwise) {
@@ -100,27 +98,28 @@ public class PolarDirectionGraph extends JComponent
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e)
-		{
-			if (!blockingManipulationEnabled || block==null)
+		public void mouseReleased(MouseEvent e) {
+			if (!blockingManipulationEnabled || block == null)
 				return;
-			
+
 			block = null;
 			listeners.fire().blockingChanged();
 		}
-		
-		public void keyReleased(KeyEvent e)
-		{
+
+		public void keyReleased(KeyEvent e) {
 			// if the user pressed "escape" terminate the action
-			if (e.getKeyCode()==KeyEvent.VK_ESCAPE) {
+			if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 				blockRegions.remove(block);
 				block = null;
 				repaint();
 			}
 		}
-		
-		public void keyPressed(KeyEvent e) {}
-		public void keyTyped(KeyEvent e) {}
+
+		public void keyPressed(KeyEvent e) {
+		}
+
+		public void keyTyped(KeyEvent e) {
+		}
 	}
 
 	/** display modes */
@@ -144,19 +143,17 @@ public class PolarDirectionGraph extends JComponent
 
 	private boolean blockingManipulationEnabled = false;
 
-	private final ListenerSupport<IPolarDirectionGraphListener> listeners = ListenerSupport.create(IPolarDirectionGraphListener.class);
+	private final ListenerSupport<IPolarDirectionGraphListener> listeners = ListenerSupport
+			.create(IPolarDirectionGraphListener.class);
 
 	/** show the N/S/E/W/NE/NW/SE/SW labels */
 	private boolean directionLabelsVisible = true;
-	
+
 	/** Creates new form cPolarDirectionGraph */
-	public PolarDirectionGraph()
-	{
-		addComponentListener(new ComponentAdapter()
-		{
+	public PolarDirectionGraph() {
+		addComponentListener(new ComponentAdapter() {
 			@Override
-			public void componentResized(ComponentEvent e)
-			{
+			public void componentResized(ComponentEvent e) {
 				paintWheelImage();
 				repaint();
 			}
@@ -169,10 +166,8 @@ public class PolarDirectionGraph extends JComponent
 	}
 
 	@Override
-	public void paint(Graphics g)
-	{
-		if (oWheelImage == null)
-		{
+	public void paint(Graphics g) {
+		if (oWheelImage == null) {
 			return;
 		}
 		final Graphics2D g2 = (Graphics2D) g;
@@ -183,19 +178,18 @@ public class PolarDirectionGraph extends JComponent
 			return;
 
 		/*
-		 * It is easier to do co-ordinates as if I was drawing a circle about the origin, so apply a translation. Also,
-		 * translate co-ordinates to position the circle in the centre of the long-axis of the containing panel.
+		 * It is easier to do co-ordinates as if I was drawing a circle about
+		 * the origin, so apply a translation. Also, translate co-ordinates to
+		 * position the circle in the centre of the long-axis of the containing
+		 * panel.
 		 */
 		g.setColor(Color.BLACK);
 		g2.translate(translateX, translateY);
 		// draw the lines
-		for (int i = 0; i < 360; i++)
-		{
-			if (magnitude[i] != 0)
-			{
+		for (int i = 0; i < 360; i++) {
+			if (magnitude[i] != 0) {
 				final int directionX, directionY;
-				switch (iDisplayMode)
-				{
+				switch (iDisplayMode) {
 				case DISPLAY_MODE_INSIDE_OUT:
 					directionX = (int) CompassLib.cartesianX(i, magnitude[i]);
 					directionY = (int) -CompassLib.cartesianY(i, magnitude[i]);
@@ -214,53 +208,57 @@ public class PolarDirectionGraph extends JComponent
 			}
 		}
 
-		// turn anti-aliasing on, so I don't get gaps between the lines I draw to make up the wheel
-		// note: this doesn't matter so much for the direction data because that changes rapidly.
+		// turn anti-aliasing on, so I don't get gaps between the lines I draw
+		// to make up the wheel
+		// note: this doesn't matter so much for the direction data because that
+		// changes rapidly.
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		drawBlockingRegions(g2, -directionRadius, -directionRadius);
 	}
 
-	private void paintWheelImage()
-	{
+	private void paintWheelImage() {
 		final int width = this.getWidth();
 		final int height = this.getHeight();
-		// sometimes, while the component hierarchy is being constructed, this happens.
+		// sometimes, while the component hierarchy is being constructed, this
+		// happens.
 		if (width == 0 || height == 0)
 			return;
 
 		// the circle must be rectangular
 		final int sideLength = Math.min(width, height);
 
-		// create an image of the type packed RGB - makes dumping the data into the image faster
+		// create an image of the type packed RGB - makes dumping the data into
+		// the image faster
 		oWheelImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		// the 0.9 factor leaves some space for the marker lines
 		directionRadius = sideLength / 2f * 0.9f;
 		final Graphics2D g = oWheelImage.createGraphics();
 		g.setColor(getBackground());
 		g.fillRect(0, 0, width, height);
-		// turn anti-aliasing on, so I don't get gaps between the lines I draw to make up the wheel
+		// turn anti-aliasing on, so I don't get gaps between the lines I draw
+		// to make up the wheel
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		/*
-		 * It is easier to do co-ordinates as if I was drawing a circle about the origin, so apply a translation. Also,
-		 * translate co-ordinates to position the circle in the centre of the long-axis of the containing panel.
+		 * It is easier to do co-ordinates as if I was drawing a circle about
+		 * the origin, so apply a translation. Also, translate co-ordinates to
+		 * position the circle in the centre of the long-axis of the containing
+		 * panel.
 		 */
 		translateX = sideLength / 2 + ((width - sideLength) / 2);
 		translateY = sideLength / 2 + ((height - sideLength) / 2);
 		g.translate(translateX, translateY);
 
 		final Paint oldPaint = g.getPaint();
-		if (isEnabled())
-		{
+		if (isEnabled()) {
 			g.setPaint(new CompassBackgroundGradientPaint(0, 0, directionRadius));
-		}
-		else
-		{
+		} else {
 			g.setPaint(Color.GRAY);
 		}
-		g.fillOval((int)-directionRadius, (int)-directionRadius, (int) (directionRadius*2), (int) (directionRadius*2));
-		
+		g.fillOval((int) -directionRadius, (int) -directionRadius, (int) (directionRadius * 2),
+				(int) (directionRadius * 2));
+
 		g.setPaint(oldPaint);
 
 		// draw the marker lines
@@ -275,8 +273,7 @@ public class PolarDirectionGraph extends JComponent
 				(int) (directionRadius));
 		// draw little ticks on edge of wheel
 		final double maxTickLength = (sideLength / 2d - directionRadius);
-		for (int i = 0; i < 360; i += 10)
-		{
+		for (int i = 0; i < 360; i += 10) {
 			// convert to cartesian co-ordinates
 			final int x1 = (int) CompassLib.cartesianX(i, directionRadius);
 			final int y1 = (int) CompassLib.cartesianY(i, directionRadius);
@@ -289,16 +286,18 @@ public class PolarDirectionGraph extends JComponent
 		g.setColor(new Color(70, 70, 70)); // grey
 		Font font = getFont();
 		final int fontHeight = g.getFontMetrics(font).getHeight();
-		// resize the font to suit the current wheel size, but don't make the font any bigger than the default size
-		float newFontHeight = Math.min(fontHeight, (float) (font.getSize() * (sideLength / 2d - directionRadius) * 0.9f
-				* 2d / fontHeight));
+		// resize the font to suit the current wheel size, but don't make the
+		// font any bigger than the default size
+		float newFontHeight = Math.min(fontHeight,
+				(float) (font.getSize() * (sideLength / 2d - directionRadius) * 0.9f * 2d / fontHeight));
 		font = font.deriveFont(newFontHeight);
 		g.setFont(font);
 
 		final double compassTextRadius = directionRadius * 0.65f;
-		
+
 		Rectangle2D stringBounds = g.getFontMetrics(font).getStringBounds("0", g);
-		g.drawString("0", (float) (-stringBounds.getWidth() / 2f), (float) (-directionRadius + stringBounds.getHeight()));
+		g.drawString("0", (float) (-stringBounds.getWidth() / 2f),
+				(float) (-directionRadius + stringBounds.getHeight()));
 
 		stringBounds = g.getFontMetrics(font).getStringBounds("180", g);
 		g.drawString("180", (float) (-stringBounds.getWidth() / 2f), (float) (directionRadius));
@@ -307,80 +306,68 @@ public class PolarDirectionGraph extends JComponent
 		g.drawString("90", (float) (directionRadius - stringBounds.getWidth()), 0);
 
 		g.drawString("270", (float) (-directionRadius), 0);
-		
-		if (directionLabelsVisible)
-		{
+
+		if (directionLabelsVisible) {
 			drawStringAtRadius("N", g, font, compassTextRadius, 0);
 			drawStringAtRadius("S", g, font, compassTextRadius, 180);
 			stringBounds = g.getFontMetrics(font).getStringBounds("E", g);
 			g.drawString("E", (float) (compassTextRadius - (stringBounds.getWidth() / 2f)), 0);
 			stringBounds = g.getFontMetrics(font).getStringBounds("W", g);
 			g.drawString("W", (float) (-compassTextRadius - (stringBounds.getWidth() / 2f)), 0);
-	
-			drawStringAtRadius("SE", g, font, compassTextRadius, 90+45);
-			drawStringAtRadius("SW", g, font, compassTextRadius, 180+45);
-			drawStringAtRadius("NW", g, font, compassTextRadius, 270+45);
+
+			drawStringAtRadius("SE", g, font, compassTextRadius, 90 + 45);
+			drawStringAtRadius("SW", g, font, compassTextRadius, 180 + 45);
+			drawStringAtRadius("NW", g, font, compassTextRadius, 270 + 45);
 			drawStringAtRadius("NE", g, font, compassTextRadius, 45);
-		}
-		else
-		{
+		} else {
 			// draw an arrow-head at the top
-			
+
 			final float arrowSize = sideLength / 2f * 0.15f;
 
 			final float x = (float) (CompassLib.cartesianX(0, directionRadius) - (arrowSize / 2f));
 			final float y = (float) (-CompassLib.cartesianY(0, directionRadius) - arrowSize);
-			final int x1 = (int)x;
-			final int y1 = (int)y;
+			final int x1 = (int) x;
+			final int y1 = (int) y;
 			final int x2 = (int) (x + arrowSize);
-			final int y2 = (int)y;
-			final int x3 = (int) (x + arrowSize/2f);
+			final int y2 = (int) y;
+			final int x3 = (int) (x + arrowSize / 2f);
 			final int y3 = (int) (y + arrowSize);
-			g.fillPolygon( new int[] { x1, x2, x3}, new int[] { y1, y2, y3}, 3);
+			g.fillPolygon(new int[] { x1, x2, x3 }, new int[] { y1, y2, y3 }, 3);
 		}
 	}
 
-	private void drawBlockingRegions(Graphics2D g, double x, double y)
-	{
+	private void drawBlockingRegions(Graphics2D g, double x, double y) {
 		g.setColor(new Color(0, 0, 0, 180)); // black, a little bit transparent
 
 		final double diameter = directionRadius * 2;
 
 		final List<BlockRegion> processedList = processList(blockRegions);
-		for (BlockRegion region : processedList)
-		{
+		for (BlockRegion region : processedList) {
 			// Note: Arc2D angles use the polar co-ordinate convention
 			final double start = CompassLib.compass2polar(region.getStart_deg());
 			final double extent = region.getExtent_deg();
 			g.fill(new Arc2D.Double(x, y, diameter, diameter, start, -extent, Arc2D.PIE));
 		}
 	}
-	
+
 	/**
 	 * split any blocking regions that span 0 degrees into regions
 	 */
-	private static List<BlockRegion> processList(List<BlockRegion> blockRegions)
-	{
+	private static List<BlockRegion> processList(List<BlockRegion> blockRegions) {
 		final ArrayList<BlockRegion> result = new ArrayList<BlockRegion>();
 
 		// Some block regions goes across 0 degrees. Break them into two.
-		for (BlockRegion blockRegion : blockRegions)
-		{
-			if (blockRegion.getStart_deg() <= blockRegion.getEnd_deg())
-			{
+		for (BlockRegion blockRegion : blockRegions) {
+			if (blockRegion.getStart_deg() <= blockRegion.getEnd_deg()) {
 				result.add(blockRegion);
-			}
-			else
-			{
+			} else {
 				final BlockRegion b1 = new BlockRegion(blockRegion.getStart_deg(), 360);
-				if (b1.getExtent_deg() != 0)
-				{
+				if (b1.getExtent_deg() != 0) {
 					result.add(b1);
 				}
 
 				final BlockRegion b2 = new BlockRegion(0, blockRegion.getEnd_deg());
-				if (b2.getExtent_deg() != 0)
-				{
+				if (b2.getExtent_deg() != 0) {
 					result.add(b2);
 				}
 			}
@@ -392,11 +379,11 @@ public class PolarDirectionGraph extends JComponent
 	/**
 	 * Draw a string, centred on the midpoint of the bounding box of the text.
 	 */
-	private static void drawStringAtRadius(String s, Graphics2D g, Font font, double radius, double angle_deg)
-	{
+	private static void drawStringAtRadius(String s, Graphics2D g, Font font, double radius, double angle_deg) {
 		final int descent = g.getFontMetrics(font).getDescent();
 		final Rectangle2D stringBounds = g.getFontMetrics(font).getStringBounds(s, g);
-		// HACK: have no idea why I need the "+1", but it makes the text centre better.
+		// HACK: have no idea why I need the "+1", but it makes the text centre
+		// better.
 		final float x = (float) (CompassLib.cartesianX(angle_deg, radius) - (stringBounds.getWidth() / 2f) + 1);
 		final float y = (float) (-CompassLib.cartesianY(angle_deg, radius) + (stringBounds.getHeight() / 2) - descent);
 		g.drawString(s, x, y);
@@ -405,36 +392,29 @@ public class PolarDirectionGraph extends JComponent
 	/**
 	 * update direction values and trigger a repaint
 	 * 
-	 * @param direction an array of 360 direction values.
+	 * @param direction
+	 *            an array of 360 direction values.
 	 */
-	public void updateDirection(int[] direction)
-	{
-		if (direction == null)
-		{
+	public void updateDirection(int[] direction) {
+		if (direction == null) {
 			throw new IllegalArgumentException("direction may not be null");
 		}
-		if (direction.length != 360)
-		{
+		if (direction.length != 360) {
 			throw new IllegalArgumentException(direction.length + "!= 360");
 		}
-		
+
 		// find the maximum direction
 		double maxDirection = 0;
-		for (int i = 0; i < 360; i++)
-		{
+		for (int i = 0; i < 360; i++) {
 			maxDirection = Math.max(maxDirection, direction[i]);
 		}
 
 		// check for zero to prevent divide/zero error
-		if (maxDirection == 0)
-		{
+		if (maxDirection == 0) {
 			Arrays.fill(magnitude, 0);
-		}
-		else
-		{
+		} else {
 			// calculate the co-ordinates of the lines
-			for (int i = 0; i < 360; i++)
-			{
+			for (int i = 0; i < 360; i++) {
 				magnitude[i] = direction[i] / maxDirection * directionRadius;
 				// ignore negative data
 				magnitude[i] = Math.max(0, magnitude[i]);
@@ -444,53 +424,45 @@ public class PolarDirectionGraph extends JComponent
 		repaint();
 	}
 
-	public void setBlockRegions(final List<BlockRegion> newBlockRegions)
-	{
-		// Since we use CopyOnAddArrayList, we can 'safely' remove the content even if the event thread is painting.
+	public void setBlockRegions(final List<BlockRegion> newBlockRegions) {
+		// Since we use CopyOnAddArrayList, we can 'safely' remove the content
+		// even if the event thread is painting.
 		blockRegions.clear();
 		blockRegions.addAll(newBlockRegions);
 		repaint();
 	}
-	
-	public List<BlockRegion> getBlockRegions()
-	{
+
+	public List<BlockRegion> getBlockRegions() {
 		return this.blockRegions;
 	}
 
 	@Override
-	public void setEnabled(boolean enabled)
-	{
+	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		paintWheelImage();
 		repaint();
 	}
-	
-	public void setBlockingManipulationEnabled(boolean enabled)
-	{
+
+	public void setBlockingManipulationEnabled(boolean enabled) {
 		this.blockingManipulationEnabled = enabled;
 	}
-	
-	public boolean isBlockingManipulationEnabled()
-	{
+
+	public boolean isBlockingManipulationEnabled() {
 		return this.blockingManipulationEnabled;
 	}
 
-	public void addControlListener(IPolarDirectionGraphListener listener)
-	{
+	public void addControlListener(IPolarDirectionGraphListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	/**
-	 * @param args the command line arguments
+	 * @param args
+	 *            the command line arguments
 	 */
-	public static void main(String args[])
-	{
-		try
-		{
+	public static void main(String args[]) {
+		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 		}
 		JFrame oTestFrame = new JFrame();
 		final PolarDirectionGraph oTestControl = new PolarDirectionGraph();
@@ -501,15 +473,14 @@ public class PolarDirectionGraph extends JComponent
 		oTestFrame.setVisible(true);
 	}
 
-	public boolean isDirectionLabelsVisible()
-	{
+	public boolean isDirectionLabelsVisible() {
 		return directionLabelsVisible;
 	}
 
-	public void setDirectionLabelsVisible(boolean showDirectionLabels)
-	{
-		if (this.directionLabelsVisible==showDirectionLabels) return;
-		
+	public void setDirectionLabelsVisible(boolean showDirectionLabels) {
+		if (this.directionLabelsVisible == showDirectionLabels)
+			return;
+
 		this.directionLabelsVisible = showDirectionLabels;
 		paintWheelImage();
 		repaint();

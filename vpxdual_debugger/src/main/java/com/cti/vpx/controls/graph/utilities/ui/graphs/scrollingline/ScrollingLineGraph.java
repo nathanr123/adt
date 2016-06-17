@@ -14,12 +14,10 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.MultiLineGraph;
 
 /**
  * A left-to-right scrolling line graph.
- * 
- * @author Roy Emmerich
- * @author Noel Grandin
  */
 public class ScrollingLineGraph extends AbstractLineGraph implements ILocaleListener
 {
+	private static final long serialVersionUID = 4758593940728618618L;
 
 	static final class LineState
 	{

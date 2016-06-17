@@ -28,8 +28,10 @@ import org.jfree.ui.RefineryUtilities;
  * A demo showing the addition and removal of multiple datasets / renderers.
  */
 public class MultipleDatasetDemo1 extends ApplicationFrame implements ActionListener {
+	
+	private static final long serialVersionUID = 3597351582215770234L;
 
-    /** The plot. */
+	/** The plot. */
     private XYPlot plot;
    
     /** The index of the last dataset added. */

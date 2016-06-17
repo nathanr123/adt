@@ -33,6 +33,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -157,7 +158,15 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private SpinnerNumberModel strideSpinnerModel;
 
 	public static void main(String[] args) {
-		new VPX_MemoryBrowserWindow(0).setVisible(true);
+
+		try {
+
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+			new VPX_MemoryBrowserWindow(0).setVisible(true);
+		} catch (Exception e) {
+
+		}
 	}
 
 	/**
@@ -740,7 +749,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		loadFilters();
 
-		//byte[] b = { 0 };
+		// byte[] b = { 0 };
 
 		// setBytes(0, 0, b);
 
@@ -1506,10 +1515,10 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		switch (typeSize) {
 		case HEX8:
-			
-			if(!value.startsWith("0x")&&!value.startsWith("0x")){
-				
-				value = "0x"+value.toString();
+
+			if (!value.startsWith("0x") && !value.startsWith("0x")) {
+
+				value = "0x" + value.toString();
 			}
 
 			newValue = Long.decode(value);
@@ -1595,7 +1604,7 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		if (typeSize == HEX64) {
 
 			String val = value.toString();
-			
+
 			byte[] bArr = new byte[8];
 
 			bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);

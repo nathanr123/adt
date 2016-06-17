@@ -8,13 +8,6 @@ import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-/**
- * Coded from articles on the web http://www.clientjava.com/blog/2004/08/31/1093972473000.html
- * http://weblogs.java.net/blog/alexfromsun/archive/2006/02/debugging_swing.html
- * 
- * @author Scott Delap
- * @author Alexander Potochkin
- */
 public final class EDT_ViolationChecker extends RepaintManager
 {
 	public static void install()

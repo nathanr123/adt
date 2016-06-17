@@ -5,8 +5,6 @@ import java.util.Arrays;
 /**
  * The line graph works with float values - this acts as a wrapper around double values 
  * so that we can pass double arrays into the graph for drawing.
- * 
- * @author Noel Grandin
  */
 public class LineDataDouble extends AbstractLineData
 {

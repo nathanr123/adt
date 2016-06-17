@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-/**
- * 
- * @author Andre E
- */
 class HistogramDualChannelDrawSurface extends DrawSurface
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8843163711739709478L;
 	/**
 	 * This stores the histogram data will be drawn in this graph.
 	 */

@@ -14,12 +14,14 @@ import com.cti.vpx.controls.graph.utilities.ui.ListenerSupport;
 /**
  * This is the draw surface for a graph. FIXME x,y grid spacing should be font-relative by default, not hard-coded
  * pixels.
- * 
- * @author Andre
  */
 public class GridDrawSurface extends PopupMenuDrawSurface
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5158431373739738074L;
 	private final ListenerSupport<IGridListener> gridListeners = ListenerSupport
 			.create(IGridListener.class);
 

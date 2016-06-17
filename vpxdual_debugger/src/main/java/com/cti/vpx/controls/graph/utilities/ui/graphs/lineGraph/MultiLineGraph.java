@@ -19,13 +19,10 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ZoomAdapter;
  * 
  * This is a development of cLineGraph, but now using a key to identify
  * each line.
- * 
- * @author Andre
- * @author Noel Grandin
  */
 public class MultiLineGraph extends AbstractLineGraph
 {
-
+	private static final long serialVersionUID = 7440429934690100455L;
 	/**
 	 * A set of simple strokes for clients to use in their graphs.
 	 */

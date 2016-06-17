@@ -2,10 +2,6 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph;
 
 import java.util.Arrays;
 
-/**
- * 
- * @author Andre
- */
 public class LineData extends LineDataY
 {
 

@@ -8,8 +8,6 @@ import javax.swing.ViewportLayout;
 
 /**
  * Some utility methods for JScrollPane.
- * 
- * @author Noel Grandin
  */
 public final class ScrollPaneLib
 {
@@ -26,6 +24,8 @@ public final class ScrollPaneLib
 	{
 		oScrollPane.getViewport().setLayout(new ViewportLayout()
 		{
+			private static final long serialVersionUID = -8675127872392792115L;
+
 			@Override
 			public Dimension minimumLayoutSize(Container parent)
 			{

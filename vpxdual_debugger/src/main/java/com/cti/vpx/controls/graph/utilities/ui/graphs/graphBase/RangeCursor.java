@@ -2,10 +2,6 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase;
 
 import java.awt.Color;
 
-/**
- *
- * @author Andre
- */
 public class RangeCursor
 {
 	

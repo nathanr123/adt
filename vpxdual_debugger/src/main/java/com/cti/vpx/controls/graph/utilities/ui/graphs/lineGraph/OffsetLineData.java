@@ -4,8 +4,6 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph;
  * Line data class that adds an offset to it's Y values.
  * 
  * Useful when one of the displayed lines is merely an offset version of another line.
- * 
- * @author Noel Grandin
  */
 public class OffsetLineData extends GeneratedLineData
 {

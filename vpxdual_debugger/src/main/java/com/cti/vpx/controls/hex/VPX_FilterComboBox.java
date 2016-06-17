@@ -20,6 +20,8 @@ public class VPX_FilterComboBox extends JComboBox<Object> {
 
 	private List<String> array;
 
+	private int currentCaretPosition = 0;
+
 	public VPX_FilterComboBox() {
 
 	}
@@ -37,24 +39,43 @@ public class VPX_FilterComboBox extends JComboBox<Object> {
 
 		final JTextField textfield = (JTextField) this.getEditor().getEditorComponent();
 
+		/*
+		 * textfield.addKeyListener(new KeyAdapter() {
+		 * 
+		 * public void keyReleased(KeyEvent ke) {
+		 * 
+		 * SwingUtilities.invokeLater(new Runnable() {
+		 * 
+		 * public void run() {
+		 * 
+		 * if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+		 * textfield.requestFocus(false); } else { if (ke.getKeyCode() !=
+		 * KeyEvent.VK_UP && ke.getKeyCode() != KeyEvent.VK_DOWN) {
+		 * comboFilter(textfield.getText()); } } } }); } });
+		 */
+
 		textfield.addKeyListener(new KeyAdapter() {
 
-			public void keyReleased(KeyEvent ke) {
+			public void keyPressed(KeyEvent ke) {
 
 				SwingUtilities.invokeLater(new Runnable() {
 
 					public void run() {
 
-						if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-							textfield.requestFocus(false);
-						} else {
-							if (ke.getKeyCode() != KeyEvent.VK_UP && ke.getKeyCode() != KeyEvent.VK_DOWN) {
-								comboFilter(textfield.getText());
-							}
+						currentCaretPosition = textfield.getCaretPosition();
+
+						if (textfield.getSelectedText() == null) {
+
+							textfield.setCaretPosition(0);
+
+							comboFilter(textfield.getText());
+
+							textfield.setCaretPosition(currentCaretPosition);
 						}
 					}
 				});
 			}
+
 		});
 
 	}

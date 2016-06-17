@@ -2,9 +2,7 @@ package com.cti.vpx.controls.graph.utilities.ui.titlebar;
 
 /**
  *
- * FIXME (Noel) add cTitleBar parameters to the listener methods
- * 
- * @author  Jaco
+ * FIXME add cTitleBar parameters to the listener methods
  */
 public interface ITitleBarListener
 {

@@ -1,34 +1,35 @@
 package com.cti.vpx.controls.graph.sharedlibs.dsphostl;
 
 /**
- * A utility class which is designed to hold three integer values which represent a legal range. Any values which fall
- * outside this range or which aren't multiples of the increment are considered invalid.
+ * A utility class which is designed to hold three integer values which
+ * represent a legal range. Any values which fall outside this range or which
+ * aren't multiples of the increment are considered invalid.
  * 
- * @author Roy Emmerich
- * @version v1.1 July 2002
  */
-public class ParameterRangeShort extends ParameterBandShort
-{
+public class ParameterRangeShort extends ParameterBandShort {
 	/** The increment of the range */
 	protected final short increment;
 
 	/**
-	 * No-args constructor. Min, max & increment values of <code>ParameterBandInt</code> will be initialised to 0.
+	 * No-args constructor. Min, max & increment values of
+	 * <code>ParameterBandInt</code> will be initialised to 0.
 	 */
-	public ParameterRangeShort()
-	{
+	public ParameterRangeShort() {
 		this.increment = 0;
 	}
 
 	/**
-	 * Creates a new instance of code>ParameterBandInt</code> with specific values.
+	 * Creates a new instance of code>ParameterBandInt</code> with specific
+	 * values.
 	 * 
-	 * @param min Minimum acceptable value in the range.
-	 * @param max Maximum acceptable value in the range.
-	 * @param increment Acceptable increment of values in the range.
+	 * @param min
+	 *            Minimum acceptable value in the range.
+	 * @param max
+	 *            Maximum acceptable value in the range.
+	 * @param increment
+	 *            Acceptable increment of values in the range.
 	 */
-	public ParameterRangeShort(short min, short max, short increment)
-	{
+	public ParameterRangeShort(short min, short max, short increment) {
 		super(min, max);
 		this.increment = increment;
 	}
@@ -36,31 +37,29 @@ public class ParameterRangeShort extends ParameterBandShort
 	/**
 	 * Check if range contains a particular value.
 	 * 
-	 * @param value Value to check against the range.
+	 * @param value
+	 *            Value to check against the range.
 	 * @return True if the value is in the range.
 	 */
 	@Override
-	public boolean contains(short value)
-	{
+	public boolean contains(short value) {
 		return (value >= min && value <= max && (value - min) % increment == 0);
 	}
 
 	/**
 	 * Snap the given value to the grid and return it.
 	 * 
-	 * @param value Value to snap to the range grid.
+	 * @param value
+	 *            Value to snap to the range grid.
 	 * @return Value after snapping it to the range grid.
 	 */
 	@Override
-	public short snapToGrid(short value)
-	{
+	public short snapToGrid(short value) {
 		// clip to range
-		if (value < min)
-		{
+		if (value < min) {
 			value = min;
 		}
-		if (value > max)
-		{
+		if (value > max) {
 			value = max;
 		}
 		// snap to grid
@@ -73,18 +72,15 @@ public class ParameterRangeShort extends ParameterBandShort
 	 * @return The valid centre value from the range.
 	 */
 	@Override
-	public short getCentre()
-	{
+	public short getCentre() {
 		short centre = (short) (min / 2 + max / 2);
-		if (!contains(centre))
-		{
+		if (!contains(centre)) {
 			centre = snapToGrid(centre);
 		}
 		return centre;
 	}
 
-	public short getIncrement()
-	{
+	public short getIncrement() {
 		return increment;
 	}
 
@@ -94,8 +90,7 @@ public class ParameterRangeShort extends ParameterBandShort
 	 * @return The string containing the values.
 	 */
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "Increment:" + getIncrement() + " " + super.toString();
 	}
 

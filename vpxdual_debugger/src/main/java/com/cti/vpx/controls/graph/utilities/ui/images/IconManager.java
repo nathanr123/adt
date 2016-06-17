@@ -22,8 +22,6 @@ import javax.swing.JLabel;
 
 /**
  * Loads/resizes/caches icons.
- * 
- * @author Noel Grandin
  */
 public final class IconManager
 {

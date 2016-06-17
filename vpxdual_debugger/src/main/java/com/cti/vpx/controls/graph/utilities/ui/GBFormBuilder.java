@@ -49,8 +49,6 @@ import javax.swing.border.Border;
  * calling <code>setDebugColor(Color.RED)</code> will cause the spaces between
  * form elements to be filled with red.
  * This is useful when debugging layout issues.
- *  
- * @author Noel Grandin
  */
 public class GBFormBuilder {
 
@@ -831,6 +829,7 @@ public class GBFormBuilder {
 	 */
 	private static class CheckboxLabel extends JLabel {
 
+		private static final long serialVersionUID = -813142803120142599L;
 		private final JCheckBox checkbox;
 
 		public CheckboxLabel(JCheckBox _checkbox, String text) {
@@ -879,7 +878,7 @@ public class GBFormBuilder {
 	}
 
 	public static class Separator extends JPanel {
-		
+		private static final long serialVersionUID = 692905565584998445L;
 		private final JLabel label;
 		
 		public Separator(String text) {

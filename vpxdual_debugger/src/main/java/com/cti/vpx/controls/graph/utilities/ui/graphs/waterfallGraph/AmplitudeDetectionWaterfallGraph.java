@@ -8,12 +8,10 @@ import com.cti.vpx.controls.graph.sharedlibs.dsphostl.TimeStamp;
 import com.cti.vpx.controls.graph.utilities.objectpool.GraphObjectPool;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.DirectionLib;
 
-/**
- * 
- * @author Jaco Jooste
- */
 public class AmplitudeDetectionWaterfallGraph extends WaterfallGraph
-{
+{	
+	private static final long serialVersionUID = 7970320646654315482L;
+
 	private static final class DetectionData {
 		public TimeStamp oTimeStamp = new TimeStamp(100);
 		public long lFirstBinFrequency_Hz;

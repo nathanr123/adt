@@ -13,11 +13,10 @@ import javax.swing.UIManager;
 
 /**
  * A JGoodies-FormLayout style separator. Looks good and takes up minimal space in forms.
- * 
- * @author Noel Grandin
  */
 public class TitleSeparator extends JPanel
 {
+	private static final long serialVersionUID = 361855275765252236L;
 	private final JLabel label;
 
 	public TitleSeparator()
@@ -75,6 +74,7 @@ public class TitleSeparator extends JPanel
 
 	private static class LineComponent extends JComponent
 	{
+		private static final long serialVersionUID = -3794759448000406323L;
 
 		@Override
 		public void paint(Graphics g)

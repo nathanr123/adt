@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -24,6 +25,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
@@ -58,6 +63,10 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner, FindContr
 
 	private VPX_FindLog find = new VPX_FindLog(this, parent);
 
+	private Highlighter highlighter;
+
+	private HighlightPainter painter;
+
 	/**
 	 * Create the panel.
 	 */
@@ -68,6 +77,8 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner, FindContr
 		init();
 
 		loadComponents();
+
+		createHighlighter();
 	}
 
 	private void init() {
@@ -375,18 +386,42 @@ public class VPX_LoggerPanel extends JPanel implements ClipboardOwner, FindContr
 		}
 	}
 
+	private void createHighlighter() {
+
+		highlighter = txtA_Log.getHighlighter();
+
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.GRAY);
+
+	}
+
 	@Override
 	public void find(String value) {
 
-		String str = txtA_Log.getText();
+		try {
+			
+			String str = txtA_Log.getText();
 
-		idx = str.indexOf(value, idx);
+			if(value.length()> 0)
+				idx = str.indexOf(value, idx);
+			else
+				idx = -1;
+			
+			highlighter.removeAllHighlights();
+			
+			if (idx > -1) {
+				
+				find.updateStatus("Found at "+idx);
+				
+				highlighter.addHighlight(idx, (idx + value.length()), painter);
 
-		txtA_Log.setSelectionStart(idx);
+				idx = idx + value.length();				
+			}else{
+				find.updateStatus("Search Finished");
+			}
 
-		idx = idx + value.length();
-
-		txtA_Log.setSelectionEnd(idx);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 
 	}
 

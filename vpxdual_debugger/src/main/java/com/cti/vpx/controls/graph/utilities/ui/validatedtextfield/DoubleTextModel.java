@@ -1,9 +1,5 @@
 package com.cti.vpx.controls.graph.utilities.ui.validatedtextfield;
 
-/**
- * 
- * @author Noel Grandin
- */
 public class DoubleTextModel extends DecimalTextModel
 {
 	private double value;

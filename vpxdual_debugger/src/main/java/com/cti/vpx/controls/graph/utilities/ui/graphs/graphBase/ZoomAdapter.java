@@ -2,8 +2,6 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase;
 
 /**
  * Adapter class for zoom listeners.
- * 
- * @author Noel Grandin
  */
 public class ZoomAdapter implements IZoomListener
 {

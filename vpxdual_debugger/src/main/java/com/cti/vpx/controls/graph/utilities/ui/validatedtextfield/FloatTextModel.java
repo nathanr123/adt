@@ -1,9 +1,6 @@
 package com.cti.vpx.controls.graph.utilities.ui.validatedtextfield;
 
-/**
- * 
- * @author Noel Grandin
- */
+
 public class FloatTextModel extends DecimalTextModel
 {
 	private float value;

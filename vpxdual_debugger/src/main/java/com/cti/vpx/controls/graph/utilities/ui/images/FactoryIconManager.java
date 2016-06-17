@@ -13,8 +13,6 @@ import javax.swing.JLabel;
 
 /**
  * Some icons are better drawn using Graphics2D code.
- * 
- * @author Noel Grandin
  */
 class FactoryIconManager
 {

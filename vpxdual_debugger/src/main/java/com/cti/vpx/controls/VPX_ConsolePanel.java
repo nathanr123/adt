@@ -1,6 +1,7 @@
 package com.cti.vpx.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -32,6 +33,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 import com.cti.vpx.command.MSGCommand;
 import com.cti.vpx.model.Processor;
@@ -81,6 +86,10 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner, FindCont
 
 	private VPX_FindLog find = new VPX_FindLog(this, parent);
 
+	private Highlighter highlighter;
+
+	private HighlightPainter painter;
+
 	private int idx = 0;
 
 	private final JPopupMenu vpxConsoleContextMenu = new JPopupMenu();
@@ -105,6 +114,8 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner, FindCont
 		loadComponents();
 
 		loadFilters();
+
+		createHighlighter();
 	}
 
 	private void init() {
@@ -249,7 +260,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner, FindCont
 		JPanel panel_1 = new JPanel();
 
 		console_Panel.add(panel_1, BorderLayout.EAST);
-		
+
 		JButton btn_Console_Find = VPXComponentFactory.createJButton(new FindAction("Find"));
 
 		panel_1.add(btn_Console_Find);
@@ -751,7 +762,7 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner, FindCont
 			saveConsoleMsgtoFile();
 		}
 	}
-	
+
 	class FindAction extends AbstractAction {
 
 		/**
@@ -773,7 +784,6 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner, FindCont
 			showFind();
 		}
 	}
-
 
 	class ClearAction extends AbstractAction {
 
@@ -814,18 +824,42 @@ public class VPX_ConsolePanel extends JPanel implements ClipboardOwner, FindCont
 		}
 	}
 
+	private void createHighlighter() {
+
+		highlighter = txtA_Console.getHighlighter();
+
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.GRAY);
+
+	}
+
 	@Override
 	public void find(String value) {
 
-		String str = txtA_Console.getText();
+		try {
 
-		idx = str.indexOf(value, idx);
+			String str = txtA_Console.getText();
 
-		txtA_Console.setSelectionStart(idx);
+			if (value.length() > 0)
+				idx = str.indexOf(value, idx);
+			else
+				idx = -1;
 
-		idx = idx + value.length();
+			highlighter.removeAllHighlights();
 
-		txtA_Console.setSelectionEnd(idx);
+			if (idx > -1) {
+
+				find.updateStatus("Found at " + idx);
+
+				highlighter.addHighlight(idx, (idx + value.length()), painter);
+
+				idx = idx + value.length();
+			} else {
+				find.updateStatus("Search Finished");
+			}
+
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 
 	}
 

@@ -25,8 +25,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.axisscale.NumberAxisScale;
  * 
  * This class is meant to have all of the same methods as cGraphWrapper, so that it is basically a drop-in
  * replacement.
- * 
- * @author Andre, Noel Grandin
  */
 public class MultiGraphWrapper implements ILocaleListener
 {

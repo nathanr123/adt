@@ -1,9 +1,5 @@
 package com.cti.vpx.controls.graph.utilities.ui.graphs.polarGraph;
 
-/**
- * 
- * @author David Lee
- */
 public class BlockRegion
 {
 	public float start_deg;

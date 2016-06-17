@@ -5,10 +5,6 @@ package com.cti.vpx.listener;
 
 import java.io.Serializable;
 
-/**
- * @author RajuDhachu
- *
- */
 public interface VPXUDPListener extends Serializable{
 
 	public int ADV_PORTNO = 12345;

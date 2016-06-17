@@ -8,10 +8,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.util.VPXUtilities;
 
-/**
- * @author nathanr_kamal
- *
- */
 public class VPX_ProcessorNode extends DefaultMutableTreeNode {
 
 	/**

@@ -80,10 +80,6 @@ import com.cti.vpx.view.VPX_ETHWindow;
 import gnu.io.CommPortIdentifier;
 import javolution.io.Struct.Enum32;
 
-/**
- * @author nathanr_kamal
- *
- */
 public class VPXUtilities {
 
 	private static int scrWidth;

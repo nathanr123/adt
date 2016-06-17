@@ -31,9 +31,6 @@ import java.util.EventListener;
 /**
  * Somebody who is interested whether the cell selection within the hex editor
  * becomes changed.
- * 
- * @author PAX
- * @version 1.0
  */
 public interface SelectionChangedListener extends EventListener {
 

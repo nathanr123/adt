@@ -9,9 +9,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ZoomDrawSurface;
 
 /**
  * Synchronise a set of graphs zoom status
- * 
- * @author David Lee
- * @author Noel Grandin
  */
 public final class SyncGraphsZoom implements IZoomListener
 {

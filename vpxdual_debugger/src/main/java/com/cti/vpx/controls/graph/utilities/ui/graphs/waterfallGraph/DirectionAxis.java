@@ -15,11 +15,10 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.axisscale.NumberAxisScale;
 
 /**
  * An axis component that displays a rainbow gradient for use with direction data.
- * 
- * @author Pieter de Vos
  */
 public class DirectionAxis extends NumberAxisScale
-{
+{	
+	private static final long serialVersionUID = -3671355373660575793L;
 	private static final float [] DEGREES_LABELS = { 
 		180f, 120, 60f, 0f, 300f, 240f, 180f };
 	

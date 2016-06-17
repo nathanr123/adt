@@ -2,8 +2,6 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph;
 
 /**
  * cLineData that generates the X values on the fly, saving some memory
- * 
- * @author Noel Grandin
  */
 public class GeneratedLineData extends LineDataY {
 

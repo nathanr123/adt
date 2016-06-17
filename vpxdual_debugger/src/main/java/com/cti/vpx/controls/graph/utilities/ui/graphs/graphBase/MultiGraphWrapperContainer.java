@@ -1,3 +1,4 @@
+
 package com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase;
 
 import java.awt.GridBagConstraints;
@@ -12,11 +13,13 @@ import javax.swing.SwingConstants;
 
 /**
  * This code wraps multiple cMultiGraphWrapper classes so that they all display nicely lined up vertically.
- * 
- * @author Noel Grandin
  */
 public class MultiGraphWrapperContainer extends JComponent
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1952076020234221040L;
 	private final Set<MultiGraphWrapper> wrappers = new HashSet<MultiGraphWrapper>();
 
 	public MultiGraphWrapperContainer()

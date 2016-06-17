@@ -13,11 +13,14 @@ import javax.swing.Timer;
  * where the co-ordinates may not be simple numbers.
  * 
  * It has a timer to limit the rate of GUI update events.
- * 
- * @author Noel Grandin
  */
 public class TextCoordinatesPanel extends javax.swing.JPanel
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1624150511502738588L;
+
 	/**
    * Timer to delay setting of Coordinate Labels.
    */

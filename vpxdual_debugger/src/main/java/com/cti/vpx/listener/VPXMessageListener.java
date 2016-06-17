@@ -5,10 +5,6 @@ package com.cti.vpx.listener;
 
 import com.cti.vpx.command.MSGCommand;
 
-/**
- * @author RajuDhachu
- *
- */
 public interface VPXMessageListener extends VPXUDPListener {
 
 	public int PORTNO = CONSOLE_MSG_PORTNO;

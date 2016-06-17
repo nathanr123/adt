@@ -15,12 +15,11 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ZoomDrawSurface;
 
 /**
  * A base waterfall graph that uses a ScrollableBufferedImage for display.
- * 
- * @author Noel Grandin
  */
 public class WaterfallGraph extends ZoomDrawSurface
 { 
-	
+	private static final long serialVersionUID = 4226058167913180934L;
+
 	public static enum TimeDisplayPrecision {
 		MICRO_SEC, MILLI_SEC, DECI_SEC;
 	}

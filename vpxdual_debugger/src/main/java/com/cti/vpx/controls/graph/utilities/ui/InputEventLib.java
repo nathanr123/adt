@@ -2,10 +2,6 @@ package com.cti.vpx.controls.graph.utilities.ui;
 
 import java.awt.event.InputEvent;
 
-/**
- * 
- * @author Noel Grandin
- */
 public final class InputEventLib
 {
 	/** not meant to be instantiated */

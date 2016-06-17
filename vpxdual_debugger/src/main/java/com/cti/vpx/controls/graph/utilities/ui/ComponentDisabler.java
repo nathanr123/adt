@@ -34,8 +34,6 @@ import javax.swing.JViewport;
  * then later on add additional children to component A, the disabler will not know about the new children. This could
  * be fixed by doing the recursive search at enable/disable time. But then we'd have to maintain an extra Set of
  * components to ignore (see method
- * 
- * @author David Lee
  */
 public class ComponentDisabler
 {

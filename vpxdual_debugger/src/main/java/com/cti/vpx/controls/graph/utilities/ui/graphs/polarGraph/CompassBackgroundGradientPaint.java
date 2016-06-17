@@ -6,8 +6,6 @@ import java.awt.image.ColorModel;
 
 /**
  * I use a gradient paint because it's about 5x faster than painting lots of lines.
- * 
- * @author Noel Grandin
  */
 class CompassBackgroundGradientPaint implements Paint
 {

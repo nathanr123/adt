@@ -259,6 +259,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					VPX_MemoryPlotWindow frame = new VPX_MemoryPlotWindow();
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -1283,7 +1284,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		plot2FilterPanel.add(plot2MapPanel);
 
-		plot2MapPanel.setLayout(new MigLayout("", "[109px][46px][406px,grow,fill][89px][120px]", "[23px]"));
+		plot2MapPanel.setLayout(new MigLayout("", "[109px][46px][974.00px,grow,fill][89px][pref!,grow,center]", "[23px]"));
 
 		radPlot2UseMap = new JRadioButton("Use Map File");
 
@@ -1364,7 +1365,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 
 		cmbPlot2MemoryVariables.setEnabled(false);
 
-		cmbPlot2MemoryVariables.setPreferredSize(new Dimension(120, 20));
+		cmbPlot2MemoryVariables.setPreferredSize(new Dimension(250, 20));
 
 		plot2MapPanel.add(cmbPlot2MemoryVariables, "cell 4 0,alignx left,aligny center");
 

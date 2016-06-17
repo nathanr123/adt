@@ -9,12 +9,10 @@ import javax.swing.table.JTableHeader;
 
 /**
  * Combine a BeanTableModel with SorterTableModel capabilities.
- * 
- * @author Noel Grandin
  */
 public class SorterBeanTableModel<T> extends SorterTableModel
 {
-
+	private static final long serialVersionUID = -7446080092196015911L;
 	private final BeanTableModel<T> beanModel;
 	
 	/**

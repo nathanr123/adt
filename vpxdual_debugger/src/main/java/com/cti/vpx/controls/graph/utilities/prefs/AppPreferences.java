@@ -8,8 +8,6 @@ import java.text.SimpleDateFormat;
 
 /**
  * Application preferences.
- * 
- * @author Noel Grandin
  */
 final class AppPreferences {
 

@@ -10,13 +10,15 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.GridDrawSurface;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.IGridListener;
 
 /**
- * A base class for providing axis-scale implementations. FIXME paint() should be using font-relative values and not
- * hard-coded pixel offsets.
- * 
- * @author Roy Emmerich, Noel Grandin
+ * A base class for providing axis-scale implementations. FIXME paint() should
+ * be using font-relative values and not hard-coded pixel offsets.
  */
-public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
-{
+public abstract class AbstractDefaultAxisScale extends AbstractAxisScale {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5212634176460064330L;
 
 	/**
 	 * These are the different Axis/orientation types.
@@ -36,8 +38,8 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 	private boolean offsetFirstLabel = false;
 
 	/**
-	 * This is a hack to turn off painting. Sometimes useful when I want this component to take up space, but not draw
-	 * anything.
+	 * This is a hack to turn off painting. Sometimes useful when I want this
+	 * component to take up space, but not draw anything.
 	 */
 	private boolean bDrawLabels = true;
 
@@ -57,14 +59,15 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 		if (iAxisOrientation == X_AXIS) {
 			// multiple by 1.2 to give a little extra space
 			final int fontHeight = (int) (getFontMetrics(getFont()).getHeight() * 1.2);
-			// only the height matters - my container should resize my width to fit the graph
+			// only the height matters - my container should resize my width to
+			// fit the graph
 			return new Dimension(1, fontHeight);
-		}
-		else {
+		} else {
 			// base the width on the width of the format used
-			final Rectangle2D rect = getFontMetrics(getFont()).getStringBounds(
-					getSampleForPreferredSizing(), getGraphics());
-			// only the width matters - my container should resize my height to fit the graph
+			final Rectangle2D rect = getFontMetrics(getFont()).getStringBounds(getSampleForPreferredSizing(),
+					getGraphics());
+			// only the width matters - my container should resize my height to
+			// fit the graph
 			return new Dimension((int) (rect.getWidth() * 1.1), 1);
 		}
 	}
@@ -75,9 +78,11 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 	protected abstract String getSampleForPreferredSizing();
 
 	/**
-	 * When any changes are made to the customisable axis this <code>paintComponent</code> method is called.
+	 * When any changes are made to the customisable axis this
+	 * <code>paintComponent</code> method is called.
 	 * 
-	 * @param g Graphics surface to be repainted after change has occurred
+	 * @param g
+	 *            Graphics surface to be repainted after change has occurred
 	 */
 	@Override
 	public void paint(Graphics g) {
@@ -91,7 +96,8 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 		g.setColor(getForeground());
 		g.setFont(getFont());
 
-		// the distance from the top of the component to the baseline of the x-axis labels.
+		// the distance from the top of the component to the baseline of the
+		// x-axis labels.
 		final int xAxisVertical = g.getFontMetrics().getAscent() + g.getFontMetrics().getLeading();
 
 		// Draw all the labels
@@ -107,34 +113,29 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 					final int iXCoord = getWidth() - stringWidth - 2;
 					if (iPosition + 4 <= 9 && iPosition >= 0) {
 						g.drawString(sLabel, iXCoord, 9);
-					}
-					else if (iPosition + 4 >= getHeight() && iPosition <= getHeight()) {
+					} else if (iPosition + 4 >= getHeight() && iPosition <= getHeight()) {
 						g.drawString(sLabel, iXCoord, getHeight());
-					}
-					else if (iPosition >= 0 && iPosition <= getHeight()) {
+					} else if (iPosition >= 0 && iPosition <= getHeight()) {
 						g.drawString(sLabel, iXCoord, iPosition + 4);
 					}
-				}
-				else
+				} else
 				// x-axis orientation
 				{
 					if (iPosition >= 0 && iPosition <= getWidth()) {
 						if (offsetFirstLabel) {
 							if (iPosition == 0) {
-								// the very first label needs to be offset slightly
+								// the very first label needs to be offset
+								// slightly
 								g.drawString(sLabel, 0, xAxisVertical);
-							}
-							else {
+							} else {
 								int xPos = iPosition - (stringWidth / 2);
 								if (xPos + stringWidth > getWidth()) {
 									g.drawString(sLabel, iPosition - stringWidth, xAxisVertical);
-								}
-								else {
+								} else {
 									g.drawString(sLabel, iPosition - (stringWidth / 2), xAxisVertical);
 								}
 							}
-						}
-						else {
+						} else {
 							g.drawString(sLabel, 30 + iPosition - (stringWidth / 2), xAxisVertical);
 						}
 					}
@@ -150,8 +151,8 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 	public abstract String formatValueAsLabel(double fVal);
 
 	/**
-	 * this mode is only meant to be turned on when AbstractDefaultAxisScale is used with GraphWrapper. It only applies to
-	 * the x-axis.
+	 * this mode is only meant to be turned on when AbstractDefaultAxisScale is
+	 * used with GraphWrapper. It only applies to the x-axis.
 	 */
 	@Override
 	public void setOffsetFirstLabel(boolean b) {
@@ -192,8 +193,8 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 	}
 
 	/**
-	 * Add a label that will be draw at the end of the axis. This calculates the necessary pixel offset so that the label
-	 * is visible.
+	 * Add a label that will be draw at the end of the axis. This calculates the
+	 * necessary pixel offset so that the label is visible.
 	 */
 	@Override
 	public void addLabelAtEnd(double fLabelValue) {
@@ -201,25 +202,26 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 		final int iPos;
 		if (iAxisOrientation == X_AXIS) {
 			Rectangle2D rect = getFontMetrics(getFont()).getStringBounds(sLabel, getGraphics());
-			// note: the /2 factor compensates for adjustments the painting method makes.
+			// note: the /2 factor compensates for adjustments the painting
+			// method makes.
 			iPos = (int) (getWidth() - (rect.getWidth() / 2));
-		}
-		else {
+		} else {
 			iPos = getHeight();
 		}
 		addLabel(iPos, fLabelValue);
 	}
 
 	/**
-	 * @param iAxisType Y_AXIS or X_AXIS
+	 * @param iAxisType
+	 *            Y_AXIS or X_AXIS
 	 */
 	public void setOrientation(int iAxisType) {
 		this.iAxisOrientation = iAxisType;
 	}
 
 	/**
-	 * this is a hack to turn off painting. Sometimes useful when I want this component to take up space, but not draw
-	 * anything.
+	 * this is a hack to turn off painting. Sometimes useful when I want this
+	 * component to take up space, but not draw anything.
 	 */
 	public void setDrawLabels(boolean bDraw) {
 		this.bDrawLabels = bDraw;
@@ -247,8 +249,7 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 		this.linkedToSurface = surface;
 	}
 
-	private final class MyGridListener implements IGridListener
-	{
+	private final class MyGridListener implements IGridListener {
 		private final int axisType;
 
 		public MyGridListener(int axisType) {
@@ -256,11 +257,12 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 		}
 
 		public void scalingFactorChanged(GridDrawSurface surface, long scalingFactor, String scaleUnit,
-				long scalingFactor2, String scaleUnit2) {}
-
-	  public void mouseCoordinatesChanged(GridDrawSurface surface, double dXValue, double dYValue) {
+				long scalingFactor2, String scaleUnit2) {
 		}
-		
+
+		public void mouseCoordinatesChanged(GridDrawSurface surface, double dXValue, double dYValue) {
+		}
+
 		public void gridChanged(int axisType, double dMinimum, double dMaximum, long lScalingFactor,
 				boolean bProportional, double[] afGridValues, int[] aiGridCoordinates) {
 			if (this.axisType != axisType)
@@ -272,8 +274,7 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 				for (int i = 0; i < afGridValues.length; i++) {
 					addLabel(aiGridCoordinates[i], afGridValues[i] / lScalingFactor);
 				}
-			}
-			else if (afGridValues.length == 1) {
+			} else if (afGridValues.length == 1) {
 				/*
 				 * Put a label at the beginning, at the end, and in the middle.
 				 */
@@ -281,13 +282,11 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 				if (bProportional) {
 					addLabel(0, dMinimum / lScalingFactor);
 					addLabelAtEnd(dMaximum / lScalingFactor);
-				}
-				else {
+				} else {
 					addLabel(0, dMaximum / lScalingFactor);
 					addLabelAtEnd(dMinimum / lScalingFactor);
 				}
-			}
-			else
+			} else
 			// no grid lines
 			{
 				/*
@@ -296,8 +295,7 @@ public abstract class AbstractDefaultAxisScale extends AbstractAxisScale
 				if (bProportional) {
 					addLabel(0, dMinimum / lScalingFactor);
 					addLabelAtEnd(dMaximum / lScalingFactor);
-				}
-				else {
+				} else {
 					addLabel(0, dMaximum / lScalingFactor);
 					addLabelAtEnd(dMinimum / lScalingFactor);
 				}

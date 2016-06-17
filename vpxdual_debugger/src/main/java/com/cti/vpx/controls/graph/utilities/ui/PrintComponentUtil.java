@@ -30,8 +30,6 @@ import javax.swing.text.BadLocationException;
  *   Rob MacGrogan http://www.developerdotstar.com/community/node/124 
  *   Marty Hall http://www.apl.jhu.edu/~hall/java/Swing-Tutorial/Swing-Tutorial-Printing.html 
  *   O'Reilly http://www.unix.org.ua/orelly/java-ent/jfc/ch05_02.htm
- * 
- * @author Rob MacGrogan, Marty Hall, Noel Grandin
  */
 public class PrintComponentUtil
 {

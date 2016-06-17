@@ -10,11 +10,11 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ZoomDrawSurface;
 
 /**
  * Contains code common to the line-graph subclasses.
- * 
- * @author Noel Grandin
  */
 public abstract class AbstractLineGraph extends ZoomDrawSurface
 {
+	private static final long serialVersionUID = -4070042422103941351L;
+
 	/**
 	 * A Timer that will limit the repainting of this graph
 	 * FIXME this should not run continuously, rather make it 1-shot-trigger-style

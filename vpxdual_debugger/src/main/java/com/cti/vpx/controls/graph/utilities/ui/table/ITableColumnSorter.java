@@ -9,9 +9,6 @@ package com.cti.vpx.controls.graph.utilities.ui.table;
  * WARNING: you can't call the normal getValueAt() from the comparator
  *   because it's not stable while we're sorting.
  *   If you are using SorterBeanTableModel, you can call getRowByModelIndex.
- *   
- * 
- * @author Noel Grandin
  */
 public interface ITableColumnSorter
 {

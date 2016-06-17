@@ -3,8 +3,6 @@ package com.cti.vpx.controls.graph.utilities.ui.graphs.polarGraph;
 /**
  * Conversion between compass co-ordinates (in degrees) and cartesian co-ordinates.
  * Where 0 degrees is at the top, and the degrees increase clockwise.
- * 
- * @author Noel Grandin
  */
 public final class CompassLib
 {

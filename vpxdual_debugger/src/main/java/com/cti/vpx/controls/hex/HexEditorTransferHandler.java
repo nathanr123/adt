@@ -12,9 +12,6 @@ import com.cti.vpx.util.VPXLogger;
 
 /**
  * The default transfer handler for <code>HexEditor</code>s.
- *
- * @author Robert Futrell
- * @version 1.0
  */
 class HexEditorTransferHandler extends TransferHandler {
 

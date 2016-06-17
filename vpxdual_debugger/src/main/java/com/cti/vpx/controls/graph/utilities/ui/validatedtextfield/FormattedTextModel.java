@@ -2,10 +2,6 @@ package com.cti.vpx.controls.graph.utilities.ui.validatedtextfield;
 
 import java.text.ParsePosition;
 
-/**
- * 
- * @author Noel Grandin
- */
 public abstract class FormattedTextModel<TFormat extends java.text.Format> implements ValidatedTextModel
 {
 	protected final TFormat format;

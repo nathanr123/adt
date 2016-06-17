@@ -14,8 +14,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.AbstractLineGrap
 
 /**
  * Provides the standard pair of red and blue measure cursors that we use.
- * 
- * @author Noel Grandin
  */
 public class StandardCursors
 {

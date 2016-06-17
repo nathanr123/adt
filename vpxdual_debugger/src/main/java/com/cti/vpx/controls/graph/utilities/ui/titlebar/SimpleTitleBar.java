@@ -7,11 +7,14 @@ import javax.swing.UIManager;
 /**
  * Simple version of the cTitleBar class without any buttons.
  * Useful as a grouping label.
- *  
- * @author Noel Grandin
  */
 public class SimpleTitleBar extends TitleBar
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7525832176426888742L;
+
 	public SimpleTitleBar()
 	{
 		this("Title");

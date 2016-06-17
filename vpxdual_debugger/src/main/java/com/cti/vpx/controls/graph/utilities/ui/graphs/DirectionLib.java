@@ -4,8 +4,6 @@ import java.awt.Color;
 
 /**
  * Some utility functions for direction stuff.
- * 
- * @author Noel Grandin
  */
 public final class DirectionLib
 {

@@ -16,8 +16,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.AbstractLineGrap
 /**
  * Provides a set of linked cursors on the waterfall and line graphs that help the user to measure
  * durations and frequency spans.
- * 
- * @author Noel Grandin
  */
 public class MeasureCursors
 {

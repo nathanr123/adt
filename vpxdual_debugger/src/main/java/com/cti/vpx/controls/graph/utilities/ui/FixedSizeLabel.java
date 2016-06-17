@@ -9,12 +9,10 @@ import javax.swing.JLabel;
  * A label that sizes itself to the maximum length of the string(s) required, and does not change size.
  * 
  * Mostly used in graph co-ordinate panel displays.
- * 
- * @author Noel Grandin
  */
 public class FixedSizeLabel extends JLabel
 {
-	
+	private static final long serialVersionUID = 5655455555780108111L;
 	private String [] samplePatterns;
 	
 	public FixedSizeLabel(String [] samplePatterns)

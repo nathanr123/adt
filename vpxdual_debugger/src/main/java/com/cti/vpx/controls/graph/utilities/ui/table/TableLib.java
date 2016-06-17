@@ -11,9 +11,6 @@ import javax.swing.table.TableModel;
 
 /**
  * A collection of few useful functions for JTable
- * 
- * @author David Lee
- * @author Noel Grandin
  */
 public class TableLib
 {

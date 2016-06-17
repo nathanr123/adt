@@ -36,9 +36,6 @@ import com.cti.vpx.util.VPXLogger;
 /**
  * A demo application for the Swing {@link com.cti.vpx.controls.hex.fife.ui.swing.hex.HexEditor}
  * component.
- *
- * @author Robert Futrell
- * @version 1.0
  */
 public class HexEditorDemoApp extends JFrame {
 

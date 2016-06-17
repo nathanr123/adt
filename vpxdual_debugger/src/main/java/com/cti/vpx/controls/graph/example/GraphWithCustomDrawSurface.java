@@ -5,12 +5,9 @@ import java.awt.Graphics;
 
 import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.MultiLineGraph;
 
-/**
- * 
- * @author Noel Grandin
- */
 public class GraphWithCustomDrawSurface extends MultiLineGraph
 {
+	private static final long serialVersionUID = -762119562578571005L;
 	private static final Object OVERVIEW_DRAWSURFACE = new Object();
 	
 	public GraphWithCustomDrawSurface()

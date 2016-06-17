@@ -10,6 +10,7 @@ import java.awt.Dimension;
 
 public class VPX_AmplitudeWindow extends JFrame {
 
+	private static final long serialVersionUID = 9014388854816005209L;
 	private JPanel contentPane;
 
 	/**

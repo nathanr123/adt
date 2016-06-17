@@ -20,12 +20,10 @@ import javax.swing.JButton;
 /**
  * Custom class overriding JButton class for creating image-like text buttons. 
  * Paints text in colour, in caps and with a drop-shadow.
- *
- * @author Pieter de Vos
  */
 public class TextImageButton extends JButton
 {
-	
+	private static final long serialVersionUID = -5515619470052113821L;
 	private static final Color TEXT_COLOR = new Color(89, 139, 206);
 	private static final Color SHADOW_COLOR;
 	static {

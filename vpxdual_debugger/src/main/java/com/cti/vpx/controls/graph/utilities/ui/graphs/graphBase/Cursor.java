@@ -6,8 +6,6 @@ import java.awt.Color;
  * FIXME This class should probably not be exposed. It should probably be an internal implementation class, 
  *  with a bunch of setter and getter methods on cCursorDrawSurface, which would allow to trigger repaints
  *  properly when values change.
- * 
- * @author Andre
  */
 public class Cursor
 {

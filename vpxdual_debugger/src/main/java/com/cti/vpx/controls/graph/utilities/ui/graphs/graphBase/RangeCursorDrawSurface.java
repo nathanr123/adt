@@ -14,11 +14,11 @@ import java.util.Set;
  * the graph.
  * 
  * Mostly useful for marking interesting ranges.
- * 
- * @author Andre
  */
 public class RangeCursorDrawSurface extends GridDrawSurface
 {
+
+	private static final long serialVersionUID = 7665948626577865124L;
 
 	/**
 	 * This is the HashMap that stores all the RangeCursors added to this graph

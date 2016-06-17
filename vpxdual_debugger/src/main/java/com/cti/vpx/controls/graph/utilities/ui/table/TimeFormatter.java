@@ -14,11 +14,10 @@ import javax.swing.text.DefaultFormatter;
  * "HH:mm:ss.SSS" but it does not care if the string is missing seconds or microseconds.
  * 
  * It also has the useful side-effect that it preserves the year/month/days value in the input.
- * 
- * @author Noel Grandin
  */
 public class TimeFormatter extends DefaultFormatter
-{
+{	
+	private static final long serialVersionUID = -67326972828452843L;
 	private final DateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
 	// used to preserve the year/month/day of the input
 	private java.util.Date oldValue;

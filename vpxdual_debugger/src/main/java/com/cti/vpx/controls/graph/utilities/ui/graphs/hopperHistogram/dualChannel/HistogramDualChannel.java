@@ -20,11 +20,14 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.hopperHistogram.IHopperHis
 
 /**
  * This class creates a new cHistogramDualChannel.
- *
- * @author Andre E
  */
 public class HistogramDualChannel extends JPanel implements IHopperHistogram, ILocaleListener
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7064645758079700780L;
+
 	/** The resource bundle used for multilingual support */
 	private ResourceBundle textRes = PeralexLibsBundle.getResource();
   

@@ -10,8 +10,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.PixelUnitConvert
 
 /**
  * Cache for computed co-ordinate values.
- * 
- * @author Noel Grandin
  */
 final class CoordinateCacheValue {
 	

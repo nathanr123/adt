@@ -11,8 +11,6 @@ import java.util.List;
 
 /**
  * Beaninfo class for cGraphWrapper. Makes GUI editing of this component easier.
- * 
- * @author Noel Grandin
  */
 public class GraphWrapperBeanInfo extends SimpleBeanInfo
 {

@@ -13,13 +13,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * FIXME rename this to something like LineCursorDrawSurface to distinguish it from the mouse-cursor.
- * 
- * @author Andre
  */
 public abstract class CursorDrawSurface extends GraphDrawSurface
 {
   	
   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1007754550061313041L;
+
+/**
    * This is the HashMap that stores all the Cursors added to this graph
    */
   private final Map<String, Cursor> oCursorsMap = new LinkedHashMap<String, Cursor>();

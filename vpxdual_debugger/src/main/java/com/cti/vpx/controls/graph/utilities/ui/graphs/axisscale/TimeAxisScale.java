@@ -4,23 +4,22 @@ import java.text.SimpleDateFormat;
 
 /**
  * An axis-scale that draw time-stamps.
- * 
- * @author Noel Grandin
  */
-public class TimeAxisScale extends AbstractDefaultAxisScale
-{
+public class TimeAxisScale extends AbstractDefaultAxisScale {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4081938399806448920L;
 	/**
 	 * SimpleDateFormat used for drawing the labels.
 	 */
 	private SimpleDateFormat oFormat = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
 
-	public TimeAxisScale(int iAxisType)
-	{
+	public TimeAxisScale(int iAxisType) {
 		super(iAxisType);
 	}
 
-	public TimeAxisScale()
-	{
+	public TimeAxisScale() {
 		this(Y_AXIS);
 	}
 
@@ -28,34 +27,27 @@ public class TimeAxisScale extends AbstractDefaultAxisScale
 	 * format a value the same way a label is formatted.
 	 */
 	@Override
-	public String formatValueAsLabel(double fVal)
-	{
+	public String formatValueAsLabel(double fVal) {
 		return oFormat.format(fVal);
 	}
 
 	@Override
-	protected String getSampleForPreferredSizing()
-	{
+	protected String getSampleForPreferredSizing() {
 		return "-" + oFormat.toPattern();
 	}
 
 	/**
 	 * set the date/time format. Setting it to null will reset to the default.
 	 */
-	public void setFormat(SimpleDateFormat df)
-	{
-		if (df == null)
-		{
+	public void setFormat(SimpleDateFormat df) {
+		if (df == null) {
 			oFormat = defaultFormat();
-		}
-		else
-		{
+		} else {
 			this.oFormat = df;
 		}
 	}
 
-	private static SimpleDateFormat defaultFormat()
-	{
+	private static SimpleDateFormat defaultFormat() {
 		return new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
 	}
 

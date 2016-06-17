@@ -1,9 +1,5 @@
 package com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase;
 
-/**
- *
- * @author  Roy Emmerich
- */
 public final class PixelUnitConverter
 {
 	

@@ -4,10 +4,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
-/**
- * 
- * @author Noel Grandin
- */
 public abstract class DecimalTextModel extends FormattedTextModel<NumberFormat>
 {
 	protected DecimalTextModel(DecimalFormat format)

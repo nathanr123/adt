@@ -34,8 +34,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *   
  * }
  * </code>
- * 
- * @author Noel Grandin
  * @param <T> listener interface
  */
 public class ListenerSupport<T>

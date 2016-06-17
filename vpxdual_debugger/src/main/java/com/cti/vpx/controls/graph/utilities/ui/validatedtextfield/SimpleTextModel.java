@@ -13,8 +13,6 @@ package com.cti.vpx.controls.graph.utilities.ui.validatedtextfield;
  *   }
  *   
  * </code>
- * 
- * @author Noel Grandin
  */
 public abstract class SimpleTextModel implements ValidatedTextModel
 {

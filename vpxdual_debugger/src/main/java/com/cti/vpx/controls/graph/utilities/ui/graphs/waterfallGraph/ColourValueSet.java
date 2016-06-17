@@ -5,8 +5,6 @@ import java.awt.Color;
 /**
  * This class is used with a Waterfall graph to set a colour for
  * a specific value. This value can then be displayed or not.
- *
- * @author  Jaco Jooste
  */
 public class ColourValueSet
 {

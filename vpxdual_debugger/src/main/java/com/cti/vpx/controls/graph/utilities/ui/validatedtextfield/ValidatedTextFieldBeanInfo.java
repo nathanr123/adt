@@ -12,8 +12,6 @@ import javax.swing.JTextField;
 
 /**
  * BeanInfo class for ValidatedTextField. Makes GUI editing of this component easier.
- * 
- * @author Noel Grandin
  */
 public class ValidatedTextFieldBeanInfo extends SimpleBeanInfo
 {

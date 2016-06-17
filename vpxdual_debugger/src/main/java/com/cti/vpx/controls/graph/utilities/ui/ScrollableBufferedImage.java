@@ -23,8 +23,6 @@ import java.awt.image.ImageObserver;
  *   ...
  *   obj.drawImageTo(graphics2D);
  * </code>
- *  
- * @author Noel Grandin
  */
 public class ScrollableBufferedImage
 {

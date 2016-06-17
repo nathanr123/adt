@@ -8,13 +8,14 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ZoomDrawSurface;
 
 /**
  * A left-to-right scrolling line graph that only handles one line.
- * 
- * @author Roy Emmerich
- * @author Noel Grandin
  */
 public class SingleScrollingLineGraph extends ZoomDrawSurface implements ILocaleListener
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2714137930074170949L;
 	private final ScrollingLineGraph.LineState lineState = new ScrollingLineGraph.LineState();
 
 	public SingleScrollingLineGraph()

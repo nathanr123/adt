@@ -7,8 +7,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.AbstractLineData
  * This is only intended to be useful for hopping from peak to peak in a graph on a GUI.
  * 
  * Note: I do not smooth the data, because that would cause me to miss some single-pixel-wide peaks.
- * 
- * @author Noel Grandin
  */
 public final class PeakSearchLib
 {

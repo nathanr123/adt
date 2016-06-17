@@ -35,11 +35,13 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.axisscale.NumberAxisScale;
  * 
  * FIXME rename the coordinates panel to something like MouseCoordinatesPanel to
  * distinguish it from line-cursors.
- * 
- * @author Andre
- * @author Noel Grandin
  */
 public class GraphWrapper extends javax.swing.JPanel implements ILocaleListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5472731847412217023L;
+
 	/** The resource bundle used for multilingual support */
 	private ResourceBundle textRes = PeralexLibsBundle.getResource();
 

@@ -7,12 +7,13 @@ import java.awt.event.ComponentEvent;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.PixelUnitConverter;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ZoomDrawSurface;
 
-/**
- * 
- * @author Andre
- */
 public class ConstellationGraph extends ZoomDrawSurface
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4112123260676380643L;
 
 	/**
    * This is the color used for drawing the Points.

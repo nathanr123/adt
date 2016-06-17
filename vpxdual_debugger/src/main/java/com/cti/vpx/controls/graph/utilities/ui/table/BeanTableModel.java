@@ -44,11 +44,10 @@ import javax.swing.table.AbstractTableModel;
  *     
  *   }
  * </code>
- * 
- * @author Noel Grandin
  */
 public class BeanTableModel<T> extends AbstractTableModel
 {
+	private static final long serialVersionUID = -4454937946069525802L;
 
 	private interface IBeanReaderWriter
 	{
@@ -351,7 +350,7 @@ public class BeanTableModel<T> extends AbstractTableModel
 		return beanFieldNames.length;
 	}
 
-	public void resetColumnNames(@SuppressWarnings("unused") ResourceBundle textRes)
+	public void resetColumnNames(ResourceBundle textRes)
 	{
 	}
 

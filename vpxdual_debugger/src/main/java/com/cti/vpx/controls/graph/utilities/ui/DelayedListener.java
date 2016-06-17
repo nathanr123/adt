@@ -16,8 +16,6 @@ import java.util.Map;
  * E.g. you could use this to do something when the text in a textfield changes, but you don't necessarily want to
  * perform the action until the users has finished typing, so you use a delayed listener to wait until the user stops
  * pressing keys for 200ms until you perform the action.
- * 
- * @author Noel Grandin
  */
 public final class DelayedListener<T> implements InvocationHandler, ActionListener
 {

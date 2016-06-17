@@ -9,13 +9,10 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.GeneratedLineDat
 import com.cti.vpx.controls.graph.utilities.ui.graphs.lineGraph.MultiLineGraph;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.waterfallGraph.IntensityWaterfallGraph;
 
-/**
- *
- * @author Jaco Jooste
- */
+
 abstract class BaseGraphDisplay extends javax.swing.JPanel
-{
-	
+{	
+	private static final long serialVersionUID = -4401722816835961720L;
 	private static final String GRAPH_DATA_AMPLITUDE = "Amplitude";
 	private static final String GRAPH_DATA_NOISE_FLOOR = "Noise";
 	private static final String GRAPH_DATA_NOISE_FLOOR_OFFSET = "Offset";

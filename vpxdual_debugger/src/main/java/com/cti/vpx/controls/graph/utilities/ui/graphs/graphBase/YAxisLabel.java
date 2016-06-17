@@ -13,12 +13,15 @@ import javax.swing.JComponent;
 
 /**
  * A component that draws a string from bottom to top.
- * 
- * @author  Roy Emmerich
  */
 public class YAxisLabel extends JComponent
 {
-  private static final int DEGREES = -90;
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4406017072666642621L;
+
+private static final int DEGREES = -90;
   
   private String sYAxisLabel;
   

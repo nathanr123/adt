@@ -10,8 +10,6 @@ import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.ICursorListener;
 
 /**
  * Used for synchronized cursor positions across multiple graphs.
- * 
- * @author Noel Grandin
  */
 public class SyncGraphsCursor
 {

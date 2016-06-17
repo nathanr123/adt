@@ -20,12 +20,10 @@ import com.cti.vpx.controls.graph.utilities.ui.images.IconManager;
 /**
  * Title bar with minimize/maximize and lock/unlock and close buttons.
  * The buttons can be set to visible or invisible.
- * 
- * @author Noel Grandin
- * @author Jaco
  */
 public class TitleBar extends javax.swing.JPanel
 {
+	private static final long serialVersionUID = -626063262372344307L;
 	private final List<ITitleBarListener> oTitleBarEventListeners = new ArrayList<ITitleBarListener>();
 	private boolean bCloseable = true;
 	private boolean bLockable = true;
@@ -181,7 +179,7 @@ public class TitleBar extends javax.swing.JPanel
 
   }// </editor-fold>//GEN-END:initComponents
 
-	private void oMinimizeToggleButtonActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt)//GEN-FIRST:event_oMinimizeToggleButtonActionPerformed
+	private void oMinimizeToggleButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_oMinimizeToggleButtonActionPerformed
 	{//GEN-HEADEREND:event_oMinimizeToggleButtonActionPerformed
 		if (bMinimizeable)
 		{
@@ -196,7 +194,7 @@ public class TitleBar extends javax.swing.JPanel
 		}
 	}//GEN-LAST:event_oMinimizeToggleButtonActionPerformed
 
-	private void oLockToggleButtonActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt)//GEN-FIRST:event_oLockToggleButtonActionPerformed
+	private void oLockToggleButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_oLockToggleButtonActionPerformed
 	{//GEN-HEADEREND:event_oLockToggleButtonActionPerformed
 		if (bLockable)
 		{
@@ -211,7 +209,7 @@ public class TitleBar extends javax.swing.JPanel
 		}
 	}//GEN-LAST:event_oLockToggleButtonActionPerformed
 
-	private void oCloseButtonActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt)//GEN-FIRST:event_oCloseButtonActionPerformed
+	private void oCloseButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_oCloseButtonActionPerformed
 	{//GEN-HEADEREND:event_oCloseButtonActionPerformed
 		if (bCloseable)
 		{

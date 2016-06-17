@@ -57,15 +57,11 @@ import javax.swing.table.TableModel;
  * 
  * FIXME this could do with a smarter strategy for dealing with updates. 
  *    Invalidating the entire model<->view cache on any update does not scale very well.
- * 
- * @author Philip Milne
- * @author Brendon McLean
- * @author Dan van Enckevort
- * @author Parwinder Sekhon
- * @version 2.0 02/27/04
  */
 public class SorterTableModel extends AbstractTableModel
 {
+	private static final long serialVersionUID = -2475930537274984522L;
+
 	public static enum SortDirection {
 		DESCENDING, NOT_SORTED, ASCENDING;
 		
@@ -94,7 +90,7 @@ public class SorterTableModel extends AbstractTableModel
 
 	private static final Directive EMPTY_DIRECTIVE = new Directive(-1, SortDirection.NOT_SORTED);
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static final Comparator<Comparable> COMPARABLE_COMPARATOR = new Comparator<Comparable>()
 	{
 		public int compare(Comparable o1, Comparable o2)
@@ -103,7 +99,7 @@ public class SorterTableModel extends AbstractTableModel
 		}
 	};
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static final Comparator LEXICAL_COMPARATOR = new Comparator()
 	{
 		public int compare(Object o1, Object o2)
@@ -151,7 +147,7 @@ public class SorterTableModel extends AbstractTableModel
 	/**
 	 * allows us to override the comparators by column type
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private final Map<Class, Comparator> columnComparatorsByType = new HashMap<Class, Comparator>();
 
 	/**
@@ -530,7 +526,7 @@ public class SorterTableModel extends AbstractTableModel
 			this.modelIndex = index;
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public int compareTo(Object o)
 		{
 			final int row1 = modelIndex;
