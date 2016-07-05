@@ -3,8 +3,8 @@ package com.cti.vpx.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.cti.vpx.controls.VPX_StatusBar;
 import com.cti.vpx.controls.VPX_LoggerPanel;
+import com.cti.vpx.controls.VPX_StatusBar;
 
 public class VPXLogger {
 
@@ -13,6 +13,8 @@ public class VPXLogger {
 	private static VPX_StatusBar statusBar;
 
 	private static String logMsg;
+
+	private static String filePath;
 
 	public static VPX_LoggerPanel getLoggerPanel() {
 		return loggerPanel;
@@ -56,7 +58,7 @@ public class VPXLogger {
 
 			if (VPXUtilities.isLogEnabled()) {
 
-				String filePath = VPXSessionManager.getCurrentLogFileName();
+				filePath = VPXSessionManager.getCurrentLogFileName();
 
 				VPXUtilities.updateToFile(filePath, log);
 

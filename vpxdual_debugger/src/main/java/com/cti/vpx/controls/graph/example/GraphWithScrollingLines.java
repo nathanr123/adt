@@ -65,9 +65,9 @@ public class GraphWithScrollingLines extends javax.swing.JPanel {
 		gridVisibleCheckBox = new javax.swing.JCheckBox();
 		zoomEnabledCheckBox = new javax.swing.JCheckBox();
 		jLabel1 = new javax.swing.JLabel();
-		line1ColorComboBox = new javax.swing.JComboBox();
+		line1ColorComboBox = new javax.swing.JComboBox<String>();
 		jLabel2 = new javax.swing.JLabel();
-		line2ColorComboBox = new javax.swing.JComboBox();
+		line2ColorComboBox = new javax.swing.JComboBox<String>();
 
 		setLayout(new java.awt.BorderLayout());
 
@@ -112,7 +112,7 @@ public class GraphWithScrollingLines extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(4, 12, 0, 0);
 		controlPanel.add(jLabel1, gridBagConstraints);
 
-		line1ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Red", "Green", "Blue" }));
+		line1ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "Red", "Green", "Blue" }));
 		line1ColorComboBox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				line1ColorComboBoxActionPerformed(evt);
@@ -134,7 +134,7 @@ public class GraphWithScrollingLines extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(4, 12, 0, 0);
 		controlPanel.add(jLabel2, gridBagConstraints);
 
-		line2ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Red", "Green", "Blue" }));
+		line2ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "Red", "Green", "Blue" }));
 		line2ColorComboBox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				line2ColorComboBoxActionPerformed(evt);
@@ -186,8 +186,8 @@ public class GraphWithScrollingLines extends javax.swing.JPanel {
 	private javax.swing.JCheckBox gridVisibleCheckBox;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
-	private javax.swing.JComboBox line1ColorComboBox;
-	private javax.swing.JComboBox line2ColorComboBox;
+	private javax.swing.JComboBox<String> line1ColorComboBox;
+	private javax.swing.JComboBox<String> line2ColorComboBox;
 	private javax.swing.JCheckBox zoomEnabledCheckBox;
 	// End of variables declaration//GEN-END:variables
 

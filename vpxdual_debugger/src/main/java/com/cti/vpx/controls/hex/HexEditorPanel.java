@@ -68,7 +68,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -1079,12 +1078,12 @@ public class HexEditorPanel extends JPanel implements ActionListener, HexEditorL
 			gbc_chckbxNewCheckBox_6.gridy = 3;
 			// contentPanel.add(highlightAsciiSelCB, gbc_chckbxNewCheckBox_6);
 
-			JLabel lblNewLabel = new JLabel("  Selection Color");
+			/*JLabel lblNewLabel = new JLabel("  Selection Color");
 			GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 			gbc_lblNewLabel.anchor = GridBagConstraints.WEST;
 			gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
 			gbc_lblNewLabel.gridx = 1;
-			gbc_lblNewLabel.gridy = 4;
+			gbc_lblNewLabel.gridy = 4;*/
 			// contentPanel.add(lblNewLabel, gbc_lblNewLabel);
 
 			highlightAsciiSelCombo = new JComboBox<Color>();

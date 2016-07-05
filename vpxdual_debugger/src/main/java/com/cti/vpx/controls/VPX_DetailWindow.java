@@ -88,6 +88,8 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		setTitle("VPX System Details");
 
+		setResizable(true);
+
 		setAlwaysOnTop(true);
 
 		setIconImage(VPXConstants.Icons.ICON_DETAIL.getImage());
@@ -209,47 +211,58 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
 
-			tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
+			if (vpxSubSystem.getIpP2020().length() > 0) {
 
-			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+				tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
 
-			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-			tbl_Property_Model.addRow(new String[] { "Up Time ",
-					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
+				tbl_Property_Model
+						.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
-			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
-					VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
 
-			tbl_Property_Model.addRow(new String[] { "", "" });
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+						VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
 
-			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
+				tbl_Property_Model.addRow(new String[] { "", "" });
+			}
 
-			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
+			if (vpxSubSystem.getIpDSP1().length() > 0) {
 
-			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
+				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
-			tbl_Property_Model.addRow(new String[] { "Up Time ",
-					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
 
-			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
-					VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
+				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
-			tbl_Property_Model.addRow(new String[] { "", "" });
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
 
-			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+						VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
 
-			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
+				tbl_Property_Model.addRow(new String[] { "", "" });
 
-			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+			}
 
-			tbl_Property_Model.addRow(new String[] { "Up Time ",
-					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp2uptime())) });
+			if (vpxSubSystem.getIpDSP2().length() > 0) {
 
-			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
-					VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });
+				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
-			tbl_Property_Model.addRow(new String[] { "", "" });
+				tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
+
+				tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+
+				tbl_Property_Model.addRow(new String[] { "Up Time ",
+						VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp2uptime())) });
+
+				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+						VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });
+
+				tbl_Property_Model.addRow(new String[] { "", "" });
+			}
 
 		}
 
@@ -319,41 +332,50 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
 
-		tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
+		if (vpxSubSystem.getIpP2020().length() > 0) {
+			tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
 
-		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpP2020() });
 
-		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
+			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getP2020ResponseTime()) });
 
-		tbl_Property_Model.addRow(new String[] { "Up Time ",
-				VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
+			tbl_Property_Model.addRow(new String[] { "Up Time ",
+					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getP2020uptime())) });
 
-		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
-				VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
+			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+					VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
+		}
 
-		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
+		if (vpxSubSystem.getIpDSP1().length() > 0) {
 
-		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
+			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
-		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP1() });
 
-		tbl_Property_Model.addRow(new String[] { "Up Time ",
-				VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
+			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp1ResponseTime()) });
 
-		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
-				VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
+			tbl_Property_Model.addRow(new String[] { "Up Time ",
+					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp1uptime())) });
 
-		tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
+			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+					VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
 
-		tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
+		}
+		if (vpxSubSystem.getIpDSP2().length() > 0) {
 
-		tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+			tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
-		tbl_Property_Model.addRow(new String[] { "Up Time ",
-				VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp2uptime())) });
+			tbl_Property_Model.addRow(new String[] { "IP Address", vpxSubSystem.getIpDSP2() });
 
-		tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
-				VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });
+			tbl_Property_Model.addRow(new String[] { "Status", getProcStatus(vpxSubSystem.getDsp2ResponseTime()) });
+
+			tbl_Property_Model.addRow(new String[] { "Up Time ",
+					VPXUtilities.getCurrentTime(4, (System.currentTimeMillis() - vpxSubSystem.getDsp2uptime())) });
+
+			tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
+					VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp2ResponseTime()) });
+
+		}
 
 	}
 
@@ -400,7 +422,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			tbl_Property_Model.addRow(new String[] { "Sub System Name", vpxSubSystem.getSubSystem() });
 
-			if (pType == PROCESSOR_TYPE.PROCESSOR_P2020) {
+			if (pType == PROCESSOR_TYPE.PROCESSOR_P2020 && (vpxSubSystem.getIpP2020().length() > 0)) {
 
 				tbl_Property_Model.addRow(new String[] { "Processor Type", "P2020" });
 
@@ -415,7 +437,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 						VPXUtilities.getCurrentTime(5, vpxSubSystem.getP2020ResponseTime()) });
 
-			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP1) {
+			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP1 && (vpxSubSystem.getIpDSP1().length() > 0)) {
 
 				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 1" });
 
@@ -429,7 +451,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 				tbl_Property_Model.addRow(new String[] { "Last Responded Time ",
 						VPXUtilities.getCurrentTime(5, vpxSubSystem.getDsp1ResponseTime()) });
 
-			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP2) {
+			} else if (pType == PROCESSOR_TYPE.PROCESSOR_DSP2 && (vpxSubSystem.getIpDSP2().length() > 0)) {
 
 				tbl_Property_Model.addRow(new String[] { "Processor Type", "DSP 2" });
 
@@ -544,7 +566,10 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 		private Font ALTERFONT = new Font(DEFAULTFONT.getFontName(), Font.BOLD, DEFAULTFONT.getSize());
 
-		private Font TITLEFONT = new Font(DEFAULTFONT.getFontName(), Font.BOLD, DEFAULTFONT.getSize() + 2);
+		// private Font TITLEFONT = new Font(DEFAULTFONT.getFontName(),
+		// Font.BOLD, DEFAULTFONT.getSize() + 2);
+
+		private Font TITLEFONT_ITALIC = new Font(DEFAULTFONT.getFontName(), Font.ITALIC, DEFAULTFONT.getSize() + 2);
 
 		public CellRenderer() {
 		}
@@ -554,7 +579,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			if (currentCol == 0)
 				if (isTitle)
-					return TITLEFONT;
+					return TITLEFONT_ITALIC;
 				else
 					return DEFAULTFONT;
 			else
@@ -569,7 +594,7 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 			String s = table.getModel().getValueAt(row, column).toString();
 
-			isTitle = s.equals("Subsystems Detail");
+			isTitle = s.equals("Subsystems Detail") || s.equals("Unlisted Processors Detail");
 
 			if (s.equals("Not Alive")) {
 
@@ -590,7 +615,9 @@ public class VPX_DetailWindow extends JDialog implements WindowListener {
 
 				if (isTitle) {
 
-					setFont(TITLEFONT);
+					setFont(TITLEFONT_ITALIC);
+
+					setForeground(Color.BLUE);
 
 				} else {
 

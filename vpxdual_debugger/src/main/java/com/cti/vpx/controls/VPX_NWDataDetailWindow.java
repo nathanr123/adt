@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.cti.vpx.model.VPXNWPacket;
+import com.cti.vpx.util.VPXUtilities;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -57,9 +58,11 @@ public class VPX_NWDataDetailWindow extends JFrame {
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		setBounds(100, 100, 600, 500);
+		setBounds(100, 100, 550, 500);
 		
 		setResizable(false);
+		
+		setIconImage(VPXUtilities.getAppIcon());
 
 	}
 
@@ -89,7 +92,7 @@ public class VPX_NWDataDetailWindow extends JFrame {
 		createSentData(pkt.getBytes());
 
 		String value = String.format(
-				"Packet No : %d\nTime : %s\nSource IP : %s\nDestination IP : %s\nPort : %d\nProtocol : %s\nLength : %s\n-----------------------------\nData : \n\n%s",
+				"Packet No\t: %d\nTime\t\t: %s\nSource IP\t: %s\nDestination IP\t: %s\nPort\t\t: %d\nProtocol\t: %s\nLength\t\t: %s\n-----------------------------\nData : \n\n%s",
 				pkt.getPktNo(), pkt.getRecievedTime(), pkt.getSourceIP(), pkt.getDestIP(), pkt.getPort(),
 				pkt.getProtocol(), pkt.getLength(), bytes);
 

@@ -7,7 +7,7 @@ import com.cti.vpx.command.MSGCommand;
 
 public interface VPXMessageListener extends VPXUDPListener {
 
-	public int PORTNO = CONSOLE_MSG_PORTNO;
+	public int PORTNO = DEFAULT_CONSOLE_MSG_PORTNO;
 
 	public void updateMessage(String ip, String msg);
 

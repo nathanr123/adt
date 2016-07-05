@@ -49,7 +49,7 @@ public class VPXLinuxCommand {
 
 		p.getOutputStream().write(passwd);
 
-	//	p.getOutputStream().flush();
+		// p.getOutputStream().flush();
 
 		n = is.read(buff, 0, 8192);
 
@@ -74,7 +74,7 @@ public class VPXLinuxCommand {
 
 			p.getOutputStream().write(passwd);
 
-			//p.getOutputStream().flush();
+			// p.getOutputStream().flush();
 
 			n = is.read(buff, 0, 8192);
 
@@ -93,7 +93,7 @@ public class VPXLinuxCommand {
 
 		p.getOutputStream().write(passwd);
 
-	//	p.getOutputStream().flush();
+		// p.getOutputStream().flush();
 
 		return p;
 	}
@@ -123,12 +123,7 @@ public class VPXLinuxCommand {
 
 		Process p = VPXLinuxCommand.runFromRoot("id", password);
 
-		System.out.print(streamToString(p.getInputStream()));
-
-		System.out.println("stdout of 'fdisk -l':");
-
 		p = VPXLinuxCommand.runFromRoot("fdisk -l", password);
 
-		System.out.print(streamToString(p.getInputStream()));
 	}
 }

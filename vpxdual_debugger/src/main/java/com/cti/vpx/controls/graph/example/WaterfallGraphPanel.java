@@ -24,13 +24,11 @@ public class WaterfallGraphPanel extends javax.swing.JPanel {
 
 		lineGraph = new IntensityWaterfallGraph();
 
-		lineGraph.setGridXMinMax(0, 1024);
+		lineGraph.setAutoscrolls(false);
 
-		lineGraph.setThresholdLimits(0, 255);
+		lineGraph.setColorScaleOn(false);
 
-		lineGraph.setThresholdValues(10, 200);
-
-		lineGraph.setGridVisible(false);
+		lineGraph.setGridVisible(true);
 
 		lineGraph.setZoomEnabled(false);
 
@@ -40,7 +38,7 @@ public class WaterfallGraphPanel extends javax.swing.JPanel {
 
 		graphWrapper.setXAxisLabelVisible(false);
 
-		graphWrapper.setXAxisScaleVisible(false);
+		graphWrapper.setXAxisScaleVisible(true);
 
 		graphWrapper.setCursorCoordinatesVisible(false);
 
@@ -58,19 +56,36 @@ public class WaterfallGraphPanel extends javax.swing.JPanel {
 	public void clearAlldata() {
 
 		lineGraph.clear();
-
 	}
 
 	public void addWaterfallData(byte[] bytes) {
 
 		final float[] data = toFloatArray(bytes);
 
+		lineGraph.setGridXMinMax(0, data.length);
+
+		lineGraph.setThresholdLimits(0, data.length);
+
+		lineGraph.setThresholdValues(0, data.length);
+
 		lineGraph.setAmplitudeData(new TimeStamp(), data);
 	}
 
-	public void addWaterfallData(float[] values) {
+	public void addWaterfallData(float[] values, float min, float max) {
+
+		lineGraph.setGridXMinMax(0, values.length);
+
+		lineGraph.setAmplitudeValueRange(-0, max);
+
+		lineGraph.setThresholdLimits(-0, max);
+
+		// lineGraph.setThresholdValues(-max,max);
 
 		lineGraph.setAmplitudeData(new TimeStamp(), values);
+	}
+
+	public void setColorScale(boolean option) {
+		lineGraph.setColorScaleOn(option);
 	}
 
 	private static float[] toFloatArray(byte[] bytes) {

@@ -142,8 +142,6 @@ public class VPX_TabbedPane extends JTabbedPane {
 				int rc = JOptionPane.showOptionDialog(null, "Dou you want to close", "Confirmation",
 						JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[2]);
 
-				System.out.println(rc);
-
 				if (rc == 0) {
 
 					frame.dispose();

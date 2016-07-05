@@ -1,4 +1,4 @@
-package com.cti.vpx.controls.hex;
+package com.cti.vpx.controls;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -23,7 +23,6 @@ public class VPX_FilterComboBox extends JComboBox<Object> {
 	private int currentCaretPosition = 0;
 
 	public VPX_FilterComboBox() {
-
 	}
 
 	private void addArray(List<String> array) {
@@ -39,41 +38,35 @@ public class VPX_FilterComboBox extends JComboBox<Object> {
 
 		final JTextField textfield = (JTextField) this.getEditor().getEditorComponent();
 
-		/*
-		 * textfield.addKeyListener(new KeyAdapter() {
-		 * 
-		 * public void keyReleased(KeyEvent ke) {
-		 * 
-		 * SwingUtilities.invokeLater(new Runnable() {
-		 * 
-		 * public void run() {
-		 * 
-		 * if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-		 * textfield.requestFocus(false); } else { if (ke.getKeyCode() !=
-		 * KeyEvent.VK_UP && ke.getKeyCode() != KeyEvent.VK_DOWN) {
-		 * comboFilter(textfield.getText()); } } } }); } });
-		 */
+		textfield.setFont(new JTextField().getFont());
 
 		textfield.addKeyListener(new KeyAdapter() {
 
 			public void keyPressed(KeyEvent ke) {
 
-				SwingUtilities.invokeLater(new Runnable() {
+				if (ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
 
-					public void run() {
+					hidePopup();
 
-						currentCaretPosition = textfield.getCaretPosition();
+				} else {
 
-						if (textfield.getSelectedText() == null) {
+					SwingUtilities.invokeLater(new Runnable() {
 
-							textfield.setCaretPosition(0);
+						public void run() {
 
-							comboFilter(textfield.getText());
+							currentCaretPosition = textfield.getCaretPosition();
 
-							textfield.setCaretPosition(currentCaretPosition);
+							if (textfield.getSelectedText() == null) {
+
+								textfield.setCaretPosition(0);
+
+								comboFilter(textfield.getText());
+
+								textfield.setCaretPosition(currentCaretPosition);
+							}
 						}
-					}
-				});
+					});
+				}
 			}
 
 		});
@@ -108,6 +101,32 @@ public class VPX_FilterComboBox extends JComboBox<Object> {
 	public void addMemoryVariables(Map<String, String> mem) {
 
 		addArray(populateArray(mem));
+	}
+
+	public void updateMemoryVariables(Map<Integer, String> mem) {
+
+		addArray(rePopulateArray(mem));
+	}
+
+	public void addMemoryVariables(List<String> mem) {
+
+		addArray(mem);
+	}
+
+	public static List<String> rePopulateArray(Map<Integer, String> mem) {
+
+		List<String> test = new ArrayList<String>();
+
+		Iterator<Map.Entry<Integer, String>> entries = mem.entrySet().iterator();
+
+		while (entries.hasNext()) {
+
+			Map.Entry<Integer, String> entry = entries.next();
+
+			test.add(entry.getValue());
+		}
+
+		return test;
 	}
 
 	private static List<String> populateArray(Map<String, String> mem) {

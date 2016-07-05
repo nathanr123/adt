@@ -2,8 +2,6 @@ package com.cti.vpx.controls.graph;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -32,8 +30,8 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 	private GeneratedLineData line1Data;
 	private GeneratedLineData line2Data;
 
-	private final javax.swing.Timer dataTimer;
-	private final javax.swing.Timer dataTimer1;
+//	private final javax.swing.Timer dataTimer;
+	//private final javax.swing.Timer dataTimer1;
 	private byte[] plot1Bytes;
 	private byte[] plot2Bytes;
 	private boolean isPlot1 = false;
@@ -66,7 +64,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 
 		//lineGraph.setGridYMinMax(0, 255);
 
-		dataTimer = new javax.swing.Timer(500, new ActionListener() {
+		/*dataTimer = new javax.swing.Timer(500, new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
@@ -108,6 +106,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		});
 
 		// dataTimer1.start();
+*/	
 	}
 
 	public float[] getFile(String fileName) {
@@ -761,9 +760,9 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		frameRateLimitingCheckBox = new javax.swing.JCheckBox();
 		zoomEnabledCheckBox = new javax.swing.JCheckBox();
 		jLabel1 = new javax.swing.JLabel();
-		line1ColorComboBox = new javax.swing.JComboBox();
+		line1ColorComboBox = new javax.swing.JComboBox<String>();
 		jLabel2 = new javax.swing.JLabel();
-		line2ColorComboBox = new javax.swing.JComboBox();
+		line2ColorComboBox = new javax.swing.JComboBox<String>();
 		framePeriodSpinner = new javax.swing.JSpinner();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel5 = new javax.swing.JLabel();
@@ -852,7 +851,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(8, 13, 0, 0);
 		controlPanel.add(jLabel1, gridBagConstraints);
 
-		line1ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Red", "Green", "Blue" }));
+		line1ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "Red", "Green", "Blue" }));
 		line1ColorComboBox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				line1ColorComboBoxActionPerformed(evt);
@@ -874,7 +873,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(4, 13, 0, 0);
 		controlPanel.add(jLabel2, gridBagConstraints);
 
-		line2ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Red", "Green", "Blue" }));
+		line2ColorComboBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "Red", "Green", "Blue" }));
 		line2ColorComboBox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				line2ColorComboBoxActionPerformed(evt);
@@ -968,7 +967,7 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 	}// GEN-LAST:event_framePeriodSpinnerStateChanged
 
 	private void dataPeriodSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {// GEN-FIRST:event_dataPeriodSpinnerStateChanged
-		dataTimer.setDelay((Integer) dataPeriodSpinner.getValue());
+		//dataTimer.setDelay((Integer) dataPeriodSpinner.getValue());
 	}// GEN-LAST:event_dataPeriodSpinnerStateChanged
 
 	private void noXPointsSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {// GEN-FIRST:event_noXPointsSpinnerStateChanged
@@ -1000,8 +999,8 @@ public class VPX_MultipleLine extends javax.swing.JPanel {
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JLabel jLabel5;
 	private javax.swing.JSeparator jSeparator1;
-	private javax.swing.JComboBox line1ColorComboBox;
-	private javax.swing.JComboBox line2ColorComboBox;
+	private javax.swing.JComboBox<String> line1ColorComboBox;
+	private javax.swing.JComboBox<String> line2ColorComboBox;
 	private javax.swing.JSpinner noXPointsSpinner;
 	private javax.swing.JCheckBox zoomEnabledCheckBox;
 	// End of variables declaration//GEN-END:variables

@@ -1,7 +1,6 @@
 package com.cti.vpx.controls.hex;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -35,7 +34,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,6 +41,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
 import com.cti.vpx.command.ATP;
+import com.cti.vpx.controls.VPX_FilterComboBox;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
@@ -156,6 +155,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 	private JComboBox<String> cmbSize;
 
 	private SpinnerNumberModel strideSpinnerModel;
+
+	private String currentIP = "";
 
 	public static void main(String[] args) {
 
@@ -1063,19 +1064,9 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			hexPanel.getHexEditor().updateBuffer();
 
-			parent.readMemory(memoryFilter);
+			setCurrentIP(cmbProcessor.getSelectedItem().toString());
 
-			/*
-			 * Thread th = new Thread(new Runnable() {
-			 * 
-			 * @Override public void run() {
-			 * 
-			 * showLoadProcessingWindow("Memory loading...");
-			 * 
-			 * } });
-			 * 
-			 * th.start();
-			 */
+			parent.readMemory(memoryFilter);
 		} else {
 			if (!isSelectedProcessorValid) {
 
@@ -1124,6 +1115,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 			currentThreadSleepTime = (value / 60) * MINUTE;
 		}
+		
+	//	currentThreadSleepTime  = 2000;
 
 	}
 
@@ -1154,6 +1147,8 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		spinMemoryStride.setValue(0);
 
 		clearTableContent();
+
+		setCurrentIP("");
 
 	}
 
@@ -1455,12 +1450,17 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 
 		isAutoRefresh = false;
 
+		this.currentIP = "";
+
 		closeLoadProcessingWindow();
 
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
+
+		this.currentIP = "";
+
 		parent.reIndexMemoryBrowserIndex();
 
 	}
@@ -1684,40 +1684,19 @@ public class VPX_MemoryBrowserWindow extends JFrame implements WindowListener {
 		hexPanel.setBytes(startAddress, stride, buf);
 	}
 
-	private void showLoadProcessingWindow(String msg) {
-
-		final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION,
-				null, new Object[] {}, null);
-
-		dialog = null;
-
-		dialog = new JDialog();
-
-		dialog.setLocationRelativeTo(VPX_MemoryBrowserWindow.this);
-
-		dialog.setTitle("Message");
-
-		dialog.setModal(false);
-
-		dialog.setUndecorated(true);
-
-		dialog.setContentPane(optionPane);
-
-		optionPane.setBorder(new LineBorder(Color.GRAY));
-
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-		dialog.setAlwaysOnTop(true);
-
-		dialog.setSize(new Dimension(450, 100));
-
-		dialog.setVisible(true);
-	}
-
 	private void closeLoadProcessingWindow() {
 
 		if (dialog != null)
 
 			dialog.dispose();
 	}
+
+	public String getCurrentIP() {
+		return currentIP;
+	}
+
+	public void setCurrentIP(String currentIP) {
+		this.currentIP = currentIP;
+	}
+
 }

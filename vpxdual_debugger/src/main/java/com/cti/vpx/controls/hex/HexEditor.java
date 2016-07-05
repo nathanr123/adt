@@ -41,7 +41,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import com.cti.vpx.controls.hex.groupmodel.Floating32;
@@ -194,7 +193,7 @@ public class HexEditor extends JScrollPane {
 	public void setHexModel(int mod) {
 
 		ByteBuffer bb = getByteBuffer(table.getModel());
-		
+
 		switch (mod) {
 
 		case HEX8:
@@ -204,7 +203,7 @@ public class HexEditor extends JScrollPane {
 			hex8model.setBytes(bb);
 
 			table.setModel(hex8model);
-			
+
 			currentMode = HEX8;
 
 			break;

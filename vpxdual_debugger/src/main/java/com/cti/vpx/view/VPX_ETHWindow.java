@@ -2,7 +2,6 @@ package com.cti.vpx.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -12,7 +11,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -176,6 +174,8 @@ public class VPX_ETHWindow extends JFrame
 	// Help Menu Items
 	private JMenuItem vpx_Menu_Help_Help;
 
+	private JMenuItem vpx_Menu_Help_Shortcut;
+
 	private JMenuItem vpx_Menu_Help_About;
 
 	private JToolBar vpx_ToolBar;
@@ -247,7 +247,7 @@ public class VPX_ETHWindow extends JFrame
 	/**
 	 * Create the frame.
 	 */
-	public VPX_ETHWindow() throws Exception {
+	public VPX_ETHWindow() {
 
 		VPXUtilities.setParent(this);
 
@@ -261,9 +261,7 @@ public class VPX_ETHWindow extends JFrame
 
 		enableSelectedProcessorMenus(VPXConstants.PROCESSOR_SELECTED_MODE_NONE);
 
-		udpMonitor = new VPXUDPMonitor();
-
-		udpMonitor.addUDPListener(VPX_ETHWindow.this);
+		udpMonitor = new VPXUDPMonitor(VPX_ETHWindow.this, VPXUtilities.getAllPorts());
 
 		udpMonitor.startMonitor();
 
@@ -886,6 +884,19 @@ public class VPX_ETHWindow extends JFrame
 			}
 		});
 
+		vpx_Menu_Help_Shortcut = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.Shortcuts"),
+				VPXConstants.Icons.ICON_SHORTCUT);
+
+		vpx_Menu_Help_Shortcut.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showShortcuts();
+
+			}
+		});
+
 		vpx_Menu_Help_About = VPXComponentFactory.createJMenuItem(rBundle.getString("Menu.Help.About"),
 				VPXConstants.Icons.ICON_ABOUT);
 
@@ -925,14 +936,16 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Menu_Tools_Prefrences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.CTRL_MASK));
 
-		vpx_Menu_Tools_ShowView_Console.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
+		vpx_Menu_Tools_ShowView_Console.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, ActionEvent.CTRL_MASK));
 
-		vpx_Menu_Tools_ShowView_Log.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
+		vpx_Menu_Tools_ShowView_Log.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, ActionEvent.CTRL_MASK));
 
 		// Help Menu Items
 		vpx_Menu_Help_Help.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 
 		vpx_Menu_Help_About.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, ActionEvent.CTRL_MASK));
+
+		vpx_Menu_Help_Shortcut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, ActionEvent.CTRL_MASK));
 
 		// Adding
 
@@ -1014,6 +1027,8 @@ public class VPX_ETHWindow extends JFrame
 
 		// Help Menu Items
 		vpx_Menu_Help.add(vpx_Menu_Help_Help);
+
+		vpx_Menu_Help.add(vpx_Menu_Help_Shortcut);
 
 		vpx_Menu_Help.add(VPXComponentFactory.createJSeparator());
 
@@ -1200,8 +1215,6 @@ public class VPX_ETHWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				// vpx_Menu_Window_EthFlash.doClick();
-
 				showEthFlash();
 
 			}
@@ -1290,21 +1303,23 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-		JPanel contentPanel = VPXComponentFactory.createJPanel();
+		JSplitPane content_SplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
-		contentPanel.setLayout(new BorderLayout());
-
-		messagePanel = new VPX_MessagePanel(this);
-
-		messagePanel.setPreferredSize(new Dimension(450, 300));
-
-		contentPanel.add(messagePanel, BorderLayout.EAST);
+		messagePanel = new VPX_MessagePanel(this,
+				Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.MESSAGE_COMMAND)));
 
 		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
 
-		contentPanel.add(vpx_Content_Tabbed_Pane_Right);
+		content_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
 
-		vpx_Right_SplitPane.setLeftComponent(contentPanel);
+		content_SplitPane.setRightComponent(messagePanel);
+
+		content_SplitPane.setDividerLocation(
+				((int) (VPXUtilities.getScreenWidth() / 2.5) + (int) VPXUtilities.getScreenWidth() / 7));
+
+		content_SplitPane.setDividerSize(2);
+
+		vpx_Right_SplitPane.setLeftComponent(content_SplitPane);
 
 		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
 
@@ -1314,20 +1329,23 @@ public class VPX_ETHWindow extends JFrame
 
 		console = new VPX_ConsolePanel(this);
 
-		nwMonitor = new VPX_NetworkMonitorPanel();
-
-		VPXNetworkLogger.setNwMonitor(nwMonitor);
-
 		vpx_Content_Tabbed_Pane_Message.addTab("Log", logger);
 
 		vpx_Content_Tabbed_Pane_Message.addTab("Console", console);
 
-		vpx_Content_Tabbed_Pane_Message.addTab("Network", nwMonitor);
+		if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER))) {
+
+			nwMonitor = new VPX_NetworkMonitorPanel();
+
+			VPXNetworkLogger.setNwMonitor(nwMonitor);
+
+			vpx_Content_Tabbed_Pane_Message.addTab("Network", nwMonitor);
+		}
 
 		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
 
 		vpx_Right_SplitPane.setDividerLocation(
-				((int) VPXUtilities.getScreenHeight() / 2 + (int) VPXUtilities.getScreenHeight() / 7));
+				((int) (VPXUtilities.getScreenHeight() / 2.5) + (int) VPXUtilities.getScreenHeight() / 7));
 
 		vpx_Right_SplitPane.setDividerSize(2);
 
@@ -1406,19 +1424,13 @@ public class VPX_ETHWindow extends JFrame
 
 		lblNewLabel_3.setSize(new Dimension(32, 24));
 
-		lblNewLabel_3.setBounds(22, 38, 46, 14);
+		lblNewLabel_3.setBounds(22, 12, 46, 32);
 
 		treeLegendPanel.add(lblNewLabel_3);
 
-		JLabel lblNewLabel_4 = new JLabel(" ");
+		JLabel lblAmplitudeGraph = new JLabel("<html>Amplitude /<br>Waterfall Graph</html>");
 
-		lblNewLabel_4.setBounds(93, 12, 148, 14);
-
-		treeLegendPanel.add(lblNewLabel_4);
-
-		JLabel lblAmplitudeGraph = new JLabel("Amplitude / Waterfall Graph");
-
-		lblAmplitudeGraph.setBounds(93, 38, 148, 14);
+		lblAmplitudeGraph.setBounds(93, 12, 148, 32);
 
 		treeLegendPanel.add(lblAmplitudeGraph);
 
@@ -1479,15 +1491,39 @@ public class VPX_ETHWindow extends JFrame
 		return ret;
 	}
 
+	private boolean isConfigRemind() {
+		try {
+
+			return Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG));
+
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	private void promptAliasConfigFileName() {
 
-		if (!vpx_Processor_Tree.isSubSystemsAvailable()) {
-			int option = JOptionPane.showConfirmDialog(VPX_ETHWindow.this,
-					"Alias config file not found.\nDo you want to config now?", "Confirmation",
-					JOptionPane.YES_NO_OPTION);
+		if (!vpx_Processor_Tree.isSubSystemsAvailable() && isConfigRemind()) {
 
-			if (option == JOptionPane.YES_OPTION) {
+			String[] buttons = { "Yes", "No", "Don't ask me again" };
+
+			int option = JOptionPane.showOptionDialog(null, "Alias config file not found.\nDo you want to config now?",
+					"Confirmation", JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[2]);
+
+			if (option == 0) {
+
 				new VPX_AliasConfigWindow(this).setVisible(true);
+
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG, "true");
+
+			} else if (option == 1) {
+
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG, "true");
+
+			} else if (option == 2) {
+
+				VPXUtilities.updateProperties(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG, "false");
+
 			}
 		}
 
@@ -1780,10 +1816,6 @@ public class VPX_ETHWindow extends JFrame
 
 			@Override
 			public void run() {
-
-				// new VPX_BISTLauncher(VPX_ETHWindow.this,
-				// VPXSessionManager.getCurrentProcessor(),
-				// VPXSessionManager.getCurrentSubSystem()).setVisible(true);
 
 				startBist(true, true, true);
 
@@ -2111,6 +2143,12 @@ public class VPX_ETHWindow extends JFrame
 
 	}
 
+	public void showShortcuts() {
+		
+		statusBar.showShorcuts();
+
+	}
+
 	public void showAbout() {
 
 		Thread th = new Thread(new Runnable() {
@@ -2214,16 +2252,7 @@ public class VPX_ETHWindow extends JFrame
 	@Override
 	public void readMemory(MemoryViewFilter filter) {
 
-		// Thread th = new Thread(new Runnable() {
-
-		// @Override
-		// public void run() {
 		udpMonitor.readMemory(filter);
-
-		// }
-		// });
-
-		// th.start();
 
 	}
 
@@ -2295,8 +2324,6 @@ public class VPX_ETHWindow extends JFrame
 					if (memoryPlotWindow[plotID].isVisible()) {
 
 						memoryPlotWindow[plotID].populateValues(lineID, buffer);
-
-						// memoryPlotWindow[plotID].setVisible(true);
 					}
 
 				} catch (Exception e) {
@@ -2337,18 +2364,18 @@ public class VPX_ETHWindow extends JFrame
 	}
 
 	@Override
-	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer) {
+	public void populateMemory(String ip, int memID, long startAddress, int stride, byte[] buffer) {
+
 		Thread th = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
 
-					if (memoryBrowserWindow[memID].isVisible()) {
+					if (memoryBrowserWindow[memID].isVisible()
+							&& (memoryBrowserWindow[memID].getCurrentIP().equals(ip))) {
 
 						memoryBrowserWindow[memID].setBytes(startAddress, stride, buffer);
-
-						// memoryBrowserWindow[memID].setVisible(true);
 					}
 
 				} catch (Exception e) {
@@ -2453,7 +2480,8 @@ public class VPX_ETHWindow extends JFrame
 		btnMemorySpectrum
 				.setToolTipText("remain " + (VPXConstants.MAX_SPECTRUM - currentNoofSpectrum) + " data analyser");
 
-		sendSpectrumInterrupt(ip, core);
+		if (ip.length() > 0)
+			sendSpectrumInterrupt(ip, core);
 	}
 
 	@Override
@@ -2664,34 +2692,28 @@ public class VPX_ETHWindow extends JFrame
 
 	public void updateNetworkError(String msg) {
 
-		
-		
-		String[] buttons = { "Ok", "<html><b>Help<b></html>" };
-
-		int rc = JOptionPane.showOptionDialog(null, msg, "Network Error",
-				JOptionPane.ERROR_MESSAGE, 0, null, buttons, buttons[0]);
-
-		System.out.println(rc);
-
-		if (rc == 0) {
-
-			
-
-		} else if (rc == 1) {
-
-			try {
-
-				Desktop.getDesktop()
-						.open(new File("E:\\netip.pdf"));
-
-			} catch (IOException e) {
-				VPXLogger.updateError(e);
-			}
-
-		}
-
-		System.exit(0);
-
+		/*
+		 * String[] buttons = { "Ok", "<html><b>Help<b></html>" };
+		 * 
+		 * int rc = JOptionPane.showOptionDialog(null, msg, "Network Error",
+		 * JOptionPane.ERROR_MESSAGE, 0, null, buttons, buttons[0]);
+		 * 
+		 * 
+		 * 
+		 * if (rc == 0) {
+		 * 
+		 * } else if (rc == 1) {
+		 * 
+		 * try {
+		 * 
+		 * Desktop.getDesktop().open(new File("E:\\netip.pdf"));
+		 * 
+		 * } catch (IOException e) { VPXLogger.updateError(e); }
+		 * 
+		 * }
+		 * 
+		 * System.exit(0);
+		 */
 	}
 
 	public void enableSelectedProcessorMenus(int option, VPX_ProcessorNode node) {
@@ -2701,7 +2723,7 @@ public class VPX_ETHWindow extends JFrame
 		if (node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP1
 				|| node.getNodeType() == PROCESSOR_LIST.PROCESSOR_DSP2) {
 
-			vpx_Menu_Window_Spectrum.setEnabled(true);// node.isAmplitude());
+			vpx_Menu_Window_Spectrum.setEnabled(true);
 
 		}
 
@@ -2738,8 +2760,6 @@ public class VPX_ETHWindow extends JFrame
 
 			btnMemorySpectrum.setEnabled(false);
 
-			// btnMAD.setEnabled(false);
-
 			btnBIST.setEnabled(false);
 
 			btnFlash.setEnabled(false);
@@ -2774,8 +2794,6 @@ public class VPX_ETHWindow extends JFrame
 
 			btnMemorySpectrum.setEnabled(true);
 
-			// btnMAD.setEnabled(true);
-
 			btnBIST.setEnabled(false);
 
 			btnFlash.setEnabled(true);
@@ -2808,8 +2826,6 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryPlot.setEnabled(false);
 
 			btnMemorySpectrum.setEnabled(false);
-
-			// btnMAD.setEnabled(true);
 
 			btnBIST.setEnabled(true);
 
@@ -2844,8 +2860,6 @@ public class VPX_ETHWindow extends JFrame
 			btnMemoryPlot.setEnabled(false);
 
 			btnMemorySpectrum.setEnabled(false);
-
-			// btnMAD.setEnabled(false);
 
 			btnBIST.setEnabled(false);
 

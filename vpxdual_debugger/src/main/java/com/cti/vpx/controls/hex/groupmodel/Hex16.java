@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
@@ -61,15 +60,15 @@ public class Hex16 extends AbstractTableModel {
 	 * Cache of string values of "<code>0</code>"-"<code>ff</code>" for fast
 	 * rendering.
 	 */
-	private String[] paddedLowerByteStrVals;
+//	private String[] paddedLowerByteStrVals;
 
 	/**
 	 * Cache of "padded" string values of "<code>00</code>"-"<code>0f</code>"
 	 * for fast rendering.
 	 */
-	private String[] byteStrVals;
+	//private String[] byteStrVals;
 
-	private BigInteger bi;
+	//private BigInteger bi;
 
 	/**
 	 * Creates the model.

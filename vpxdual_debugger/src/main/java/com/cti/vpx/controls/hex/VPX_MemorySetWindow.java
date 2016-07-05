@@ -439,7 +439,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 		 */
 	}
 
-	private boolean isValidData(String data) {
+	/*private boolean isValidData(String data) {
 
 		try {
 			Long.toHexString(Long.decode(data)).toUpperCase();
@@ -451,7 +451,7 @@ public class VPX_MemorySetWindow extends JDialog implements WindowListener {
 			return false;
 		}
 
-	}
+	}*/
 
 	public void setMode(int mode) {
 

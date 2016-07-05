@@ -16,7 +16,7 @@ public interface VPXCommunicationListener extends VPXUDPListener {
 
 	public void readMemory(MemoryViewFilter filter);
 
-	public void populateMemory(int memID, long startAddress, int stride, byte[] buffer);
+	public void populateMemory(String ip,int memID, long startAddress, int stride, byte[] buffer);
 
 	public void reIndexMemoryBrowserIndex();
 

@@ -53,7 +53,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 	private XYSeriesCollection dataset;
 
-	private VPX_ETHWindow parent;
+//	private VPX_ETHWindow parent;
 
 	private String currentip="";
 
@@ -85,7 +85,7 @@ public class VPX_AmpWindow extends JFrame implements WindowListener {
 
 		this.amplitudeID = id;
 
-		this.parent = parnt;
+	//	this.parent = parnt;
 
 		init();
 

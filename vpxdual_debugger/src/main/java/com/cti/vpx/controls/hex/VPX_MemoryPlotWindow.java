@@ -65,6 +65,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
 import com.cti.vpx.command.ATP;
+import com.cti.vpx.controls.VPX_FilterComboBox;
 import com.cti.vpx.controls.graph.utilities.ui.graphs.graphBase.DrawSurface;
 import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
@@ -1915,7 +1916,6 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		enablePlot1Components();
 
 		enablePlot2Components();
-
 	}
 
 	private void enablePlot2Components() {
@@ -2445,7 +2445,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		}
 	}
 
-	private void testPlot() {
+	/*private void testPlot() {
 
 		Thread t = new Thread(new Runnable() {
 
@@ -2457,7 +2457,7 @@ public class VPX_MemoryPlotWindow extends JFrame implements WindowListener {
 		});
 
 		t.start();
-	}
+	}*/
 
 	private void doPlotMemory() {
 

@@ -52,7 +52,7 @@ public class NumberAxisScale extends AbstractDefaultAxisScale {
 	 */
 	public void setFormat(DecimalFormat df) {
 		if (df == null) {
-			oNumberFormat = defaultNumberFormat(getOrientation());
+			oNumberFormat = new DecimalFormat("0");//defaultNumberFormat(getOrientation());
 		} else {
 			this.oNumberFormat = df;
 		}

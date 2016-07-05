@@ -12,6 +12,8 @@ public class NWInterface {
 
 	boolean isDedicated;
 
+	boolean isDHCPEnabled;
+	
 	List<String> ipAddresses = new ArrayList<String>();
 
 	String gateWay;
@@ -179,6 +181,14 @@ public class NWInterface {
 
 	public void setDisplayName(String displayName) {
 		DisplayName = displayName;
+	}
+
+	public boolean isDHCPEnabled() {
+		return isDHCPEnabled;
+	}
+
+	public void setDHCPEnabled(boolean isDHCPEnabled) {
+		this.isDHCPEnabled = isDHCPEnabled;
 	}
 
 }

@@ -27,6 +27,8 @@ public class VPXConstants {
 
 	public final static String WIN_CMD_BASE = "netsh interface show interface";
 
+	public final static String WIN_CMD_BASE_DHCB = "netsh interface ipv4 show config";
+
 	public final static String LINUX_CMD_BASE = "ip link show | grep UP |grep eth | awk '{print $2,$8,$9}'";
 
 	public static final String RESOURCENAME = "VPX_Dual_adt";
@@ -140,6 +142,8 @@ public class VPXConstants {
 
 		public static final String GENERAL_MEMORY = "general.memorybar";
 
+		public static final String REMIND_ALIAS_CONFIG = "remind.alias";
+
 		public static final String WORKSPACE_PATH = "workspace.path";
 
 		public static final String SECURITY_PWD = "security.pwd";
@@ -161,6 +165,18 @@ public class VPXConstants {
 		public static final String LOG_APPENDCURTIME = "log.appendcurtime";
 
 		public static final String LOG_OVERWRITE = "log.overwrite";
+
+		public static final String NETWORK_PORT_ADV = "network.port.adv";
+
+		public static final String NETWORK_PORT_COMM = "network.port.comm";
+
+		public static final String NETWORK_PORT_MSG = "network.port.msg";
+
+		public static final String NETWORK_PKT_SNIFFER = "network.pkt.sniffer";
+
+		public static final String MESSAGE_COMMAND = "message.cmd";
+
+		public static final String MESSAGE_COMMAND_FILENAME = "message.cmd.filename";
 
 		public static final String PATH_PYTHON = "path.python";
 
@@ -258,7 +274,7 @@ public class VPXConstants {
 
 		public static final String ICON_UPLOAD_NAME = "upload.png";
 
-		public static final String ICON_CLEAR_NAME = "clear.gif";
+		public static final String ICON_CLEAR_NAME = "clear1.png";// "clear.gif";
 
 		public static final String ICON_DOWNLOADOUT_NAME = "download1.png";
 
@@ -284,6 +300,8 @@ public class VPXConstants {
 
 		public static final String ICON_EXECUTION_NAME = "execution.png";
 
+		public static final String ICON_SHOWCOMMAND_NAME = "execution.png";
+
 		public static final String ICON_ETHFLASH_NAME = "memory1.png";
 
 		public static final String ICON_PROCESSOR_NAME = "Processor4.jpg";
@@ -304,7 +322,11 @@ public class VPXConstants {
 
 		public static final String ICON_HELP_NAME = "help.png";
 
-		public static final String ICON_ABOUT_NAME = "detail.png";
+		public static final String ICON_ABOUT_NAME = "about.png";
+		
+		public static final String ICON_SHORTCUT_NAME = "contexthelp.png";
+
+		public static final String ICON_SHOW_CMD_NAME = "detail1.png";
 
 		public static final String ICON_SPECTRUM_NAME = "sepctrum.png";
 
@@ -323,6 +345,10 @@ public class VPXConstants {
 		public static final ImageIcon ICON_HELP = VPXUtilities.getImageIcon(ICON_HELP_NAME, 14, 14);
 
 		public static final ImageIcon ICON_ABOUT = VPXUtilities.getImageIcon(ICON_ABOUT_NAME, 14, 14);
+		
+		public static final ImageIcon ICON_SHORTCUT = VPXUtilities.getImageIcon(ICON_SHORTCUT_NAME, 14, 14);
+
+		public static final ImageIcon ICON_SHOW_CMD = VPXUtilities.getImageIcon(ICON_SHOW_CMD_NAME, 14, 14);
 
 		public static final ImageIcon ICON_FILTER = VPXUtilities.getImageIcon(ICON_FILTER_NAME, 14, 14);
 

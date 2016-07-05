@@ -39,7 +39,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 	private WaterfallGraphPanel newWaterfallGraph = null;
 
-	private VPX_ETHWindow parent;
+	//private VPX_ETHWindow parent;
 
 	private String currentip = "";
 
@@ -50,7 +50,7 @@ public class VPX_WaterfallWindow extends JFrame implements WindowListener {
 
 		this.waterfallID = idx;
 
-		this.parent = parnt;
+		//this.parent = parnt;
 
 		newWaterfallGraph = new WaterfallGraphPanel();
 

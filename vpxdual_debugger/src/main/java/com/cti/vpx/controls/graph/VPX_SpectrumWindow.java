@@ -4,8 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -23,13 +23,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -49,13 +46,12 @@ import com.cti.vpx.model.Processor;
 import com.cti.vpx.model.VPXSubSystem;
 import com.cti.vpx.model.VPXSystem;
 import com.cti.vpx.util.VPXConstants;
-import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXSessionManager;
 import com.cti.vpx.util.VPXUtilities;
 import com.cti.vpx.view.VPX_ETHWindow;
 
 import net.miginfocom.swing.MigLayout;
-import java.awt.GridLayout;
+import javax.swing.DefaultComboBoxModel;
 
 public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
@@ -64,18 +60,11 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 	 */
 	private static final long serialVersionUID = -7945447785324008590L;
 
-	@SuppressWarnings("unused")
-	private String currentSubSystem = "";
-
 	private String currentProcIP = "";
 
 	private int currentCore = -1;
 
 	private final JPanel contentPanel = new JPanel();
-
-	private JLabel lblMins;
-
-	private JLabel lblAutoRefreshValue;
 
 	private JComboBox<String> cmbGraphObject;
 
@@ -85,17 +74,7 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	private WaterfallGraphPanel newWaterfallGraph = null;
 
-	private int currentThreadSleepTime;
-
-	private boolean isStarted = false;
-
-	private int MINUTE = 60 * 1000;
-
 	private int spectrumID = -1;
-
-	private Thread autoRefreshThread = null;
-
-	private JSlider slideAutoRefresh;
 
 	private VPX_ETHWindow parent;
 
@@ -115,16 +94,28 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	private Crosshair yCrosshair;
 
+	private JButton btnClear;
+
+	private JButton btnClearAll;
+
 	private JButton btnStart;
 
-	private JButton btnClear;
+	private XYPlot xyplot;
+
+	private JCheckBox chkColorScale;
+
+	private XYItemRenderer renderer;
+	private JLabel lblLineColor;
+	private JComboBox<String> cmbLineColor;
+	private JLabel label;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		try {
-			VPX_SpectrumWindow dialog = new VPX_SpectrumWindow(null, "sub1", "172.17.1.28");
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			VPX_SpectrumWindow dialog = new VPX_SpectrumWindow(null, 0);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -132,11 +123,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		}
 	}
 
-	/**
-	 * Create the dialog.
-	 * 
-	 * @wbp.parser.constructor
-	 */
 	public VPX_SpectrumWindow(VPX_ETHWindow parent, int id) {
 
 		this.spectrumID = id;
@@ -155,42 +141,17 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		loadGraphObjects();
 
-		centerFrame();
+		clearData();
 
-	}
+		// startLoadtData();
 
-	public VPX_SpectrumWindow(VPX_ETHWindow parent, String subsystem, String ip) {
-
-		this.parent = parent;
-
-		this.spectrumID = -1;
-
-		setTitle("Data Graph");
-
-		this.currentProcIP = ip;
-
-		this.currentSubSystem = subsystem;
-
-		newWaterfallGraph = new WaterfallGraphPanel();
-
-		init();
-
-		loadComponents();
-
-		updateProcessorDetail();
-
-		loadGraphObjects();
-
-		centerFrame();
 	}
 
 	private void init() {
 
-		// setResizable(false);
-
 		setIconImage(VPXConstants.Icons.ICON_SPECTRUM.getImage());
 
-		setSize((int) (VPXUtilities.getScreenWidth() * .80), (int) (VPXUtilities.getScreenHeight() * .90));
+		setBounds(0, 0, VPXUtilities.getScreenWidth(), VPXUtilities.getScreenHeight());
 
 		getContentPane().setLayout(new BorderLayout());
 
@@ -212,17 +173,16 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		panelFilter.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
-		panelFilter.setPreferredSize(new Dimension(10, 100));
+		panelFilter.setPreferredSize(new Dimension(175, 100));
 
-		contentPanel.add(panelFilter, BorderLayout.NORTH);
-
-		panelFilter.setLayout(new MigLayout("",
-				"[88px,left][pref!,grow][85px,fill][10px][214px][21px][49px][57px][][][][]", "[29px][30px,center]"));
+		contentPanel.add(panelFilter, BorderLayout.EAST);
+		panelFilter.setLayout(new MigLayout("", "[59px,grow,fill][13px,grow,fill][48px,grow,fill]",
+				"[20px][20px][20px][20px][20px][20px][20px][][][][][20px][20px][20px][][25px][25px]"));
 
 		JLabel lblSubSystem = new JLabel("Sub System");
 		lblSubSystem.setHorizontalAlignment(SwingConstants.LEFT);
 
-		panelFilter.add(lblSubSystem, "cell 0 0,alignx trailing,growy");
+		panelFilter.add(lblSubSystem, "cell 0 0 3 1,grow");
 
 		cmbSubSystem = new JComboBox<String>();
 
@@ -243,89 +203,72 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 			}
 		});
 
-		panelFilter.add(cmbSubSystem, "cell 1 0,growx");
+		panelFilter.add(cmbSubSystem, "cell 0 1 3 1,alignx left,aligny top");
+
+		chkColorScale = new JCheckBox("Color Scale");
+
+		chkColorScale.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				lblLineColor.setEnabled(chkColorScale.isSelected());
+
+				cmbLineColor.setEnabled(chkColorScale.isSelected());
+			}
+		});
+
+		chkColorScale.setVisible(true);
+
+		chkColorScale.setSelected(true);
+
+		panelFilter.add(chkColorScale, "cell 0 8");
+
+		lblLineColor = new JLabel("Line Color");
+		panelFilter.add(lblLineColor, "cell 0 9");
+
+		cmbLineColor = new JComboBox<String>();
+
+		cmbLineColor
+				.setModel(new DefaultComboBoxModel<String>(new String[] { "Red", "Green", "Blue", "Yellow", "Cyan" }));
+
+		cmbLineColor.setSelectedIndex(3);
+
+		panelFilter.add(cmbLineColor, "cell 1 9 2 1,growx");
+
+		label = new JLabel("             ");
+
+		panelFilter.add(label, "cell 0 10");
 
 		lblMinVal = new JLabel("");
 
+		lblMinVal.setFont(new Font("Tahoma", Font.BOLD, 12));
+
 		lblMinVal.setPreferredSize(new Dimension(45, 25));
 
-		panelFilter.add(lblMinVal, "cell 11 0");
+		panelFilter.add(lblMinVal, "cell 2 16,alignx center,aligny top");
 
 		JLabel lblProcessor = new JLabel("Processor");
 
 		lblProcessor.setHorizontalAlignment(SwingConstants.LEFT);
 
-		panelFilter.add(lblProcessor, "cell 0 1,alignx trailing,growy");
+		panelFilter.add(lblProcessor, "cell 0 2 3 1,grow");
 
 		JLabel lblGraphObject = new JLabel("Graph Object");
 
-		lblGraphObject.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		panelFilter.add(lblGraphObject, "cell 2 0,grow");
+		panelFilter.add(lblGraphObject, "cell 0 4 3 1,grow");
 
 		cmbGraphObject = new JComboBox<String>();
 
-		panelFilter.add(cmbGraphObject, "cell 4 0,growx,aligny center");
+		panelFilter.add(cmbGraphObject, "cell 0 5 3 1,growx,aligny top");
 
 		cmbProcessor = new JComboBox<String>();
 
 		cmbProcessor.setPreferredSize(new Dimension(120, 20));
 
-		panelFilter.add(cmbProcessor, "cell 1 1,growx");
+		panelFilter.add(cmbProcessor, "cell 0 3 3 1,alignx left,aligny top");
 
-		JLabel lblAutoRefresh = new JLabel("Auto Refresh");
-		lblAutoRefresh.setVisible(false);
+		btnClear = new JButton("Clear Graph");
 
-		lblAutoRefresh.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		panelFilter.add(lblAutoRefresh, "cell 2 1,alignx left,growy");
-
-		slideAutoRefresh = new JSlider();
-		slideAutoRefresh.setVisible(false);
-
-		slideAutoRefresh.setMinimum(30);
-
-		slideAutoRefresh.setMaximum(960);
-
-		slideAutoRefresh.setValue(30);
-
-		panelFilter.add(slideAutoRefresh, "cell 4 1,growx,aligny bottom");
-
-		lblAutoRefreshValue = new JLabel("30");
-		lblAutoRefreshValue.setVisible(false);
-
-		lblAutoRefreshValue.setHorizontalAlignment(SwingConstants.CENTER);
-
-		lblAutoRefreshValue.setPreferredSize(new Dimension(25, 25));
-
-		panelFilter.add(lblAutoRefreshValue, "cell 5 1,alignx center,aligny center");
-
-		lblMins = new JLabel("Secs");
-		lblMins.setVisible(false);
-
-		lblMins.setPreferredSize(new Dimension(45, 25));
-
-		panelFilter.add(lblMins, "cell 6 1,alignx left,aligny center");
-
-		btnStart = new JButton("Apply");
-
-		btnStart.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				startPopulateData();
-
-			}
-		});
-
-		panelFilter.add(btnStart, "cell 7 1,alignx center,aligny center");
-
-		chkWaterfall = new JCheckBox("Waterfall");
-
-		panelFilter.add(chkWaterfall, "cell 5 0 2 1,alignx left,aligny center");
-
-		btnClear = new JButton("Clear");
 		btnClear.setEnabled(false);
 
 		btnClear.addActionListener(new ActionListener() {
@@ -333,26 +276,71 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
+				VPX_SpectrumWindow.this.series.clear();
+
+				VPX_SpectrumWindow.this.dataset.removeSeries(series);
+
+				newWaterfallGraph.clearAlldata();
+
+				lblMaxVal.setText("");
+
+				lblMinVal.setText("");
+
+			}
+		});
+
+		btnStart = new JButton("Apply");
+
+		btnStart.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				startPopulateData();
+
+			}
+		});
+		panelFilter.add(btnStart, "cell 0 11 3 1,grow");
+
+		panelFilter.add(btnClear, "cell 0 12 3 1,grow");
+
+		chkWaterfall = new JCheckBox("Waterfall");
+
+		panelFilter.add(chkWaterfall, "cell 0 6 3 1,grow");
+
+		btnClearAll = new JButton("Clear All");
+
+		btnClearAll.setEnabled(false);
+
+		btnClearAll.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				parent.sendSpectrumInterrupt(currentProcIP, currentCore);
+
 				clearData();
 
 			}
 		});
 
-		panelFilter.add(btnClear, "cell 8 1");
+		panelFilter.add(btnClearAll, "cell 0 13 3 1,grow");
 
-		JLabel lblMax = new JLabel("Max Value");
+		JLabel lblMax = new JLabel("Max Value : ");
+		lblMax.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
-		panelFilter.add(lblMax, "cell 9 1");
+		panelFilter.add(lblMax, "cell 0 15,alignx left,growy");
 
-		JLabel lblMin = new JLabel("Min Value");
+		JLabel lblMin = new JLabel("Min Value : ");
+		lblMin.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
-		panelFilter.add(lblMin, "cell 9 0");
+		panelFilter.add(lblMin, "cell 0 16,alignx center,growy");
 
 		lblMaxVal = new JLabel("");
+		lblMaxVal.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 		lblMaxVal.setPreferredSize(new Dimension(45, 25));
 
-		panelFilter.add(lblMaxVal, "cell 11 1");
+		panelFilter.add(lblMaxVal, "cell 2 15,alignx left,aligny top");
 
 		JPanel panelGraph = new JPanel();
 
@@ -383,57 +371,13 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelAmplitude.setBackground(Color.BLACK);
 
-		series = new XYSeries("Amplitude", true, true);
+		series = new XYSeries("", true, true);
 
 		dataset = new XYSeriesCollection(series);
 
 		final JFreeChart chart = createChart(dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		/*
-		chartPanel.addChartMouseListener(new ChartMouseListener() {
-
-			@Override
-			public void chartMouseClicked(ChartMouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void chartMouseMoved(ChartMouseEvent event) {
-
-				try {
-
-					Rectangle2D dataArea = chartPanel.getScreenDataArea();
-
-					JFreeChart chart = event.getChart();
-
-					XYPlot plot = (XYPlot) chart.getPlot();
-
-					ValueAxis xAxis = plot.getDomainAxis();
-
-					double x = xAxis.java2DToValue(event.getTrigger().getX(), dataArea, RectangleEdge.BOTTOM);
-
-					// make the crosshairs disappear if the mouse is out of
-					// range
-
-					if (!xAxis.getRange().contains(x)) {
-						x = Double.NaN;
-					}
-
-					double y = DatasetUtilities.findYValue(plot.getDataset(), 0, x);
-
-					VPX_SpectrumWindow.this.xCrosshair.setValue(x);
-
-					VPX_SpectrumWindow.this.yCrosshair.setValue(y);
-
-				} catch (Exception e) {
-
-				}
-
-			}
-
-		});*/
 
 		CrosshairOverlay crosshairOverlay = new CrosshairOverlay();
 
@@ -463,31 +407,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		panelGraph.add(panelAmplitude);
 
-		slideAutoRefresh.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-
-				JSlider source = (JSlider) e.getSource();
-
-				int fps = (int) source.getValue();
-
-				if (fps <= 59) {
-
-					lblAutoRefreshValue.setText("" + fps);
-
-					lblMins.setText("Secs");
-
-				} else {
-
-					lblAutoRefreshValue.setText("" + (fps / 60));
-
-					lblMins.setText("Mins");
-				}
-
-			}
-		});
-
 		cmbProcessor.addItemListener(new ItemListener() {
 
 			@Override
@@ -508,8 +427,8 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	private JFreeChart createChart(final XYDataset dataset) {
 
-		JFreeChart jfreechart = ChartFactory.createXYLineChart("", "Time", "Amplitude", dataset,
-				PlotOrientation.VERTICAL, true, true, true);
+		JFreeChart jfreechart = ChartFactory.createXYLineChart("", "", "", dataset, PlotOrientation.VERTICAL, true,
+				true, true);
 
 		jfreechart.setAntiAlias(true);
 
@@ -519,9 +438,9 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		jfreechart.setTextAntiAlias(true);
 
-		XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+		xyplot = (XYPlot) jfreechart.getPlot();
 
-		XYItemRenderer renderer = xyplot.getRenderer();
+		renderer = xyplot.getRenderer();
 
 		renderer.setSeriesPaint(0, Color.YELLOW);
 
@@ -561,21 +480,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	}
 
-	private void centerFrame() {
-
-		Dimension windowSize = getSize();
-
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
-		Point centerPoint = ge.getCenterPoint();
-
-		int dx = centerPoint.x - windowSize.width / 2;
-
-		int dy = centerPoint.y - windowSize.height / 2;
-
-		setLocation(dx, dy);
-	}
-
 	private void enableComponents(boolean option) {
 
 		cmbSubSystem.setEnabled(option);
@@ -583,6 +487,8 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		cmbProcessor.setEnabled(option);
 
 		cmbGraphObject.setEnabled(option);
+
+		btnClearAll.setEnabled(!option);
 
 		btnClear.setEnabled(!option);
 
@@ -599,21 +505,16 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 			if (!parent.isAlreadyAvailable(cmbProcessor.getSelectedItem().toString(),
 					cmbGraphObject.getSelectedIndex())) {
 
-				setTitle("Data Graph " + (spectrumID + 1) + " for " + currentProcIP + " Core " + currentCore);
-
 				currentProcIP = cmbProcessor.getSelectedItem().toString();
 
 				currentCore = cmbGraphObject.getSelectedIndex();
 
-				doReadData();
+				setTitle("Data Graph " + (spectrumID + 1) + " for " + currentProcIP + " Graph Object - " + currentCore);
 
-				isStarted = true;
+				doReadData();
 
 				enableComponents(false);
 
-				// loadCurrentThreadSleepTime(slideAutoRefresh.getValue());
-
-				// startAutoRefreshThread();
 			} else {
 
 				JOptionPane.showMessageDialog(this,
@@ -626,54 +527,6 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 			JOptionPane.showMessageDialog(this, "Please Select processor", "Validation", JOptionPane.ERROR_MESSAGE);
 
 		}
-	}
-
-	private void loadCurrentThreadSleepTime(int value) {
-
-		if (value < 60) {
-
-			currentThreadSleepTime = value * 1000;
-		} else {
-
-			currentThreadSleepTime = (value / 60) * MINUTE;
-		}
-
-	}
-
-	private void startAutoRefreshThread() {
-
-		if (autoRefreshThread == null) {
-
-			autoRefreshThread = null;
-
-			autoRefreshThread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-
-					while (isStarted) {
-
-						try {
-
-							// send command to to populate data
-							doReadData();
-
-							Thread.sleep(currentThreadSleepTime);
-
-						} catch (Exception e) {
-							VPXLogger.updateError(e);
-							e.printStackTrace();
-
-						}
-
-					}
-
-				}
-			});
-
-			autoRefreshThread.start();
-		}
-
 	}
 
 	public void showSpectrumWindow() {
@@ -782,89 +635,113 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 		newWaterfallGraph.clearAlldata();
 
+		this.cmbGraphObject.setSelectedIndex(0);
+
 		enableComponents(true);
+
+		chkWaterfall.setSelected(true);
+
+		lblMaxVal.setText("");
+
+		lblMinVal.setText("");
 
 		setTitle("Data Graph " + (spectrumID + 1));
 
-	}
-
-	public void loadData(int core, float yAxis[]) {
-
-		currentCore = core;
-
-		float[] f = new float[1024];
-
-		this.series.clear();
-
-		this.dataset.removeSeries(series);
-
-		for (int i = 0; i < yAxis.length; i++) {
-			yAxis[i] = ((Float.isNaN(yAxis[i])) ? 0 : yAxis[i]);
-		}
-
-		for (int i = 0; i < yAxis.length; i++) {
-
-			final double x = i;
-
-			final double y = yAxis[i];
-
-			this.series.addOrUpdate(x, y);
-		}
-
-		this.dataset.addSeries(series);
-
-		if (chkWaterfall.isSelected()) {
-
-			if (yAxis.length != 1024) {
-
-				for (int i = 0; i < yAxis.length; i++) {
-
-					f[i] = yAxis[i];
-				}
-
-				for (int i = yAxis.length; i < 1024; i++) {
-
-					f[i] = 0;
-				}
-
-				newWaterfallGraph.addWaterfallData(f);
-
-			} else {
-
-				newWaterfallGraph.addWaterfallData(yAxis);
-			}
-
-		}
-
-		setMinMaxValues(yAxis);
+		cmbSubSystem.setSelectedIndex(0);
 
 	}
 
-	private void setMinMaxValues(float[] yValues) {
+	public void loadData(int core, float[] yAxis) {
 
-		if (yValues.length > 0) {
+		// assign first element of an array to largest and smallest
 
-			// assign first element of an array to largest and smallest
-			double smallest = yValues[0];
+		if (yAxis.length > 0) {
+			double smallest = yAxis[0];
 
-			double largetst = yValues[0];
+			double largest = yAxis[0];
 
-			for (int i = 1; i < yValues.length; i++) {
+			currentCore = core;
 
-				double b = yValues[i];
+			this.series.clear();
 
-				if (b > largetst)
-					largetst = b;
-				else if (b < smallest)
-					smallest = b;
+			this.dataset.removeSeries(series);
+
+			for (int i = 0; i < yAxis.length; i++) {
+
+				final double x = i;
+
+				final double y = yAxis[i];
+
+				this.series.addOrUpdate(x, y);
+
+				if (yAxis.length > 0) {
+
+					for (int j = 1; j < yAxis.length; j++) {
+
+						double b = yAxis[j];
+
+						if (b > largest)
+							largest = b;
+						else if (b < smallest)
+							smallest = b;
+
+					}
+				}
+			}
+
+			this.dataset.addSeries(series);
+
+			xyplot.getDomainAxis().setFixedAutoRange(this.dataset.getDomainUpperBound(true));
+
+			if (chkWaterfall.isSelected()) {
+
+				newWaterfallGraph.addWaterfallData(yAxis, (float) smallest, (float) largest);
 
 			}
 
-			lblMaxVal.setText("" + largetst);
+			renderer.setSeriesPaint(0, getLineColor(chkColorScale.isSelected(), cmbLineColor.getSelectedIndex()));
 
-			lblMinVal.setText("" + smallest);
+			newWaterfallGraph.setColorScale(chkColorScale.isSelected());
+
+			setMinMaxValues(smallest, largest);
 		}
+	}
 
+	private Color getLineColor(boolean isColorScale, int color) {
+
+		Color clr = Color.YELLOW;
+
+		if (isColorScale) {
+
+			switch (color) {
+			case 0:
+				clr = Color.RED;
+				break;
+			case 1:
+				clr = Color.GREEN;
+				break;
+			case 2:
+				clr = Color.BLUE;
+				break;
+			case 3:
+				clr = Color.YELLOW;
+				break;
+			case 4:
+				clr = Color.CYAN;
+				break;
+			default:
+				break;
+			}
+
+		} else
+			clr = Color.WHITE;
+		return clr;
+	}
+
+	private void setMinMaxValues(double min, double max) {
+		lblMinVal.setText("" + String.format("%.02f", min));
+
+		lblMaxVal.setText("" + String.format("%.02f", max));
 	}
 
 	@Override
@@ -876,18 +753,43 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		// parent.sendAnalyticalDataInterrupt(currentProcIP);
-
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-
 		parent.reIndexSpectrumWindowIndex(currentProcIP, currentCore);
 
 		currentProcIP = "";
 
 		currentCore = -1;
+
+		clearData();
+
+	}
+
+	public void startLoadtData() {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true) {
+
+					float[] ff = new float[1024];
+
+					for (int i = 0; i < ff.length; i++) {
+						ff[i] = (float) (Math.random() * 1024);
+					}
+					loadData(1, ff);
+					try {
+
+						Thread.sleep(100);
+
+					} catch (Exception e) { // TODO: handle exception
+					}
+				}
+
+			}
+		}).start();
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
 
 	}
 
@@ -909,14 +811,10 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 
 	@Override
 	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -930,5 +828,4 @@ public class VPX_SpectrumWindow extends JFrame implements WindowListener {
 		// TODO Auto-generated method stub
 
 	}
-
 }

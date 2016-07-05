@@ -567,7 +567,7 @@ public class VPX_AppModeWindow extends JFrame {
 
 						populateETHValues(arg0.getItem().toString());
 
-						btnOpen.setEnabled((cmbNWIface.getSelectedIndex() > 0));
+						//btnOpen.setEnabled((cmbNWIface.getSelectedIndex() > 0));
 					}
 				}
 			}
@@ -703,28 +703,42 @@ public class VPX_AppModeWindow extends JFrame {
 
 				txtDiplayName.setText(nw.getDisplayName());
 
-				if (nw.isConnected() && nw.isEnabled()) {
+				if (nw.isConnected() && nw.isEnabled() && !nw.isDHCPEnabled()) {
 
 					setEnabledETHs(true);
 
 				} else {
 
 					setEnabledETHs(false);
-
+					
 					if (!nw.isEnabled()) {
 
 						String msg = name + " is disabled.Please enable and continue!";
+						
+						btnOpen.setEnabled(false);
 
 						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, msg);
 
-					} else {
+					} else if (!nw.isConnected()) {
+						
+						String msg = name + " is not connected.Please connect and continue!";
+						
+						
 
-						if (!nw.isConnected()) {
-							String msg = name + " is not connected.Please connect and continue!";
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, msg);
+						
+						btnOpen.setEnabled(false);
 
-							JOptionPane.showMessageDialog(VPX_AppModeWindow.this, msg);
-						}
+					} else if (nw.isDHCPEnabled()) {
+
+						String msg = name + " is DHCP mode is enabled.\nUser cannot able to change the values.";
+						
+						btnOpen.setEnabled(true);
+
+						JOptionPane.showMessageDialog(VPX_AppModeWindow.this, msg);
+
 					}
+
 				}
 				break;
 			}
@@ -809,6 +823,8 @@ public class VPX_AppModeWindow extends JFrame {
 
 			setLogFileName();
 
+			VPXSessionManager.setCurrentMode(currentMode);
+
 			if (currentMode == VPXConstants.ETHMODE) {
 
 				boolean ip = VPXUtilities.isValidIP(txtIPAddress.getText());
@@ -862,7 +878,7 @@ public class VPX_AppModeWindow extends JFrame {
 						JOptionPane.showMessageDialog(null,
 								"Another instance is running or the ports are bind by another application.",
 								"Opening Application", JOptionPane.ERROR_MESSAGE);
-						
+
 						VPXLogger.updateError(e);
 
 						System.exit(0);

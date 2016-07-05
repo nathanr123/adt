@@ -18,6 +18,8 @@ public class VPXSessionManager {
 
 	private static String currentLogFileName;
 
+	private static String currentCommandFileName;
+
 	private static String currentErrorLogFileName;
 
 	private static String currentWorkspacePath;
@@ -27,6 +29,8 @@ public class VPXSessionManager {
 	private static String currentSubnet;
 
 	private static String currentGateway;
+
+	private static int currentMode;
 
 	private static int currentPeriodicity = VPXConstants.PERIODICITY;
 
@@ -177,6 +181,14 @@ public class VPXSessionManager {
 		VPXSessionManager.currentErrorLogFileName = getErrorPath() + "/" + currentErrorLogFileName;
 	}
 
+	public static int getCurrentMode() {
+		return currentMode;
+	}
+
+	public static void setCurrentMode(int currentMode) {
+		VPXSessionManager.currentMode = currentMode;
+	}
+
 	public static VPXSystem getVpxSystem() {
 
 		return vpxSystem;
@@ -212,6 +224,12 @@ public class VPXSessionManager {
 
 		return getAsFullPath(getSubSystemPath(),
 				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP));
+	}
+
+	public static String getBinPath() {
+
+		return getAsFullPath(getDSPPath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_SUBSYSTEM_DSP_BIN));
 	}
 
 	public static String getDataPath() {
@@ -279,4 +297,14 @@ public class VPXSessionManager {
 
 		return parent + "/" + child;
 	}
+
+	public static String getCurrentCommandFileName() {
+		return getAsFullPath(getMessagePath(),
+				VPXUtilities.getString(VPXConstants.ResourceFields.MESSAGE_COMMAND_FILENAME));
+	}
+
+	public static void setCurrentCommandFileName(String currentCommandFileName) {
+		VPXSessionManager.currentCommandFileName = currentCommandFileName;
+	}
+
 }

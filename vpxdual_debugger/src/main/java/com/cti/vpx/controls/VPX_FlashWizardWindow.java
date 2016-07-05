@@ -863,7 +863,7 @@ public class VPX_FlashWizardWindow extends JDialog {
 			String core5 = txtCompilePathCore5.getText().trim().replaceAll("\\\\", "/");
 			String core6 = txtCompilePathCore6.getText().trim().replaceAll("\\\\", "/");
 			String core7 = txtCompilePathCore7.getText().trim().replaceAll("\\\\", "/");
-			String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
+		//	String bin = txtCompilePathFinalOut.getText().trim().replaceAll("\\\\", "/");
 
 			dialog.updatePackets(1, core0);
 			checkAndCopy(corePath, core0, 0, false);

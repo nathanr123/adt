@@ -69,7 +69,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	private void init() {
 
-		setTitle("Flash Out File");
+		setTitle("Flashing bin file");
 
 		setIconImage(VPXUtilities.getAppIcon());
 
@@ -128,7 +128,7 @@ public class VPX_FlashProgressWindow extends JDialog implements WindowListener {
 
 	public void updatePackets(long curpacket) {
 
-		setTitle("Backup Out files and Bin file");
+		//setTitle("Backup Out files and Bin file");
 
 		if (curpacket == 1) {
 

@@ -84,6 +84,10 @@ public class GenericBundle
 	{
 		return exceptionSwallower;
 	}
+	
+	public String get(){
+		return bundleName;
+	}
 
 	/**
 	 * Gets a string for the given key from this resource bundle. If the corresponding string can't be found, we return

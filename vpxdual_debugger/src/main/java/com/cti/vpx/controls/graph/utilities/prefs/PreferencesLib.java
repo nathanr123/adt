@@ -116,14 +116,14 @@ public class PreferencesLib {
 	 * configures a JComboBox by item name ( ie. a combobox that stores strings
 	 * in it's item list)
 	 */
-	public static void loadByItemName(IPreferencesNode node, String prefName, JComboBox combobox, String defaultVal) {
+	public static void loadByItemName(IPreferencesNode node, String prefName, JComboBox<String> combobox, String defaultVal) {
 		combobox.setSelectedItem(node.get(prefName, defaultVal));
 	}
 
 	/**
 	 * configures a JComboBox by index
 	 */
-	public static void loadByItemIdx(IPreferencesNode node, String prefName, JComboBox combobox, int defaultIdx) {
+	public static void loadByItemIdx(IPreferencesNode node, String prefName, JComboBox<String> combobox, int defaultIdx) {
 		combobox.setSelectedIndex(node.getInt(prefName, defaultIdx));
 	}
 

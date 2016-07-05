@@ -5,11 +5,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 
 import com.cti.vpx.util.VPXComponentFactory;
 import com.cti.vpx.util.VPXConstants;
@@ -41,6 +44,8 @@ public class VPX_StatusBar extends JPanel {
 	private JLabel lblProc;
 
 	private JLabel lblLAN;
+
+	private VPX_Shortcuts shortcuts = new VPX_Shortcuts();
 
 	public VPX_StatusBar() {
 
@@ -118,6 +123,21 @@ public class VPX_StatusBar extends JPanel {
 
 		lblLAN = VPXComponentFactory.createJLabel("");
 
+		JRadioButton jrb = new JRadioButton();
+
+		jrb.setIcon(VPXUtilities.getImageIcon(VPXConstants.Icons.ICON_SHORTCUT_NAME, 12, 12));
+
+		jrb.setToolTipText("<html>Show Shortcuts<br>Press Ctrl + F2</html>");
+
+		jrb.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showShorcuts();
+
+			}
+		});
+
 		addRightComponent(lblProc);
 
 		addRightComponent(lblLAN);
@@ -133,12 +153,14 @@ public class VPX_StatusBar extends JPanel {
 			addRightComponent(progressBar);
 		}
 
-		//MemoryMonitor memMonitor = new MemoryMonitor();
+		addRightComponent(jrb);
 
-		//memMonitor.execute();
-		
+		// MemoryMonitor memMonitor = new MemoryMonitor();
+
+		// memMonitor.execute();
+
 		Thread th = new Thread(new MemMonitor());
-		
+
 		th.start();
 	}
 
@@ -162,6 +184,11 @@ public class VPX_StatusBar extends JPanel {
 
 		lblStatus.setText("");
 
+	}
+
+	public void showShorcuts() {
+
+		shortcuts.setVisible(true);
 	}
 
 	private void updateMemory() {
@@ -304,31 +331,27 @@ public class VPX_StatusBar extends JPanel {
 
 	}
 
-	
 	class MemMonitor implements Runnable {
 
 		@Override
 		public void run() {
 			while (isAppRunning) {
 
-				
 				try {
-				
-				updateMemory();
 
-				clearStatus();
+					updateMemory();
 
-				Thread.sleep(5000);
-				
-				
+					clearStatus();
+
+					Thread.sleep(5000);
+
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 			}
-			
+
 		}
-		
+
 	}
-	
 
 }

@@ -50,6 +50,12 @@ public class VPXUDPMonitor {
 
 	VPX_ETHWindow parent;
 
+	private int currentAdvPort = VPXUDPListener.DEFAULT_ADV_PORTNO;
+
+	private int currentCommPort = VPXUDPListener.DEFAULT_COMM_PORTNO;
+
+	private int currentMsgPort = VPXUDPListener.DEFAULT_CONSOLE_MSG_PORTNO;
+
 	private static VPXSubnetFilter subnet = null;
 
 	private boolean isipinRange = true;
@@ -164,14 +170,14 @@ public class VPXUDPMonitor {
 
 	private InetAddress inetAddressRecv = null;
 
-	public VPXUDPMonitor() throws Exception {
+	public VPXUDPMonitor() {
 
 		vpxSystem = VPXSessionManager.getVPXSystem();
 
 		createDefaultMonitors();
 	}
 
-	public VPXUDPMonitor(VPXUDPListener prent) throws Exception {
+	public VPXUDPMonitor(VPXUDPListener prent) {
 
 		this.listener = prent;
 
@@ -183,7 +189,25 @@ public class VPXUDPMonitor {
 
 	}
 
-	private void createDefaultMonitors() throws Exception {
+	public VPXUDPMonitor(VPXUDPListener prent, int[] ports) {
+
+		this.currentAdvPort = ports[0];
+
+		this.currentCommPort = ports[1];
+
+		this.currentMsgPort = ports[2];
+
+		this.listener = prent;
+
+		parent = ((VPX_ETHWindow) listener);
+
+		vpxSystem = VPXSessionManager.getVPXSystem();
+
+		createDefaultMonitors();
+
+	}
+
+	private void createDefaultMonitors() {
 
 		setInetAddress();
 
@@ -199,16 +223,9 @@ public class VPXUDPMonitor {
 
 		messageMonitor = new Thread(messageMonitorRunnable);
 
-		advMonitor.setPriority(10);
-
-		advMonitor.setDaemon(true);
-
-		commMonitor.setPriority(5);
-
-		messageMonitor.setPriority(5);
 	}
 
-	public void startMonitor() throws Exception {
+	public void startMonitor() {
 
 		if (listener != null) {
 
@@ -240,7 +257,7 @@ public class VPXUDPMonitor {
 
 	}
 
-	private void start() throws Exception {
+	private void start() {
 
 		advMonitor.start();
 
@@ -297,7 +314,7 @@ public class VPXUDPMonitor {
 
 			msg.params.flash_info.offset.set(page);
 
-			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, ip, currentCommPort, false);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -363,7 +380,7 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			send(buffer, VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO, true);
+			send(buffer, VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), currentCommPort, true);
 
 			P2020ATPCommand msg1 = new P2020ATPCommand();
 
@@ -381,7 +398,7 @@ public class VPXUDPMonitor {
 
 			msg1.periodicity.set(period);
 
-			send(buffer, VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), VPXUDPListener.COMM_PORTNO, true);
+			send(buffer, VPXUtilities.getCurrentInterfaceAddress().getBroadcast(), currentCommPort, true);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -416,7 +433,7 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, ip, currentCommPort, false);
 
 			VPXLogger.updateLog(String.format("Periodicity updated %s into %d seconds", ip, period));
 
@@ -465,7 +482,7 @@ public class VPXUDPMonitor {
 
 			msg.periodicity.set(period);
 
-			send(buffer, recvip, VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, recvip, currentCommPort, false);
 
 			VPXLogger.updateLog(String.format("Periodicity updated to %s into %d seconds", ip, period));
 
@@ -509,7 +526,7 @@ public class VPXUDPMonitor {
 
 			msg.command_msg.set(message);
 
-			send(buffer, ip, VPXUDPListener.CONSOLE_MSG_PORTNO, false);
+			send(buffer, ip, currentMsgPort, false);
 
 			VPXLogger.updateLog("Message sent to " + ip + " for core " + core);
 
@@ -522,7 +539,7 @@ public class VPXUDPMonitor {
 
 	public void sendMessageToProcessor(String ip, String msg) {
 
-		send(msg.getBytes(), ip, VPXUDPListener.CONSOLE_MSG_PORTNO, false);
+		send(msg.getBytes(), ip, currentMsgPort, false);
 
 	}
 
@@ -576,8 +593,6 @@ public class VPXUDPMonitor {
 			executionLoadingDialog.updateOverallProgress(currentFileIndex + 1);
 
 			currentbyteArray = e.getHexArray();
-
-			// System.out.println(currentbyteArray.length);
 
 			currentbyteTotalpckt = currentbyteArray.length / ATP.DEFAULTBUFFERSIZE;
 
@@ -676,7 +691,7 @@ public class VPXUDPMonitor {
 
 				msg.params.flash_info.currentpacket.set(currentPacket);
 
-				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+				send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 			}
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -709,7 +724,7 @@ public class VPXUDPMonitor {
 
 			msg.params.memoryinfo.core.set(core);
 
-			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -755,7 +770,7 @@ public class VPXUDPMonitor {
 
 			msg.params.memoryinfo.buffer[6].set((short) core7);
 
-			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -851,7 +866,7 @@ public class VPXUDPMonitor {
 
 			dialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
 
-			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -898,11 +913,11 @@ public class VPXUDPMonitor {
 			msg.params.TFTPInfo.ip.set(serverIP);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger
 					.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), VPXSessionManager.getCurrentIP(),
-							ip, "UDP", VPXUDPListener.COMM_PORTNO, buffer.length, new JLabel("Sending"), buffer));
+							ip, "UDP", currentCommPort, buffer.length, new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -971,7 +986,7 @@ public class VPXUDPMonitor {
 
 				msg.params.flash_info.currentpacket.set(currPacket);
 
-				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+				send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 			} catch (Exception e) {
 				VPXLogger.updateError(e);
@@ -1107,7 +1122,7 @@ public class VPXUDPMonitor {
 
 			this.memLoadDialog.updatePackets(size, tot, 0, sendBuffer.length, sendBuffer.length);
 
-			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -1171,7 +1186,7 @@ public class VPXUDPMonitor {
 
 				msg.params.flash_info.currentpacket.set(currPacket);
 
-				send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+				send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 			} catch (Exception e) {
 				VPXLogger.updateError(e);
@@ -1287,6 +1302,8 @@ public class VPXUDPMonitor {
 
 		} catch (Exception e) {
 
+		//	e.printStackTrace();
+
 			VPXLogger.updateError(e);
 
 			parent.updateNetworkError(ip.getHostAddress()
@@ -1319,7 +1336,7 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(ATP.MSG_TYPE_FLASH_INTERRUPTED);
 
-			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, ip, currentCommPort, false);
 
 			isFlashingStatred = false;
 
@@ -1366,7 +1383,7 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(ATP.MSG_TYPE_BIST);
 
-			send(buffer, InetAddress.getByName(ip), VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, InetAddress.getByName(ip), currentCommPort, false);
 
 			VPXLogger.updateLog(String.format("Built in Self Test is started for %s", ip));
 
@@ -1410,11 +1427,11 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.newvalue.set(newValue);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger
 					.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), VPXSessionManager.getCurrentIP(),
-							ip, "UDP", VPXUDPListener.COMM_PORTNO, buffer.length, new JLabel("Sending"), buffer));
+							ip, "UDP", currentCommPort, buffer.length, new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -1495,11 +1512,11 @@ public class VPXUDPMonitor {
 			}
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger
 					.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), VPXSessionManager.getCurrentIP(),
-							ip, "UDP", VPXUDPListener.COMM_PORTNO, buffer.length, new JLabel("Sending"), buffer));
+							ip, "UDP", currentCommPort, buffer.length, new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -1614,11 +1631,11 @@ public class VPXUDPMonitor {
 			}
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
-					InetAddress.getByName(filter.getProcessor()), VPXUDPListener.COMM_PORTNO);
+					InetAddress.getByName(filter.getProcessor()), currentCommPort);
 
 			VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0),
-					VPXSessionManager.getCurrentIP(), filter.getProcessor(), "UDP", VPXUDPListener.COMM_PORTNO,
-					buffer.length, new JLabel("Sending"), buffer));
+					VPXSessionManager.getCurrentIP(), filter.getProcessor(), "UDP", currentCommPort, buffer.length,
+					new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -1640,8 +1657,6 @@ public class VPXUDPMonitor {
 			int index = (int) msg.params.memoryinfo.memIndex.get();
 
 			byte[] b = new byte[msg.params.memoryinfo.buffer.length];
-
-			System.out.println();
 
 			for (int i = 0; i < b.length; i++) {
 
@@ -1808,7 +1823,7 @@ public class VPXUDPMonitor {
 					System.arraycopy(memoryBuff3, 0, bb, 0, (int) msg.params.memoryinfo.length.get());
 				}
 
-				parent.populateMemory(index, msg.params.memoryinfo.address.get(),
+				parent.populateMemory(ip, index, msg.params.memoryinfo.address.get(),
 						(int) msg.params.memoryinfo.stride.get(), bb);
 
 			}
@@ -1859,11 +1874,11 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.memIndex.set(filter.getMemoryBrowserID());
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
-					InetAddress.getByName(filter.getProcessor()), VPXUDPListener.COMM_PORTNO);
+					InetAddress.getByName(filter.getProcessor()), currentCommPort);
 
 			VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0),
-					VPXSessionManager.getCurrentIP(), filter.getProcessor(), "UDP", VPXUDPListener.COMM_PORTNO,
-					buffer.length, new JLabel("Sending"), buffer));
+					VPXSessionManager.getCurrentIP(), filter.getProcessor(), "UDP", currentCommPort, buffer.length,
+					new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -1919,11 +1934,11 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.memIndex.set(filter1.getMemoryBrowserID());
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
-					InetAddress.getByName(filter1.getProcessor()), VPXUDPListener.COMM_PORTNO);
+					InetAddress.getByName(filter1.getProcessor()), currentCommPort);
 
 			VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0),
-					VPXSessionManager.getCurrentIP(), filter1.getProcessor(), "UDP", VPXUDPListener.COMM_PORTNO,
-					buffer.length, new JLabel("Sending"), buffer));
+					VPXSessionManager.getCurrentIP(), filter1.getProcessor(), "UDP", currentCommPort, buffer.length,
+					new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -1964,11 +1979,11 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.memIndex.set(filter2.getMemoryBrowserID());
 
 			packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(filter2.getProcessor()),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0),
-					VPXSessionManager.getCurrentIP(), filter2.getProcessor(), "UDP", VPXUDPListener.COMM_PORTNO,
-					buffer.length, new JLabel("Sending"), buffer));
+					VPXSessionManager.getCurrentIP(), filter2.getProcessor(), "UDP", currentCommPort, buffer.length,
+					new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -2168,11 +2183,11 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.core.set(core);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger
 					.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), VPXSessionManager.getCurrentIP(),
-							ip, "UDP", VPXUDPListener.COMM_PORTNO, buffer.length, new JLabel("Sending"), buffer));
+							ip, "UDP", currentCommPort, buffer.length, new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -2207,11 +2222,11 @@ public class VPXUDPMonitor {
 			msg.msgType.set(ATP.MSG_TYPE_DATA_ANALYSISL_INTERRUPTED);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger
 					.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), VPXSessionManager.getCurrentIP(),
-							ip, "UDP", VPXUDPListener.COMM_PORTNO, buffer.length, new JLabel("Sending"), buffer));
+							ip, "UDP", currentCommPort, buffer.length, new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -2248,11 +2263,11 @@ public class VPXUDPMonitor {
 			msg.params.memoryinfo.core.set(core);
 
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ip),
-					VPXUDPListener.COMM_PORTNO);
+					currentCommPort);
 
 			VPXNetworkLogger
 					.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), VPXSessionManager.getCurrentIP(),
-							ip, "UDP", VPXUDPListener.COMM_PORTNO, buffer.length, new JLabel("Sending"), buffer));
+							ip, "UDP", currentCommPort, buffer.length, new JLabel("Sending"), buffer));
 
 			datagramSocket.send(packet);
 
@@ -2606,7 +2621,7 @@ public class VPXUDPMonitor {
 
 			msg.msgType.set(ATP.MSG_TYPE_CLOSE);
 
-			send(buffer, ip, VPXUDPListener.COMM_PORTNO, false);
+			send(buffer, ip, currentCommPort, false);
 
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
@@ -2671,6 +2686,8 @@ public class VPXUDPMonitor {
 			}
 		} catch (Exception e) {
 			VPXLogger.updateError(e);
+
+			e.printStackTrace();
 		}
 
 		parent.updateExit(-1);
@@ -2960,12 +2977,18 @@ public class VPXUDPMonitor {
 
 		DatagramPacket messagePacket = new DatagramPacket(messageData, messageData.length);
 
-		public VPXMessageConsoleMonitor() throws Exception {
+		public VPXMessageConsoleMonitor() {
 
-			if (inetAddressRecv != null)
-				messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO, inetAddressRecv);
-			else
-				messageReceiverSocket = new DatagramSocket(VPXUDPListener.CONSOLE_MSG_PORTNO);
+			try {
+
+				if (inetAddressRecv != null)
+					messageReceiverSocket = new DatagramSocket(currentMsgPort, inetAddressRecv);
+				else
+					messageReceiverSocket = new DatagramSocket(currentMsgPort);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+			}
 
 		}
 
@@ -2976,21 +2999,26 @@ public class VPXUDPMonitor {
 
 				try {
 
-					messageReceiverSocket.receive(messagePacket);
+					if (messageReceiverSocket != null && !messageReceiverSocket.isClosed()) {
 
-					String ip = messagePacket.getAddress().getHostAddress();
+						messageReceiverSocket.receive(messagePacket);
 
-					VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
-							VPXSessionManager.getCurrentIP(), "UDP", messageReceiverSocket.getLocalPort(),
-							messagePacket.getLength(), new JLabel("Recieved Message Packet"), messageData));
+						String ip = messagePacket.getAddress().getHostAddress();
 
-					parseMessagePacket(ip, createMSGCommand(ip, messageData));
+						VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
+								VPXSessionManager.getCurrentIP(), "UDP", messageReceiverSocket.getLocalPort(),
+								messagePacket.getLength(), new JLabel("Recieved Message Packet"), messageData));
 
-					Thread.sleep(15);
+						parseMessagePacket(ip, createMSGCommand(ip, messageData));
+
+						Thread.sleep(15);
+					}
 
 				} catch (Exception e) {
 
-					VPXLogger.updateError(e);
+					isRunning = false;
+
+					// VPXLogger.updateError(e);
 
 					e.printStackTrace();
 				}
@@ -3019,12 +3047,16 @@ public class VPXUDPMonitor {
 
 		DatagramPacket messagePacket = new DatagramPacket(commandData, commandData.length);
 
-		public VPXCommMonitor() throws Exception {
+		public VPXCommMonitor() {
+			try {
+				if (inetAddressRecv != null)
+					communicationSocket = new DatagramSocket(currentCommPort, inetAddressRecv);
+				else
+					communicationSocket = new DatagramSocket(currentCommPort);
+			} catch (Exception e) {
+				e.printStackTrace();
 
-			if (inetAddressRecv != null)
-				communicationSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO, inetAddressRecv);
-			else
-				communicationSocket = new DatagramSocket(VPXUDPListener.COMM_PORTNO);
+			}
 		}
 
 		@Override
@@ -3034,25 +3066,29 @@ public class VPXUDPMonitor {
 
 				try {
 
-					communicationSocket.receive(messagePacket);
+					if (communicationSocket != null && !communicationSocket.isClosed()) {
+						communicationSocket.receive(messagePacket);
 
-					String ip = messagePacket.getAddress().getHostAddress();
+						String ip = messagePacket.getAddress().getHostAddress();
 
-					VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
-							VPXSessionManager.getCurrentIP(), "UDP", communicationSocket.getLocalPort(),
-							messagePacket.getLength(), new JLabel("Recieved Communication Packet"), commandData));
+						VPXNetworkLogger.updatePacket(new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip,
+								VPXSessionManager.getCurrentIP(), "UDP", communicationSocket.getLocalPort(),
+								messagePacket.getLength(), new JLabel("Recieved Communication Packet"), commandData));
 
-					if (messagePacket.getLength() > 64)
+						if (messagePacket.getLength() > 64)
 
-						parseCommunicationPacket(ip, createATPCommand(ip, commandData));
-					else
-						parseCommunicationPacket(ip, createBISTCommand(ip, commandData));
+							parseCommunicationPacket(ip, createATPCommand(ip, commandData));
+						else
+							parseCommunicationPacket(ip, createBISTCommand(ip, commandData));
 
-					Thread.sleep(15);
+						Thread.sleep(15);
+					}
 
 				} catch (Exception e) {
 
-					VPXLogger.updateError(e);
+					isRunning = false;
+
+					// VPXLogger.updateError(e);
 
 					e.printStackTrace();
 				}
@@ -3086,9 +3122,9 @@ public class VPXUDPMonitor {
 			try {
 
 				if (inetAddressRecv != null)
-					advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO, inetAddressRecv);
+					advertisementSocket = new DatagramSocket(currentAdvPort, inetAddressRecv);
 				else
-					advertisementSocket = new DatagramSocket(VPXUDPListener.ADV_PORTNO);
+					advertisementSocket = new DatagramSocket(currentAdvPort);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -3104,23 +3140,29 @@ public class VPXUDPMonitor {
 				try {
 					isipinRange = true;
 
-					advertisementSocket.receive(advertisementPacket);
+					if (advertisementSocket != null && !advertisementSocket.isClosed()) {
 
-					ip = advertisementPacket.getAddress().getHostAddress();
+						advertisementSocket.receive(advertisementPacket);
 
-					VPXNetworkLogger.updatePacket(
-							new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip, VPXSessionManager.getCurrentIP(),
-									"UDP", advertisementSocket.getLocalPort(), advertisementPacket.getLength(),
-									new JLabel("Recieved Advertisement Packet"), advertisementData));
+						ip = advertisementPacket.getAddress().getHostAddress();
 
-					parseAdvertisementPacket(ip,
-							new String(advertisementPacket.getData(), 0, advertisementPacket.getLength()));
+						VPXNetworkLogger.updatePacket(
+								new VPXNWPacket(0, VPXUtilities.getCurrentTime(0), ip, VPXSessionManager.getCurrentIP(),
+										"UDP", advertisementSocket.getLocalPort(), advertisementPacket.getLength(),
+										new JLabel("Recieved Advertisement Packet"), advertisementData));
 
-					Thread.sleep(25);
+						parseAdvertisementPacket(ip,
+								new String(advertisementPacket.getData(), 0, advertisementPacket.getLength()));
+
+						Thread.sleep(25);
+					}
 
 				} catch (Exception e) {
-					VPXLogger.updateError(e);
-					e.printStackTrace();
+
+					isRunning = false;
+					// VPXLogger.updateError(e);
+					//e.printStackTrace();
+
 				}
 
 			}

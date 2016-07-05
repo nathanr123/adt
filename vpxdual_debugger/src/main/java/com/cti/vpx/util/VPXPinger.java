@@ -40,6 +40,6 @@ public class VPXPinger {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(VPXPinger.ping("172.17.1.28"));		
+		VPXPinger.ping("172.17.1.28");		
 	}
 }

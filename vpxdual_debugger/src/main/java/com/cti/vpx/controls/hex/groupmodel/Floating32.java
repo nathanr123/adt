@@ -29,7 +29,6 @@ package com.cti.vpx.controls.hex.groupmodel;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.nio.ByteOrder;
 import java.util.ResourceBundle;
 
@@ -70,7 +69,7 @@ public class Floating32 extends AbstractTableModel {
 	 */
 	private String[] byteStrVals;
 
-	private BigInteger bi;
+	//private BigInteger bi;
 
 	/**
 	 * Creates the model.

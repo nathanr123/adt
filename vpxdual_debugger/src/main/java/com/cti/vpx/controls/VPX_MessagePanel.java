@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -23,9 +24,11 @@ import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -33,6 +36,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -65,7 +69,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	 */
 	private static final long serialVersionUID = -1739175553026398101L;
 
-	private JTextField txt_Msg_Send;
+	private VPX_FilterComboBox cmb_Msg_Send;
 
 	private VPX_ETHWindow parent;
 
@@ -119,7 +123,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	Map<Integer, String> cmdHistory = new LinkedHashMap<Integer, String>();
 
-	VPX_ListCommands cmdLists = new VPX_ListCommands();
+	VPX_ListCommands cmdLists = null;
 
 	private int currentCommandIndex = -1;
 
@@ -127,25 +131,37 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	private JMenuItem vpxSendMsgContextMenu_SetCmdGo;
 
+	private JCheckBox chkStoreCommands;
+
+	private boolean isStoreCommands = false;
+
+	private JButton btn_Show_Cmd;
+
 	/**
 	 * Create the panel.
 	 */
-	public VPX_MessagePanel(VPX_ETHWindow parent) {
-
-		setBorder(new TitledBorder(null, "Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+	public VPX_MessagePanel(VPX_ETHWindow parent, boolean isStore) {
 
 		this.parent = parent;
 
+		this.isStoreCommands = isStore;
+
 		init();
+
+		cmdLists = new VPX_ListCommands();
 
 		loadComponents();
 
 		createContextMenus();
 
 		loadCoresFilter();
+
+		loadCommandStoreProperties();
 	}
 
 	private void init() {
+
+		setBorder(new TitledBorder(null, "Messages", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		loadMessageStyles();
 	}
@@ -158,7 +174,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				currentCommandIndex = currentCommandIndex - 1;
 
-				txt_Msg_Send.setText(cmdHistory.get(currentCommandIndex));
+				cmb_Msg_Send.setSelectedItem(cmdHistory.get(currentCommandIndex));
 			}
 
 		} else if (keyEvent == KeyEvent.VK_DOWN) {
@@ -167,7 +183,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				currentCommandIndex = currentCommandIndex + 1;
 
-				txt_Msg_Send.setText(cmdHistory.get(currentCommandIndex));
+				cmb_Msg_Send.setSelectedItem(cmdHistory.get(currentCommandIndex));
 			}
 
 		}
@@ -240,6 +256,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 				VPX_MessagePanel.this.btn_Msg_Send.doClick();
 
 				cmdLists.updateCommands(cmdHistory);
+
+				cmb_Msg_Send.setSelectedItem("");
 			}
 		});
 
@@ -269,7 +287,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		vpxSendMsgContextMenu.add(vpxSendMsgContextMenu_Clear);
 
 		vpxSendMsgContextMenu.add(VPXComponentFactory.createJSeparator());
-		
+
 		vpxSendMsgContextMenu.add(vpxSendMsgContextMenu_Cut);
 
 		vpxSendMsgContextMenu.add(vpxSendMsgContextMenu_Copy);
@@ -296,7 +314,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		if (isList) {
 
 			vpxSendMsgContextMenu_Clear.setEnabled(true);
-			
+
 			if (cmdHistory.size() > 0) {
 
 				vpxSendMsgContextMenu_Cut.setEnabled(false);
@@ -353,6 +371,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 	}
 
 	private void loadComponents() {
+
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel base_Panel = VPXComponentFactory.createJPanel();
@@ -379,11 +398,31 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		panel.add(btn_Msg_Send);
 
-		txt_Msg_Send = VPXComponentFactory.createJTextField();
+		btn_Show_Cmd = VPXComponentFactory.createJButton("", VPXConstants.Icons.ICON_SHOW_CMD, null);
 
-		txt_Msg_Send.setFont(VPXConstants.BISTRESULTFONT);
+		btn_Show_Cmd.addActionListener(new ActionListener() {
 
-		txt_Msg_Send.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				showCommands();
+
+			}
+		});
+
+		btn_Show_Cmd.setToolTipText("Show Command History");
+
+		btn_Show_Cmd.setPreferredSize(new Dimension(22, 22));
+
+		panel.add(btn_Show_Cmd, BorderLayout.EAST);
+
+		cmb_Msg_Send = new VPX_FilterComboBox();
+
+		cmb_Msg_Send.setEditable(true);
+
+		cmb_Msg_Send.setFont(VPXConstants.BISTRESULTFONT);
+
+		cmb_Msg_Send.addMouseWheelListener(new MouseWheelListener() {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -399,12 +438,34 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			}
 		});
 
-		txt_Msg_Send.addMouseListener(new MouseListener() {
+		final JTextField textfield = (JTextField) cmb_Msg_Send.getEditor().getEditorComponent();
+
+		curComp = textfield;
+
+		textfield.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+					sendMessage();
+
+					cmb_Msg_Send.hidePopup();
+
+				}
+			}
+		});
+
+		textfield.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+
+				curComp = (JTextField) cmb_Msg_Send.getEditor().getEditorComponent();
+
 				if (e.getButton() == 3) {
-					showPopupMenu(false, txt_Msg_Send, e.getX(), e.getY());
+					showPopupMenu(false, cmb_Msg_Send, e.getX(), e.getY());
 				}
 			}
 
@@ -429,7 +490,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			}
 		});
 
-		txt_Msg_Send.addKeyListener(new KeyListener() {
+		cmb_Msg_Send.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent arg0) {
@@ -439,7 +500,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			@Override
 			public void keyReleased(KeyEvent arg0) {
 
-				if (arg0.getKeyChar() == KeyEvent.VK_ENTER) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 
 					btn_Msg_Send.doClick();
 
@@ -457,9 +518,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			}
 		});
 
-		base_Panel.add(txt_Msg_Send, BorderLayout.CENTER);
-
-		txt_Msg_Send.setColumns(10);
+		base_Panel.add(cmb_Msg_Send, BorderLayout.CENTER);
 
 		JPanel message_Panel = VPXComponentFactory.createJPanel();
 
@@ -509,6 +568,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		scrl_User_Msg_Pane.setViewportView(txtP_User_Msg_Display);
 
 		controlsPanel = new JPanel();
+
 		add(controlsPanel, BorderLayout.NORTH);
 
 		FlowLayout fl_controlsPanel = (FlowLayout) controlsPanel.getLayout();
@@ -532,11 +592,24 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 					if (arg0.getStateChange() == ItemEvent.SELECTED) {
 
-						txt_Msg_Send.requestFocus();
+						cmb_Msg_Send.requestFocus();
 					}
 				}
 			}
 		});
+
+		chkStoreCommands = new JCheckBox("Save Commands");
+
+		chkStoreCommands.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				updateCommandStoreStatus();
+
+			}
+		});
+
+		controlsPanel.add(chkStoreCommands);
 
 		cmbCores.setPreferredSize(new Dimension(140, 22));
 
@@ -685,7 +758,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 				updateProcessorMessage(procs + " : \n", proc_From_Style);
 
-				updateProcessorMessage("  " + msg.command_msg + "\n\n", proc_Msg_Style);
+				updateProcessorMessage("  " + msg.command_msg.get() + "\n\n", proc_Msg_Style);
 
 			}
 
@@ -756,6 +829,12 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			JTextField jf = (JTextField) curComp;
 
 			jf.cut();
+		} else if (curComp instanceof VPX_FilterComboBox) {
+
+			JTextField jf = (JTextField) cmb_Msg_Send.getEditor().getEditorComponent();
+			;
+
+			jf.cut();
 		}
 	}
 
@@ -770,6 +849,9 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		} else if (curComp instanceof JTextArea) {
 
 			jf = (JTextArea) curComp;
+		} else if (curComp instanceof VPX_FilterComboBox) {
+
+			jf = (JTextField) cmb_Msg_Send.getEditor().getEditorComponent();
 		}
 
 		jf.copy();
@@ -783,7 +865,13 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			jf.paste();
 
+		} else if (curComp instanceof VPX_FilterComboBox) {
+
+			JTextField jf = (JTextField) cmb_Msg_Send.getEditor().getEditorComponent();
+
+			jf.paste();
 		}
+
 	}
 
 	private void doSetCommand() {
@@ -792,19 +880,35 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			JTextArea jf = (JTextArea) curComp;
 
-			txt_Msg_Send.setText(jf.getSelectedText());
+			cmb_Msg_Send.setSelectedItem(jf.getSelectedText());
 
 		}
 
 	}
 
+	private void doSetCommandByButton() {
+
+		cmb_Msg_Send.setSelectedItem(cmdLists.getSelectedText());
+
+	}
+
 	private void clearContents() {
 
-		txtP_Proc_Msg_Display.setText("");
+		if (curComp instanceof JTextField) {
 
-		txtP_User_Msg_Display.setText("");
+			txtP_Proc_Msg_Display.setText("");
 
-		txt_Msg_Send.setText("");
+			txtP_User_Msg_Display.setText("");
+
+			cmb_Msg_Send.setSelectedItem("");
+
+		} else if (curComp instanceof JTextArea) {
+
+			cmdLists.clearCommandsHistory();
+		}
+		
+		cmbCores.setSelectedIndex(0);
+
 	}
 
 	private void loadCoresFilter() {
@@ -868,6 +972,24 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	}
 
+	private void loadCommandStoreProperties() {
+
+		chkStoreCommands.setSelected(isStoreCommands);
+
+		loadCommandsFromFile();
+
+		currentCommandIndex = cmdHistory.size();
+
+	}
+
+	public void updateCommandStoreStatus() {
+
+		isStoreCommands = chkStoreCommands.isSelected();
+
+		VPXUtilities.updateProperties(VPXConstants.ResourceFields.MESSAGE_COMMAND, Boolean.toString(isStoreCommands));
+
+	}
+
 	public void showHelp() {
 
 		Thread th = new Thread(new Runnable() {
@@ -884,50 +1006,34 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 					VPXLogger.updateError(e);
 				}
 			}
-			/*
-			 * VPXLogger.updateLog("Help document opened");
-			 * 
-			 * final VPX_VLANConfig browserCanvas = new VPX_VLANConfig();
-			 * 
-			 * JPanel contentPane = new JPanel();
-			 * 
-			 * contentPane.setLayout(new BorderLayout());
-			 * 
-			 * contentPane.add(browserCanvas, BorderLayout.CENTER);
-			 * 
-			 * JDialog frame = new JDialog(parent, "List of commands");
-			 * 
-			 * frame.setBounds(100, 100, 650, 600);
-			 * 
-			 * frame.setLocationRelativeTo(parent);
-			 * 
-			 * frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			 * 
-			 * frame.setContentPane(contentPane);
-			 * 
-			 * frame.setResizable(true);
-			 * 
-			 * frame.addWindowListener(new WindowAdapter() {
-			 * 
-			 * @Override public void windowClosing(WindowEvent e) { // Dispose
-			 * of the // native // component cleanly browserCanvas.dispose(); }
-			 * });
-			 * 
-			 * frame.setVisible(true);
-			 * 
-			 * if (browserCanvas.initialise()) {
-			 * 
-			 * browserCanvas.setUrl(
-			 * VPXUtilities.getPathAsLinuxStandard(System.getProperty("user.dir"
-			 * )) + "/help/help.html"); } else { }
-			 * 
-			 * frame.setSize(651, 601);
-			 * 
-			 * }
-			 */
 		});
 
 		th.start();
+
+	}
+
+	public void loadCommandsFromFile() {
+
+		List<String> cmd = new ArrayList<String>();
+
+		cmd.add("");
+
+		String cmds = VPXUtilities.readFile(VPXSessionManager.getCurrentCommandFileName());
+
+		if (cmds != null) {
+
+			String[] cms = cmds.split(",");
+
+			for (int i = 0; i < cms.length; i++) {
+
+				if (cms[i].trim().length() > 0) {
+					cmdHistory.put(i, cms[i]);
+					cmd.add(cms[i]);
+				}
+			}
+
+			cmb_Msg_Send.addMemoryVariables(cmd);
+		}
 
 	}
 
@@ -937,6 +1043,10 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 			@Override
 			public void run() {
+
+				JTextField textfield = (JTextField) cmb_Msg_Send.getEditor().getEditorComponent();
+
+				curComp = textfield;
 
 				VPXLogger.updateLog("Command histroy opened");
 
@@ -956,6 +1066,124 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 	}
 
+	private boolean isCommandAvailable(String command) {
+
+		boolean isAvail = false;
+
+		String str = VPXUtilities.readFile(VPXSessionManager.getCurrentCommandFileName());
+
+		if (str != null)
+			isAvail = str.contains(command + ",");
+
+		return isAvail;
+	}
+
+	public void sendMessage() {
+		String str = cmb_Msg_Send.getSelectedItem().toString();
+
+		if (str.length() > 0) {
+
+			if (str.equalsIgnoreCase("ls") || str.equalsIgnoreCase("help") || str.equalsIgnoreCase("?")) {
+
+				if (str.equalsIgnoreCase("ls")) {
+
+					showCommands();
+
+				} else if (str.equalsIgnoreCase("help") || str.equalsIgnoreCase("?")) {
+
+					showHelp();
+				}
+
+				cmb_Msg_Send.setSelectedItem("");
+
+			} else if (VPXSessionManager.getCurrentProcessor().length() > 0) {
+
+				if (str.length() > 0 && str.length() <= 48) {
+
+					String[] s = str.split(" ");
+
+					if (s.length <= 5) {
+
+						if (VPXSessionManager.getCurrentProcType().contains("P2020")) {
+
+							if (!cmdHistory.containsValue(str)) {
+
+								cmdHistory.put(cmdHistory.size(), str);
+
+								cmb_Msg_Send.updateMemoryVariables(cmdHistory);
+
+							}
+							if (isStoreCommands) {
+
+								if (!isCommandAvailable(str))
+									VPXUtilities.updateToCommandFile(VPXSessionManager.getCurrentCommandFileName(),
+											str.trim());
+							}
+							parent.sendMessage(VPXSessionManager.getCurrentProcessor(), cmbCores.getSelectedIndex(),
+									cmb_Msg_Send.getSelectedItem().toString());
+
+							updateUserMessage(cmb_Msg_Send.getSelectedItem().toString());
+
+							cmb_Msg_Send.setSelectedItem("");
+
+						} else {
+
+							if (cmbCores.getSelectedIndex() > 0) {
+
+								if (!cmdHistory.containsValue(str)) {
+
+									cmdHistory.put(cmdHistory.size(), str);
+
+									cmb_Msg_Send.updateMemoryVariables(cmdHistory);
+
+								}
+								if (isStoreCommands) {
+
+									if (!isCommandAvailable(str))
+										VPXUtilities.updateToCommandFile(VPXSessionManager.getCurrentCommandFileName(),
+												str.trim());
+								}
+
+								parent.sendMessage(VPXSessionManager.getCurrentProcessor(),
+										cmbCores.getSelectedIndex() - 1, cmb_Msg_Send.getSelectedItem().toString());
+
+								updateUserMessage(cmb_Msg_Send.getSelectedItem().toString());
+
+								cmb_Msg_Send.setSelectedItem("");
+							} else {
+								JOptionPane.showMessageDialog(parent, "Please select any one core", "Message",
+										JOptionPane.ERROR_MESSAGE);
+
+								cmb_Msg_Send.requestFocus();
+							}
+						}
+
+					} else {
+						JOptionPane.showMessageDialog(parent, "invalid Arguments", "Message",
+								JOptionPane.ERROR_MESSAGE);
+
+						cmb_Msg_Send.requestFocus();
+					}
+
+				} else {
+					JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
+							JOptionPane.ERROR_MESSAGE);
+
+					cmb_Msg_Send.requestFocus();
+				}
+			} else {
+
+				JOptionPane.showMessageDialog(parent, "No processor is selected.Please select any one processor",
+						"Processor Selection", JOptionPane.ERROR_MESSAGE);
+				cmb_Msg_Send.requestFocus();
+			}
+
+			currentCommandIndex = cmdHistory.size();
+
+			cmb_Msg_Send.setSelectedItem("");
+		}
+	}
+
 	class SendMsgAction extends AbstractAction {
 
 		/**
@@ -971,80 +1199,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			String str = txt_Msg_Send.getText();
-
-			cmdHistory.put(cmdHistory.size(), str);
-
-			currentCommandIndex = cmdHistory.size();
-
-			if (str.equalsIgnoreCase("ls") || str.equalsIgnoreCase("help") || str.equalsIgnoreCase("?")) {
-
-				if (str.equalsIgnoreCase("ls")) {
-
-					showCommands();
-
-				} else if (str.equalsIgnoreCase("help") || str.equalsIgnoreCase("?")) {
-
-					showHelp();
-				}
-
-				txt_Msg_Send.setText("");
-
-			} else if (VPXSessionManager.getCurrentProcessor().length() > 0) {
-
-				if (str.length() > 0 && str.length() <= 48) {
-
-					String[] s = str.split(" ");
-
-					if (s.length <= 5) {
-
-						if (VPXSessionManager.getCurrentProcType().contains("P2020")) {
-
-							parent.sendMessage(VPXSessionManager.getCurrentProcessor(), cmbCores.getSelectedIndex(),
-									txt_Msg_Send.getText());
-
-							updateUserMessage(txt_Msg_Send.getText());
-
-							txt_Msg_Send.setText("");
-
-						} else {
-
-							if (cmbCores.getSelectedIndex() > 0) {
-
-								parent.sendMessage(VPXSessionManager.getCurrentProcessor(),
-										cmbCores.getSelectedIndex() - 1, txt_Msg_Send.getText());
-
-								updateUserMessage(txt_Msg_Send.getText());
-
-								txt_Msg_Send.setText("");
-							} else {
-								JOptionPane.showMessageDialog(parent, "Please select any one core", "Message",
-										JOptionPane.ERROR_MESSAGE);
-
-								txt_Msg_Send.requestFocus();
-							}
-						}
-
-					} else {
-						JOptionPane.showMessageDialog(parent, "invalid Arguments", "Message",
-								JOptionPane.ERROR_MESSAGE);
-
-						txt_Msg_Send.requestFocus();
-					}
-
-				} else {
-					JOptionPane.showMessageDialog(parent, "Message length is not valid", "Message",
-							JOptionPane.ERROR_MESSAGE);
-
-					txt_Msg_Send.requestFocus();
-				}
-			} else {
-
-				JOptionPane.showMessageDialog(parent, "No processor is selected.Please select any one processor",
-						"Processor Selection", JOptionPane.ERROR_MESSAGE);
-				txt_Msg_Send.requestFocus();
-			}
-
+			sendMessage();
 		}
 	}
 
@@ -1129,13 +1284,15 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 
 		Map<Integer, String> cmds;
 
-		private JTextArea txtALstCmd;
+		public JTextArea txtALstCmd;
 
 		/**
 		 * Create the dialog.
 		 */
 
 		public VPX_ListCommands() {
+
+			super(parent);
 
 			init();
 
@@ -1153,6 +1310,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 			getContentPane().setLayout(new BorderLayout());
+
+			setResizable(false);
 
 		}
 
@@ -1210,6 +1369,82 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			
+			JButton btnCmdCopyClipboard = new JButton("Copy");
+
+			btnCmdCopyClipboard.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+
+					String str = cmdLists.getSelectedText();
+
+					if (str != null) {
+						
+						if (str.length() > 0) {
+
+							setClipboardContents(str);
+						}
+					}
+				}
+			});
+
+			buttonPane.add(btnCmdCopyClipboard);
+
+			JButton btnCmdCopy = new JButton("Copy Command");
+
+			btnCmdCopy.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+
+					String str = cmdLists.getSelectedText();
+
+					if (str != null) {
+						if (str.length() > 0) {
+
+							doSetCommandByButton();
+						}
+					}
+				}
+			});
+
+			buttonPane.add(btnCmdCopy);
+
+			JButton btnCmdCopySend = new JButton("Copy Command & Send");
+
+			btnCmdCopySend.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+
+					String str = cmdLists.getSelectedText();
+
+					if (str != null) {
+						if (str.length() > 0) {
+
+							doSetCommandByButton();
+
+							VPX_MessagePanel.this.btn_Msg_Send.doClick();
+
+							cmdLists.updateCommands(cmdHistory);
+
+							cmb_Msg_Send.setSelectedItem("");
+						}
+					}
+				}
+			});
+
+			buttonPane.add(btnCmdCopySend);
+
+			JButton btnClear = new JButton("Clear History");
+
+			btnClear.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+
+					clearCommandsHistory();
+				}
+			});
+
+			buttonPane.add(btnClear);
 
 			JButton btnClose = new JButton("Close");
 
@@ -1224,6 +1459,23 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			btnClose.setActionCommand("Cancel");
 
 			buttonPane.add(btnClose);
+
+		}
+
+		private void clearCommandsHistory() {
+
+			VPXUtilities.deleteFile(VPXSessionManager.getCurrentCommandFileName(), false);
+
+			cmdHistory.clear();
+
+			currentCommandIndex = -1;
+
+			updateCommands(cmdHistory);
+		}
+
+		public String getSelectedText() {
+
+			return txtALstCmd.getSelectedText();
 
 		}
 

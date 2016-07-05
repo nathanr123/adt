@@ -583,7 +583,6 @@ public class VPXTFTPMonitor implements Runnable {
 							
 							progressFileSent.updatePackets(block);
 							
-							//System.out.println(block);
 							// send the next block
 							block++;
 
@@ -848,14 +847,12 @@ public class VPXTFTPMonitor implements Runnable {
 
 	public static void main(String[] args) throws Exception {
 
-		VPXTFTPMonitor ts = new VPXTFTPMonitor(new File("D:/tftp"), VPXTFTPMonitor.ServerMode.GET_ONLY);
-		ts.setSocketTimeout(2000);
+		VPXTFTPMonitor ts = new VPXTFTPMonitor(new File("E:/tftp"), VPXTFTPMonitor.ServerMode.GET_ONLY);
+		ts.setSocketTimeout(30000);
 
-		System.out.println("TFTP Server running.  Press enter to stop.");
 		new InputStreamReader(System.in).read();
 
 		ts.shutdown();
-		System.out.println("Server shut down.");
 		System.exit(0);
 	}
 }

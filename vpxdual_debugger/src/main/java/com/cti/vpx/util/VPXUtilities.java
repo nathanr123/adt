@@ -31,6 +31,7 @@ import java.net.NetworkInterface;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +72,7 @@ import com.cti.vpx.command.ATPCommand;
 import com.cti.vpx.command.DSPATPCommand;
 import com.cti.vpx.command.P2020ATPCommand;
 import com.cti.vpx.controls.hex.HexEditor;
+import com.cti.vpx.listener.VPXUDPListener;
 import com.cti.vpx.model.NWInterface;
 import com.cti.vpx.model.VPX.PROCESSOR_LIST;
 import com.cti.vpx.model.VPXSubSystem;
@@ -626,6 +628,8 @@ public class VPXUtilities {
 
 			prop.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY, String.valueOf(true));
 
+			prop.setProperty(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG, String.valueOf(true));
+
 			prop.setProperty(VPXConstants.ResourceFields.SECURITY_PWD, encodePassword("cornet"));
 			// Log Tab Settings
 
@@ -647,6 +651,19 @@ public class VPXUtilities {
 			prop.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME, String.valueOf(true));
 
 			prop.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(false));
+
+			prop.setProperty(VPXConstants.ResourceFields.MESSAGE_COMMAND, String.valueOf(true));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_ADV,
+					String.format("%d", VPXUDPListener.DEFAULT_ADV_PORTNO));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_COMM,
+					String.format("%d", VPXUDPListener.DEFAULT_COMM_PORTNO));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_MSG,
+					String.format("%d", VPXUDPListener.DEFAULT_CONSOLE_MSG_PORTNO));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER, String.valueOf(true));
 
 			prop.setProperty(VPXConstants.ResourceFields.FILTER_SUBNET, "");
 
@@ -716,7 +733,7 @@ public class VPXUtilities {
 		return resourceBundle.getString(key);
 	}
 
-	public static void updateProperties(Properties prop) {
+	public static boolean updateProperties(Properties prop) {
 		try {
 			props = (Properties) prop.clone();
 
@@ -725,8 +742,13 @@ public class VPXUtilities {
 			prop.store(out, null);
 
 			out.close();
+
+			return true;
 		} catch (Exception e) {
+
 			e.printStackTrace();
+
+			return false;
 		}
 
 	}
@@ -940,28 +962,117 @@ public class VPXUtilities {
 		}
 	}
 
-	/**
-	 * Use FileWriter when number of write operations are less
-	 * 
-	 * @param filePath
-	 * @param text
-	 * @param noOfLines
-	 */
-	public static void updateToFile(String filePath, String text) {
+	private static void setLogFileName() {
+
+		String curTime = VPXUtilities.getCurrentTime(3);
+
+		String flnmae = VPXUtilities
+				.getPathAsLinuxStandard(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_FILEPATH));
+
+		if (!flnmae.endsWith(".log")) {
+
+			if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+
+				flnmae = flnmae + "_" + curTime + ".log";
+			} else {
+				flnmae += ".log";
+			}
+
+		} else {
+			if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_APPENDCURTIME))) {
+
+				flnmae = flnmae.substring(0, flnmae.length() - 4);
+
+				flnmae = flnmae + "_" + curTime + ".log";
+			}
+
+		}
+
+		if (VPXSessionManager.getCurrentMode() == VPXConstants.UARTMODE) {
+
+			flnmae = "UART_" + flnmae;
+		}
+
+		VPXSessionManager.setCurrentLogFileName(flnmae);
+
+		VPXUtilities.setEnableLog(true);
+	}
+
+	private static boolean isFileSizeValid(File f) {
+
+		if (f.exists() && Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_MAXFILE))) {
+
+			long fileSize = FileUtils.sizeOf(f);
+
+			int fileMaxSize = Integer.valueOf(
+					VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.LOG_MAXFILESIZE)) * VPXConstants.MB;
+
+			return fileSize < fileMaxSize;
+		} else
+			return true;
+
+	}
+
+	public static void updateToCommandFile(String filePath, String text) {
+
 		File file = new File(filePath);
+
 		BufferedWriter fr = null;
+
 		try {
-			// Below constructor argument decides whether to append or override
+
 			fr = new BufferedWriter(new FileWriter(file, true));
+
+			fr.write(text + ",");
+
+			// fr.newLine();
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		} finally {
+
+			try {
+
+				fr.close();
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void updateToFile(String filePath, String text) {
+
+		File file = new File(filePath);
+
+		if (!isFileSizeValid(file))
+			setLogFileName();
+
+		BufferedWriter fr = null;
+
+		try {
+
+			fr = new BufferedWriter(new FileWriter(file, true));
+
 			fr.write(text);
+
 			fr.newLine();
 
 		} catch (IOException e) {
+
 			e.printStackTrace();
+
 		} finally {
+
 			try {
+
 				fr.close();
+
 			} catch (IOException e) {
+
 				e.printStackTrace();
 			}
 		}
@@ -1337,7 +1448,7 @@ public class VPXUtilities {
 
 						+ "\" static " + ip + " " + subnet + " " + gateway + " 1";
 
-				Process pp = Runtime.getRuntime().exec(cmd);
+				Runtime.getRuntime().exec(cmd);
 
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
@@ -1345,11 +1456,11 @@ public class VPXUtilities {
 
 				String cmd = String.format("sudo ifconfig %s %s netmask %s up", lan, ip, subnet);
 
-				Process pp = VPXLinuxCommand.runFromRoot(cmd, password);
+				VPXLinuxCommand.runFromRoot(cmd, password);
 
 				cmd = String.format("sudo ip route replace default via %s", gateway);
 
-				pp = VPXLinuxCommand.runFromRoot(cmd, password);
+				VPXLinuxCommand.runFromRoot(cmd, password);
 
 			}
 
@@ -1362,6 +1473,41 @@ public class VPXUtilities {
 			return false;
 		}
 
+	}
+
+	public static boolean isDHCPEnabled(String nwIface) {
+
+		boolean ret = false;
+
+		try {
+
+			String s = "";
+
+			Process p = Runtime.getRuntime().exec(VPXConstants.WIN_CMD_BASE_DHCB + " \"" + nwIface + "\"");
+
+			BufferedReader inputStream = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			// reading output stream of the command
+			while ((s = inputStream.readLine()) != null) {
+
+				if (s.contains("DHCP")) {
+
+					if (s.split(":")[1].trim().toLowerCase().equals("yes")) {
+
+						ret = true;
+
+						break;
+					}
+				}
+			}
+
+		} catch (Exception e) {
+
+			ret = false;
+
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	public static NWInterface getEthernetPort(String name) {
@@ -1440,10 +1586,13 @@ public class VPXUtilities {
 						}
 						j = -1;
 						break;
+
 					}
 
 					j++;
 				}
+
+				nw.setDHCPEnabled(isDHCPEnabled(nw.getName()));
 
 			} else if (os.startsWith(VPXConstants.LINUX_OSNAME)) {
 
@@ -1584,9 +1733,6 @@ public class VPXUtilities {
 					VPXLogger.updateLog(s);
 
 				}
-
-				// System.out.println("Exit Code : "+p.exitValue());
-
 				// delete run.bat, and other extra files
 
 				deleteDeploymentFiles(System.getProperty("user.dir") + "/execute/bootimage.bin",
@@ -1643,8 +1789,6 @@ public class VPXUtilities {
 					VPXLogger.updateLog(sErr);
 
 				}
-
-				// System.out.println("Exit Code : "+p.exitValue());
 
 				// delete run.bat, and other extra files
 
@@ -1717,6 +1861,9 @@ public class VPXUtilities {
 					Files.readAllBytes(Paths.get(URI.create("file:///" + getPathAsLinuxStandard(filename)))));
 
 			return content;
+
+		} catch (NoSuchFileException e) {
+			return null;
 
 		} catch (Exception e) {
 
@@ -2030,40 +2177,40 @@ public class VPXUtilities {
 
 	}
 
-	private static long convertIntoLong(String str) {
-
-		String val = String.format("%08X", Float.floatToIntBits(Float.parseFloat(str)));
-
-		byte[] bArr = new byte[4];
-
-		bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
-
-		bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
-
-		bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
-
-		bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
-
-		long s = bytesToLong(bArr);
-
-		return s;
-
-	}
-
-	private static long bytesToLong(byte[] b) {
-
-		long result = 0;
-
-		for (int i = 0; i < 4; i++) {
-
-			result <<= 8;
-
-			result |= (b[i] & 0xFF);
-		}
-
-		return result;
-	}
-
+	/*
+	 * private static long convertIntoLong(String str) {
+	 * 
+	 * String val = String.format("%08X",
+	 * Float.floatToIntBits(Float.parseFloat(str)));
+	 * 
+	 * byte[] bArr = new byte[4];
+	 * 
+	 * bArr[0] = (byte) Integer.parseInt(val.substring(0, 2), 16);
+	 * 
+	 * bArr[1] = (byte) Integer.parseInt(val.substring(2, 4), 16);
+	 * 
+	 * bArr[2] = (byte) Integer.parseInt(val.substring(4, 6), 16);
+	 * 
+	 * bArr[3] = (byte) Integer.parseInt(val.substring(6, 8), 16);
+	 * 
+	 * long s = bytesToLong(bArr);
+	 * 
+	 * return s;
+	 * 
+	 * }
+	 * 
+	 * private static long bytesToLong(byte[] b) {
+	 * 
+	 * long result = 0;
+	 * 
+	 * for (int i = 0; i < 4; i++) {
+	 * 
+	 * result <<= 8;
+	 * 
+	 * result |= (b[i] & 0xFF); }
+	 * 
+	 * return result; }
+	 */
 	public static void writeFile(String filename, String content) {
 		try {
 
@@ -2112,6 +2259,44 @@ public class VPXUtilities {
 			return false;
 		}
 
+	}
+
+	public static int[] getAllPorts() {
+
+		int[] retVal = new int[3];
+
+		retVal[0] = getPortNumber(getPropertyValue(VPXConstants.ResourceFields.NETWORK_PORT_ADV),
+				VPXUDPListener.DEFAULT_ADV_PORTNO);
+
+		retVal[1] = getPortNumber(getPropertyValue(VPXConstants.ResourceFields.NETWORK_PORT_COMM),
+				VPXUDPListener.DEFAULT_COMM_PORTNO);
+
+		retVal[2] = getPortNumber(getPropertyValue(VPXConstants.ResourceFields.NETWORK_PORT_MSG),
+				VPXUDPListener.DEFAULT_CONSOLE_MSG_PORTNO);
+
+		return retVal;
+	}
+
+	private static int getPortNumber(String value, int defaultPort) {
+
+		int ret = defaultPort;
+
+		try {
+
+			if (value != null) {
+
+				if (value.length() > 0) {
+
+					ret = Integer.valueOf(value);
+				}
+			}
+
+		} catch (Exception e) {
+
+			ret = defaultPort;
+		}
+
+		return ret;
 	}
 
 	public static boolean isFileNameValid(String fileName) {
@@ -2208,6 +2393,50 @@ public class VPXUtilities {
 				cmd = String.format("rm -rf %s %s", deployFile, cfgFile);
 			} else {
 				cmd = String.format("rm -rf %s %s", deployFile, cfgFile);
+			}
+
+		}
+
+		String s = null;
+
+		try {
+
+			Process proc = Runtime.getRuntime().exec(cmd);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+			while ((s = stdInput.readLine()) != null) {
+				VPXLogger.updateLog(s);
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
+
+	public static void deleteFile(String fileName, boolean isdirectory) {
+
+		String cmd = "";
+
+		String os = System.getProperty("os.name");
+
+		if (os.startsWith(VPXConstants.WIN_OSNAME)) {
+
+			if (isdirectory) {
+				cmd = String.format("cmd /c rmdir /S /Q %s", fileName);
+			} else {
+				cmd = String.format("cmd /c del /F %s", fileName.replaceAll("/", "\\\\"));
+			}
+		} else {
+
+			if (isdirectory) {
+
+				// setPermission(deployFile);
+
+				cmd = String.format("rm -rf %s", fileName);
+			} else {
+				cmd = String.format("rm -rf %s", fileName);
 			}
 
 		}

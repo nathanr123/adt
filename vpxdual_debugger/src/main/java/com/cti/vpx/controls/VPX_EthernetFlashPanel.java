@@ -189,12 +189,6 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 				if (VPXUtilities.isFileValid(txtBinFilePath.getText().trim())) {
 
-					VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(VPX_EthernetFlashPanel.this);
-
-					dialog.setLoadingTFTPFileProcess(new File(txtBinFilePath.getText().trim()).getName());
-
-					dialog.setVisible(true);
-
 					if (flashIP.length() == 0) {
 
 						flashIP = cmbFlshProcessors.getSelectedItem().toString();
@@ -202,44 +196,55 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 					if (currentType == PROCESSOR_LIST.PROCESSOR_P2020) {
 
-						Thread t = new Thread(new Runnable() {
+						if (cmbOffset.getSelectedItem().toString().equals("UBoot")) {
 
-							@Override
-							public void run() {
-								try {
+							int option = JOptionPane.showConfirmDialog(VPX_EthernetFlashPanel.this,
+									"Please make sure the following till flashing completes\n"
+											+ "1. Do not turnoff the board\n"
+											+ "2. LAN connection should be remain connected\n"
+											+ "Do you want to continue?",
+									"Confirmation", JOptionPane.YES_NO_OPTION);
 
-									if (!FileUtils.directoryContains(new File(VPXSessionManager.getWorkspacePath()),
-											new File(VPXUtilities
-													.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_TFTP)))) {
+							if (option == JOptionPane.YES_OPTION) {
 
-										FileUtils.forceMkdir(new File(VPXSessionManager.getTFTPPath()));
+								VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(
+										VPX_EthernetFlashPanel.this);
 
-									}
+								dialog.setLoadingTFTPFileProcess(new File(txtBinFilePath.getText().trim()).getName());
 
-									FileUtils.copyFileToDirectory(new File(txtBinFilePath.getText().trim()),
-											new File(VPXSessionManager.getTFTPPath()));
+								dialog.setTitle(
+										"Flashing " + (new File(txtBinFilePath.getText().trim()).getName()) + " file");
 
-									dialog.setIndeterminate(false);
+								dialog.setVisible(true);
 
-								} catch (IOException e1) {
-
-									e1.printStackTrace();
-								}
-
-								parent.sendTFTPFile(flashIP, txtBinFilePath.getText(), dialog,
-										cmbOffset.getSelectedIndex());
-
+								startP2020Flash(dialog);
 							}
-						});
 
-						t.start();
+						} else {
+
+							VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(VPX_EthernetFlashPanel.this);
+
+							dialog.setLoadingTFTPFileProcess(new File(txtBinFilePath.getText().trim()).getName());
+
+							dialog.setTitle(
+									"Flashing " + (new File(txtBinFilePath.getText().trim()).getName()) + " file");
+
+							dialog.setVisible(true);
+							
+							startP2020Flash(dialog);
+						}
 
 					} else {
 
-						dialog.setIndeterminate(false);
+						VPX_FlashProgressWindow dialog = new VPX_FlashProgressWindow(VPX_EthernetFlashPanel.this);
 
-						parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(),
-								cmbOffset.getSelectedIndex());
+						dialog.setLoadingTFTPFileProcess(new File(txtBinFilePath.getText().trim()).getName());
+
+						dialog.setTitle("Flashing " + (new File(txtBinFilePath.getText().trim()).getName()) + " file");
+
+						dialog.setVisible(true);
+
+						startDSPFlash(dialog);
 					}
 
 				} else {
@@ -328,6 +333,49 @@ public class VPX_EthernetFlashPanel extends JPanel {
 		JLabel lblProcessor = new JLabel("Processor");
 
 		flashOptionPanel.add(lblProcessor, "cell 0 1,growx,aligny center");
+	}
+
+	private void startDSPFlash(VPX_FlashProgressWindow dialog) {
+
+		dialog.setIndeterminate(false);
+
+		parent.sendFile(flashIP, txtBinFilePath.getText(), dialog, cmbFlshDevice.getSelectedIndex(),
+				cmbOffset.getSelectedIndex());
+	}
+
+	private void startP2020Flash(VPX_FlashProgressWindow dialog) {
+
+		dialog.setTitle("Flashing " + (new File(txtBinFilePath.getText().trim()).getName()) + " file");
+
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+
+					if (!FileUtils.directoryContains(new File(VPXSessionManager.getWorkspacePath()),
+							new File(VPXUtilities.getString(VPXConstants.ResourceFields.FOLDER_WORKSPACE_TFTP)))) {
+
+						FileUtils.forceMkdir(new File(VPXSessionManager.getTFTPPath()));
+
+					}
+
+					FileUtils.copyFileToDirectory(new File(txtBinFilePath.getText().trim()),
+							new File(VPXSessionManager.getTFTPPath()));
+
+					dialog.setIndeterminate(false);
+
+				} catch (IOException e1) {
+
+					e1.printStackTrace();
+				}
+
+				parent.sendTFTPFile(flashIP, txtBinFilePath.getText(), dialog, cmbOffset.getSelectedIndex());
+
+			}
+		});
+
+		t.start();
 	}
 
 	public void setProcessorDetail(String ip) {
@@ -596,7 +644,9 @@ public class VPX_EthernetFlashPanel extends JPanel {
 
 			}
 
-			int returnVal = fileDialog.showOpenDialog(null);
+			fileDialog.setCurrentDirectory(new File(VPXSessionManager.getBinPath()));
+
+			int returnVal = fileDialog.showOpenDialog(VPX_EthernetFlashPanel.this);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 

@@ -9,6 +9,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Properties;
@@ -31,9 +33,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.cti.vpx.listener.VPXUDPListener;
 import com.cti.vpx.util.VPXConstants;
 import com.cti.vpx.util.VPXLogger;
 import com.cti.vpx.util.VPXUtilities;
+
+import net.miginfocom.swing.MigLayout;
 
 public class VPX_PreferenceWindow extends JDialog {
 
@@ -41,6 +48,18 @@ public class VPX_PreferenceWindow extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = -999389272992924693L;
+
+	private static final String PORTNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Advertisement port is receive advertisement packets through Adv. port.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RX Tx port is receive RxTx packets through Comm port.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Messaging port is receive message packets through Msg port.<p><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Please ensure board side also using same ports</u></b></font></p></left></body></html>";
+
+	private static String ADVNOTE = "<html><body><b>Note:</b><br><left><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Advertisement port is receive advertisement packets through Adv. port.</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RX Tx port is receive RxTx packets through Comm port.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Messaging port is receive message packets through Msg port.<p><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Please ensure board side also using same ports</u></b></font></p></left></body></html>";
+
+	private static String COMMNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Advertisement port is receive advertisement packets through Adv. port.<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RX Tx port is receive RxTx packets through Comm port.</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Messaging port is receive message packets through Msg port.<p><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Please ensure board side also using same ports</u></b></font></p></left></body></html>";
+
+	private static String MSGNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Advertisement port is receive advertisement packets through Adv. port.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RX Tx port is receive RxTx packets through Comm port.<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Messaging port is receive message packets through Msg port.</b><p><font color='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Please ensure board side also using same ports</u></b></font></p></left></body></html>";
+
+	private static final String NETWORKNOTE = "<html><body><b>Note:</b><br><left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Showing network packet capturing tab.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It keeps the packets send or receive</left></html>";
+
+	private VPX_PasswordWindow paswordWindow = new VPX_PasswordWindow();
 
 	private final JPanel basePanel = new JPanel();
 
@@ -51,6 +70,8 @@ public class VPX_PreferenceWindow extends JDialog {
 	private JTextField txtLogFilePath;
 
 	private Properties preferenceProperties;
+
+	private Properties preferenceProperties_Backup;
 
 	private final JFileChooser fileDialog = new JFileChooser();
 
@@ -83,6 +104,20 @@ public class VPX_PreferenceWindow extends JDialog {
 	private JLabel lblJVMArch;
 
 	private JLabel lblErrLogPath;
+
+	private JTextField txtAdvPort;
+
+	private JTextField txtTxRxCommPort;
+
+	private JTextField txtMsgConPort;
+
+	private JCheckBox chkNWPktAnalyzer;
+
+	private JLabel lblNWNote;
+
+	private JLabel lblNote;
+
+	private JCheckBox chkShowAliasCheck;
 
 	/**
 	 * Launch the application.
@@ -122,7 +157,7 @@ public class VPX_PreferenceWindow extends JDialog {
 		setModal(true);
 
 		setResizable(false);
-		
+
 		setIconImage(VPXConstants.Icons.ICON_SETTINGS.getImage());
 
 		fileDialog.setAcceptAllFileFilterUsed(false);
@@ -130,11 +165,18 @@ public class VPX_PreferenceWindow extends JDialog {
 
 	public void showPreferenceWindow() {
 
-		preferenceProperties = VPXUtilities.readProperties();
+		readProperties();
 
 		loadProperties();
 
 		setVisible(true);
+	}
+
+	private void readProperties() {
+
+		preferenceProperties = VPXUtilities.readProperties();
+
+		preferenceProperties_Backup = (Properties) preferenceProperties.clone();
 	}
 
 	private void loadPropertiesTab() {
@@ -142,6 +184,8 @@ public class VPX_PreferenceWindow extends JDialog {
 		loadGeneralPropertiesPanel();
 
 		loadLogPropertiesPanel();
+
+		loadNetworkPropertiesPanel();
 
 		loadJavaPropertiesPanel();
 	}
@@ -151,6 +195,8 @@ public class VPX_PreferenceWindow extends JDialog {
 		loadGeneralProperties(false);
 
 		loadLogProperties(false);
+
+		loadNWProperties(false);
 
 		loadJavaProperties();
 	}
@@ -163,7 +209,9 @@ public class VPX_PreferenceWindow extends JDialog {
 		case 1:
 			loadLogProperties(isRestore);
 			break;
-
+		case 2:
+			loadNWProperties(isRestore);
+			break;
 		case 3:
 			loadJavaProperties();
 			break;
@@ -171,28 +219,71 @@ public class VPX_PreferenceWindow extends JDialog {
 	}
 
 	private void loadGeneralProperties(boolean isRestore) {
+
 		boolean splash = true;
 
 		boolean memory = true;
+
+		boolean askAlias = true;
 
 		if (!isRestore) {
 
 			splash = Boolean.valueOf(preferenceProperties.getProperty(VPXConstants.ResourceFields.GENERAL_SPLASH));
 
 			memory = Boolean.valueOf(preferenceProperties.getProperty(VPXConstants.ResourceFields.GENERAL_MEMORY));
+
+			askAlias = Boolean
+					.valueOf(preferenceProperties.getProperty(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG));
 		}
 
 		chkShowSplash.setSelected(!splash);
 
 		chkShowMemory.setSelected(!memory);
 
+		chkShowAliasCheck.setSelected(!askAlias);
+
 		chkShowSplash.setSelected(splash);
 
 		chkShowMemory.setSelected(memory);
 
+		chkShowAliasCheck.setSelected(askAlias);
+
+	}
+
+	private void loadNWProperties(boolean isRestore) {
+
+		Properties prop = new Properties();
+
+		if (isRestore) {
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_ADV,
+					String.format("%d", VPXUDPListener.DEFAULT_ADV_PORTNO));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_COMM,
+					String.format("%d", VPXUDPListener.DEFAULT_COMM_PORTNO));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_MSG,
+					String.format("%d", VPXUDPListener.DEFAULT_CONSOLE_MSG_PORTNO));
+
+			prop.setProperty(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER, String.valueOf(true));
+
+		} else {
+			prop = (Properties) preferenceProperties.clone();
+		}
+
+		chkNWPktAnalyzer
+				.setSelected(Boolean.valueOf(prop.getProperty(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER)));
+
+		txtAdvPort.setText(prop.getProperty(VPXConstants.ResourceFields.NETWORK_PORT_ADV));
+
+		txtTxRxCommPort.setText(prop.getProperty(VPXConstants.ResourceFields.NETWORK_PORT_COMM));
+
+		txtMsgConPort.setText(prop.getProperty(VPXConstants.ResourceFields.NETWORK_PORT_MSG));
+
 	}
 
 	private void loadLogProperties(boolean isRestore) {
+
 		Properties prop = new Properties();
 
 		if (isRestore) {
@@ -205,7 +296,7 @@ public class VPX_PreferenceWindow extends JDialog {
 
 			prop.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, "2");
 
-			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, "");
+			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, "log");
 
 			prop.setProperty(VPXConstants.ResourceFields.LOG_FILEFORMAT, "$(FileName)_$(CurrentTime)");
 
@@ -254,6 +345,7 @@ public class VPX_PreferenceWindow extends JDialog {
 
 	private void loadJavaProperties() {
 		// Java Settings Properties
+				
 		lblJVersion.setText(System.getProperty("java.version"));
 
 		lblJName.setText(System.getProperty("java.runtime.name"));
@@ -273,6 +365,7 @@ public class VPX_PreferenceWindow extends JDialog {
 	private void updateProperties(int propId) {
 
 		switch (propId) {
+
 		case 0:// General Tab Settings
 
 			preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH,
@@ -281,17 +374,23 @@ public class VPX_PreferenceWindow extends JDialog {
 			preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY,
 					String.valueOf(chkShowMemory.isSelected()));
 
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG,
+					String.valueOf(chkShowAliasCheck.isSelected()));
+
 			break;
 		case 1:// Log Tab Settings
 
-			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(chkEnableLog.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_ENABLE,
+					String.valueOf(chkEnableLog.isSelected()));
 
 			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_PROMPT,
 					String.valueOf(chkPromptSerialNo.isSelected()));
 
-			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(chkMaxLogFile.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE,
+					String.valueOf(chkMaxLogFile.isSelected()));
 
-			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE,
+					spinMaxFileSize.getValue().toString());
 
 			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFilePath.getText());
 
@@ -300,10 +399,23 @@ public class VPX_PreferenceWindow extends JDialog {
 			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME,
 					String.valueOf(chkAppndTimeLogFile.isSelected()));
 
-			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE,
+					String.valueOf(chkOverwrite.isSelected()));
 
 			break;
 
+		case 2:// Network Tab Settings
+
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_ADV, txtAdvPort.getText());
+
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_COMM, txtTxRxCommPort.getText());
+
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_MSG, txtMsgConPort.getText());
+
+			preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER,
+					String.valueOf(chkNWPktAnalyzer.isSelected()));
+
+			break;
 		}
 
 	}
@@ -312,19 +424,28 @@ public class VPX_PreferenceWindow extends JDialog {
 
 		// General Tab Settings
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH, String.valueOf(chkShowSplash.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_SPLASH,
+				String.valueOf(chkShowSplash.isSelected()));
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY, String.valueOf(chkShowMemory.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.GENERAL_MEMORY,
+				String.valueOf(chkShowMemory.isSelected()));
+
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.REMIND_ALIAS_CONFIG,
+				String.valueOf(chkShowAliasCheck.isSelected()));
 
 		// Log Tab Settings
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_ENABLE, String.valueOf(chkEnableLog.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_ENABLE,
+				String.valueOf(chkEnableLog.isSelected()));
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_PROMPT, String.valueOf(chkPromptSerialNo.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_PROMPT,
+				String.valueOf(chkPromptSerialNo.isSelected()));
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE, String.valueOf(chkMaxLogFile.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILE,
+				String.valueOf(chkMaxLogFile.isSelected()));
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE, spinMaxFileSize.getValue().toString());
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_MAXFILESIZE,
+				spinMaxFileSize.getValue().toString());
 
 		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_FILEPATH, txtLogFilePath.getText());
 
@@ -333,199 +454,239 @@ public class VPX_PreferenceWindow extends JDialog {
 		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_APPENDCURTIME,
 				String.valueOf(chkAppndTimeLogFile.isSelected()));
 
-		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE, String.valueOf(chkOverwrite.isSelected()));
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.LOG_OVERWRITE,
+				String.valueOf(chkOverwrite.isSelected()));
 
+		// Network Tab Settings
+
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_ADV, txtAdvPort.getText());
+
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_COMM, txtTxRxCommPort.getText());
+
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PORT_MSG, txtMsgConPort.getText());
+
+		preferenceProperties.setProperty(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER,
+				String.valueOf(chkNWPktAnalyzer.isSelected()));
 	}
 
 	private void loadGeneralPropertiesPanel() {
 
 		JPanel tabPanel_General = new JPanel();
 
-		preference_TabbedPane.addTab("General", tabPanel_General);
-		tabPanel_General.setLayout(null);
+		tabPanel_General.setLayout(new MigLayout("", "[190px][16px][89px][16px][343px]", "[102px][102px][76px][23px]"));
 
 		JPanel panel_Splash = new JPanel();
+
 		panel_Splash.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_Splash.setBounds(10, 11, 535, 102);
-		tabPanel_General.add(panel_Splash);
-		panel_Splash.setLayout(null);
+
+		tabPanel_General.add(panel_Splash, "cell 0 0 5 1,grow");
+
+		panel_Splash.setLayout(new MigLayout("", "[50px][458px]", "[23px][54px]"));
 
 		chkShowSplash = new JCheckBox("Show Splash Screen");
-		chkShowSplash.setBounds(6, 7, 265, 23);
-		panel_Splash.add(chkShowSplash);
+
+		panel_Splash.add(chkShowSplash, "cell 0 0 2 1,alignx left,aligny top");
 
 		JLabel lblNote = new JLabel("Note:");
+
 		lblNote.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblNote.setBounds(10, 37, 46, 14);
-		panel_Splash.add(lblNote);
+
+		panel_Splash.add(lblNote, "cell 0 1,growx,aligny top");
 
 		JLabel lblNewLabel = new JLabel("Display Spalsh screen before starting the application");
-		lblNewLabel.setBounds(56, 46, 458, 45);
-		panel_Splash.add(lblNewLabel);
+
+		panel_Splash.add(lblNewLabel, "cell 1 1,grow");
 
 		JPanel panel_Memory = new JPanel();
+
 		panel_Memory.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_Memory.setLayout(null);
-		panel_Memory.setBounds(10, 127, 535, 102);
-		tabPanel_General.add(panel_Memory);
+
+		tabPanel_General.add(panel_Memory, "cell 0 1 5 1,grow");
+
+		panel_Memory.setLayout(new MigLayout("", "[50px][458px]", "[23px][54px]"));
 
 		chkShowMemory = new JCheckBox("Show Memory Bar");
-		chkShowMemory.setBounds(6, 7, 265, 23);
-		panel_Memory.add(chkShowMemory);
+
+		panel_Memory.add(chkShowMemory, "cell 0 0 2 1,alignx left,aligny top");
 
 		JLabel label = new JLabel("Note:");
+
 		label.setFont(new Font("Tahoma", Font.BOLD, 11));
-		label.setBounds(10, 37, 46, 14);
-		panel_Memory.add(label);
+
+		panel_Memory.add(label, "cell 0 1,growx,aligny top");
 
 		JLabel lblDisplayMemoryBar = new JLabel("Display memory bar on status bar(Bottom Right)");
-		lblDisplayMemoryBar.setBounds(56, 46, 458, 45);
-		panel_Memory.add(lblDisplayMemoryBar);
+
+		panel_Memory.add(lblDisplayMemoryBar, "cell 1 1,grow");
 
 		JButton btnGenDefault = new JButton(new RestoreAction("Restore Default"));
-		btnGenDefault.setBounds(313, 284, 131, 23);
-		tabPanel_General.add(btnGenDefault);
+
+		tabPanel_General.add(btnGenDefault, "cell 4 3,alignx left,aligny top");
 
 		JButton btnGenApply = new JButton(new ModuleApplyAction("Apply"));
-		btnGenApply.setBounds(454, 284, 91, 23);
-		tabPanel_General.add(btnGenApply);
+
+		tabPanel_General.add(btnGenApply, "cell 0 3,alignx right,aligny top");
 
 		JButton btnGenReset = new JButton(new ResetAction("Reset"));
-		btnGenReset.setBounds(212, 284, 91, 23);
-		tabPanel_General.add(btnGenReset);
+
+		tabPanel_General.add(btnGenReset, "cell 2 3,growx,aligny top");
+
+		JPanel panel_Alias = new JPanel();
+
+		panel_Alias.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+
+		tabPanel_General.add(panel_Alias, "cell 0 2 5 1,grow");
+
+		panel_Alias.setLayout(new MigLayout("", "[50px][5px][564px]", "[23px][23px]"));
+
+		JLabel lblNotes = new JLabel("Ask user to cofig Alias on startup if configurations is not found");
+
+		panel_Alias.add(lblNotes, "cell 2 1,grow");
+
+		chkShowAliasCheck = new JCheckBox("Always ask Alias Configuration");
+
+		panel_Alias.add(chkShowAliasCheck, "cell 0 0 3 1,growx,aligny top");
+
+		JLabel lblNoteAlias = new JLabel("Note:");
+
+		lblNoteAlias.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		panel_Alias.add(lblNoteAlias, "cell 0 1,grow");
+
+		preference_TabbedPane.addTab("General", tabPanel_General);
 
 	}
 
 	private void loadLogPropertiesPanel() {
+
 		JPanel tabPanel_Log = new JPanel();
 
-		preference_TabbedPane.addTab("Log", tabPanel_Log);
-		tabPanel_Log.setLayout(null);
+		tabPanel_Log.setLayout(new MigLayout("", "[97px][10px][91px][8px][91px][10px][67px][11px][154px]",
+				"[23px][90px][133px][23px]"));
 
 		chkEnableLog = new JCheckBox("Enable Log", true);
-		chkEnableLog.setBounds(6, 7, 97, 23);
-		tabPanel_Log.add(chkEnableLog);
+
+		tabPanel_Log.add(chkEnableLog, "cell 0 0,growx,aligny top");
 
 		JPanel panelSerialNo = new JPanel();
-		panelSerialNo.setBorder(new TitledBorder(null, "Log File Name", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
-		panelSerialNo.setLayout(null);
-		panelSerialNo.setBounds(10, 36, 370, 90);
-		tabPanel_Log.add(panelSerialNo);
+
+		panelSerialNo
+				.setBorder(new TitledBorder(null, "Log File Name", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		tabPanel_Log.add(panelSerialNo, "cell 0 1 7 1,grow");
+
+		panelSerialNo.setLayout(new MigLayout("", "[50px][10px][294px]", "[23px][32px]"));
 
 		chkPromptSerialNo = new JCheckBox("Prompt log filename on startup", true);
-		chkPromptSerialNo.setBounds(6, 20, 354, 23);
-		panelSerialNo.add(chkPromptSerialNo);
+
+		panelSerialNo.add(chkPromptSerialNo, "cell 0 0 3 1,growx,aligny top");
 
 		JLabel label_2 = new JLabel("Note:");
+
 		label_2.setFont(new Font("Tahoma", Font.BOLD, 11));
-		label_2.setBounds(10, 50, 46, 14);
-		panelSerialNo.add(label_2);
+
+		panelSerialNo.add(label_2, "cell 0 1,growx,aligny top");
 
 		JLabel lblAlwaysPromptBoard = new JLabel(
 				"<html>Always prompt log filename from user.<br/>on application startup</html>");
+
 		lblAlwaysPromptBoard.setVerticalAlignment(SwingConstants.TOP);
-		lblAlwaysPromptBoard.setBounds(66, 50, 294, 32);
-		panelSerialNo.add(lblAlwaysPromptBoard);
+
+		panelSerialNo.add(lblAlwaysPromptBoard, "cell 2 1,grow");
 
 		JPanel panelLogFile = new JPanel();
-		panelLogFile.setBorder(new TitledBorder(null, "Log File", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelLogFile.setLayout(null);
-		panelLogFile.setBounds(10, 137, 535, 133);
-		tabPanel_Log.add(panelLogFile);
 
-		JLabel lblNewLabel_1 = new JLabel("File name format");
-		lblNewLabel_1.setBounds(12, 73, 87, 14);
-		panelLogFile.add(lblNewLabel_1);
+		panelLogFile.setBorder(new TitledBorder(null, "Log File", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		tabPanel_Log.add(panelLogFile, "cell 0 2 9 1,grow");
+
+		panelLogFile.setLayout(
+				new MigLayout("", "[48px][10px][29px][19px][252px][8px][147px]", "[23px][14px][23px][32px]"));
+
+		JLabel lblNewLabel_1 = new JLabel("File name pattern");
+
+		panelLogFile.add(lblNewLabel_1, "cell 0 2 3 1,grow");
 
 		txtLogFileFormat = new JTextField();
+
 		txtLogFileFormat.setEditable(false);
-		txtLogFileFormat.setBounds(118, 67, 241, 23);
-		panelLogFile.add(txtLogFileFormat);
+
+		panelLogFile.add(txtLogFileFormat, "cell 4 2,grow");
+
 		txtLogFileFormat.setColumns(10);
 
 		lblErrLogPath = new JLabel("");
-		lblErrLogPath.setForeground(Color.RED);
-		lblErrLogPath.setBounds(118, 46, 305, 14);
-		panelLogFile.add(lblErrLogPath);
 
-		JLabel lblLogFilePath = new JLabel("Select Path");
-		lblLogFilePath.setBounds(10, 21, 87, 14);
-		panelLogFile.add(lblLogFilePath);
+		lblErrLogPath.setForeground(Color.RED);
+
+		panelLogFile.add(lblErrLogPath, "cell 4 1 3 1,grow");
+
+		JLabel lblLogFilePath = new JLabel("File Name");
+
+		panelLogFile.add(lblLogFilePath, "cell 0 0 3 1,grow");
 
 		txtLogFilePath = new JTextField();
+
 		txtLogFilePath.setColumns(10);
-		txtLogFilePath.setBounds(116, 18, 307, 20);
-		panelLogFile.add(txtLogFilePath);
 
-		JButton btnLogFilePathBrowse = new JButton("Browse");
-		btnLogFilePathBrowse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-				int returnVal = fileDialog.showOpenDialog(null);
-
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-
-					java.io.File file = fileDialog.getSelectedFile();
-
-					txtLogFilePath.setText(file.getPath());
-				}
-			}
-		});
-		btnLogFilePathBrowse.setBounds(433, 17, 87, 23);
-		panelLogFile.add(btnLogFilePathBrowse);
+		panelLogFile.add(txtLogFilePath, "cell 4 0 3 1,growx,aligny center");
 
 		chkOverwrite = new JCheckBox("Overwrite old log file", true);
-		chkOverwrite.setBounds(376, 90, 147, 23);
-		panelLogFile.add(chkOverwrite);
+
+		chkOverwrite.setEnabled(false);
+
+		panelLogFile.add(chkOverwrite, "cell 6 3,growx,aligny top");
 
 		JLabel label_5 = new JLabel("Note:");
+
 		label_5.setFont(new Font("Tahoma", Font.BOLD, 11));
-		label_5.setBounds(12, 108, 46, 14);
-		panelLogFile.add(label_5);
+
+		panelLogFile.add(label_5, "cell 0 3,growx,aligny bottom");
 
 		chkAppndTimeLogFile = new JCheckBox("Append Current Time", true);
-		chkAppndTimeLogFile.setBounds(376, 67, 147, 23);
-		panelLogFile.add(chkAppndTimeLogFile);
+
+		panelLogFile.add(chkAppndTimeLogFile, "cell 6 2,growx,aligny top");
 
 		JLabel lblNewLabel_5 = new JLabel("Append current time with file name while creating log file");
+
 		lblNewLabel_5.setVerticalAlignment(SwingConstants.TOP);
-		lblNewLabel_5.setBounds(68, 108, 300, 14);
-		panelLogFile.add(lblNewLabel_5);
+
+		panelLogFile.add(lblNewLabel_5, "cell 2 3 3 1,growx,aligny bottom");
 
 		JPanel panelMaxLogFileSize = new JPanel();
-		panelMaxLogFileSize.setBorder(new TitledBorder(null, "Log File Size", TitledBorder.LEADING, TitledBorder.TOP,
-				null, null));
-		panelMaxLogFileSize.setLayout(null);
-		panelMaxLogFileSize.setBounds(391, 36, 154, 90);
-		tabPanel_Log.add(panelMaxLogFileSize);
+
+		panelMaxLogFileSize
+				.setBorder(new TitledBorder(null, "Log File Size", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		tabPanel_Log.add(panelMaxLogFileSize, "cell 8 1,grow");
+
+		panelMaxLogFileSize.setLayout(new MigLayout("", "[74px][10px][58px]", "[23px][23px]"));
 
 		chkMaxLogFile = new JCheckBox("Max. Log File Size", true);
-		chkMaxLogFile.setBounds(6, 20, 142, 23);
-		panelMaxLogFileSize.add(chkMaxLogFile);
+
+		panelMaxLogFileSize.add(chkMaxLogFile, "cell 0 0 3 1,growx,aligny top");
 
 		spinMaxFileSize = new JSpinner(new SpinnerNumberModel(2, 2, 10, 1));
-		spinMaxFileSize.setBounds(20, 50, 74, 23);
-		panelMaxLogFileSize.add(spinMaxFileSize);
+
+		panelMaxLogFileSize.add(spinMaxFileSize, "cell 0 1,grow");
 
 		JLabel lblNewLabel_2 = new JLabel("MB(s)");
+
 		lblNewLabel_2.setVerticalAlignment(SwingConstants.BOTTOM);
-		lblNewLabel_2.setBounds(100, 50, 34, 23);
-		panelMaxLogFileSize.add(lblNewLabel_2);
+
+		panelMaxLogFileSize.add(lblNewLabel_2, "cell 2 1,alignx left,growy");
 
 		JButton btnLogApply = new JButton(new ModuleApplyAction("Apply"));
-		btnLogApply.setBounds(454, 281, 91, 23);
-		tabPanel_Log.add(btnLogApply);
+
+		tabPanel_Log.add(btnLogApply, "cell 2 3,growx,aligny top");
 
 		JButton btnLogDefault = new JButton(new RestoreAction("Restore Default"));
-		btnLogDefault.setBounds(313, 281, 131, 23);
-		tabPanel_Log.add(btnLogDefault);
+
+		tabPanel_Log.add(btnLogDefault, "cell 6 3 3 1,alignx left,aligny top");
 
 		JButton btnLogReset = new JButton(new ResetAction("Reset"));
-		btnLogReset.setBounds(212, 281, 91, 23);
-		tabPanel_Log.add(btnLogReset);
+
+		tabPanel_Log.add(btnLogReset, "cell 4 3,growx,aligny top");
 
 		chkEnableLog.addItemListener(new ItemListener() {
 
@@ -552,8 +713,6 @@ public class VPX_PreferenceWindow extends JDialog {
 				lblLogFilePath.setEnabled(val);
 
 				txtLogFilePath.setEnabled(val);
-
-				btnLogFilePathBrowse.setEnabled(val);
 
 				chkOverwrite.setEnabled(val);
 
@@ -603,69 +762,246 @@ public class VPX_PreferenceWindow extends JDialog {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
+
+				chkOverwrite.setEnabled(!chkAppndTimeLogFile.isSelected());
+
 				if (e.getStateChange() == ItemEvent.SELECTED) {
+
 					txtLogFileFormat.setText("$(FileName)_$(CurrentTime)");
 				} else {
 					txtLogFileFormat.setText("$(FileName)");
 				}
 			}
 		});
+
+		preference_TabbedPane.addTab("Log", tabPanel_Log);
 	}
 
 	private void loadJavaPropertiesPanel() {
 
 		JPanel tabPanel_Java = new JPanel();
 
-		preference_TabbedPane.addTab("Java", tabPanel_Java);
-		tabPanel_Java.setLayout(null);
+		tabPanel_Java
+				.setBorder(new TitledBorder(null, "Java Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		JLabel lblNewLabel_6 = new JLabel("Java Version");
-		lblNewLabel_6.setBounds(10, 28, 96, 14);
-		tabPanel_Java.add(lblNewLabel_6);
+		tabPanel_Java.setLayout(new MigLayout("", "[96px][][324px]",
+				"[14px,grow][14px,grow][14px,grow][14px,grow][14px,grow][14px,grow]"));
 
-		JLabel lblNewLabel_7 = new JLabel("Name");
-		lblNewLabel_7.setBounds(10, 70, 96, 14);
-		tabPanel_Java.add(lblNewLabel_7);
+		JLabel lblNewLabel_6 = new JLabel("Java Version : ");
 
-		JLabel lblInstalledPath = new JLabel("Installed path");
-		lblInstalledPath.setBounds(10, 112, 96, 14);
-		tabPanel_Java.add(lblInstalledPath);
+		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
-		JLabel lblInstalledJre = new JLabel("Installed jre");
-		lblInstalledJre.setBounds(10, 154, 96, 14);
-		tabPanel_Java.add(lblInstalledJre);
+		lblNewLabel_6.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		JLabel lblVmName = new JLabel("Vm Name");
-		lblVmName.setBounds(10, 196, 96, 14);
-		tabPanel_Java.add(lblVmName);
+		tabPanel_Java.add(lblNewLabel_6, "cell 0 0,grow");
 
-		JLabel lblVmArchitecture = new JLabel("VM Architecture");
-		lblVmArchitecture.setBounds(10, 238, 96, 14);
-		tabPanel_Java.add(lblVmArchitecture);
+		JLabel lblNewLabel_7 = new JLabel("Name : ");
+
+		lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+		lblNewLabel_7.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		tabPanel_Java.add(lblNewLabel_7, "cell 0 1,grow");
+
+		JLabel lblInstalledPath = new JLabel("Installed path : ");
+
+		lblInstalledPath.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+		lblInstalledPath.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		tabPanel_Java.add(lblInstalledPath, "cell 0 2,grow");
+
+		JLabel lblInstalledJre = new JLabel("Installed jre : ");
+
+		lblInstalledJre.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+		lblInstalledJre.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		tabPanel_Java.add(lblInstalledJre, "cell 0 3,grow");
+
+		JLabel lblVmName = new JLabel("Vm Name : ");
+
+		lblVmName.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+		lblVmName.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		tabPanel_Java.add(lblVmName, "cell 0 4,grow");
+
+		JLabel lblVmArchitecture = new JLabel("VM Architecture : ");
+
+		lblVmArchitecture.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+		lblVmArchitecture.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		tabPanel_Java.add(lblVmArchitecture, "cell 0 5,grow");
 
 		lblJVersion = new JLabel("");
-		lblJVersion.setBounds(148, 28, 324, 14);
-		tabPanel_Java.add(lblJVersion);
+
+		lblJVersion.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		tabPanel_Java.add(lblJVersion, "cell 2 0,grow");
 
 		lblJName = new JLabel("");
-		lblJName.setBounds(148, 70, 324, 14);
-		tabPanel_Java.add(lblJName);
+
+		lblJName.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		tabPanel_Java.add(lblJName, "cell 2 1,grow");
 
 		lblJInstallPath = new JLabel("");
-		lblJInstallPath.setBounds(148, 112, 324, 14);
-		tabPanel_Java.add(lblJInstallPath);
+
+		lblJInstallPath.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		tabPanel_Java.add(lblJInstallPath, "cell 2 2,grow");
 
 		lbJInstallJRE = new JLabel("");
-		lbJInstallJRE.setBounds(148, 154, 324, 14);
-		tabPanel_Java.add(lbJInstallJRE);
+
+		lbJInstallJRE.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		tabPanel_Java.add(lbJInstallJRE, "cell 2 3,grow");
 
 		lblJVMName = new JLabel("");
-		lblJVMName.setBounds(148, 196, 324, 14);
-		tabPanel_Java.add(lblJVMName);
+
+		lblJVMName.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		tabPanel_Java.add(lblJVMName, "cell 2 4,grow");
 
 		lblJVMArch = new JLabel("");
-		lblJVMArch.setBounds(148, 238, 324, 14);
-		tabPanel_Java.add(lblJVMArch);
+
+		lblJVMArch.setFont(new Font("Tahoma", Font.BOLD, 11));
+
+		tabPanel_Java.add(lblJVMArch, "cell 2 5,grow");
+
+		preference_TabbedPane.addTab("Java", tabPanel_Java);
+
+	}
+
+	private void loadNetworkPropertiesPanel() {
+
+		JPanel tabPanel_Network = new JPanel();
+
+		preference_TabbedPane.addTab("Network", tabPanel_Network);
+
+		tabPanel_Network.setLayout(new BorderLayout(0, 0));
+
+		JPanel panel_PortSettings = new JPanel();
+
+		panel_PortSettings
+				.setBorder(new TitledBorder(null, "Port Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		tabPanel_Network.add(panel_PortSettings, BorderLayout.CENTER);
+
+		panel_PortSettings
+				.setLayout(new MigLayout("", "[194px][28px][176px][28px][110px]", "[23px][23px][23px][96px]"));
+
+		JLabel lblAdvPort = new JLabel("Advertisement Port");
+
+		panel_PortSettings.add(lblAdvPort, "cell 0 0,grow");
+
+		JLabel lblTxRxCommPort = new JLabel("Tx Rx Communication Port");
+
+		panel_PortSettings.add(lblTxRxCommPort, "cell 0 1,grow");
+
+		JLabel lblMsgConPort = new JLabel("Message / Console Port");
+
+		panel_PortSettings.add(lblMsgConPort, "cell 0 2,grow");
+
+		txtAdvPort = new JTextField();
+
+		txtAdvPort.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+
+				lblNote.setText(ADVNOTE);
+
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+
+				lblNote.setText(PORTNOTE);
+			}
+		});
+
+		panel_PortSettings.add(txtAdvPort, "cell 2 0,growx,aligny center");
+
+		txtAdvPort.setColumns(10);
+
+		txtTxRxCommPort = new JTextField();
+
+		txtTxRxCommPort.addFocusListener(new FocusAdapter() {
+
+			@Override
+			public void focusGained(FocusEvent e) {
+
+				lblNote.setText(COMMNOTE);
+
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+
+				lblNote.setText(PORTNOTE);
+			}
+		});
+		txtTxRxCommPort.setColumns(10);
+
+		panel_PortSettings.add(txtTxRxCommPort, "cell 2 1,growx,aligny center");
+
+		txtMsgConPort = new JTextField();
+
+		txtMsgConPort.addFocusListener(new FocusAdapter() {
+
+			@Override
+			public void focusGained(FocusEvent e) {
+
+				lblNote.setText(MSGNOTE);
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+
+				lblNote.setText(PORTNOTE);
+			}
+		});
+
+		txtMsgConPort.setColumns(10);
+
+		panel_PortSettings.add(txtMsgConPort, "cell 2 2,growx,aligny center");
+
+		lblNote = new JLabel(PORTNOTE);
+
+		panel_PortSettings.add(lblNote, "cell 0 3 5 1,grow");
+
+		JButton btnApply = new JButton(new ModuleApplyAction("Apply"));
+
+		panel_PortSettings.add(btnApply, "cell 4 0,growx,aligny top");
+
+		JButton btnReset = new JButton(new ResetAction("Reset"));
+
+		panel_PortSettings.add(btnReset, "cell 4 1,growx,aligny top");
+
+		JButton btnRestore = new JButton(new RestoreAction("Restore  Default"));
+
+		panel_PortSettings.add(btnRestore, "cell 4 2,alignx center,aligny top");
+
+		JPanel panel_NetworkPackt = new JPanel();
+
+		panel_NetworkPackt.setPreferredSize(new Dimension(10, 100));
+
+		panel_NetworkPackt.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
+				"Network Packet Analyzer", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+
+		tabPanel_Network.add(panel_NetworkPackt, BorderLayout.SOUTH);
+
+		panel_NetworkPackt.setLayout(new MigLayout("", "[536px]", "[23px][55px]"));
+
+		chkNWPktAnalyzer = new JCheckBox("Show Network Packet Analyzer");
+
+		panel_NetworkPackt.add(chkNWPktAnalyzer, "cell 0 0,growx,aligny top");
+
+		lblNWNote = new JLabel(NETWORKNOTE);
+
+		panel_NetworkPackt.add(lblNWNote, "cell 0 1,grow");
 	}
 
 	private void centerFrame() {
@@ -684,34 +1020,112 @@ public class VPX_PreferenceWindow extends JDialog {
 	}
 
 	private void loadComponents() {
+
 		getContentPane().setLayout(new BorderLayout());
+
 		basePanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
 		getContentPane().add(basePanel, BorderLayout.CENTER);
+
 		basePanel.setLayout(new BorderLayout(0, 0));
 
 		preference_TabbedPane = new JTabbedPane(JTabbedPane.TOP);
+
 		basePanel.add(preference_TabbedPane);
 
 		loadPropertiesTab();
 
 		JPanel buttonPane = new JPanel();
+
 		buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
+
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
+
 		JButton okButton = new JButton(new ApplyAction("Apply"));
+
 		okButton.setActionCommand("OK");
+
 		buttonPane.add(okButton);
+
 		getRootPane().setDefaultButton(okButton);
+
 		JButton cancelButton = new JButton("Close");
+
 		cancelButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				VPX_PreferenceWindow.this.dispose();
 
 			}
 		});
+
 		cancelButton.setActionCommand("Cancel");
+
 		buttonPane.add(cancelButton);
+	}
+
+	private String isValidPorts(String advPort, String commPort, String msgPort) {
+
+		StringBuilder errors = new StringBuilder("");
+
+		if (StringUtils.isEmpty(advPort)) {
+			errors.append("Advertisement port should not be empty.\n");
+		}
+		if (StringUtils.isEmpty(commPort)) {
+			errors.append("Communication port should not be empty.\n");
+		}
+		if (StringUtils.isEmpty(msgPort)) {
+			errors.append("Message port should not be empty.\n");
+		}
+
+		if (StringUtils.isEmpty(errors.toString())) {
+
+			boolean b = false;
+
+			if (!StringUtils.isNumeric(advPort)) {
+
+				errors.append("Please enter the valid port number for Advertisement.\n");
+
+				b = true;
+			}
+			if (!StringUtils.isNumeric(commPort)) {
+
+				errors.append("Please enter the valid port number for Communication.\n");
+
+				b = true;
+
+			}
+			if (!StringUtils.isNumeric(msgPort)) {
+
+				errors.append("Please enter the valid port number for Message.\n");
+
+				b = true;
+			}
+
+			if (!b) {
+
+				if (advPort.equals(msgPort) || advPort.equals(commPort) || msgPort.equals(commPort)) {
+
+					errors.append("Ports are not same.\nPlease enter the different ports for each\n");
+				}
+
+			}
+		}
+		return errors.toString();
+	}
+
+	private boolean isValueChanged(int tab) {
+
+		return (tab == 2
+				&& (!txtAdvPort.getText().trim()
+						.equals(preferenceProperties_Backup.getProperty(VPXConstants.ResourceFields.NETWORK_PORT_ADV))
+						|| !txtTxRxCommPort.getText().trim()
+								.equals(preferenceProperties_Backup
+										.getProperty(VPXConstants.ResourceFields.NETWORK_PORT_COMM))
+						|| !txtMsgConPort.getText().trim().equals(preferenceProperties_Backup
+								.getProperty(VPXConstants.ResourceFields.NETWORK_PORT_MSG))));
 	}
 
 	public class RestoreAction extends AbstractAction {
@@ -729,6 +1143,7 @@ public class VPX_PreferenceWindow extends JDialog {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
 			loadProperties(preference_TabbedPane.getSelectedIndex(), true);
 		}
 	}
@@ -748,6 +1163,7 @@ public class VPX_PreferenceWindow extends JDialog {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
 			loadProperties(preference_TabbedPane.getSelectedIndex(), false);
 		}
 	}
@@ -768,12 +1184,65 @@ public class VPX_PreferenceWindow extends JDialog {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			updateProperties(preference_TabbedPane.getSelectedIndex());
+			if (preference_TabbedPane.getSelectedIndex() == 2) {
+				if (isValueChanged(preference_TabbedPane.getSelectedIndex())) {
 
-			VPXUtilities.updateProperties(preferenceProperties);
+					String error = isValidPorts(txtAdvPort.getText().trim(), txtTxRxCommPort.getText().trim(),
+							txtMsgConPort.getText().trim());
 
-			JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
-					"Updated successfully.\nPlease restart the appliction to take effect");
+					if (error.length() == 0) {
+
+						paswordWindow.resetPassword();
+
+						paswordWindow.setVisible(true);
+
+						if (paswordWindow.isAccepted()) {
+
+							if (VPXUtilities.getCurrentPassword()
+									.equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
+
+								paswordWindow.dispose();
+
+								updateProperties(preference_TabbedPane.getSelectedIndex());
+
+								if (VPXUtilities.updateProperties(preferenceProperties)) {
+
+									readProperties();
+
+									JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
+											"Updated successfully.\nPlease restart the appliction to take effect");
+								}
+
+							} else {
+
+								JOptionPane.showMessageDialog(VPX_PreferenceWindow.this, "Pasword invalid",
+										"Authentication", JOptionPane.ERROR_MESSAGE);
+
+								paswordWindow.dispose();
+
+								VPXLogger.updateLog("Invalid Password");
+							}
+						}
+					} else {
+						JOptionPane.showMessageDialog(VPX_PreferenceWindow.this, error, "Validation",
+								JOptionPane.ERROR_MESSAGE);
+
+						txtAdvPort.requestFocus();
+
+						VPXLogger.updateLog("Invalid Ports");
+					}
+				}
+			} else {
+				updateProperties(preference_TabbedPane.getSelectedIndex());
+
+				if (VPXUtilities.updateProperties(preferenceProperties)) {
+
+					readProperties();
+
+					JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
+							"Updated successfully.\nPlease restart the appliction to take effect");
+				}
+			}
 		}
 	}
 
@@ -793,14 +1262,45 @@ public class VPX_PreferenceWindow extends JDialog {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			updateProperties();
+			if (isValueChanged(2)) {
 
-			VPXUtilities.updateProperties(preferenceProperties);
+				paswordWindow.resetPassword();
 
-			JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
-					"Updated successfully.\nPlease restart the appliction to take effect");
+				paswordWindow.setVisible(true);
 
-			VPX_PreferenceWindow.this.dispose();
+				if (paswordWindow.isAccepted()) {
+
+					if (VPXUtilities.getCurrentPassword()
+							.equals(VPXUtilities.encodePassword(paswordWindow.getPasword()))) {
+
+						paswordWindow.dispose();
+
+						updateProperties();
+
+						if (VPXUtilities.updateProperties(preferenceProperties)) {
+
+							readProperties();
+
+							JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
+									"Updated successfully.\nPlease restart the appliction to take effect");
+						}
+
+						VPX_PreferenceWindow.this.dispose();
+					}
+				}
+			} else {
+				updateProperties();
+
+				if (VPXUtilities.updateProperties(preferenceProperties)) {
+
+					readProperties();
+
+					JOptionPane.showMessageDialog(VPX_PreferenceWindow.this,
+							"Updated successfully.\nPlease restart the appliction to take effect");
+				}
+
+				VPX_PreferenceWindow.this.dispose();
+			}
 		}
 	}
 }
