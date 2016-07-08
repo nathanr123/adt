@@ -1277,7 +1277,7 @@ public class VPX_ETHWindow extends JFrame
 
 		vpx_SplitPane.setLeftComponent(tb);
 
-		vpx_SplitPane.setRightComponent(getRightComponent());
+		vpx_SplitPane.setRightComponent(getRightComponents());
 
 		vpx_SplitPane.setDividerLocation((int) VPXUtilities.getScreenWidth() / 6);
 
@@ -1297,6 +1297,69 @@ public class VPX_ETHWindow extends JFrame
 		statusBar.setOpaque(true);
 
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
+	}
+	
+	private JPanel getRightComponents() {
+
+		JPanel rightPanel = new JPanel();
+
+		rightPanel.setLayout(new BorderLayout());
+
+		JSplitPane contentSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+		contentSplitPane.setDividerLocation(
+				((int) (VPXUtilities.getScreenWidth() / 2.5) + (int) VPXUtilities.getScreenWidth() / 5));
+
+		contentSplitPane.setDividerSize(2);
+
+		rightPanel.add(contentSplitPane, BorderLayout.CENTER);
+
+		// Loading left component
+
+		vpx_Right_SplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+
+		vpx_Content_Tabbed_Pane_Right = new VPX_TabbedPane(true, true);
+
+		vpx_Right_SplitPane.setLeftComponent(vpx_Content_Tabbed_Pane_Right);
+
+		vpx_Content_Tabbed_Pane_Message = new JTabbedPane();
+
+		logger = new VPX_LoggerPanel(this);
+
+		VPXLogger.setLoggerPanel(logger);
+
+		console = new VPX_ConsolePanel(this);
+
+		vpx_Content_Tabbed_Pane_Message.addTab("Log", logger);
+
+		vpx_Content_Tabbed_Pane_Message.addTab("Console", console);
+
+		if (Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.NETWORK_PKT_SNIFFER))) {
+
+			nwMonitor = new VPX_NetworkMonitorPanel();
+
+			VPXNetworkLogger.setNwMonitor(nwMonitor);
+
+			vpx_Content_Tabbed_Pane_Message.addTab("Network", nwMonitor);
+		}
+
+		vpx_Right_SplitPane.setRightComponent(vpx_Content_Tabbed_Pane_Message);
+
+		vpx_Right_SplitPane.setDividerLocation(
+				((int) (VPXUtilities.getScreenHeight() / 2.5) + (int) VPXUtilities.getScreenHeight() / 7));
+
+		vpx_Right_SplitPane.setDividerSize(2);
+
+		contentSplitPane.setLeftComponent(vpx_Right_SplitPane);
+
+		// Loading right component
+		messagePanel = new VPX_MessagePanel(this,
+				Boolean.valueOf(VPXUtilities.getPropertyValue(VPXConstants.ResourceFields.MESSAGE_COMMAND)));
+
+		contentSplitPane.setRightComponent(messagePanel);
+
+		return rightPanel;
+
 	}
 
 	private JSplitPane getRightComponent() {
