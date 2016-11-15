@@ -799,6 +799,7 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 		
 		MouseListener mouseListener = new MouseAdapter() {
 			
+			@SuppressWarnings("unchecked")
 			public void mouseClicked(MouseEvent mouseEvent) {
 				
 				JList<String> theList = (JList<String>) mouseEvent.getSource();
@@ -1935,8 +1936,8 @@ public class VPX_MessagePanel extends JPanel implements ClipboardOwner {
 			
 			mems = s;
 			
-			for (Iterator iterator = s.iterator(); iterator.hasNext();) {
-				String string = (String) iterator.next();
+			for (Iterator<String> iterator = s.iterator(); iterator.hasNext();) {
+				String string = iterator.next();
 				addElement(string);
 			}
 		}
